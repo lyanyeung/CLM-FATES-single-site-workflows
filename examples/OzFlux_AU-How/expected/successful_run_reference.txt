@@ -1,0 +1,60 @@
+AU-How successful CLM-FATES forward-run reference
+=================================================
+
+Source:
+  HowardSprings_L6.nc
+  OzFlux / TERN L6
+  native timestep: 30 min
+
+Site:
+  latitude  = -12.4952
+  longitude = 131.15005
+  altitude  = 64 m
+  ZBOT      = 23 m
+
+Processed forcing period:
+  2003-2025 inclusive
+
+Row counts:
+  before noleap conversion = 403248
+  after removing Feb 29    = 402960
+  annual DATM records      = 17520 every year
+  annual DATM files        = 23
+
+DATM files:
+  AU-How_DATM_2003.nc
+  ...
+  AU-How_DATM_2025.nc
+
+Surface file from the successful run:
+  surfdata_AU-How_hist_2000_16pfts_c260929.nc
+
+Case:
+  AU-How_FATES_1PT
+  I1PtClm60FatesRsGs
+  CLM_USRDAT
+  ATM_NCPL=48
+  RUN_STARTDATE=2003-01-01
+  STOP_OPTION=nyears
+  STOP_N=1
+  REST_OPTION=nyears
+  REST_N=1
+  RESUBMIT=22
+  CALENDAR=NO_LEAP
+
+EC comparison:
+  GPP = GPP_LT
+  NEE = NEE_LT
+  FATES NEE = -FATES_NEP
+  half-hourly -> daily: >=40/48 valid records
+  daily -> monthly: >=20 valid days
+
+Plot windows:
+  2003-2012
+  2013-2022
+  2023-2025
+
+Note:
+  Exact forcing min/max values are intentionally not fabricated here.
+  Run scripts/04_validate_forcing.py on HowardSprings_L6.nc-derived forcing
+  and, if desired, commit that printed QC output as the site reference.
