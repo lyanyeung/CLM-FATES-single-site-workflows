@@ -1,0 +1,30 @@
+{
+  "repository": "CLM-FATES-single-site-workflows",
+  "case": "ICOS_ES-LJu",
+  "site": "ES-LJu",
+  "period": "2004-2024",
+  "ctsm": "ctsm5.4.056",
+  "fates": "sci.1.92.7_api.46.0.0",
+  "cime": "cime6.5.5",
+  "generated_files": [
+    ".gitignore",
+    "README.md",
+    "examples/ICOS_ES-LJu/KNOWN_ISSUES.md",
+    "examples/ICOS_ES-LJu/README.md",
+    "examples/ICOS_ES-LJu/expected/forcing_qc_reference.txt",
+    "examples/ICOS_ES-LJu/scripts/00_config.sh",
+    "examples/ICOS_ES-LJu/scripts/01_transfer_raw_data.sh",
+    "examples/ICOS_ES-LJu/scripts/02_inspect_metadata.sh",
+    "examples/ICOS_ES-LJu/scripts/03_prepare_forcing.py",
+    "examples/ICOS_ES-LJu/scripts/04_validate_forcing.py",
+    "examples/ICOS_ES-LJu/scripts/05_make_datm.py",
+    "examples/ICOS_ES-LJu/scripts/06_make_surface.sh",
+    "examples/ICOS_ES-LJu/scripts/07_create_case.sh",
+    "examples/ICOS_ES-LJu/scripts/08_build_and_submit.sh",
+    "examples/ICOS_ES-LJu/scripts/09_compare_fates_ec.py",
+    "examples/ICOS_ES-LJu/scripts/__pycache__/03_prepare_forcing.cpython-313.pyc",
+    "examples/ICOS_ES-LJu/scripts/__pycache__/04_validate_forcing.cpython-313.pyc",
+    "examples/ICOS_ES-LJu/scripts/__pycache__/05_make_datm.cpython-313.pyc",
+    "examples/ICOS_ES-LJu/scripts/__pycache__/09_compare_fates_ec.cpython-313.pyc"
+  ]
+}

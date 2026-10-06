@@ -1,0 +1,16 @@
+Successful ES-LJu processed forcing reference
+=============================================
+
+Rows:       367920
+
+TBOT       259.075 to 307.728 K
+QBOT       5.0770710315088015e-05 to 0.0241836601452864 kg/kg
+PSRF       80813.0 to 86066.0 Pa
+FSDS       0.0 to 1312.4 W/m2
+FLDS       192.112 to 432.023 W/m2
+WIND       0.005 to 28.053 m/s
+PRECTmms   0.0 to 0.0351166666666666 mm/s
+ZBOT       2.5 to 2.5 m
+
+Every forcing year 2004–2024 contains exactly 17520 records.
+No forcing variable contains missing values.

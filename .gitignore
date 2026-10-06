@@ -1,0 +1,23 @@
+# Raw / licensed data
+**/raw/
+**/forcing/raw/
+**/*FLUXNET*.csv
+**/*ERA5*.csv
+
+# Generated forcing / model inputs / outputs
+**/forcing/processed/
+**/forcing/datm/
+**/subset_data/
+**/validation/
+**/*.nc
+
+# CIME cases and run/archive output
+cases/
+run/
+archive/
+CTSM_FATES_OUTPUTS/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
