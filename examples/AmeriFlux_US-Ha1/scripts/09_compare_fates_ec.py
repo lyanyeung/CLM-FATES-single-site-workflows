@@ -273,5 +273,155 @@ PERIODS = [
 for y1, y2 in PERIODS:
     plot_period(monthly, "EC_GPP", "FATES_GPP", "GPP", y1, y2)
     plot_period(monthly, "EC_NEE", "FATES_NEE", "NEE", y1, y2)
+    
+# ---------------------------------------------------------------------
+# Combined monthly plots: all <=10-year windows in one vertical figure
+# ---------------------------------------------------------------------
+def plot_all_periods(df, obs, mod, flux):
+    fig, axes = plt.subplots(
+        nrows=len(PERIODS),
+        ncols=1,
+        figsize=(15, 4 * len(PERIODS)),
+        squeeze=False,
+    )
 
+    axes = axes[:, 0]
+
+    # Use one common y-axis range across all panels
+    values = pd.concat(
+        [df[obs], df[mod]],
+        ignore_index=True,
+    ).replace([np.inf, -np.inf], np.nan).dropna()
+
+    if len(values) == 0:
+        raise RuntimeError(f"No valid monthly {flux} values available for plotting")
+
+    if flux == "NEE":
+        lim = np.nanmax(np.abs(values))
+        ylim = (-1.05 * lim, 1.05 * lim)
+    else:
+        ymin = min(0.0, float(values.min()))
+        ymax = float(values.max())
+        span = ymax - ymin
+
+        if span == 0:
+            span = 1.0
+
+        ylim = (
+            ymin - 0.03 * span if ymin < 0 else 0,
+            ymax + 0.05 * span,
+        )
+
+    for ax, (start_year, end_year) in zip(axes, PERIODS):
+        start = pd.Timestamp(f"{start_year}-01-01")
+        end = pd.Timestamp(f"{end_year}-12-31")
+
+        x = df[
+            (df["date"] >= start)
+            & (df["date"] <= end)
+        ].copy()
+
+        ax.plot(
+            x["date"],
+            x[obs],
+            label="EC tower",
+            linewidth=1.5,
+        )
+
+        ax.plot(
+            x["date"],
+            x[mod],
+            label="FATES",
+            linewidth=1.5,
+        )
+
+        if flux == "NEE":
+            ax.axhline(
+                0,
+                linestyle="--",
+                linewidth=0.8,
+            )
+
+        ax.set_ylabel(
+            f"{flux}\n({YLABEL})"
+        )
+
+        ax.set_title(
+            f"{start_year}-{end_year}",
+            loc="left",
+            fontsize=12,
+        )
+
+        ax.set_ylim(*ylim)
+
+        ax.set_xlim(
+            start,
+            pd.Timestamp(f"{end_year + 1}-01-01"),
+        )
+
+        ax.xaxis.set_major_locator(
+            mdates.YearLocator(1)
+        )
+
+        ax.xaxis.set_major_formatter(
+            mdates.DateFormatter("%Y")
+        )
+
+        ax.tick_params(
+            axis="x",
+            rotation=45,
+        )
+
+        ax.grid(alpha=0.2)
+
+    # One legend for the complete figure
+    handles, labels = axes[0].get_legend_handles_labels()
+
+    fig.legend(
+        handles,
+        labels,
+        loc="upper center",
+        ncol=2,
+        frameon=False,
+    )
+
+    fig.suptitle(
+        f"US-Ha1 monthly {flux}: EC tower vs FATES",
+        fontsize=16,
+        y=0.995,
+    )
+
+    fig.tight_layout(
+        rect=[0, 0, 1, 0.97]
+    )
+
+    outfile = (
+        OUT
+        / f"US-Ha1_{flux}_monthly_all_10year_panels.png"
+    )
+
+    fig.savefig(
+        outfile,
+        dpi=300,
+        bbox_inches="tight",
+    )
+
+    plt.close(fig)
+
+    print("Saved:", outfile)
+
+
+plot_all_periods(
+    monthly,
+    "EC_GPP",
+    "FATES_GPP",
+    "GPP",
+)
+
+plot_all_periods(
+    monthly,
+    "EC_NEE",
+    "FATES_NEE",
+    "NEE",
+)
 print("\nComparison complete.")
