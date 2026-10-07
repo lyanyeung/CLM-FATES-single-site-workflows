@@ -1,0 +1,85 @@
+US-Ha1 AmeriFlux forcing QC reference
+======================================
+
+Source
+------
+AMF_US-Ha1_FLUXNET_FLUXMET_HR_1991-2025_v1.3_r1.csv
+
+Temporal resolution
+-------------------
+Hourly
+
+Original rows
+-------------
+306816
+
+Rows after removing Feb 29
+--------------------------
+306600
+
+Expected
+--------
+35 years x 8760 = 306600
+
+Period
+------
+1991-01-01 00:00:00 to 2025-12-31 23:00:00
+
+Measurement heights
+-------------------
+TA_F  = 27.9 m
+VPD_F = 27.9 m
+WS_F  = 29.0 m
+PA_F  = 3.0 m
+P_F   = 1.0 m
+
+CLM reference height
+--------------------
+ZBOT = 27.9 m
+
+Successful forcing ranges
+-------------------------
+TBOT       245.45 to 308.15 K
+QBOT       1.4273533e-05 to 0.031877725 kg/kg
+PSRF       93830 to 103021 Pa
+FSDS       0 to 1165.16 W/m2
+FLDS       109.059 to 456.644 W/m2
+WIND       0 to 12.3 m/s
+PRECTmms   0 to 0.014055556 mm/s
+ZBOT       27.9 m
+
+Automatic forcing corrections
+-----------------------------
+LW_IN_F:
+  2 isolated invalid zero values
+  -> mean of adjacent hours
+
+PA_F:
+  1 isolated invalid pressure value
+  -> mean of adjacent hours
+
+TA_F / VPD_F:
+  joint physical QC
+  if ea <= 0 OR RH < 1%, replace BOTH TA and VPD
+  with TA_ERA and VPD_ERA
+
+TA/VPD ERA replacement:
+29 hours
+
+Correction log
+--------------
+LW_IN_F      2
+PA_F         1
+TA_F        29
+VPD_F       29
+
+Total correction-log rows:
+61
+
+DATM
+----
+35 annual NetCDF files
+1991-2025
+8760 records per year
+NO_LEAP
+ATM_NCPL = 24

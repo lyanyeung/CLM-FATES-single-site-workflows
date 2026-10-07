@@ -18,3 +18,5 @@ Current software context for the ES-LJu example:
 - grid: `CLM_USRDAT`
 - compiler / MPI: Intel / OpenMPI
 - calendar: `NO_LEAP`
+
+- `examples/AmeriFlux_US-Ha1/` — Harvard Forest EMS Tower, 1991–2025, hourly AmeriFlux/FLUXNET forcing with automated physical QC and CTSM/FATES workflow.

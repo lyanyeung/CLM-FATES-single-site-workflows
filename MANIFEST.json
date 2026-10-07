@@ -25,6 +25,26 @@
     "examples/ICOS_ES-LJu/scripts/__pycache__/03_prepare_forcing.cpython-313.pyc",
     "examples/ICOS_ES-LJu/scripts/__pycache__/04_validate_forcing.cpython-313.pyc",
     "examples/ICOS_ES-LJu/scripts/__pycache__/05_make_datm.cpython-313.pyc",
-    "examples/ICOS_ES-LJu/scripts/__pycache__/09_compare_fates_ec.cpython-313.pyc"
+    "examples/ICOS_ES-LJu/scripts/__pycache__/09_compare_fates_ec.cpython-313.pyc",
+    "examples/AmeriFlux_US-Ha1/KNOWN_ISSUES.md",
+    "examples/AmeriFlux_US-Ha1/README.md",
+    "examples/AmeriFlux_US-Ha1/expected/forcing_qc_reference.txt",
+    "examples/AmeriFlux_US-Ha1/scripts/00_config.sh",
+    "examples/AmeriFlux_US-Ha1/scripts/01_transfer_raw_data.sh",
+    "examples/AmeriFlux_US-Ha1/scripts/02_inspect_metadata.sh",
+    "examples/AmeriFlux_US-Ha1/scripts/03_prepare_forcing.py",
+    "examples/AmeriFlux_US-Ha1/scripts/04_validate_forcing.py",
+    "examples/AmeriFlux_US-Ha1/scripts/05_make_datm.py",
+    "examples/AmeriFlux_US-Ha1/scripts/06_make_surface.sh",
+    "examples/AmeriFlux_US-Ha1/scripts/07_create_case.sh",
+    "examples/AmeriFlux_US-Ha1/scripts/08_build_and_submit.sh",
+    "examples/AmeriFlux_US-Ha1/scripts/09_compare_fates_ec.py"
+  ],
+  "examples": [
+    {
+      "network": "AmeriFlux/FLUXNET",
+      "site": "US-Ha1",
+      "period": "1991-2025"
+    }
   ]
 }
