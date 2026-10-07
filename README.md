@@ -4,8 +4,9 @@ Reproducible single-site CTSM/CLM-FATES workflows used on University of Southamp
 
 The repository is organized by observing network / case study:
 
-- `examples/ICOS_ES-LJu/` — ES-LJu, 2004–2024, half-hourly forcing, CTSM/FATES forward run and EC comparison.
-- `examples/OzFlux_AU-How/` — reserved for the AU-How example to be added next.
+- `examples/ICOS_ES-LJu/` — ES-LJu ICOS/FLUXNET single-site CLM-FATES workflow.
+- `examples/OzFlux_AU-How/` — Howard Springs OzFlux single-site CLM-FATES workflow.
+- `examples/AmeriFlux_US-Ha1/` — Harvard Forest EMS Tower, 1991–2025 hourly AmeriFlux/FLUXNET forcing with automated physical QC and CLM-FATES workflow.
 
 This repository intentionally does **not** contain raw flux-tower packages, annual DATM NetCDFs, CTSM surface files, or model history files. Those are large and/or subject to source-data terms. The scripts reconstruct the workflow from the original downloaded data.
 
