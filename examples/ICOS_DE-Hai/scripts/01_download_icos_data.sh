@@ -59,8 +59,17 @@ if [[ "${valid_zip}" == false ]]; then
         read -r -s -p 'ICOS cpauthToken (hidden): ' ICOS_TOKEN
         printf '\n'
     fi
-    if [[ -z "${ICOS_TOKEN}" ]]; then
-        printf 'No ICOS token provided.\n' >&2
+    # Accept both copied cookie formats: "VALUE" and "cpauthToken=VALUE".
+    # ICOS documentation shows both conventions.
+    ICOS_TOKEN="${ICOS_TOKEN//$'\r'/}"
+    ICOS_TOKEN="${ICOS_TOKEN#"${ICOS_TOKEN%%[![:space:]]*}"}"
+    ICOS_TOKEN="${ICOS_TOKEN%"${ICOS_TOKEN##*[![:space:]]}"}"
+    if [[ "${ICOS_TOKEN}" == cpauthToken=* ]]; then
+        ICOS_TOKEN="${ICOS_TOKEN#cpauthToken=}"
+        printf 'Full cpauthToken= prefix detected; normalized automatically.\n'
+    fi
+    if [[ -z "${ICOS_TOKEN}" || "${ICOS_TOKEN}" == cpauthToken=* ]]; then
+        printf 'Missing or malformed ICOS token.\n' >&2
         exit 1
     fi
 
@@ -76,6 +85,18 @@ if [[ "${valid_zip}" == false ]]; then
     curl --fail --location --retry 3 --connect-timeout 30 \
         --config "${CURL_CONFIG}" \
         --output "${PART}" "${URL}"
+
+    # HTTP 200 may still be an ICOS Data Licence HTML page.
+    if [[ "$(head -c 2 "${PART}")" != "PK" ]]; then
+        if grep -qi '<title>Data Licence' "${PART}"; then
+            printf 'ICOS returned the Data Licence page, not ZIP data.\n' >&2
+            printf 'Check saved licence acceptance and API cookie authentication.\n' >&2
+        else
+            printf 'Downloaded response is not a ZIP. Inspect: file %s\n' "${PART}" >&2
+        fi
+        printf 'Response retained at: %s\n' "${PART}" >&2
+        exit 1
+    fi
 
     actual="$(sha256sum "${PART}")"
     actual="${actual%% *}"
