@@ -261,3 +261,51 @@ Figures and metrics are saved under each site's
 `validation/spinup_latest_complete_cycle/` directory.
 
 The figures and model NetCDF output files are not committed to GitHub.
+
+<!-- SIX_SITE_OVERVIEW_START -->
+
+## Example results: Six-site GPP and NEE comparison
+
+Monthly CLM-FATES GPP and NEE compared with FLUXNET eddy covariance observations.
+
+Each figure shows the latest complete meteorological forcing cycle available during the 500-year spin-up, mapped onto the original observation years.
+
+**Note:** These are interim spin-up diagnostics, not final converged simulations. Model forcing, vegetation representation and convergence require further scientific evaluation.
+
+### DE-Hai
+
+![DE-Hai monthly GPP and NEE comparison](figures/DE-Hai_GPP_NEE_monthly_overview.png)
+
+Monthly performance: **GPP R² = 0.883**; **NEE R² = 0.631**.
+
+### RU-Fyo
+
+![RU-Fyo monthly GPP and NEE comparison](figures/RU-Fyo_GPP_NEE_monthly_overview.png)
+
+Monthly performance: **GPP R² = 0.917**; **NEE R² = -1.619**.
+
+### DE-Tha
+
+![DE-Tha monthly GPP and NEE comparison](figures/DE-Tha_GPP_NEE_monthly_overview.png)
+
+Monthly performance: **GPP R² = 0.725**; **NEE R² = -1.179**.
+
+### DK-Sor
+
+![DK-Sor monthly GPP and NEE comparison](figures/DK-Sor_GPP_NEE_monthly_overview.png)
+
+Monthly performance: **GPP R² = 0.913**; **NEE R² = 0.810**.
+
+### NL-Loo
+
+![NL-Loo monthly GPP and NEE comparison](figures/NL-Loo_GPP_NEE_monthly_overview.png)
+
+Monthly performance: **GPP R² = -0.030**; **NEE R² = -1.674**.
+
+### IL-Yat
+
+![IL-Yat monthly GPP and NEE comparison](figures/IL-Yat_GPP_NEE_monthly_overview.png)
+
+Monthly performance: **GPP R² = -3.146**; **NEE R² = -9.479**.
+
+<!-- SIX_SITE_OVERVIEW_END -->
