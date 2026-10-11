@@ -228,3 +228,36 @@ the 500-year simulations or convergence of vegetation/carbon pools.
 This repository records the configuration and source code;
 it does not contain raw FLUXNET packages, surface NetCDFs,
 DATM NetCDFs, CIME case outputs, or model history/restart files.
+
+## Stage 08 — GPP and NEE comparison during spin-up
+
+Script: `scripts/10_compare_six_site_latest_complete_cycle.py`
+
+This script compares CLM-FATES GPP and NEE with FLUXNET eddy
+covariance observations for all six sites.
+
+Key features:
+
+- Automatically identifies the latest complete meteorological
+  forcing cycle from archived annual `h0a` files.
+- Maps simulated years back to each site's original EC years.
+- Uses `FATES_GPP` for simulated GPP and `-FATES_NEP` for NEE.
+- Uses FLUXNET GPP_DT_VUT_REF and NEE_VUT_REF observations.
+- Produces daily and monthly comparison CSV files.
+- Calculates R, R2, RMSE, MAE and Bias.
+- Creates monthly GPP and NEE plots using the same plotting
+  conventions as the ICOS_ES-LJu example.
+- Supports both Jan-01 and Jan-02 annual h0a filename timestamps.
+- Reads archived history without modifying running simulations.
+
+The output represents an interim spin-up diagnostic, not necessarily
+a converged 500-year equilibrium result.
+
+Run on IRIDIS:
+
+    python scripts/10_compare_six_site_latest_complete_cycle.py
+
+Figures and metrics are saved under each site's
+`validation/spinup_latest_complete_cycle/` directory.
+
+The figures and model NetCDF output files are not committed to GitHub.
