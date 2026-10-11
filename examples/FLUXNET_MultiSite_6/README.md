@@ -1,6 +1,6 @@
-# FLUXNET six-site workflow: input preparation and quality-control record
+# FLUXNET six-site CLM-FATES workflow: surface, forcing, DATM and spin-up
 
-**Stage:** 01–03 scripts developed and executed on Southampton IRIDIS6; surface extraction completed for all six sites. **Meteorological QC is provisional** (five sites still have review records). DATM NetCDF production, site PFT/measurement-height validation, and independent 500-year spin-ups are **not** part of this stage and have **not** been certified by this record.
+**Current implementation (2026-10-11):** Six point surface datasets generated; QC v5 processed; 167/167 candidate annual DATM files validated; six independent 500-year CLM-FATES spin-ups submitted. Scientific QC, vegetation representation and measurement-height uncertainties remain under review.
 
 **Record updated:** 2026-10-11. This is a reproducibility / decision log, not a statement that all site forcing has passed scientific quality assurance.
 
@@ -28,6 +28,10 @@ examples/FLUXNET_MultiSite_6/
 │   ├── 03_prepare_six_site_forcing_v5.py
 │   ├── 04_audit_six_site_qc_v5.py
 │   ├── 05_inspect_two_site_humidity.py
+│   ├── 06_check_surface_zbot_make_datm.py
+│   ├── 07_make_six_site_datm_timevarying_zbot.py
+│   ├── 08_audit_six_site_datm_surface.py
+│   ├── 09_submit_six_site_spinup500.sh
 │   └── history/                            # earlier experimental QC versions v1–v4
 └── .gitignore
 ```
@@ -104,7 +108,7 @@ On IRIDIS, for each site under `/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_S
 
 The exact processed output file name should be read from the v5 script, not guessed. Do not add original FLUXNET packages, downloads, tokens, large CSVs, `.nc`, case `run/`, or archive files to this GitHub example. Network/source data redistribution conditions must be respected.
 
-## Next scientific and modeling steps (not yet completed here)
+## Original stage-03 follow-up plan (historical; see implementation update below)
 
 1. Resolve or explicitly document high-impact QC review events (especially official QC=0 replacements and longwave outliers); archive versioned QC reports outside Git.
 2. Verify the extracted surface PFT coverage against real site vegetation; obtain appropriate reference vegetation and soil information as needed.
@@ -117,3 +121,110 @@ The exact processed output file name should be read from the v5 script, not gues
 
 - [`../FLUXNET_GF-Guy/`](../FLUXNET_GF-Guy/) — GF-Guy surface/case/spin-up example.
 - [`../ICOS_ES-LJu/`](../ICOS_ES-LJu/) — ES-LJu forcing QC and CLM-FATES workflow.
+
+
+## Implementation update: dynamic ZBOT, DATM and 500-year spin-up
+
+### Stage 02 — Surface data
+
+All six surface datasets were generated using
+`scripts/02_make_6_surfaces.sh` and the CTSM point-subsetting utility,
+with surface reference year 2000.
+
+The generated gridded surface landunits are not necessarily
+representative of the actual flux-tower footprint. In particular,
+PCT_CROP ranges from 3.3% (RU-Fyo) to 44.6% (DK-Sor).
+FATES vegetation initialization and the natural-landunit treatment
+require further scientific verification. The surfaces were not
+regenerated when sensor heights were subsequently processed.
+
+### Stages 04–05 — Measurement heights and DATM
+
+`scripts/06_check_surface_zbot_make_datm.py` records the initial
+constant-height DATM candidate workflow and metadata checks.
+
+`scripts/07_make_six_site_datm_timevarying_zbot.py` is the later
+time-dependent-ZBOT implementation actually used to generate
+the final candidate DATM files. It uses dated BIF TA_F sensor
+heights, including changes within the historical forcing period.
+
+| Site | ZBOT history (m) | Forcing period | Annual DATM files |
+|---|---|---|---:|
+| DE-Hai | 44 -> 44.5 (2023-06-06) | 2000–2025 | 26 |
+| RU-Fyo | 28 | 1998–2025 | 28 |
+| DE-Tha | 40 | 1996–2025 | 30 |
+| DK-Sor | 57 -> 30 (2014-04-11) -> 43 (2021-02-06) | 1996–2024 | 29 |
+| NL-Loo | 23.5 -> 38.2 (2023-05-23) | 1997–2025 | 29 |
+| IL-Yat | 15 -> 19 (2012-01-01) | 2000–2024 | 25 |
+
+Total: **167 annual NetCDFs**, each containing 17,520 half-hour
+records on a NO_LEAP calendar.
+
+The dynamic ZBOT files are under each site's
+`forcing/datm_v5_candidate_timevarying_zbot/` directory on IRIDIS.
+
+Important limitations:
+
+- Some first-year height values are extrapolated backwards from
+  the first available BIF sensor-height date.
+- DK-Sor, NL-Loo and IL-Yat have substantial periods with
+  mismatched TA and WS measurement heights.
+- Wind speed was not vertically adjusted to the TA height.
+- The forcing is QC v5 candidate data, not fully approved observations.
+
+### Stage 06 — Final structural audit
+
+`scripts/08_audit_six_site_datm_surface.py` was run on IRIDIS.
+Result: **167/167 annual DATM files passed structural validation**.
+
+All six sites returned `STRUCTURE_OK_REVIEW`.
+This establishes file compatibility and basic numerical checks,
+not final scientific validity. QC v5 manual reviews remain unresolved
+at five sites, and surface landunit/PFT representation requires review.
+
+### Stage 07 — Independent 500-year spin-ups
+
+`scripts/09_submit_six_site_spinup500.sh` is the corrected,
+successfully executed six-site submission script.
+
+The case setup is based on the existing GF-Guy FATES workflow,
+reusing its compiled executable through CIME cloning while
+applying each site's own surface, forcing and fixed CO2 setting.
+
+| Site | Meteorological cycling years | Fixed CO2 (ppm) |
+|---|---|---:|
+| DE-Hai | 2000–2025 | 368.96 |
+| RU-Fyo | 1998–2025 | 365.70 |
+| DE-Tha | 1996–2025 | 361.93 |
+| DK-Sor | 1996–2024 | 361.93 |
+| NL-Loo | 1997–2025 | 363.04 |
+| IL-Yat | 2000–2024 | 368.96 |
+
+Fixed atmospheric CO2 values correspond approximately to global
+annual mean concentrations in each site's initial forcing year;
+they are not local EC-tower measurements.
+
+Spin-up configuration:
+
+- RUN_TYPE = startup
+- CALENDAR = NO_LEAP
+- ATM_NCPL = 48
+- CLM_CO2_TYPE = constant
+- DATM taxmode = cycle, using the site's entire available forcing window
+- STOP_OPTION = nyears; STOP_N = 5
+- REST_OPTION = nyears; REST_N = 5
+- RESUBMIT = 99
+- Intended total: 100 segments x 5 years = 500 model years per site
+
+**The five-year job segment length is not the meteorological
+cycling period.** Meteorological years cycle according to each
+site's historical forcing window, across successive restart jobs.
+
+All six independent initial jobs were successfully submitted
+to IRIDIS6 on 2026-10-11. This does not certify completion of
+the 500-year simulations or convergence of vegetation/carbon pools.
+
+**Do not rerun the submission script against active cases.**
+This repository records the configuration and source code;
+it does not contain raw FLUXNET packages, surface NetCDFs,
+DATM NetCDFs, CIME case outputs, or model history/restart files.
