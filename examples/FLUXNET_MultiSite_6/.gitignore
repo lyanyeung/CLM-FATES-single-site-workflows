@@ -1,0 +1,22 @@
+# Source data and generated simulation artifacts: never commit
+*.zip
+*.nc
+*.csv
+*.parquet
+*.log
+*.err
+*.out
+*.json
+*.png
+*.pdf
+__pycache__/
+*.pyc
+raw/
+processed/
+processed_v*/
+qc/
+qc_v*/
+subset_data/
+inputdata/
+run/
+archive_outputs/
