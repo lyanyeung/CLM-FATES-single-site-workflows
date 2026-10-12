@@ -1,0 +1,32 @@
+# Do not redistribute network files, workstation/HPC data, or generated artifacts.
+*.zip
+*.nc
+*.csv
+*.parquet
+*.log
+*.json
+*.png
+*.pdf
+*.out
+*.err
+*.tmp
+*.partial
+*.h5
+*.hdf5
+__pycache__/
+*.pyc
+raw/
+packages/
+forcing/
+processed*/
+qc*/
+subset_data/
+inputdata/
+run/
+archive/
+archive_outputs/
+# Local secrets/tokens/SSH assets
+*.pem
+*.key
+*.token
+.env
