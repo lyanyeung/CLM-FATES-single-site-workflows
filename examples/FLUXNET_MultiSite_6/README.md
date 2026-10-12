@@ -309,3 +309,119 @@ Monthly performance: **GPP R² = -0.030**; **NEE R² = -1.674**.
 Monthly performance: **GPP R² = -3.146**; **NEE R² = -9.479**.
 
 <!-- SIX_SITE_OVERVIEW_END -->
+
+<!-- SPINUP500_FINAL_START -->
+
+## Final 500-year spin-up results
+
+All six CLM-FATES simulations completed 500 model years.
+Each simulation cycles its own full meteorological forcing period
+and uses fixed atmospheric CO2 from its initial forcing year.
+
+The following figures show annual carbon-pool trajectories
+and monthly GPP/NEE comparisons against FLUXNET EC observations
+for the last complete meteorological forcing cycle.
+
+**Important:** Completing 500 years does not demonstrate
+carbon-pool or FATES demographic convergence.
+Several slow carbon pools continue to drift.
+
+| Site | Monthly GPP R² | Monthly NEE R² |
+|---|---:|---:|
+| DE-Hai | 0.878 | 0.616 |
+| RU-Fyo | 0.917 | -1.525 |
+| DE-Tha | 0.719 | -1.367 |
+| DK-Sor | 0.913 | 0.800 |
+| NL-Loo | -0.059 | -1.721 |
+| IL-Yat | -2.571 | -8.012 |
+
+### DE-Hai
+
+**500-year carbon-pool trajectories**
+
+![DE-Hai carbon-pool convergence](figures/spinup500_final/DE-Hai_01_carbon_pools_annual_mean.png)
+
+**Final complete meteorological cycle: GPP and NEE**
+
+![DE-Hai final GPP and NEE](figures/spinup500_final/DE-Hai_GPP_NEE_monthly_overview.png)
+
+Monthly GPP R² = 0.878; monthly NEE R² = 0.616.
+
+---
+
+### RU-Fyo
+
+**500-year carbon-pool trajectories**
+
+![RU-Fyo carbon-pool convergence](figures/spinup500_final/RU-Fyo_01_carbon_pools_annual_mean.png)
+
+**Final complete meteorological cycle: GPP and NEE**
+
+![RU-Fyo final GPP and NEE](figures/spinup500_final/RU-Fyo_GPP_NEE_monthly_overview.png)
+
+Monthly GPP R² = 0.917; monthly NEE R² = -1.525.
+
+---
+
+### DE-Tha
+
+**500-year carbon-pool trajectories**
+
+![DE-Tha carbon-pool convergence](figures/spinup500_final/DE-Tha_01_carbon_pools_annual_mean.png)
+
+**Final complete meteorological cycle: GPP and NEE**
+
+![DE-Tha final GPP and NEE](figures/spinup500_final/DE-Tha_GPP_NEE_monthly_overview.png)
+
+Monthly GPP R² = 0.719; monthly NEE R² = -1.367.
+
+---
+
+### DK-Sor
+
+**500-year carbon-pool trajectories**
+
+![DK-Sor carbon-pool convergence](figures/spinup500_final/DK-Sor_01_carbon_pools_annual_mean.png)
+
+**Final complete meteorological cycle: GPP and NEE**
+
+![DK-Sor final GPP and NEE](figures/spinup500_final/DK-Sor_GPP_NEE_monthly_overview.png)
+
+Monthly GPP R² = 0.913; monthly NEE R² = 0.800.
+
+---
+
+### NL-Loo
+
+**500-year carbon-pool trajectories**
+
+![NL-Loo carbon-pool convergence](figures/spinup500_final/NL-Loo_01_carbon_pools_annual_mean.png)
+
+**Final complete meteorological cycle: GPP and NEE**
+
+![NL-Loo final GPP and NEE](figures/spinup500_final/NL-Loo_GPP_NEE_monthly_overview.png)
+
+Monthly GPP R² = -0.059; monthly NEE R² = -1.721.
+
+---
+
+### IL-Yat
+
+**500-year carbon-pool trajectories**
+
+![IL-Yat carbon-pool convergence](figures/spinup500_final/IL-Yat_01_carbon_pools_annual_mean.png)
+
+**Final complete meteorological cycle: GPP and NEE**
+
+![IL-Yat final GPP and NEE](figures/spinup500_final/IL-Yat_GPP_NEE_monthly_overview.png)
+
+Monthly GPP R² = -2.571; monthly NEE R² = -8.012.
+
+---
+
+The earlier interim-spin-up figures are retained above
+for comparison. These final-cycle results are model diagnostics
+and still require scientific review of convergence, forcing QC,
+and site vegetation representation.
+
+<!-- SPINUP500_FINAL_END -->
