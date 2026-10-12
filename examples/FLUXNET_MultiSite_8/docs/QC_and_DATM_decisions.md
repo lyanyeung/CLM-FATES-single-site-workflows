@@ -45,4 +45,4 @@ All **188/188** candidate annual DATM files passed independent structural verifi
 - ERA-source proportions can be high, including DE-Hzd `PA_F` and `P_F` = 100%; keep source information, not just numeric QC pass/fail.
 - The BIF `TA_F` heights are used for time-dependent `ZBOT`. Some early portions are extrapolated from the earliest height metadata; `WS_F` instrument height differs from TA by more than 3 m for long periods at several sites. WIND is not vertically normalized.
 - CTSM gridded surface natural-PFT and crop percentages are not an independently verified representation of a flux-tower footprint or the FATES plant-functional-type parameterization. Gridded crop fractions reach 37.3% at DE-Hzd; many stations have substantial natural-landunit grass fractions.
-- **No model spin-up is claimed for these eight stations.** The repository currently documents transfer, QC, provisional DATM creation and structural/surface audit.
+- **The eight 500-year spin-up cases were configured and initial jobs submitted.** See `spinup500_submission.md`; completion and ecological convergence are not yet established.

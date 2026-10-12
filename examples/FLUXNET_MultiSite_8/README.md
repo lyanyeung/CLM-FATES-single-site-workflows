@@ -86,9 +86,25 @@ python ~/08_audit_eight_site_datm_surface.py
 
 See [`docs/QC_and_DATM_decisions.md`](docs/QC_and_DATM_decisions.md) for each human decision, ERA provenance, FR-Hes change ledger, surface/PFT warnings, and the retained unverified high precipitation of DE-Hzd.
 
+## Stage 07 — Independent 500-year spin-ups
+
+The actual executed IRIDIS code is in
+[`scripts/09_eight_site_spinup500.sh`](scripts/09_eight_site_spinup500.sh).
+It was generated from the successful six-site configuration by
+[`scripts/build_eight_spinup.py`](scripts/build_eight_spinup.py).
+
+All eight cases passed preflight and preparation, and the IRIDIS submission
+manifest records `SUBMITTED` for each initial job. Each case targets **500
+model years** in 100 five-year segments, with a site-specific complete forcing
+cycle, a fixed first-year CO2 concentration, `NO_LEAP`, and `ATM_NCPL=48`.
+
+See [the actual submission settings and decisions](docs/spinup500_submission.md).
+**Submitting the initial batch jobs does not establish completion or scientific
+convergence. Do not rerun the submission on existing active cases.**
+
 ## Reproducibility scope
 
 - Periods are intentionally site-specific, with 2026 excluded where incomplete/future.
 - All candidate annual NetCDFs have 17,520 records and use `NO_LEAP`, half-hour forcing (`ATM_NCPL=48` when configuring a model case).
-- Model startup/spin-up, CO2 assignment, landunit/FATES PFT suitability, meteorological validation against independent stations, and forest carbon convergence are **not yet certified by this example**.
+- Model case setup and initial submission are documented, but 500-year completion, carbon convergence, surface/PFT suitability and independent meteorological verification are **not certified** by this example.
 - Avoid uploading logs, local paths containing tokens, original data, output CSVs or `.nc` files to GitHub. The `.gitignore` excludes the principal raw and generated file types.
