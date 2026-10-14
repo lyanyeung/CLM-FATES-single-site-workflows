@@ -49,3 +49,8 @@ Stage07 `pressure07a` generated `status.json` using `trial_sha256` instead of `c
 See repository `scripts/stage13b/`, `scripts/stage14/`, and `scripts/stage15/`, and the eight-site reference `../FLUXNET_MultiSite_8/scripts/07_make_eight_site_datm_timevarying_zbot.py`. Run Stage13b corrected BIF parser → Stage14 cross-product evidence inventory → Stage15 height policy freeze → Stage15 read-only source/DATM preflight → optional new, non-overwriting PROVISIONAL annual NetCDF creation → independent audit. Existing output folders are never rewritten.
 
 **Remaining gates**: climate-driver scientific QC, CH-Aws 559 modeled humidity replacements (33 strong ERA5-vs-ERA5-Land disagreements), surface natural/managed landcover and FATES PFT assignment, CIME case preflight, short test simulation and convergence analysis. A 238/238 structural pass is not authorization for production spin-up.
+
+## Observed height-change count in this particular 11-site snapshot
+
+**Do not confuse a time-indexed ZBOT variable with evidence of actual historical instrument-height changes.** Stage13b documented **one distinct dated TA_F height record per site** for all eleven sites. Consequently the current user-approved backwards-first-known-height rule yields an **effectively constant TA-based ZBOT within each site across its entire forcing period**. The code follows the eight-site *piecewise-constant, date-aware* framework and will support multiple height epochs when valid BIF evidence exists, but the available eleven-site data do **not** demonstrate a TA height change. CZ-Stn has two WS_F events at 44 m, which do not change TA-based ZBOT.
+
