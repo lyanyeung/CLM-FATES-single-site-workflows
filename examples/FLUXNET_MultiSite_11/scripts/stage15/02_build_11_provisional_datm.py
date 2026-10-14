@@ -95,14 +95,20 @@ def inspect_site(root,site,policy):
     meta=json.loads(status.read_text())
     if meta.get('site')!=site:raise ValueError('Site name mismatch in candidate status')
     checksum=sha256(candidate)
-    # Stage07 pressure07a uses trial_sha256; Stage03/08/11 use candidate_sha256.
-    # Verify the real CSV against the original immutable source manifest; never reset it.
+    # Stage07 pressure07a uses trial_sha256.
+    # Other selected candidate versions use candidate_sha256.
     digest_field = 'trial_sha256' if tag == 'pressure07a' else 'candidate_sha256'
     expected_digest = meta.get(digest_field)
+
     if not isinstance(expected_digest, str) or len(expected_digest) != 64:
         raise ValueError(f'Missing/invalid {digest_field} in {status}')
+
     if checksum != expected_digest:
-        raise ValueError(f'CSV SHA256 mismatch ({digest_field}): actual={checksum}, recorded={expected_digest}')
+        raise ValueError(
+            f'CSV SHA256 mismatch ({digest_field}): '
+            f'actual={checksum}, recorded={expected_digest}'
+        )
+
     if tag == 'pressure07a':
         expected_pressure_edits = {'CH-Fru': 6, 'CZ-Stn': 3}
         if (site not in expected_pressure_edits or
