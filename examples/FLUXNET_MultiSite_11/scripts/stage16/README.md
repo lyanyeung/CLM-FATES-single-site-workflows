@@ -1,0 +1,1 @@
+Stage 16: read-only pre-spinup configuration check. On IRIDIS6: `conda activate clm_fates_env && python 01_pre_spinup_readiness_readonly.py`. Creates only local CSV/JSON audit reports, no CIME cases, builds, or SLURM submissions. This is NOT a science approval. After technical preflight, independent ecological FATES/PFT review, driver QC and CH-Aws RH uncertainty review remain.
