@@ -71,3 +71,12 @@ For context, see the [eight-site workflow README](../FLUXNET_MultiSite_8/README.
 3. Examine surface landcover/PFT fractions relative to each EC footprint; identify crop contamination and whether FATES requires site-specific PFT adjustments.
 4. Use dated BIF `TA_F`/wind observation heights for time-varying `ZBOT`; audit sensor-height mismatches and metadata gaps. No eleven-site DATM or spin-up is represented as completed by this directory.
 5. Produce independently verified, non-overwriting final DATM and only then run subsequent model checks/spin-up and carbon convergence analysis.
+
+
+## Update — 14 October 2026: 238/238 PROVISIONAL DATM validated
+
+The eleven-site candidate forcing now has a **user-approved dated-BIF TA_F ZBOT policy**, with the earliest documented height held constant backwards only as an explicitly annotated assumption. This does not reconstruct actual early sensor heights. The Stage15 read-only DATM audit returned **238/238 annual NO_LEAP NetCDF files** structurally correct; all 11 site-specific `user_nl_clm` files are present. **No 500-year spin-up was submitted, and scientific approval is still open.**
+
+Read the full scientific/methodological record: **[Dated BIF height and dynamic ZBOT, Stage13–15](docs/BIF_DYNAMIC_ZBOT_STAGE13_15.md)**. For exact executable scripts use `scripts/stage13b/`, `scripts/stage14/`, `scripts/stage15/`, and the Stage16 configuration-only inspection in `scripts/stage16/` after it has been published. The old sections below describing uncompleted BIF/DATM are preserved as a historical snapshot, superseded by this update.
+
+**Outstanding:** independent driver science review; CH-Aws winter modeled humidity uncertainty; gridded crop/PFT vs tower footprint; site-specific stream/namelist/CO₂ choice and GF-Guy executable preflight; short model tests. **Do not submit spin-up yet.**
