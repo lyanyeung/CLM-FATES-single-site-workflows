@@ -1,5 +1,7 @@
 # Eight-site CLM-FATES spin-up: recovery using shared Slurm nodes
 
+> **Historical configuration (2026-10-13); superseded for future concurrent restarts.** This document explains removal of Slurm `--exclusive`, but the original `mpirun --bind-to core --map-by socket` still allowed competing CPU affinity. The eight-run batch described below **timed out after one hour** and its archive dependencies could not run. Use [the corrected `srun --mpi=pmix` recovery](srun_pmix_resume_2026-10-14.md) and [current script `12_resume_eight_site_srun_pmix500.sh`](../scripts/12_resume_eight_site_srun_pmix500.sh) instead. Keep this document as incident history, not current operational instructions.
+
 **Project:** `CLM-FATES-single-site-workflows`  
 **Date:** 2026-10-13 (Europe/London)  
 **Scope:** ONLY the eight unfinished `<SITE>_FATES_SPINUP500` cases in `examples/FLUXNET_MultiSite_8`. Do not rerun the original Stage 07 creation/submission script. The other six sites in `FLUXNET_MultiSite_6` finished their spin-ups and are **out of scope**.
