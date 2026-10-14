@@ -26,3 +26,20 @@
 ## No data in git
 
 `.gitignore` excludes CSV, NetCDF, ZIP, JSON, caches and output folders to reduce accidental publication of licensed data. For this experiment upload only `README.md`, Markdown science decisions, and `.py`/`.sh` code. Never publish downloaded reanalysis JSON, site raw tables, corrected candidate tables, source-package archives, debug logs, machine tokens or model outputs. Consult network terms and attribution before distributing any result derived from site observations.
+
+
+## Status update: Stage13b–15 completed; Stage16 read-only final check
+
+The earlier section saying no 11-site DATM exists is a historical state, superseded by this dated update. As confirmed by IRIDIS6 logs on 2026-10-14:
+
+- Stage13b correctly parsed eight- and twelve-digit BIF dates and corrected erroneous counts of undocumented heights; Stage14 inventory found duplicates across BIF resolution products but no earlier height dates.
+- The user explicitly chose first-documented TA_F height held constant backwards before that BIF date; later height changes follow BIF dates. WS_F heights are diagnostics only; WIND remains unadjusted; CH-Aws WS_F is unknown.
+- Stage15 height policy was written at `~/FLUXNET_MultiSite_11/stage15_provisional_DATM/height_policy_v1.json` with SHA256 `4eff9273d6aa73bc71f4b6104470b9189fb3d5491ea2393698564720f6764068`.
+- CH-Fru/CZ-Stn Stage07 uses `trial_sha256`, so the Stage15 DATM writer must use the compatible checksum verification without bypassing it. Stage15 preflight passed 11/11 and wrote 238 **PROVISIONAL** annual DATM files. Independent audit verified 238/238. 11/11 site `user_nl_clm` paths exist; the GF-Guy source case directory exists.
+- **Stage16 pre-spinup inspection (no case clone/build/submit)** needs to run on the IRIDIS6 copy of the scripts. This is a technical file/reference check, *not* a science approval.
+- Large gridded crop percentages: FR-Fon 50.8%, CZ-Stn 47.8%, BE-Bra 37.4%, IT-Noe 30.5%, CH-Cha/CH-Lae 22.2%. Some natural-PFT vectors are dominated by grass or bare-ground indices; do not assert a forest site has forest-appropriate surface merely because a NetCDF has 15 PFT entries. Interpret PFT indices using actual NetCDF coordinate conventions, not a guessed 16-PFT mapping.
+- CH-Aws 559 winter modeled humidity replacements remain scientifically uncertain, including 33 cases of >15 percentage-point ERA5 vs ERA5-Land disagreement.
+
+See [BIF/ZBOT documentation](BIF_DYNAMIC_ZBOT_STAGE13_15.md), `scripts/stage13b/`, `scripts/stage14/`, `scripts/stage15/` and `scripts/stage16/`.
+
+**Model run status: NOT STARTED. Do not submit 500-year spin-up until scientific and case configuration reviews are completed.**
