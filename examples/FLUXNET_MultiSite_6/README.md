@@ -425,3 +425,52 @@ and still require scientific review of convergence, forcing QC,
 and site vegetation representation.
 
 <!-- SPINUP500_FINAL_END -->
+
+<!-- SIX_SITE_SPINUP1000_START -->
+
+## Stage 09 — Extending the six completed 500-year spin-ups to 1000 model years (2026-10-14)
+
+All six original CLM-FATES spin-ups completed 500 model years, but some slow carbon pools still showed drift. This continuation starts from each site's **fully archived 500-year coordinated restart**, adds **500 more model years** in 100 five-year segments, and targets **1000 model years total**. Running for 1000 years is not proof of carbon-pool or FATES demographic convergence.
+
+- [Continuation script (`13_extend_six_site_spinup500_to1000.sh`)](scripts/13_extend_six_site_spinup500_to1000.sh)
+- [Detailed operating guide, checkpoints and safeguards](docs/spinup500_to1000_continuation_2026-10-14.md)
+- [Repository-wide IRIDIS6 MPI and CPU-affinity investigation](../../IRIDIS6_MPI_CPU_AFFINITY.md)
+- [Original 500-year spin-up submission script — historical only](scripts/09_submit_six_site_spinup500.sh)
+
+| Site | Completed 500-year restart | Target 1000-year restart | Constant CO2 (ppm) |
+|---|---|---|---:|
+| DE-Hai | 2500-01-01 | 3000-01-01 | 368.96 |
+| RU-Fyo | 2498-01-01 | 2998-01-01 | 365.70 |
+| DE-Tha | 2496-01-01 | 2996-01-01 | 361.93 |
+| DK-Sor | 2496-01-01 | 2996-01-01 | 361.93 |
+| NL-Loo | 2497-01-01 | 2997-01-01 | 363.04 |
+| IL-Yat | 2500-01-01 | 3000-01-01 | 368.96 |
+
+### IRIDIS6 MPI/Slurm affinity: why the launcher matters
+
+In the related eight-site study, an inherited OpenMPI launcher (`mpirun -n 1 --bind-to core --map-by socket`) was observed assigning a launched process to Linux CPU 0 even when independent Slurm jobs were allocated **different** CPU IDs. Eight concurrently launched models then slowed markedly and timed out. These affinity tests establish a mismatch in the tested environment; they do not prove every historical model rank was on CPU 0. The successful single-rank replacement is:
+
+```bash
+srun --mpi=pmix --ntasks=1 --cpus-per-task=1 --cpu-bind=cores
+```
+
+The continuation script requests 1 CPU and 8 GiB per case, without `--exclusive`, and preserves the original site-specific forcing cycles, surfaces, CO2, numerical configuration, executable, and five-year restart cadence. **Slurm CPU allocation is not the same thing as the actual CPU affinity of `cesm.exe`**. Compare `scontrol show job -dd JOBID` (Slurm `CPU_IDs`) against the model process's `/proc/PID/status` (`Cpus_allowed_list`) on the compute node.
+
+An optional `EXCLUDE_NODES=red6129` excludes one specific node from the six-site launch but **does not guarantee permanent node separation** from the independent eight-site chain, which may migrate to other nodes. CPU core-binding correctness is the primary requirement.
+
+### Safe execution and current status
+
+The script's `audit` mode checks the six **idle**, fully archived 500-year cases; `prepare` makes backups, stages coordinated restarts, corrects the MPI launcher and configures the 100 additional five-year segments **without submission**; `submit SESSION` submits once; `status` reports read-only progress.
+
+The six-site continuation **was already submitted** on 2026-10-14 (first run jobs: DE-Hai 4237364, RU-Fyo 4237366, DE-Tha 4237368, DK-Sor 4237370, NL-Loo 4237372, IL-Yat 4237374). At the latest available queue snapshot they were running or pending, **not verified as complete**. Do **not** repeat `prepare`, `submit` or the historical original spin-up script on active cases.
+
+For current monitoring on IRIDIS6:
+
+```bash
+bash ~/13_extend_six_site_spinup500_to1000.sh status
+squeue -u ly3n24 -o '%.12i %.36j %.10T %.12M %.12l %R'
+```
+
+Only after the extra 500 years are successfully archived should convergence be re-evaluated using carbon pool trends (including `TOTECOSYSC`, live vegetation and slower soil pools), not GPP/NEE agreement alone. The public GitHub repository does not contain restricted EC downloads, NetCDF data, restarts, or model archives.
+
+<!-- SIX_SITE_SPINUP1000_END -->
