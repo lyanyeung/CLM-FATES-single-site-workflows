@@ -1,5 +1,8 @@
 # Eleven long-term FLUXNET sites: source-aware forcing QC and site-specific review trials
 
+> **15 October 2026 status supersedes the older prospective sections below.** Stage15 produced **238/238 structurally audited, provisional** annual DATM files. Stage17 prepared cases; Stage18 initiated **1000-model-year CIME/Slurm resubmission workflows** for the eleven-site campaign. Multiple sites have been observed `RUNNING`, but **no complete 1000-year outcome or convergence has been established here**. IT-Noe has a dependency-error indication requiring separate investigation. **CH-Aws remains unresolved following three unsuccessful first segments** (`4286717`, `4286891`, `4286954`). For complete operational and scientific incident records, see [Stage17–18 1000-year spin-up status](docs/SPINUP_1000YEAR_STAGE17_18_2026-10-15.md) and [CH-Aws failed runs and meteorological investigations](docs/CH_Aws_HUMIDITY_FAILURES_2026-10-15.md). A [read-only status command](scripts/operations/01_readonly_spinup_status.sh) inspects running cases without resubmission.
+
+
 **Recorded state: 14 October 2026 · Candidate forcing only · NOT scientifically approved for DATM or spin-up.**
 
 This example documents the *executed* multisource meteorological consolidation and investigation of eleven long-running eddy-covariance sites for CTSM/CLM-FATES on IRIDIS6. It extends the scientific method and provenance principles of [eight-site QC v5](../FLUXNET_MultiSite_8/docs/QC_and_DATM_decisions.md); **it does not claim that the eight-site v5 Python script was directly run for these eleven sites**. Here, Stage03 is a distinct, source-aware merger, followed by narrowly scoped, independently versioned QC *trials* in Stages07, 08 and 11.
