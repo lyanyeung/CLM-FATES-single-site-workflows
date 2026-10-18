@@ -598,3 +598,22 @@ cluster paths, and job logs are deliberately excluded.
 ## Operational recovery incident (2026-10-18)
 
 - [DE-Hai: CIME startup failure and five-year recovery](docs/DE_Hai_GIT_INDEX_LOCK_RECOVERY_2026-10-18.md) — incident evidence, checkpoint validation and caveats.
+
+<!-- DK_SOR_HISTORICAL_PILOT_START -->
+
+## Stage 10 — 1000-year restart and historical flux-evaluation pilot (2026-10-18)
+
+**Scientific motivation.** The five-site 1000-year spin-ups still show slow soil-carbon accumulation, but the research objective is to test whether CLM-FATES reproduces *GPP and NEE dynamics*, not solely whether every slow soil pool has equilibrated. The next test separates **flux stability** from **soil/vegetation carbon-stock stability**.
+
+**Experiment A — 500 vs 1000 years (read-only):** compare model-model GPP, NEE, respiration and LAI for *identical forcing-year phases* in complete meteorological cycles, as well as EC skill (R², RMSE, bias). Similar EC R² alone is insufficient evidence that model fluxes stopped changing. Independently report SOC/vegetation/litter carbon trends and verify total-carbon accounting in FATES.
+
+**Experiment B — DK-Sor historical hybrid pilot:** initialize a new, isolated `DK-Sor_FATES_HIST1996_2024_TEST` case using the original spin-up's archived `2996-01-01` restart, reset the model clock to `1996-01-01`, and first test one historical year at fixed 361.93 ppm CO2. Both experiments use real EC-period meteorological years; the spin-up *cycles* 1996–2024 repeatedly whereas the proposed historical run uses that interval just once. Future controlled tests will separately introduce genuinely time-varying historical CO2.
+
+**Status:** Hybrid case cloning, restart staging, land `finidat`, DK-Sor surface, and CIME `preview_run` were observed successful. **Pilot job has NOT been confirmed submitted or completed.** At the last reported checkpoint `BUILD_COMPLETE=FALSE` after `case.setup --reset`; build provenance and hybrid time-alignment must be checked before submitting. The original spin-up cases/restarts must be preserved. DE-Hai is excluded from the current five-site final results; IL-Yat requires structural vegetation-carbon investigation before historical benchmarking.
+
+- **[Detailed experiment design, comparison windows, existing configuration and limitations](docs/DK_Sor_historical_hybrid_flux_stability_experiment_2026-10-18.md)**
+- [DK-Sor historical hybrid preparation script (archived; **do not re-run** on the already prepared case)](scripts/17_prepare_DK_Sor_historical_pilot.sh)
+- [Read-only DK-Sor case / restart / build preflight](scripts/18_audit_DK_Sor_historical_pilot.sh)
+- [Five-site 1000-year figures and numerical diagnostics](figures/spinup1000_final/)
+
+<!-- DK_SOR_HISTORICAL_PILOT_END -->
