@@ -31,3 +31,32 @@ Current software context for the ES-LJu example:
 **Eight-site experiment:** [`examples/FLUXNET_MultiSite_8/`](examples/FLUXNET_MultiSite_8/) now includes the checkpoint-safe `srun` recovery script, test evidence, and detailed operating instructions. This supersedes the October 13 `mpirun` shared-node resumption method; do not repeat the original eight-site creation/submission script against active cases.
 
 - `examples/FLUXNET_MultiSite_11/` — Eleven-site FLUXNET/ICOS/EUF source-aware meteorological QC; ERA5-Land winter humidity, pressure/longwave trial corrections, and scientific-review ledgers.
+
+## DK-Sor CO2 sensitivity experiment
+
+[**DK-Sor: Fixed vs NOAA Historical CO2 (1996–2024)**](examples/FLUXNET_MultiSite_6/experiments/DK-Sor_CO2_sensitivity/)
+
+This experiment investigates how time-varying atmospheric CO2
+influences CLM-FATES simulations of GPP and NEE at DK-Sor.
+
+Two historical simulations are designed to use the same
+1000-year spin-up restart and meteorological forcing:
+
+- **Fixed CO2:** 361.93 ppm throughout 1996–2024.
+- **Dynamic CO2:** NOAA globally averaged monthly atmospheric CO2
+  covering the historical observation period.
+
+The objective is to evaluate whether historical CO2 forcing
+changes simulated carbon fluxes, seasonal dynamics, interannual
+variability and agreement with eddy-covariance observations.
+
+The experiment includes:
+
+- Scientific hypotheses and experimental configuration.
+- Read-only IRIDIS6 monitoring scripts.
+- GPP and NEE comparison and visualization scripts.
+- Documentation of reproducibility and scientific limitations.
+
+**Status:** NOAA historical simulation underway.
+The full fixed-CO2 historical control and 29-year comparison
+are not yet completed.
