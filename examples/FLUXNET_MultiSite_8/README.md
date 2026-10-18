@@ -183,3 +183,117 @@ These values are a dated snapshot: the script recalculates checkpoint progress o
 ## Operational recovery incident (2026-10-18)
 
 - [FR-Hes: CIME startup failure and five-year recovery](docs/FR_Hes_DATM_XML_FILE_NOT_FOUND_RECOVERY_2026-10-18.md) — incident evidence, checkpoint validation and caveats.
+
+<!-- EIGHT_SITE_SPINUP500_RESULTS_START -->
+## Stage 09 — Seven-site 500-year spin-up diagnostics (18 October 2026)
+
+This seven-site subset uses the original SITE_FATES_SPINUP500 cases.
+**FR-Hes is excluded** until its 500-year completion is verified.
+Every published carbon diagnostic was made from 500 consecutive annual
+h0a history files. Finishing 500 model years does NOT imply convergence.
+
+| Site | Carbon archive | Last complete model forcing cycle | GPP monthly R² | NEE monthly R² |
+|---|---|---|---:|---:|
+| CZ-BK1 | 500 verified years | 2466–2487 | 0.628 | -0.561 |
+| IT-Ren | 500 verified years | 2458–2484 | 0.515 | -0.684 |
+| FR-FBn | 500 verified years | 2484–2500 | -0.106 | -3.276 |
+| DE-Hzd | 500 verified years | 2490–2505 | 0.714 | -0.869 |
+| CH-Dav | 500 verified years | 2461–2489 | -1.304 | -0.001 |
+| BE-Vie | 500 verified years | 2446–2475 | 0.871 | -0.036 |
+| IT-Lav | 500 verified years | 2471–2488 | 0.291 | -3.683 |
+
+Carbon pool diagnostics reuse the
+[six-site plotting reference](../FLUXNET_MultiSite_6/scripts/14_plot_five_site_spinup1000.py).
+Fluxes use the last complete, phase-aligned forcing cycle mapped to
+the original EC years: GPP=FATES_GPP, NEE=-FATES_NEP (EC NEE=NEE_VUT_REF).
+R² is 1 - SSE/SST (negative values are possible).
+
+Code: [plotter](scripts/18_plot_seven_site_spinup500.py),
+[Slurm job](scripts/19_submit_seven_site_spinup500.sbatch),
+[publishing utility](scripts/20_publish_seven_site_spinup500.py).
+[Derived result summary](figures/spinup500_final/seven_site_spinup500_summary.csv).
+
+Only model-derived figures and limited carbon/skill CSVs are committed;
+downloaded flux records, raw paired tower data, model archives,
+restart data and local machine paths are not redistributed.
+
+### CZ-BK1
+
+![CZ-BK1 carbon pools](figures/spinup500_final/CZ-BK1/CZ-BK1_01_carbon_pools_annual_mean.png)
+
+[Last 100 years](figures/spinup500_final/CZ-BK1/CZ-BK1_02_carbon_pools_last100years.png)
+ · [Convergence metrics](figures/spinup500_final/CZ-BK1/CZ-BK1_convergence_metrics.csv)
+
+![CZ-BK1 monthly GPP and NEE](figures/spinup500_final/CZ-BK1/CZ-BK1_GPP_NEE_monthly_overview.png)
+
+[Monthly metrics](figures/spinup500_final/CZ-BK1/CZ-BK1_monthly_metrics.csv)
+
+### IT-Ren
+
+![IT-Ren carbon pools](figures/spinup500_final/IT-Ren/IT-Ren_01_carbon_pools_annual_mean.png)
+
+[Last 100 years](figures/spinup500_final/IT-Ren/IT-Ren_02_carbon_pools_last100years.png)
+ · [Convergence metrics](figures/spinup500_final/IT-Ren/IT-Ren_convergence_metrics.csv)
+
+![IT-Ren monthly GPP and NEE](figures/spinup500_final/IT-Ren/IT-Ren_GPP_NEE_monthly_overview.png)
+
+[Monthly metrics](figures/spinup500_final/IT-Ren/IT-Ren_monthly_metrics.csv)
+
+### FR-FBn
+
+![FR-FBn carbon pools](figures/spinup500_final/FR-FBn/FR-FBn_01_carbon_pools_annual_mean.png)
+
+[Last 100 years](figures/spinup500_final/FR-FBn/FR-FBn_02_carbon_pools_last100years.png)
+ · [Convergence metrics](figures/spinup500_final/FR-FBn/FR-FBn_convergence_metrics.csv)
+
+![FR-FBn monthly GPP and NEE](figures/spinup500_final/FR-FBn/FR-FBn_GPP_NEE_monthly_overview.png)
+
+[Monthly metrics](figures/spinup500_final/FR-FBn/FR-FBn_monthly_metrics.csv)
+
+### DE-Hzd
+
+![DE-Hzd carbon pools](figures/spinup500_final/DE-Hzd/DE-Hzd_01_carbon_pools_annual_mean.png)
+
+[Last 100 years](figures/spinup500_final/DE-Hzd/DE-Hzd_02_carbon_pools_last100years.png)
+ · [Convergence metrics](figures/spinup500_final/DE-Hzd/DE-Hzd_convergence_metrics.csv)
+
+![DE-Hzd monthly GPP and NEE](figures/spinup500_final/DE-Hzd/DE-Hzd_GPP_NEE_monthly_overview.png)
+
+[Monthly metrics](figures/spinup500_final/DE-Hzd/DE-Hzd_monthly_metrics.csv)
+
+### CH-Dav
+
+![CH-Dav carbon pools](figures/spinup500_final/CH-Dav/CH-Dav_01_carbon_pools_annual_mean.png)
+
+[Last 100 years](figures/spinup500_final/CH-Dav/CH-Dav_02_carbon_pools_last100years.png)
+ · [Convergence metrics](figures/spinup500_final/CH-Dav/CH-Dav_convergence_metrics.csv)
+
+![CH-Dav monthly GPP and NEE](figures/spinup500_final/CH-Dav/CH-Dav_GPP_NEE_monthly_overview.png)
+
+[Monthly metrics](figures/spinup500_final/CH-Dav/CH-Dav_monthly_metrics.csv)
+
+### BE-Vie
+
+![BE-Vie carbon pools](figures/spinup500_final/BE-Vie/BE-Vie_01_carbon_pools_annual_mean.png)
+
+[Last 100 years](figures/spinup500_final/BE-Vie/BE-Vie_02_carbon_pools_last100years.png)
+ · [Convergence metrics](figures/spinup500_final/BE-Vie/BE-Vie_convergence_metrics.csv)
+
+![BE-Vie monthly GPP and NEE](figures/spinup500_final/BE-Vie/BE-Vie_GPP_NEE_monthly_overview.png)
+
+[Monthly metrics](figures/spinup500_final/BE-Vie/BE-Vie_monthly_metrics.csv)
+
+### IT-Lav
+
+![IT-Lav carbon pools](figures/spinup500_final/IT-Lav/IT-Lav_01_carbon_pools_annual_mean.png)
+
+[Last 100 years](figures/spinup500_final/IT-Lav/IT-Lav_02_carbon_pools_last100years.png)
+ · [Convergence metrics](figures/spinup500_final/IT-Lav/IT-Lav_convergence_metrics.csv)
+
+![IT-Lav monthly GPP and NEE](figures/spinup500_final/IT-Lav/IT-Lav_GPP_NEE_monthly_overview.png)
+
+[Monthly metrics](figures/spinup500_final/IT-Lav/IT-Lav_monthly_metrics.csv)
+
+Convergence requires separate assessment of slow carbon pools,
+the aligned forcing-cycle changes, FATES demography and input QC.
+<!-- EIGHT_SITE_SPINUP500_RESULTS_END -->
