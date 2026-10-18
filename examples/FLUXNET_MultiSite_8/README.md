@@ -179,3 +179,7 @@ These values are a dated snapshot: the script recalculates checkpoint progress o
 - Confirm `model execution success`, `case.run success`, `st_archive success`, a valid next coordinated restart, and reasonable walltime before accepting a completed 5-year segment.
 
 **Do not** rerun `scripts/09_eight_site_spinup500.sh`, the historical `10_...` resumption, or `prepare` against live jobs. This repository documents the code and methods; no raw tower data, NetCDF histories, checkpoint files, private cluster logs, or authentication tokens should be committed.
+
+## Operational recovery incident (2026-10-18)
+
+- [FR-Hes: CIME startup failure and five-year recovery](docs/FR_Hes_DATM_XML_FILE_NOT_FOUND_RECOVERY_2026-10-18.md) — incident evidence, checkpoint validation and caveats.

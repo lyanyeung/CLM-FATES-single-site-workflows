@@ -594,3 +594,7 @@ flux tables, original flux packages, NetCDF history and restarts,
 cluster paths, and job logs are deliberately excluded.
 
 <!-- SPINUP1000_FINAL_RESULTS_END -->
+
+## Operational recovery incident (2026-10-18)
+
+- [DE-Hai: CIME startup failure and five-year recovery](docs/DE_Hai_GIT_INDEX_LOCK_RECOVERY_2026-10-18.md) — incident evidence, checkpoint validation and caveats.
