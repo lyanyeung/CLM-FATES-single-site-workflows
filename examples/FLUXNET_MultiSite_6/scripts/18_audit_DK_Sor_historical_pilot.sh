@@ -80,8 +80,15 @@ echo "PASS: land initialization/forcing metadata"
 
 echo "=== Slurm and MPI ==="
 grep -Eq '^#SBATCH[[:space:]]+--nodes=1([[:space:]]|$)' "$CASE/.case.run" || fail "Wrong node count"
-grep -Fq 'srun --mpi=pmix --ntasks=1 --cpus-per-task=1 --cpu-bind=cores' "$CASE/.case.run" || fail "MPI launcher absent from .case.run"
-echo "PASS: Slurm/MPI configuration"
+# MPI_RUN_COMMAND is held in the CIME XML configuration and expanded at
+# runtime. The generated .case.run is a wrapper and need not contain 'srun'.
+expected_mpi='srun --mpi=pmix --ntasks=1 --cpus-per-task=1 --cpu-bind=cores'
+mpi_raw=$(cd "$CASE" && ./xmlquery MPI_RUN_COMMAND --value) || fail "Could not read MPI_RUN_COMMAND"
+mpi_cmd=$(printf '%s\n' "$mpi_raw" | awk '{$1=$1; print}')
+[ "$mpi_cmd" = "$expected_mpi" ] || fail "Unexpected MPI_RUN_COMMAND: <$mpi_raw>"
+preview=$(cd "$CASE" && ./preview_run 2>&1) || fail "CIME preview_run failed"
+[[ "$preview" == *"$expected_mpi"* ]] || fail "preview_run does not show the expected srun launcher"
+echo "PASS: Slurm/MPI configuration (CIME XML + preview_run)"
 echo
 echo "BASIC PREFLIGHT PASSED — STILL NOT EVIDENCE OF RUN SUCCESS."
 echo "Before any case.submit: examine hybrid DATM/coupler restart semantics,"
