@@ -474,3 +474,123 @@ squeue -u ly3n24 -o '%.12i %.36j %.10T %.12M %.12l %R'
 Only after the extra 500 years are successfully archived should convergence be re-evaluated using carbon pool trends (including `TOTECOSYSC`, live vegetation and slower soil pools), not GPP/NEE agreement alone. The public GitHub repository does not contain restricted EC downloads, NetCDF data, restarts, or model archives.
 
 <!-- SIX_SITE_SPINUP1000_END -->
+
+<!-- SPINUP1000_FINAL_RESULTS_START -->
+
+## Five-site 1000-year spin-up results (18 October 2026)
+
+Five sites successfully archived **1000 continuous annual h0a files**
+and completed read-only carbon and flux diagnostics. **DE-Hai is
+excluded** from this release. These are diagnostics, not evidence
+that any site has reached carbon-pool or demographic equilibrium.
+
+All model cases retain the original \`<SITE>_FATES_SPINUP500\` name
+despite continuing from 500 to 1000 elapsed model years.
+
+| Site | Latest complete model forcing cycle | Monthly GPP R² | Monthly NEE R² |
+|---|---|---:|---:|
+| RU-Fyo | 2950–2977 | 0.918 | -1.508 |
+| DE-Tha | 2956–2985 | 0.729 | -1.365 |
+| DK-Sor | 2953–2981 | 0.910 | 0.794 |
+| NL-Loo | 2954–2982 | -0.023 | -1.710 |
+| IL-Yat | 2975–2999 | -2.451 | -7.466 |
+
+GPP and NEE comparisons use the last **complete, phase-aligned** forcing
+cycle mapped back onto the original EC observation years; they do
+not necessarily cover the simulation's final 100 model years.
+
+Convergence CSVs report last-30/100-year trends, paired forcing-cycle
+changes, and phase-aligned 500-vs-1000-year cycle means. These
+metrics are not automatic convergence pass/fail thresholds.
+
+[Five-site numerical summary](figures/spinup1000_final/five_site_spinup1000_summary.csv)
+ · [Reproducible Python analysis](scripts/14_plot_five_site_spinup1000.py)
+ · [IRIDIS6 Slurm job](scripts/15_submit_five_site_spinup1000_plots.sh)
+ · [Result publishing script](scripts/16_publish_five_site_spinup1000.py)
+
+### RU-Fyo — 1000 years
+
+**Carbon pools, years 1–1000**
+
+![RU-Fyo 1000-year carbon pools](figures/spinup1000_final/RU-Fyo/RU-Fyo_01_carbon_pools_annual_mean.png)
+
+**Carbon pools, last 250 years**
+
+![RU-Fyo last 250 years](figures/spinup1000_final/RU-Fyo/RU-Fyo_02_carbon_pools_last250years.png)
+
+**Latest complete forcing-cycle GPP/NEE versus EC**
+
+![RU-Fyo GPP NEE monthly comparison](figures/spinup1000_final/RU-Fyo/RU-Fyo_GPP_NEE_monthly_overview.png)
+
+[Carbon annual means](figures/spinup1000_final/RU-Fyo/RU-Fyo_carbon_annual_means.csv) · [Convergence statistics](figures/spinup1000_final/RU-Fyo/RU-Fyo_convergence_metrics.csv) · [Monthly GPP/NEE skill statistics](figures/spinup1000_final/RU-Fyo/RU-Fyo_monthly_metrics.csv)
+
+### DE-Tha — 1000 years
+
+**Carbon pools, years 1–1000**
+
+![DE-Tha 1000-year carbon pools](figures/spinup1000_final/DE-Tha/DE-Tha_01_carbon_pools_annual_mean.png)
+
+**Carbon pools, last 250 years**
+
+![DE-Tha last 250 years](figures/spinup1000_final/DE-Tha/DE-Tha_02_carbon_pools_last250years.png)
+
+**Latest complete forcing-cycle GPP/NEE versus EC**
+
+![DE-Tha GPP NEE monthly comparison](figures/spinup1000_final/DE-Tha/DE-Tha_GPP_NEE_monthly_overview.png)
+
+[Carbon annual means](figures/spinup1000_final/DE-Tha/DE-Tha_carbon_annual_means.csv) · [Convergence statistics](figures/spinup1000_final/DE-Tha/DE-Tha_convergence_metrics.csv) · [Monthly GPP/NEE skill statistics](figures/spinup1000_final/DE-Tha/DE-Tha_monthly_metrics.csv)
+
+### DK-Sor — 1000 years
+
+**Carbon pools, years 1–1000**
+
+![DK-Sor 1000-year carbon pools](figures/spinup1000_final/DK-Sor/DK-Sor_01_carbon_pools_annual_mean.png)
+
+**Carbon pools, last 250 years**
+
+![DK-Sor last 250 years](figures/spinup1000_final/DK-Sor/DK-Sor_02_carbon_pools_last250years.png)
+
+**Latest complete forcing-cycle GPP/NEE versus EC**
+
+![DK-Sor GPP NEE monthly comparison](figures/spinup1000_final/DK-Sor/DK-Sor_GPP_NEE_monthly_overview.png)
+
+[Carbon annual means](figures/spinup1000_final/DK-Sor/DK-Sor_carbon_annual_means.csv) · [Convergence statistics](figures/spinup1000_final/DK-Sor/DK-Sor_convergence_metrics.csv) · [Monthly GPP/NEE skill statistics](figures/spinup1000_final/DK-Sor/DK-Sor_monthly_metrics.csv)
+
+### NL-Loo — 1000 years
+
+**Carbon pools, years 1–1000**
+
+![NL-Loo 1000-year carbon pools](figures/spinup1000_final/NL-Loo/NL-Loo_01_carbon_pools_annual_mean.png)
+
+**Carbon pools, last 250 years**
+
+![NL-Loo last 250 years](figures/spinup1000_final/NL-Loo/NL-Loo_02_carbon_pools_last250years.png)
+
+**Latest complete forcing-cycle GPP/NEE versus EC**
+
+![NL-Loo GPP NEE monthly comparison](figures/spinup1000_final/NL-Loo/NL-Loo_GPP_NEE_monthly_overview.png)
+
+[Carbon annual means](figures/spinup1000_final/NL-Loo/NL-Loo_carbon_annual_means.csv) · [Convergence statistics](figures/spinup1000_final/NL-Loo/NL-Loo_convergence_metrics.csv) · [Monthly GPP/NEE skill statistics](figures/spinup1000_final/NL-Loo/NL-Loo_monthly_metrics.csv)
+
+### IL-Yat — 1000 years
+
+**Carbon pools, years 1–1000**
+
+![IL-Yat 1000-year carbon pools](figures/spinup1000_final/IL-Yat/IL-Yat_01_carbon_pools_annual_mean.png)
+
+**Carbon pools, last 250 years**
+
+![IL-Yat last 250 years](figures/spinup1000_final/IL-Yat/IL-Yat_02_carbon_pools_last250years.png)
+
+**Latest complete forcing-cycle GPP/NEE versus EC**
+
+![IL-Yat GPP NEE monthly comparison](figures/spinup1000_final/IL-Yat/IL-Yat_GPP_NEE_monthly_overview.png)
+
+[Carbon annual means](figures/spinup1000_final/IL-Yat/IL-Yat_carbon_annual_means.csv) · [Convergence statistics](figures/spinup1000_final/IL-Yat/IL-Yat_convergence_metrics.csv) · [Monthly GPP/NEE skill statistics](figures/spinup1000_final/IL-Yat/IL-Yat_monthly_metrics.csv)
+
+The published CSV files contain simulated carbon pools and
+aggregate diagnostics. Raw EC time series, paired monthly EC/model
+flux tables, original flux packages, NetCDF history and restarts,
+cluster paths, and job logs are deliberately excluded.
+
+<!-- SPINUP1000_FINAL_RESULTS_END -->
