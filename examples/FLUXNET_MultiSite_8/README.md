@@ -297,3 +297,92 @@ restart data and local machine paths are not redistributed.
 Convergence requires separate assessment of slow carbon pools,
 the aligned forcing-cycle changes, FATES demography and input QC.
 <!-- EIGHT_SITE_SPINUP500_RESULTS_END -->
+
+## Stage 09 — Seven-site 500-to-1000-year spin-up extension
+
+**Added: 2026-10-18**
+
+The seven selected FLUXNET_MultiSite_8 cases are intended
+to continue from their fully archived 500-model-year
+checkpoints to a cumulative 1000 model years.
+
+### Target sites
+
+| Site | Original case | Target model years |
+| --- | --- | ---: |
+| CZ-BK1 | CZ-BK1_FATES_SPINUP500 | 1000 |
+| IT-Ren | IT-Ren_FATES_SPINUP500 | 1000 |
+| FR-FBn | FR-FBn_FATES_SPINUP500 | 1000 |
+| DE-Hzd | DE-Hzd_FATES_SPINUP500 | 1000 |
+| CH-Dav | CH-Dav_FATES_SPINUP500 | 1000 |
+| BE-Vie | BE-Vie_FATES_SPINUP500 | 1000 |
+| IT-Lav | IT-Lav_FATES_SPINUP500 | 1000 |
+
+**FR-Hes is excluded** pending confirmation of a
+complete 500-year archived run.
+
+### Implementation
+
+Script:
+[`scripts/13_extend_seven_site_spinup500_to1000.sh`](scripts/13_extend_seven_site_spinup500_to1000.sh)
+
+The implementation is adapted from the six-site
+500-to-1000-year continuation workflow, retaining
+the checkpoint-safe CIME recovery procedure.
+
+- Continue from complete archived restart files.
+- Preserve existing CIME cases and model executables.
+- Preserve each site's meteorological forcing cycle.
+- Preserve time-varying DATM ZBOT and surface inputs.
+- Preserve fixed site-specific spin-up CO2.
+- Keep NO_LEAP and ATM_NCPL=48.
+- Continue in five-model-year segments.
+- For exactly 500 completed years, use RESUBMIT=99
+  for the remaining 100 five-year segments.
+- Preserve historical 500-year archives and history.
+- Use one MPI rank, one CPU core and 8 GB per job.
+- Remove Slurm exclusive allocation.
+- Use Slurm-aware PMIx MPI launch with core binding.
+- Exclude FR-Hes from this extension.
+
+MPI launch:
+
+```bash
+srun --mpi=pmix --ntasks=1 --cpus-per-task=1 --cpu-bind=cores
+```
+
+### Execute on IRIDIS6
+
+Production submission, only once:
+
+```bash
+bash scripts/13_extend_seven_site_spinup500_to1000.sh run
+```
+
+Read-only progress:
+
+```bash
+bash scripts/13_extend_seven_site_spinup500_to1000.sh status
+```
+
+Run from the `FLUXNET_MultiSite_8` example directory.
+
+### Important notes
+
+The original `_FATES_SPINUP500` case name is retained
+even when the cumulative simulation reaches 1000 years.
+
+The script requires fully archived restart components,
+appropriate CaseStatus records, compatible scientific
+settings and no active target-site jobs.
+
+No preliminary test simulation or model rebuild is run.
+
+A successful submission does not establish completion
+of 1000 model years or carbon-pool convergence.
+Actual completion must be established from IRIDIS6
+model history, successful archives and restart records.
+
+Do not rerun production submission against active jobs.
+Do not upload FLUXNET data, NetCDF output, private
+cluster logs or restart archives to GitHub.
