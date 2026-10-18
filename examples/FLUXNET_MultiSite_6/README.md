@@ -617,3 +617,16 @@ cluster paths, and job logs are deliberately excluded.
 - [Five-site 1000-year figures and numerical diagnostics](figures/spinup1000_final/)
 
 <!-- DK_SOR_HISTORICAL_PILOT_END -->
+
+<!-- FIVE_SITE_SPINUP3000_START -->
+## Five-site continuation: 1000 to 3000 model years (18 October 2026)
+
+Sites: **RU-Fyo, DE-Tha, DK-Sor, NL-Loo, IL-Yat**; DE-Hai excluded.
+The original five completed 1000 model years. A separate continuation adds 2000 years (400 x 5-year job segments, `RESUBMIT=399`), retaining each site's original case name, fixed CO2, forcing cycle and model settings. Each model job requests one CPU, 8 GiB RAM and nonexclusive Slurm allocation, with `srun --mpi=pmix --cpu-bind=cores` for CPU affinity.
+
+- [One-click wrapper](scripts/20_five_site_spinup1000_plus2000_oneclick.sh)
+- [Generated continuation code](scripts/21_five_site_spinup1000_to3000_generated.sh)
+- [Continuation documentation](docs/spinup1000_to3000_continuation_2026-10-18.md)
+
+This section documents the experiment configuration; successful 3000-year completion and carbon-pool convergence remain to be verified.
+<!-- FIVE_SITE_SPINUP3000_END -->
