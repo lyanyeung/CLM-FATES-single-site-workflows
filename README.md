@@ -1,5 +1,28 @@
 # CLM-FATES single-site workflows
 
+<!-- MULTIBATCH_SPINUP1000_STATUS_START -->
+## Four FLUXNET multi-site spin-up campaigns — 1000-model-year status (20 October 2026)
+
+**Evidence categories:** "Confirmed" means a dated IRIDIS6 archive inventory has been supplied previously and/or site-specific published numerical diagnostics establish 1000 complete annual model histories. "Not yet confirmed" is **not** the same as failed; it requires a fresh IRIDIS6 live check. Completion is not evidence of carbon-pool convergence. GitHub cannot see live Slurm jobs or Research Filestore files.
+
+| Campaign | Confirmed 1000-year sites | Not confirmed at 1000 years |
+| --- | --- | --- |
+| [6 sites](examples/FLUXNET_MultiSite_6/) | **5/6:** RU-Fyo, DE-Tha, DK-Sor, NL-Loo, IL-Yat | DE-Hai (previously backup-only; 1000-year completion not verified) |
+| [8 sites](examples/FLUXNET_MultiSite_8/) | **Live verification pending.** Seven sites have prior verified 500-year results. | CZ-BK1, IT-Ren, FR-FBn, DE-Hzd, CH-Dav, BE-Vie, IT-Lav (500→1000 continuation), and FR-Hes (separate recovery) |
+| [11 sites](examples/FLUXNET_MultiSite_11/) | **9/11:** BE-Bra, FR-Fon, GL-ZaH, AT-Neu, FI-Sod, CH-Cha, CH-Fru, CH-Lae, CZ-Stn | IT-Noe, CH-Aws (failed/incomplete at last supplied snapshot) |
+| [13 sites](examples/FLUXNET_MultiSite_13/) | **Live verification pending.** | All 13 `_S30SHARED` cases require a fresh post-recovery inventory; old `_S30EXCL` cases must not be combined |
+
+**Confirmed minimum: 14 distinct sites** across the four non-overlapping site groups. This is a dated documentary minimum rather than a live aggregate total; 8-/13-site cases may have advanced in the meantime.
+
+### Read-only live progress and protected Research Filestore archival
+
+- [Check all four campaigns on IRIDIS6](scripts/research_filestore/audit_four_batches_live.py): prints annual h0a inventory, contiguous years, archive restart model years, live Slurm job state, and 1000-year milestone.
+- [Selective 8-/13-site transfer and SHA-256 verification](scripts/research_filestore/archive_completed_8_13.py): only run for sites independently verified at 1000 years and with no active jobs; keeps the original Scratch data. Use the batch-specific `--sites` selection; do not run an unconditional 8-/13-site migration.
+- [Established 11-site transfer tool](scripts/research_filestore/archive_eleven_site_1000yr.py), [Filestore guidance](docs/research_filestore/README.md), [11-site operational record](docs/research_filestore/FLUXNET_MultiSite_11.md).
+
+**Research Filestore destination:** `/research/xclimatetbm/ly3n24/CLM_FATES/Spinup_Archives/<BATCH>/<SITE>/<CASE>/`. Copying and SHA-256 confirmation do not permit automatic Scratch pruning; preserve restarts, pointers and active 1000→3000 continuations. Filestore transfer completion must be evidenced by actual receipts/logs on IRIDIS6, not by this README.
+<!-- MULTIBATCH_SPINUP1000_STATUS_END -->
+
 Reproducible single-site CTSM/CLM-FATES workflows used on University of Southampton IRIDIS6.
 
 The repository is organized by observing network / case study:
