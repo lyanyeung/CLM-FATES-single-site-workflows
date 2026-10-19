@@ -1,5 +1,27 @@
 # FLUXNET MultiSite 13: QC v5 forcing and exploratory meteorological repairs
 
+<!-- FLUXNET13_STAGE37_QUOTA_RECOVERY -->
+## Stage 37 — Recover interrupted 1000-year spin-ups after Scratch file-count quota failure (20 October 2026)
+
+**Status: recovery code and runbook published; actual successful resumption NOT YET VERIFIED.** Following the October 18–19 IRIDIS6 Scratch inode/file-count exhaustion (614,400/614,400 files), CESM/ParallelIO reported `Disk quota exceeded`, and many dependent CIME `st_archive` jobs remained `DependencyNeverSatisfied`. That queue state does not distinguish a first-segment failure from a later interruption. Consult site-specific `CaseStatus`, `sacct` and restart inventory before deciding how far a station ran.
+
+**Recovery target:** the 13 existing `<SITE>_FATES_SPINUP1000_S30SHARED` cases, not the superseded `S30EXCL` cases. Target 1000 cumulative model years (200 × 5-year segments); preserve site-specific surface, DATM, fixed CO2 and executable. Avoid rerunning Stage31–36 initial submission scripts or resetting the automatic resubmission counter to 199.
+
+The new [Stage37 guarded recovery implementation](scripts/stage37/37_recover_13site_spinup1000_after_inode_quota.py) separates `inspect` (read-only), `prepare SITE` (back up interrupted output and stage a verified coordinated archived restart), and `submit SESSION` (a separate one-shot `case.submit` after revalidation). A site is blocked if the latest recoverable checkpoint, restart components, `RESUBMIT`, case history or Slurm state are ambiguous. Cases with no completed five-year restart are not automatically restarted. No GitHub model NetCDF/restart data are uploaded.
+
+- [**Incident details, case safeguards, documented recovery procedure and IRIDIS6 commands**](docs/SPINUP1000_INODE_QUOTA_RECOVERY_2026-10-20.md).
+- [**Stage31–36 original CIME and Slurm chronology**](docs/SPINUP1000_CIME_SLURM_STAGE31_36_STATUS.md).
+
+```bash
+cd ~/CLM-FATES-single-site-workflows
+git pull --ff-only origin main
+myfiles
+python3 examples/FLUXNET_MultiSite_13/scripts/stage37/37_recover_13site_spinup1000_after_inode_quota.py inspect
+```
+
+**Do not claim 13/13 restarts, completed 1000 model years, or carbon-pool convergence until independently validated after resumed CIME/Slurm execution.**
+<!-- END FLUXNET13_STAGE37_QUOTA_RECOVERY -->
+
 <!-- FLUXNET13_20261018_FULLSYNC_START -->
 ## October 18, 2026 checkpoint: 13-site MET, BIF/ZBOT, DATM, surface and spin-up source
 
