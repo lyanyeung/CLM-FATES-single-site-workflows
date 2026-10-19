@@ -82,10 +82,16 @@ def ensure_safe_to_copy(selected):
     if not RESEARCH_MOUNT.is_dir():
         raise RuntimeError(f"Research Filestore not visible: {RESEARCH_MOUNT}")
     mount = subprocess.run(
-        ["findmnt", "-n", "-T", str(RESEARCH_MOUNT), "-o", "FSTYPE,TARGET"],
+        ["findmnt", "-n", "-T", str(RESEARCH_MOUNT / "ly3n24"), "-o", "FSTYPE,TARGET"],
         capture_output=True, text=True, check=True,
     ).stdout.strip()
-    if not mount.lower().startswith("nfs"):
+    # IRIDIS6 uses autofs to mount Research Filestore; findmnt can return
+    # both "autofs" and the backing "nfs" line. Do not rely on the first line.
+    if not any(
+        line.split()[0].lower() in ("nfs", "nfs4")
+        for line in mount.splitlines()
+        if line.split()
+    ):
         raise RuntimeError(
             f"Refusing transfer: {RESEARCH_MOUNT} is not on an NFS mount: {mount}"
         )
