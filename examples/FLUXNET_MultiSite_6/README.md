@@ -650,3 +650,39 @@ On 18 October 2026, the Scratch **file-count quota** (614,400/614,400 files; spa
 To inspect without changing files: `python3 scripts/research_filestore/audit_six_site_archive.py` (from the repository root on IRIDIS6).
 
 <!-- SIX_SITE_RESEARCH_FILESTORE_END -->
+
+
+<!-- FIVE_SITE_INODE_RECOVERY_20261019 -->
+## Stage 11 — Interrupted 1000→3000 spin-up and checkpoint recovery (19 October 2026)
+
+**Cause.** The October 18 IRIDIS6 Scratch *file-count* quota reached **614,400/614,400 files** (despite about 629/2000 GB being used). CESM ParallelIO reported `Disk quota exceeded`; dependent CIME `st_archive` Slurm jobs became `DependencyNeverSatisfied`. This is a storage/quota interruption, not demonstrated model instability. The file-count issue has subsequently been reported addressed, and historical outputs have been backed up. GitHub contains scripts and documentation, **not restart NetCDFs**. Research Filestore migration checksums and the actual successful restart submission remain to be confirmed by runtime logs.
+
+**Observed recovery preflight (19 October 2026, before repair):**
+
+| Site | Latest archived model year (elapsed) | Years remaining to 3000 | Pre-repair diagnosis |
+| --- | ---: | ---: | --- |
+| RU-Fyo | 1070 | 1930 | run ATM/LND/CPL pointers differ from archive; 4 unarchived history files |
+| DE-Tha | 1065 | 1935 | mismatched pointers; 8 unarchived history files |
+| DK-Sor | 1070 | 1930 | mismatched pointers; 6 unarchived history files |
+| NL-Loo | 1065 | 1935 | mismatched pointers; 6 unarchived history files |
+| IL-Yat | 1105 | 1895 | mismatched pointers; 4 unarchived history files |
+
+Five sites are **BLOCKED until recovery checks are satisfied**, not known to have completed 3000 years. **DE-Hai is not part of this continuation.** The CIME case names remain `<SITE>_FATES_SPINUP500`; their elapsed model years come from the archived model-clock restart date minus each site's original `RUN_STARTDATE` year.
+
+**Recovery method:** stop duplicate submissions; compare active Slurm jobs, CIME `CaseStatus`, current `RESUBMIT`, coordinated ATM/LND/CPL checkpoints, and run/archived pointers. Preserve unarchived partial files and all original CIME/XML state in a timestamped backup. If and only if no newer valid checkpoint exists, restore the last complete coordinated archived restart and active pointers, verify SHA256, and **submit separately** using the existing case's `./case.submit`. Do not rerun the original [20 one-click launcher](scripts/20_five_site_spinup1000_plus2000_oneclick.sh) or reset `RESUBMIT=399`. Confirm completion from follow-up `sacct`, `CaseStatus`, and next archived checkpoint; scientific convergence is a separate assessment.
+
+- **[Detailed incident evidence and restart recovery runbook](docs/spinup3000_inode_quota_recovery_2026-10-19.md)**
+- **[Initial read-only restart-check script](scripts/23_resume_five_site_3000_safely.py)** (when published; do not assume script exists until verified)
+- **[1000→3000 continuation script](scripts/21_five_site_spinup1000_to3000_generated.sh)**
+
+Run read-only diagnostics first on IRIDIS6:
+
+```bash
+myfiles
+squeue -u ly3n24 -o '%.12i %.55j %.10T %R'
+python3 ~/resume_five_site_3000_safely.py check
+python3 ~/recover_five_site_spinup3000_after_quota.py inspect
+```
+
+**Status as documented:** checkpoint assessment complete; live repair/submit success **not yet evidenced** in this repository. The operator must validate each transition before claiming resumed jobs or full 3000-year completion.
+<!-- END FIVE_SITE_INODE_RECOVERY_20261019 -->
