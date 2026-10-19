@@ -34,3 +34,7 @@ python3 scripts/research_filestore/audit_six_site_archive.py
 ```
 
 This audit is read-only and must not be interpreted as cryptographic proof of migration.
+
+## Eleven-site 1000-year model outputs (20 October 2026)
+
+Nine stations have reported successful 1000-model-year simulations: BE-Bra, FR-Fon, GL-ZaH, AT-Neu, FI-Sod, CH-Cha, CH-Fru, CH-Lae and CZ-Stn. IT-Noe and CH-Aws are excluded pending recovery. Use the [eleven-site archive and checksum operations guide](FLUXNET_MultiSite_11.md) and [copy-only script](../../scripts/research_filestore/archive_eleven_site_1000yr.py). **Research Filestore transfer remains unverified** until executed on IRIDIS6 and checked against its SHA-256 manifests.
