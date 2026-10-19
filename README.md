@@ -60,3 +60,7 @@ The experiment includes:
 **Status:** NOAA historical simulation underway.
 The full fixed-CO2 historical control and 29-year comparison
 are not yet completed.
+
+## Southampton Research Filestore: six-site 1000-year history archival
+
+See [FLUXNET_MultiSite_6 Research Filestore runbook](examples/FLUXNET_MultiSite_6/docs/research_filestore_README.md): five published 1000-year spin-up cases with carbon-pool and GPP/NEE figures, a separate DE-Hai backup-only case, the 2026-10-18 Scratch file-count quota incident, safe archival paths, and read-only verification code. Successful migration and Scratch deletion must be confirmed from live checksum manifests; this repository does not contain raw NetCDF or restart files.

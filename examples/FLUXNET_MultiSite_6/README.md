@@ -630,3 +630,23 @@ The original five completed 1000 model years. A separate continuation adds 2000 
 
 This section documents the experiment configuration; successful 3000-year completion and carbon-pool convergence remain to be verified.
 <!-- FIVE_SITE_SPINUP3000_END -->
+<!-- SIX_SITE_RESEARCH_FILESTORE_START -->
+
+## Research Filestore archive: six-site 1000-year CLM-FATES experiments (19 October 2026)
+
+**Location (IRIDIS6 NFS):** `/research/xclimatetbm/ly3n24/CLM_FATES/Spinup_Archives/FLUXNET_MultiSite_6/`
+**Windows SMB:** `\\xclimatetbm.files.soton.ac.uk\xclimatetbm`
+**Status:** Archive location selected and migration workflow documented; **per-site transfer verification and Scratch cleanup are not independently confirmed**.
+
+This six-site example is the first documented use of Southampton Research Filestore for long-term CLM-FATES NetCDF history retention. **Five stations** (RU-Fyo, DE-Tha, DK-Sor, NL-Loo, IL-Yat) previously completed 1000 model years and already have carbon-pool, convergence and monthly GPP/NEE results under [`figures/spinup1000_final/`](figures/spinup1000_final/). **DE-Hai is a backup-only exception**; it is not listed as a completed 1000-year station.
+
+On 18 October 2026, the Scratch **file-count quota** (614,400/614,400 files; space 629/2000 GB) triggered `Disk quota exceeded` failures in ParallelIO and CIME. Research Filestore showed approximately 2.2 TB available at inspection, so completed outputs can be copied there to support future xarray-based plots. This is *not* a substitute for validating the site's active 1000→3000-year restart chain. Do not delete the original CIME cases, run directories, current recovery checkpoints, or DE-Hai original files.
+
+- **[Detailed storage incident, scientific status, directory layout, backup instructions, safety/retention policy and plotting example](docs/research_filestore_README.md)**
+- **[Read-only six-site Research Filestore audit script](scripts/22_audit_research_filestore_sixsite.py)**
+- **[Existing five-site 1000-year figures and statistics](figures/spinup1000_final/)**
+- **[1000→3000 continuation plan](docs/spinup1000_to3000_continuation_2026-10-18.md)**
+
+To inspect without changing files: `python3 scripts/22_audit_research_filestore_sixsite.py` (from this example directory on IRIDIS6).
+
+<!-- SIX_SITE_RESEARCH_FILESTORE_END -->
