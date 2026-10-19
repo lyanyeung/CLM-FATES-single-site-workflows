@@ -1,6 +1,45 @@
 # FLUXNET MultiSite 13: QC v5 forcing and exploratory meteorological repairs
 
-**Research checkpoint, 15 October 2026.** This folder preserves 13-site baseline preparation, the correctly adapted QC v5 code, and every subsequent meteorological QC experiment through Stage 22. **The forcing is a numerical trial, not scientifically approved for BIF, DATM or spin-up.** No FLUXNET/ICOS or ERA source files are redistributed here.
+<!-- FLUXNET13_20261018_FULLSYNC_START -->
+## October 18, 2026 checkpoint: 13-site MET, BIF/ZBOT, DATM, surface and spin-up source
+
+**Current status: 13/13 scientifically PROVISIONAL annual DATM inputs available; 271 annual files verified; 13/13 site point-surface NetCDF files detected.** Stage 28 numerical QC is **13/13 PASS**, but all underlying scientific forcing/height/PFT decisions remain subject to review. **1000-year spin-up completion and convergence are NOT established here.** Historical Stage00–22 notes below remain part of the experiment's decision history; they do not supersede this checkpoint.
+
+### Detailed method documents
+
+- [**MET Stage20–28: selected versions, unusual weather, source/QC caveats and unresolved MDS blocks**](docs/MET_STAGE20_28_METHOD_AND_OPEN_ISSUES.md).
+- [**BIF TA/WS sensor heights, dated ZBOT changes, early extrapolation, DE-Lnf and IT-Col literature references, Stage29b/30 DATM manifests**](docs/BIF_HEIGHT_ZBOT_DATM_STAGE23_30.md).
+- [**1000-year case configuration, Slurm shared-CPU-core policy, and the Stage31–36 recovery/failed-attempt timeline**](docs/SPINUP1000_CIME_SLURM_STAGE31_36_STATUS.md).
+- [Source inventory and SHA256 ledger](docs/CODE_SOURCES_SHA256_20261018.tsv) (generated during publication).
+
+### Data production status
+
+| Data product / experiment | Recorded result | Remaining issue |
+|---|---|---|
+| 13-site MET Stage28 selection | 13/13 numerical hard-QC PASS | **Scientifically provisional.** Original MDS gaps and suspicious extreme rain remain |
+| BIF TA reference heights, 11 stations | 5 time-varying dated BIF; 6 single documented BIF TA height | First-known-height extrapolation and TA/WS height mismatch require disclosure |
+| **DE-Lnf** | **44 m static**, published **air-temperature sensor height** ([Jürgensen et al., 2021](https://doi.org/10.3390/f12121693)) | No proof it remained at 44 m across **all** 2002–2024 |
+| **IT-Col** | **32 m static**, published **site measurement-height proxy** ([Keenan et al., 2009](https://doi.org/10.5194/bg-6-1423-2009)) | **NOT confirmed `TA_F` sensor height**; sensitivity/metadata confirmation needed |
+| Stage29b / Stage30 DATM | 229 + 42 = **271** yearly 30-min `NO_LEAP` NetCDFs; earlier 229 SHA256-verified unchanged | Research-only provisional forcing; full manifest lives on IRIDIS |
+| Surface data | 13/13 single-site point-surface NetCDFs found | Vegetation PFT / footprint / soil representation not independently certified |
+| Spin-up setup | Intended **1000 model years per site**, 5-year jobs × 200, `RESUBMIT=199` | Slurm launch corrections; model completion and equilibrium not established |
+
+**Special MET and BIF points:** DE-Gri and FI-Let retain **49 + 20 = 69** original MDS flagged blocks in the Stage28 decision ledger. ES-LJu has a suspicious strong-rainfall concentration at **23:00**; do **not** automatically re-time or redistribute precipitation without instrument/record evidence. FI-Hyy has **122,640 half-hour records** with TA/WS height difference >3 m in the BIF audit; wind speed was not vertically adjusted. Site heights may change at times not on the 30-minute grid, so Stage29b retains the original effective instant and maps height at the next eligible model timestamp, with early extrapolation explicitly flagged.
+
+### Workflow and source code
+
+`Surface: scripts/stage02/` → `MET: scripts/stage20–stage28/` → `BIF audit: scripts/stage23–stage24/` → `dynamic/static ZBOT and annual DATM: scripts/stage29b/` → `published/proxy static height completion: scripts/stage30/` → `CIME spin-up history: scripts/stage31–stage36/`.
+
+**Warning on spin-up scripts:** `stage31` first submitted 13 cases using **incorrect whole-node `--exclusive`**, `stage34` stopped after preparation, and `stage35` hit a submission-state ambiguity. Those scripts are **audit history and superseded experiments**, not a recommended fresh spin-up recipe. Existing successful 8-/11-site references use **1 CPU / 8 GB per Slurm job, no `--exclusive`, PMIx `srun`**, with batch resources regenerated from CIME XML. The outcome of Stage36 needs its actual running log; do not assert it succeeded or double-submit uncertain cases.
+
+The final Stage30 manifest lives under:
+
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/FLUXNET_13_ZBOT_DATM_STAGE30_20261018_055940_1008203/reports/04_consolidated_13site_271_DATM_SHA256_manifest.csv`
+
+**Reproducibility vs redistribution:** the repository contains source code, scientific limitations and non-sensitive summaries. It intentionally excludes raw FLUXNET/ICOS/EUF packages, licensed BIF/EC observations, ERA caches, derived MET CSV, ZBOT/DATM NetCDF, active CIME case directories, restarts, spin-up output, private credentials and internal per-record manifests. Original files and hashes are retained on IRIDIS only.
+<!-- FLUXNET13_20261018_FULLSYNC_END -->
+
+**Historical checkpoint, 15 October 2026 (prior to the 18 October Stage28–30 completions).** This folder preserves 13-site baseline preparation, the correctly adapted QC v5 code, and every subsequent meteorological QC experiment through Stage 22. **The forcing is a numerical trial, not scientifically approved for BIF, DATM or spin-up.** No FLUXNET/ICOS or ERA source files are redistributed here.
 
 ## Sites and release windows
 
@@ -54,7 +93,7 @@ The corrected v5 audit is [Stage04 `*_fixed.py`](scripts/stage04/04_audit_13_sit
 
 Stage21 rejection *decision rows*: 45 `NO_STAGE18_SUPPORTED_UNTOUCHED_QC1_SUBSEGMENTS`, 33 `BOUNDARY_OR_INTERNAL_CONTINUITY_HOLD`, 2 `QC0_OR_UNSUPPORTED_SOURCE_KEEP`, and 2 `SEGMENT_LONGER_THAN_CONFIGURED_MAX`. Decision rows need not equal distinct blocks. The key insight: using only selected points inside a longer continuous QC1 fill period often introduces artificial discontinuities, motivating the unexecuted Stage22 whole-envelope experiment.
 
-## Decisions still pending before BIF
+## Historical Stage21 science decisions before the later BIF implementation
 
 1. Review the **74 pending** DE-Gri/FI-Let MDS flagged blocks using original measured QC0 anchors, whole fill periods and model disagreement; ERA5 and ERA5-Land are not independent ground truth.
 2. Examine **21** remaining large half-hour TA steps and original source/QC transitions across sites. Do not automatically rewrite QC0.
@@ -77,4 +116,4 @@ Stage21 QC and decision reports:
 
 Source code [all stages](scripts) and the associated [ES-LJu v7 methodology](docs/ES-LJu_site_specific_QC_v7_METHOD.md) are in this folder. Code files were archived as supplied; actual numerical runs occurred on IRIDIS6, not inside GitHub.
 
-**Do not commit licensed raw FLUXNET/ICOS data, ERA JSON caches, derived met forcing, NetCDF, access tokens, site credentials or model archives.** Preserve original and per-trial SHA256 ledgers on IRIDIS. **BIF gate: CLOSED_PENDING_SCIENTIFIC_MET_QC.**
+**Do not commit licensed raw FLUXNET/ICOS data, ERA JSON caches, derived met forcing, NetCDF, access tokens, site credentials or model archives.** Preserve original and per-trial SHA256 ledgers on IRIDIS. **Historical Stage21 BIF gate: CLOSED_PENDING_SCIENTIFIC_MET_QC.** The later Stage29b/30 research-only BIF/ZBOT/DATM products are described above; scientific approval remains open.
