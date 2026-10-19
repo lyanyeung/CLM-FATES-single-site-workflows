@@ -1,5 +1,11 @@
 # FLUXNET eight-site CLM-FATES workflow — upload, surface, QC v5 and dynamic-ZBOT DATM
 
+## 20 October 2026: 1000-year completion and Filestore audit
+
+The seven sites **CZ-BK1, IT-Ren, FR-FBn, DE-Hzd, CH-Dav, BE-Vie, IT-Lav** have verified *500-year* histories and a published 500-to-1000-year continuation workflow; **1000-year completion has not yet been independently confirmed in this repository**. FR-Hes has a separately documented recovery from a DATM/CIME failure and likewise requires a live check.
+
+Use the repository-wide [read-only four-batch IRIDIS6 audit](../../scripts/research_filestore/audit_four_batches_live.py) with `--batch FLUXNET_MultiSite_8`. It reports contiguous annual history and archived restart milestones without modifying models. Once a subset genuinely reaches 1000 years, the [selective copy-and-SHA256 archiver](../../scripts/research_filestore/archive_completed_8_13.py) can archive **only that subset** to Southampton Research Filestore. Do not mark any remaining sites completed or migrate their history on the strength of a historic submission alone. Never delete Scratch data as part of this process.
+
 **Forcing/data snapshot (2026-10-12):** Eight site datasets transferred and extracted on IRIDIS6; point surfaces created; forcing QC v5 run with targeted human reviews; three FR-Hes temperature/humidity time steps revised in a **separate** versioned forcing file. **188/188** annual candidate DATM NetCDF files validated. Each site has `STRUCTURE_OK_REVIEW`: this certifies structural/numerical checks, **not** complete scientific forcing, PFT or spin-up readiness.
 
 This example parallels [`../FLUXNET_MultiSite_6/`](../FLUXNET_MultiSite_6/). It deliberately contains source scripts and decision documentation **only**. Do not commit or redistribute downloaded FLUXNET/ICOS/EUF ZIPs, raw or processed CSVs, weather data, output NetCDFs, or model archives. Respect each network's data licence and citation requirements.
