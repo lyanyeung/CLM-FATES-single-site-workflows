@@ -33,9 +33,9 @@ The [main six-site README](../../examples/FLUXNET_MultiSite_6/README.md) records
 | IL-Yat | `IL-Yat_FATES_SPINUP500` | Completed; figures + CSV published | Same; structural vegetation-carbon interpretation requires care |
 | DE-Hai | `DE-Hai_FATES_SPINUP500` | **Not verified complete at 1000 years** | Copy what exists as backup only; **retain all originals** |
 
-Model convergence must not be inferred from the fact that a 1000-year run finished. The related [1000→3000 continuation workflow](spinup1000_to3000_continuation_2026-10-18.md) adds 2000 years in 400 five-year segments and **reuses the same original case names**. Its script records the correct five-site membership (excluding DE-Hai).
+Model convergence must not be inferred from the fact that a 1000-year run finished. The related [1000→3000 continuation workflow](../../examples/FLUXNET_MultiSite_6/docs/spinup1000_to3000_continuation_2026-10-18.md) adds 2000 years in 400 five-year segments and **reuses the same original case names**. Its script records the correct five-site membership (excluding DE-Hai).
 
-Existing publishable plots and CSVs are already tracked at [`figures/spinup1000_final/` ](../../examples/FLUXNET_MultiSite_6/figures/spinup1000_final/), including each station's `*_01_carbon_pools_annual_mean.png`, `*_02_carbon_pools_last250years.png`, `*_GPP_NEE_monthly_overview.png`, `*_carbon_annual_means.csv`, `*_convergence_metrics.csv`, and `*_monthly_metrics.csv`. These plots **stay on GitHub**; raw time-series NetCDF files and full restart state **do not**.
+Existing publishable plots and CSVs are already tracked at [`figures/spinup1000_final/`](../../examples/FLUXNET_MultiSite_6/figures/spinup1000_final/), including each station's `*_01_carbon_pools_annual_mean.png`, `*_02_carbon_pools_last250years.png`, `*_GPP_NEE_monthly_overview.png`, `*_carbon_annual_means.csv`, `*_convergence_metrics.csv`, and `*_monthly_metrics.csv`. These plots **stay on GitHub**; raw time-series NetCDF files and full restart state **do not**.
 
 ## 3. Storage locations
 
@@ -75,7 +75,7 @@ myfiles
 df -h /research/xclimatetbm
 df -i /research/xclimatetbm
 squeue -u ly3n24 -o '%.12i %.72j %.2t %.35R'
-python3 examples/FLUXNET_MultiSite_6/scripts/22_audit_research_filestore_sixsite.py
+python3 scripts/research_filestore/audit_six_site_archive.py
 ```
 
 The checker below is read-only; run it from a repository checkout on IRIDIS6. It reports the 1000-year h0a inventory, latest restart timestamps, NFS contents and transfer-manifest status for each of the six stations. It never removes model data.
@@ -102,7 +102,7 @@ This copies *all* h0a/hist files in the source folder, including later 1000→30
 2. Check all 1000 expected annual model years for five completed stations, plus *actual* available years for DE-Hai. The original first years are RU-Fyo 1998, DE-Tha 1996, DK-Sor 1996, NL-Loo 1997, IL-Yat 2000, DE-Hai 2000.
 3. Compare source/destination filenames, sizes and SHA-256 hashes; keep a per-site manifest on Research Filestore. Validate netCDF readability.
 4. **Never remove** source `case/`, `run/`, source inputs, the active restart checkpoint(s), `rpointer.*`, shared `cesm.exe`, or partial current-cycle output that might be needed for recovery.
-5. Specifically preserve the **1000-year boundary checkpoint** and the latest full 1000→3000 continuation restart; the [continuation script ](../../examples/FLUXNET_MultiSite_6/scripts/21_five_site_spinup1000_to3000_generated.sh) stages and validates coordinated ATM/LND/CPL restart components.
+5. Specifically preserve the **1000-year boundary checkpoint** and the latest full 1000→3000 continuation restart; the [continuation script](../../examples/FLUXNET_MultiSite_6/scripts/21_five_site_spinup1000_to3000_generated.sh) stages and validates coordinated ATM/LND/CPL restart components.
 6. **DE-Hai must remain backup-only.** Do not delete its Scratch originals on the basis of five-site reports.
 7. Re-check `myfiles` after any explicitly approved cleanup. Deleting large files is not equivalent to releasing a large number of file-count slots; count the candidate files first.
 
@@ -122,7 +122,7 @@ with xr.open_dataset(files[0], decode_times=False) as ds:
     print(sorted(ds.data_vars))
 ```
 
-The plotting implementation [`14_plot_five_site_spinup1000.py` ](../../examples/FLUXNET_MultiSite_6/scripts/14_plot_five_site_spinup1000.py) may need a configurable archive input root to use the NFS copy. Keep output figures/CSV in GitHub, but exclude all raw tower data, full NetCDF history, and restart files from Git.
+The plotting implementation [`14_plot_five_site_spinup1000.py`](../../examples/FLUXNET_MultiSite_6/scripts/14_plot_five_site_spinup1000.py) may need a configurable archive input root to use the NFS copy. Keep output figures/CSV in GitHub, but exclude all raw tower data, full NetCDF history, and restart files from Git.
 
 ## 7. Proof-of-migration checklist (pending live audit)
 
