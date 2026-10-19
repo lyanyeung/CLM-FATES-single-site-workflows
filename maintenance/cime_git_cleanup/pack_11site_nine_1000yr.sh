@@ -16,12 +16,16 @@ exec 9>"$HOME/.11site_nine_git_pack.lock"
 flock -n 9 || die "Another copy of this maintenance script is running"
 
 check_queue() {
-    local jobs jid job state
+    local jobs jid job state site
     jobs="$(squeue -h -u "$USER" -o '%i|%j|%t')" || die "squeue failed"
     while IFS='|' read -r jid job state; do
         [[ -n "$jid" ]] || continue
         [[ -n "$SELF_JOB" && "$jid" == "$SELF_JOB" ]] && continue
-        die "Other Slurm job exists: $jid $job $state"
+        for site in $SITES; do
+            if [[ "$job" == *"${site}_FATES_SPINUP500_11P"* ]]; then
+                die "Slurm job targets selected case: $jid $job $state"
+            fi
+        done
     done <<< "$jobs"
 }
 
