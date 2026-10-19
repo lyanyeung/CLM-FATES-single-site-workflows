@@ -125,11 +125,11 @@ def check(site, jobs):
             for option in ("--nodes=1", "--ntasks-per-node=1",
                            "--cpus-per-task=1", "--mem=8G"):
                 if not re.search(
-                    r"(?m)^\\s*#SBATCH\\s+" + re.escape(option) + r"\\s*$",
+                    r"(?m)^\s*#SBATCH\s+" + re.escape(option) + r"\s*$",
                     content,
                 ):
                     bad.append(f"{batch_name} missing expected {option}")
-            if re.search(r"(?m)^\\s*#SBATCH\\s+--exclusive(?:\\s|$)", content):
+            if re.search(r"(?m)^\s*#SBATCH\s+--exclusive(?:\s|$)", content):
                 bad.append(f"{batch_name} has forbidden --exclusive")
     except Exception as e:
         bad.append(f"CIME XML unreadable: {e}")
