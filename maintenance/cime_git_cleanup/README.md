@@ -88,3 +88,33 @@ Before moving any lock, establish from the recorded PID/host, process lists on t
 - [Six-site spin-up and Research Filestore records](../../examples/FLUXNET_MultiSite_6/README.md)
 - [Research Filestore management](../../docs/research_filestore/README.md)
 - [MPI, Slurm and CPU affinity](../../IRIDIS6_MPI_CPU_AFFINITY.md)
+
+## 11-site campaign: 9 completed 1000-year runs (user audit, 20 October 2026)
+
+The IRIDIS6 read-only progress report established 9/11 cases at 1000 model years with 1000 archived annual histories, a final 1000-year restart, `RESUBMIT=0`, `st_archive success` and no queued job at the time of the audit. **IT-Noe** was at 5 years and **CH-Aws** had no verified restart; neither is included.
+
+| Eligible | Case name pattern | History/restart status |
+|---|---|---|
+| BE-Bra, FR-Fon, GL-ZaH, AT-Neu, FI-Sod, CH-Cha, CH-Fru, CH-Lae, CZ-Stn | `<SITE>_FATES_SPINUP500_11P` | User-audited 1000 years; rerun preflight before maintenance |
+| IT-Noe | `IT-Noe_FATES_SPINUP500_11P` | 5 years — **excluded** |
+| CH-Aws | `CH-Aws_FATES_SPINUP500_11P` | 0 verified years — **excluded** |
+
+The standalone [nine-site audit/packing script](pack_11site_nine_1000yr.sh) verifies the exact nine case names, archive history counts/year span, final restart-directory presence, `CaseStatus`, `RESUBMIT`, Git locks and Git integrity. It will not start unless all nine pass preflight. The script deliberately stops if **any other Slurm job** is present; when running under Slurm it exempts only its own job ID.
+
+From the repository root on IRIDIS6:
+
+```bash
+git pull --ff-only
+bash maintenance/cime_git_cleanup/pack_11site_nine_1000yr.sh audit
+```
+
+Only if the audit reports `AUDIT PASSED`, submit:
+
+```bash
+sbatch --partition=batch --job-name=gc_11site_nine --nodes=1 --ntasks=1 \
+ --cpus-per-task=1 --mem=4G --time=01:00:00 \
+ --output="$HOME/gc_11site_nine_%j.log" \
+ --wrap="bash $HOME/CLM-FATES-single-site-workflows/maintenance/cime_git_cleanup/pack_11site_nine_1000yr.sh run"
+```
+
+**Do not run a second copy**, do not delete `.git`, and do not manually clear a `gc.pid` that may belong to another host. The script verifies archive structure and the presence of a restart folder, but does not independently inspect NetCDF file contents or establish scientific carbon-pool convergence. The nine cases' post-maintenance inode reductions must be recorded from IRIDIS; this GitHub commit only publishes code, not evidence of completed cleanup.
