@@ -58,3 +58,39 @@ Archive jobs pending with `DependencyNeverSatisfied` should be identified by **f
 Record per-site selected checkpoint, the sha256s of all three archived component restarts, the original and restored pointers, original `RESUBMIT`, Slurm job IDs and status, `CaseStatus` model/archive success messages, subsequent archived checkpoint and numerical convergence diagnostics. Keep source model NetCDF, licensed tower data and internal logs off GitHub. Only the reusable source, workflow explanation and non-sensitive summaries should be published.
 
 **Status:** Stage37 source and plan are documented here; neither actual restoration nor 1000-year completion has been established by the information available at publication.
+
+## 20 October follow-up: observed 13-site checkpoint inventory and missing runtime pointers
+
+Read-only Stage37 inspection on IRIDIS6 found **all 13 archived checkpoints**, but all cases were initially blocked because active `run/rpointer.cpl`, `run/rpointer.atm`, and `run/rpointer.lnd` were missing. These runtime pointers are not required to persist in `run/` after successful short-term archival; they may be reconstructed **only from verified coordinated archived component restarts and dated archived pointers**.
+
+| Site | Archived elapsed model years | Remaining | Unarchived h* files |
+|---|---:|---:|---:|
+| DE-Lnf | 50 | 950 | 6 |
+| DE-Obe | 40 | 960 | 6 |
+| ES-Agu | 40 | 960 | 10 |
+| ES-LJu | 40 | 960 | 2 |
+| IT-Col | 40 | 960 | 2 |
+| DE-Gri | 40 | 960 | 6 |
+| DE-RuR | 40 | 960 | 4 |
+| FI-Hyy | 40 | 960 | 6 |
+| FI-Let | 40 | 960 | 0 |
+| FR-Pue | 55 | 945 | 8 |
+| GF-Guy | 40 | 960 | 2 |
+| IT-MBo | 35 | 965 | 2 |
+| IT-Tor | 50 | 950 | 8 |
+
+**DE-Lnf also has a separately observed incorrect/unvalidated `MPI_RUN_COMMAND`.** Stage37 was amended so missing active pointers are an expected, recoverable condition; `prepare SITE` records missing original pointers and creates them from the verified archived restarts. A guarded **`fix-mpi DE-Lnf`** command is provided to back up CIME files and correct only the launcher, without resubmitting.
+
+**Required sequence**:
+
+```bash
+cd ~/CLM-FATES-single-site-workflows
+git fetch origin main
+# Retrieve the script as an exact remote blob without merging unrelated work:
+SCRIPT=examples/FLUXNET_MultiSite_13/scripts/stage37/37_recover_13site_spinup1000_after_inode_quota.py
+git show "origin/main:$SCRIPT" > "$SCRIPT"
+python3 -m py_compile "$SCRIPT"
+python3 "$SCRIPT" inspect
+```
+
+Only after the full `inspect` output confirms archived restart components, `RESUBMIT` and Slurm status, correct DE-Lnf launcher separately with `python3 "$SCRIPT" fix-mpi DE-Lnf`, then re-inspect. Use one-site `prepare SITE` and `submit SESSION` with checks between the two stages. **Do not batch-submit all 13 sites from this snapshot**; neither SHA256 verification nor actual restart execution has yet been established. This historical status snapshot is not proof of resumed simulation.
