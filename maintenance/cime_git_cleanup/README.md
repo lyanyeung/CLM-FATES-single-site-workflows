@@ -1,0 +1,90 @@
+# CIME case Git maintenance — IRIDIS6
+
+This folder documents a **safe, non-destructive approach** to reducing Scratch inode usage from the per-case `.git/objects` directories created and updated by CIME during long CLM-FATES spin-ups.
+
+**Use `git gc --no-prune`, never `rm -rf .git`.** Git object packing preserves reachable history, case configuration, NetCDF outputs and restart files. It does not demonstrate that a spin-up has converged.
+
+## Why this is needed
+
+On 19 October 2026, Scratch was limited to 614,400 files/inodes. Usage exceeded 593,000, even though GB storage was well below its quota. Three key contributors were:
+
+| Scratch path | Observed inodes | Note |
+|---|---:|---|
+| `CLM_FATES/cases` | 176,302 | Many replicated CIME Git repositories |
+| `.conda/pkgs` | 157,838 | Conda package cache; separate cleanup policy |
+| `CTSM_FATES_OUTPUTS/archive` | 92,844 | History/restarts; do not delete active data |
+
+Pack-file maintenance applies **only** to `CLM_FATES/cases/<case>/.git`. It does *not* apply to the source-control repository `~/CLM-FATES-single-site-workflows/.git`.
+
+## Six-site experiment: five 1000-year cases
+
+Five of the six historical cases reached 1000 model years: RU-Fyo, DE-Tha, DK-Sor, NL-Loo, IL-Yat. The sixth, DE-Hai, was a backup-only exception and must not be described as a completed 1000-year run. Case names still end in `_FATES_SPINUP500` even after later continuation to 1000 years.
+
+User-observed checkpoint on 20 October 2026:
+
+| Case | .git inodes before | .git inodes last reported | Loose objects last reported | Status |
+|---|---:|---:|---:|---|
+| RU-Fyo | 4,442 | 42 | 0 | Packed |
+| DE-Tha | 9,501 | 47 | 0 | Packed |
+| DK-Sor | 9,546 | 47 | 0 | Packed |
+| NL-Loo | 3,215 | 3,215 | 2,917 | **Not yet packed**: `gc.pid` must be investigated |
+| IL-Yat | 9,850 | 43 | 0 | Packed |
+
+The four verified packed case directories therefore reduced their combined inode footprint by about **33,160**. A preceding five-case maintenance Slurm job 4441251 failed during all-site preflight because NL-Loo contained a `gc.pid`; the later successful jobs and inode checks establish the above state. These are observations of Git storage, **not** proof of restart-chain health or 1000→3000-year readiness.
+
+## Recommended workflow
+
+1. Complete a simulation batch and verify `CaseStatus`, archive, restart and model results separately.
+2. Ensure there is **no Slurm work or other CIME/Git process** modifying the intended cases. The provided script conservatively stops if *any* of the user's Slurm jobs are queued or running.
+3. Run an inode / Git health **read-only audit**:
+   ```bash
+   bash maintenance/cime_git_cleanup/cime_git_maintenance.sh audit
+   ```
+4. If every repository is idle and has no lock, pack objects sequentially:
+   ```bash
+   bash maintenance/cime_git_cleanup/cime_git_maintenance.sh run
+   ```
+   Run expensive maintenance on a **single Slurm CPU**, not as multiple jobs on login nodes. See examples below.
+5. Recheck `git fsck --connectivity-only --no-dangling`, `git count-objects -vH`, `du --inodes -s .../.git`, and `myfiles`. Do not rely on an inode reduction alone.
+
+Both modes default to the five six-site case directory basenames. Supply **exact case names** (without paths) for other completed batches, for example:
+```bash
+bash maintenance/cime_git_cleanup/cime_git_maintenance.sh audit DE-Lnf_FATES_SPINUP1000_S30SHARED DE-Obe_FATES_SPINUP1000_S30SHARED
+```
+Do **not** include active 1000→3000-year cases.
+
+### Slurm maintenance job for the default five-site batch
+
+From the repository root on IRIDIS6, and **only after the audit passes**:
+```bash
+sbatch --partition=batch --job-name=cime_git_pack --nodes=1 --ntasks=1 \
+  --cpus-per-task=1 --mem=4G --time=01:00:00 \
+  --output="$HOME/cime_git_pack_%j.log" \
+  --wrap="bash $HOME/CLM-FATES-single-site-workflows/maintenance/cime_git_cleanup/cime_git_maintenance.sh run"
+```
+This submits a maintenance operation, not a CLM-FATES simulation. It cannot fix active model failures.
+
+## Stale Git locks: stop and investigate
+
+An old `.git/gc.pid` is **not by itself proof** that Git is inactive. The process may have run on another Slurm/login host. The `inspect_gc_lock.sh` helper reports its contents and timestamps; it never deletes it.
+
+```bash
+bash maintenance/cime_git_cleanup/inspect_gc_lock.sh NL-Loo_FATES_SPINUP500
+```
+
+Before moving any lock, establish from the recorded PID/host, process lists on the recorded host, Slurm/accounting history and lack of other activity that the operation has ended. Do not automatically delete a lock solely because it is older than 24 hours. If uncertain, leave it in place and skip that case. Never use `git gc --force` as a workaround for unexplained locking.
+
+## What packing does and does not do
+
+- `git gc --no-prune` packs Git objects and preserves reachable history; it may still update Git metadata and reflogs. It is **not a read-only command**.
+- Do not add the unsupported `--no-detach` option. On this IRIDIS installation, that option caused a previous `git gc` attempt to fail without changing inode usage.
+- Do **not** remove per-case `.git` directories or run `git clean`, `rm -rf`, `scancel -u`, or destructive `git gc --prune=now` in this maintenance workflow.
+- CIME case Git maintenance and the separate GitHub source repository are distinct concerns.
+- Packing Git objects does not change NetCDFs/restarts. Extending 1000→3000 model years still requires independent verification of last successful archive, restarts, pointers and CIME XML continuation settings.
+- Future CIME operations will create fresh loose Git objects again; repeat this maintenance **only at safe batch checkpoints**, not every 5-year resubmission.
+
+## Related documentation
+
+- [Six-site spin-up and Research Filestore records](../../examples/FLUXNET_MultiSite_6/README.md)
+- [Research Filestore management](../../docs/research_filestore/README.md)
+- [MPI, Slurm and CPU affinity](../../IRIDIS6_MPI_CPU_AFFINITY.md)
