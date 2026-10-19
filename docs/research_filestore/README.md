@@ -21,6 +21,7 @@ Five sites (RU-Fyo, DE-Tha, DK-Sor, NL-Loo, IL-Yat) previously produced complete
 - [Detailed case-study archival record](FLUXNET_MultiSite_6.md)
 - [Existing science results and figures](../../examples/FLUXNET_MultiSite_6/README.md)
 - [Read-only six-site archive audit](../../scripts/research_filestore/audit_six_site_archive.py)
+- [Reusable case-by-case read-only inspector](../../scripts/research_filestore/inspect_archive.py)
 
 **Transfer completion and Scratch deletion are not independently confirmed in these documents.** Only live checksum manifests and post-cleanup quota output can verify success.
 
