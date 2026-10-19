@@ -79,21 +79,20 @@ def validate_history(site):
 
 
 def ensure_safe_to_copy(selected):
-    if not RESEARCH_MOUNT.is_dir():
-        raise RuntimeError(f"Research Filestore not visible: {RESEARCH_MOUNT}")
-    mount = subprocess.run(
-        ["findmnt", "-n", "-T", str(RESEARCH_MOUNT / "ly3n24"), "-o", "FSTYPE,TARGET"],
+    target = RESEARCH_MOUNT / "ly3n24"
+    # Resolve the actual destination to trigger autofs before checking its FS.
+    if not target.is_dir():
+        raise RuntimeError(f"Research Filestore destination not accessible: {target}")
+    # GNU stat -f reports the actual backing filesystem. On IRIDIS6,
+    # findmnt can intermittently list autofs only even when the backing NFS
+    # is mounted and working, so do not use its first/only line as a gate.
+    fs_type = subprocess.run(
+        ["stat", "-f", "-c", "%T", str(target)],
         capture_output=True, text=True, check=True,
-    ).stdout.strip()
-    # IRIDIS6 uses autofs to mount Research Filestore; findmnt can return
-    # both "autofs" and the backing "nfs" line. Do not rely on the first line.
-    if not any(
-        line.split()[0].lower() in ("nfs", "nfs4")
-        for line in mount.splitlines()
-        if line.split()
-    ):
+    ).stdout.strip().lower()
+    if fs_type not in ("nfs", "nfs4"):
         raise RuntimeError(
-            f"Refusing transfer: {RESEARCH_MOUNT} is not on an NFS mount: {mount}"
+            f"Refusing transfer: {target} filesystem is {fs_type!r}, not NFS"
         )
     job_result = subprocess.run(
         ["squeue", "-h", "-u", USER, "-o", "%j"],
@@ -104,7 +103,11 @@ def ensure_safe_to_copy(selected):
     if active:
         raise RuntimeError("Refusing transfer while selected case has Slurm jobs: "
                            + ", ".join(active))
-    print(f"Research mount: {mount}; no selected-site Slurm jobs found", flush=True)
+    print(
+        f"Research filesystem: {fs_type} at {target}; "
+        "no selected-site Slurm jobs found",
+        flush=True,
+    )
 
 
 def copy_dir(src, dst):
