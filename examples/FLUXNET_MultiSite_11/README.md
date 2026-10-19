@@ -1,3 +1,10 @@
+
+## 20 October 2026 — Nine completed 1000-year cases and Git inode maintenance
+
+A later **read-only IRIDIS6 progress snapshot** supersedes the earlier 15 October operational status for these nine cases. BE-Bra, FR-Fon, GL-ZaH, AT-Neu, FI-Sod, CH-Cha, CH-Fru, CH-Lae and CZ-Stn each showed 1000 archived annual history files, continuous model years, a final restart, `RESUBMIT=0`, and `st_archive success`. IT-Noe remained at 5 model years and CH-Aws at 0 verified model years. This is a **run-completeness observation, not evidence of ecological equilibrium**.
+
+For the protected per-case Git object packing workflow, see [nine-site maintenance script](../../maintenance/cime_git_cleanup/pack_11site_nine_1000yr.sh) and [maintenance README](../../maintenance/cime_git_cleanup/README.md). The script defaults to read-only audit and cannot include the two unfinished sites. Git compaction and any subsequent 1000→3000-year continuation are separate activities; verify restart-chain integrity and continuation settings first. No Git maintenance execution result is claimed in this repository update.
+
 # Eleven long-term FLUXNET sites: source-aware forcing QC and site-specific review trials
 
 > **15 October 2026 status supersedes the older prospective sections below.** Stage15 produced **238/238 structurally audited, provisional** annual DATM files. Stage17 prepared cases; Stage18 initiated **1000-model-year CIME/Slurm resubmission workflows** for the eleven-site campaign. Multiple sites have been observed `RUNNING`, but **no complete 1000-year outcome or convergence has been established here**. IT-Noe has a dependency-error indication requiring separate investigation. **CH-Aws remains unresolved following three unsuccessful first segments** (`4286717`, `4286891`, `4286954`). For complete operational and scientific incident records, see [Stage17–18 1000-year spin-up status](docs/SPINUP_1000YEAR_STAGE17_18_2026-10-15.md) and [CH-Aws failed runs and meteorological investigations](docs/CH_Aws_HUMIDITY_FAILURES_2026-10-15.md). A [read-only status command](scripts/operations/01_readonly_spinup_status.sh) inspects running cases without resubmission.
