@@ -3,6 +3,7 @@
 
 Modes:
   inspect                     READ ONLY, all 13 sites
+  fix-mpi DE-Lnf              Backed-up PMIx launcher correction; no submission
   prepare SITE                Isolate incomplete files; restore last complete archived restart
   submit SESSION_DIRECTORY    One case.submit attempt for the prepared site
 
@@ -111,6 +112,7 @@ def check(site, jobs):
                 bad.append(f"{k}={settings[k]!r}; expected {v!r}")
         if "srun --mpi=pmix" not in settings["MPI_RUN_COMMAND"]:
             bad.append("MPI_RUN_COMMAND not validated PMIx srun")
+            notes.append(f"Actual MPI_RUN_COMMAND: {settings['MPI_RUN_COMMAND']!r}")
     except Exception as e:
         bad.append(f"CIME XML unreadable: {e}")
         return result
@@ -165,8 +167,13 @@ def check(site, jobs):
                 bad.append(f"Archived rpointer.{comp} mismatches {filename}")
             if not source.is_file() or not source.stat().st_size:
                 bad.append(f"Archived {comp} restart missing: {filename}")
-            current = ref(active)
-            notes.append(f"run rpointer.{comp}: {current}")
+            if not active.is_file():
+                # CIME short-term archive can move runtime rpointer files;
+                # verified archived pointers are the source of truth.
+                notes.append(f"run rpointer.{comp} absent; Stage37 prepare can restore it")
+            else:
+                current = ref(active)
+                notes.append(f"run rpointer.{comp}: {current}")
         except Exception as e:
             bad.append(str(e))
         result["refs"][comp] = (ptr, source, active, run / filename)
@@ -251,7 +258,13 @@ def prepare(site):
         original = session / "original_pointers"
         original.mkdir()
         for comp, (_, _, ptr, _) in d["refs"].items():
-            shutil.copy2(ptr, original / ptr.name)
+            if ptr.is_file():
+                shutil.copy2(ptr, original / ptr.name)
+            else:
+                (original / (ptr.name + ".MISSING")).write_text(
+                    "This rpointer was absent before restoration; "
+                    "original archive checkpoint pointers are preserved.\n"
+                )
         isolated = session / "interrupted_output"
         isolated.mkdir()
         for f in d["partial"] + d["newer"]:
@@ -318,17 +331,69 @@ def submit(session):
         raise Stop("case.submit failed/uncertain. DO NOT rerun blindly.")
 
 
+def fix_mpi(site):
+    """Explicit, guarded DE-Lnf-only CIME launcher fix; does not submit or reset."""
+    if site != "DE-Lnf":
+        raise Stop("fix-mpi is limited to DE-Lnf; inspect other sites separately")
+    d = check(site, slurm())
+    if not d["blockers"] or any(
+            not issue.startswith("MPI_RUN_COMMAND not validated")
+            for issue in d["blockers"]):
+        raise Stop(f"Not a clean MPI-only correction candidate: {d['blockers']}")
+    if d["done"] == TARGET:
+        raise Stop("Already completed target; no launcher change needed")
+    case = d["case"]
+    xml_keys = ("RESUBMIT", "STOP_N", "REST_N", "CONTINUE_RUN",
+                "RUN_STARTDATE", "RUNDIR", "DOUT_S_ROOT", "CLM_CO2_TYPE")
+    original = {key: xml(case, key) for key in xml_keys}
+    src_files = ("env_mach_specific.xml", "env_run.xml", "env_batch.xml",
+                 ".case.run", "CaseStatus", "user_nl_clm", "user_nl_datm_streams")
+    source_hashes = {k: digest(case / k) for k in
+                     ("user_nl_clm", "user_nl_datm_streams")
+                     if (case / k).is_file()}
+    BACKUP.mkdir(parents=True, exist_ok=True)
+    session = Path(tempfile.mkdtemp(prefix="DE-Lnf_mpi_", dir=BACKUP))
+    for filename in src_files:
+        candidate = case / filename
+        if candidate.is_file():
+            shutil.copy2(candidate, session / filename)
+    (session / "previous_mpi.txt").write_text(
+        xml(case, "MPI_RUN_COMMAND") + "\n")
+    if any(r[1] in ("run." + d["name"], "st_archive." + d["name"])
+           for r in slurm()):
+        raise Stop("A Slurm job appeared before MPI correction")
+    new_command = "srun --mpi=pmix --ntasks=1 --cpus-per-task=1 --cpu-bind=cores"
+    command(["./xmlchange", f"MPI_RUN_COMMAND={new_command}"], cwd=case)
+    if xml(case, "MPI_RUN_COMMAND") != new_command:
+        raise Stop(f"xmlchange verification failed; backup at {session}")
+    for key, previous in original.items():
+        if xml(case, key) != previous:
+            raise Stop(f"CIME setting {key} changed unexpectedly; backup at {session}")
+    for filename, previous_hash in source_hashes.items():
+        if digest(case / filename) != previous_hash:
+            raise Stop(f"Science input {filename} changed; backup at {session}")
+    preview = command(["./preview_run"], cwd=case)
+    (session / "preview_run.txt").write_text(preview + "\n")
+    if new_command not in preview:
+        raise Stop(f"preview_run did not confirm expected PMIx launcher; {session}")
+    print(f"MPI_FIXED DE-Lnf; BACKUP={session}")
+    print("No case.setup --reset, job cancellation, or job submission performed.")
+    print("Next: rerun inspect, then prepare DE-Lnf only if REPAIRABLE.")
+
+
 def main():
     if os.environ.get("USER") != ACCOUNT:
         raise Stop("Run as ly3n24 on IRIDIS6")
     if len(sys.argv) == 2 and sys.argv[1] == "inspect":
         inspect()
+    elif len(sys.argv) == 3 and sys.argv[1] == "fix-mpi":
+        fix_mpi(sys.argv[2])
     elif len(sys.argv) == 3 and sys.argv[1] == "prepare":
         prepare(sys.argv[2])
     elif len(sys.argv) == 3 and sys.argv[1] == "submit":
         submit(Path(sys.argv[2]).resolve())
     else:
-        raise Stop("Usage: SCRIPT inspect | prepare SITE | submit SESSION_DIRECTORY")
+        raise Stop("Usage: SCRIPT inspect | fix-mpi DE-Lnf | prepare SITE | submit SESSION_DIRECTORY")
 
 
 if __name__ == "__main__":
