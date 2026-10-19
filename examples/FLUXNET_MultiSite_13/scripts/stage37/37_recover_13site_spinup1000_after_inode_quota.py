@@ -113,6 +113,24 @@ def check(site, jobs):
         if "srun --mpi=pmix" not in settings["MPI_RUN_COMMAND"]:
             bad.append("MPI_RUN_COMMAND not validated PMIx srun")
             notes.append(f"Actual MPI_RUN_COMMAND: {settings['MPI_RUN_COMMAND']!r}")
+
+        # Validate actual Slurm directives, not MPI XML alone.  Both model
+        # and short-term archive jobs must respect shared-core 1CPU/8GB.
+        for batch_name in (".case.run", "case.st_archive"):
+            batch = case / batch_name
+            if not batch.is_file():
+                bad.append(f"Missing generated batch script: {batch_name}")
+                continue
+            content = batch.read_text(errors="replace")
+            for option in ("--nodes=1", "--ntasks-per-node=1",
+                           "--cpus-per-task=1", "--mem=8G"):
+                if not re.search(
+                    r"(?m)^\\s*#SBATCH\\s+" + re.escape(option) + r"\\s*$",
+                    content,
+                ):
+                    bad.append(f"{batch_name} missing expected {option}")
+            if re.search(r"(?m)^\\s*#SBATCH\\s+--exclusive(?:\\s|$)", content):
+                bad.append(f"{batch_name} has forbidden --exclusive")
     except Exception as e:
         bad.append(f"CIME XML unreadable: {e}")
         return result
