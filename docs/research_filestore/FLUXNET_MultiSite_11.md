@@ -52,3 +52,9 @@ The script checks all 1000 annual `h0a` years by filenames against the case's si
 **Important:** Do not delete Scratch history, restart checkpoints, `rpointer.*`, case directories, active recovery snapshots, executables, or source forcing. Full CIME continuation may require more than an archived final-year output. Neither `inspect` nor completion receipts prove a scientifically converged spin-up. Confirm future continuation requirements before any separate cleanup. The two unfinished sites are deliberately untouched.
 
 For storage policy and the earlier file-count quota incident, see [Research Filestore overview](README.md) and [six-site case study](FLUXNET_MultiSite_6.md). Raw NetCDFs and the original tower inputs are not published to GitHub.
+
+## IRIDIS6 autofs-backed NFS mount compatibility (2026-10-20)
+
+The Research Filestore at `/research/xclimatetbm` is an **autofs-backed NFS mount**. A confirmed IRIDIS6 `findmnt -T /research/xclimatetbm/ly3n24 -o TARGET,FSTYPE,SOURCE` returned **both** `autofs` and `nfs` records; `stat -f -c %T /research/xclimatetbm/ly3n24` reported `nfs`. The initial copy tool incorrectly required the first `findmnt` result to begin with `nfs`, rejecting valid mounts before copying. The archive script now queries the `ly3n24` path and accepts an NFS/NFS4 result on any returned mount record while still rejecting unverified mounts.
+
+The BE-Bra source inventory independently passed with **1000 annual h0a files (1996–2995)**. This entry documents the script repair only; it does **not** claim that Research Filestore copies for any of the nine sites have successfully transferred and passed SHA-256 verification. Confirm the per-site receipts and logs on IRIDIS6 before stating migration is complete.
