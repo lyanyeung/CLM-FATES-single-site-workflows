@@ -1,5 +1,31 @@
 # FLUXNET MultiSite 13: QC v5 forcing and exploratory meteorological repairs
 
+<!-- IRIDIS_LIVE_20261020_LATEST_START -->
+## Latest IRIDIS6 run snapshot — 20 October 2026 (13 sites)
+
+This is newer than the Stage37 recovery publication below. All reported cases are the existing `_FATES_SPINUP1000_S30SHARED` cases, **not** the superseded `S30EXCL` cases.
+
+| Site | Archived years / target | Remaining model years | Latest coordinated checkpoint | `RESUBMIT` | Slurm snapshot | Job IDs (as reported) |
+| --- | ---: | ---: | --- | ---: | --- | --- |
+| DE-Lnf | 650 / 1000 | 350 | `2652-01-01-00000` | 69 | **PENDING** | 4490359:PENDING |
+| DE-Obe | 455 / 1000 | 545 | `2463-01-01-00000` | 108 | **RUNNING** | 4490688:RUNNING, 4490690:PENDING |
+| ES-Agu | 460 / 1000 | 540 | `2466-01-01-00000` | 107 | **PENDING** | 4489459:PENDING |
+| ES-LJu | 470 / 1000 | 530 | `2474-01-01-00000` | 105 | **PENDING** | 4490127:PENDING |
+| IT-Col | 465 / 1000 | 535 | `2461-01-01-00000` | 106 | **PENDING** | 4490463:PENDING |
+| DE-Gri | 510 / 1000 | 490 | `2514-01-01-00000` | 97 | **RUNNING** | 4490687:RUNNING, 4490689:PENDING |
+| DE-RuR | 505 / 1000 | 495 | `2516-01-01-00000` | 98 | **PENDING** | 4490358:PENDING |
+| FI-Hyy | 500 / 1000 | 500 | `2497-01-01-00000` | 99 | **PENDING** | 4490465:PENDING |
+| FI-Let | 495 / 1000 | 505 | `2505-01-01-00000` | 100 | **PENDING** | 4491686:PENDING, 4491687:PENDING |
+| FR-Pue | 465 / 1000 | 535 | `2465-01-01-00000` | 106 | **PENDING** | 4490129:PENDING |
+| GF-Guy | 465 / 1000 | 535 | `2469-01-01-00000` | 106 | **PENDING** | 4491521:PENDING, 4491522:PENDING |
+| IT-MBo | 485 / 1000 | 515 | `2488-01-01-00000` | 102 | **PENDING** | 4490834:PENDING, 4490835:PENDING |
+| IT-Tor | 435 / 1000 | 565 | `2443-01-01-00000` | 112 | **PENDING** | 4490130:PENDING |
+
+**Summary:** **2 RUNNING** (DE-Obe, DE-Gri) and **11 PENDING**; none is archived at 1000 years in this snapshot. The 13 archived checkpoints total **6,360 of 13,000 target model-years**, with **6,640 remaining**. This establishes post-recovery queued/running jobs and advanced checkpoints relative to historical incidents, but does not independently verify each next CIME segment or confirm final 1000-year completion.
+
+Source: operator-provided, read-only IRIDIS6 `check_four_spinups.py` report on **20 October 2026**. The report shows the newest archived, minimally validated three-component CIME restart and the Slurm queue at that instant, **not the current model timestep**. This page is not live telemetry. `RUNNING`/`PENDING` do not prove the next five-year segment has completed; `COMPLETE` means a target-year restart was observed, not that all history has been rechecked or that carbon pools/FATES demography have converged. No submissions, restart edits, or Slurm actions were performed in this README update.
+<!-- IRIDIS_LIVE_20261020_LATEST_END -->
+
 <!-- FLUXNET13_STAGE37_QUOTA_RECOVERY -->
 ## Stage 37 — Recover interrupted 1000-year spin-ups after Scratch file-count quota failure (20 October 2026)
 
