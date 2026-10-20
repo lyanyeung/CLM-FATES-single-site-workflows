@@ -443,3 +443,20 @@ The script works on **existing** `SITE_FATES_SPINUP500` cases. For the seven sit
 
 `inspect` is read-only; `prepare SITE` backs up case settings and stages a verified checkpoint but **does not submit**; `submit SESSION` requires an unchanged prepared manifest and runs `case.submit` once. Never run old creation/whole-batch scripts on active or previously submitted cases. Scientific convergence and actual subsequent 5-year model/archive completion require separate checks. This addition documents the method; it does **not** claim any jobs were resumed successfully.
 <!-- END EIGHT_SITE_QUOTA_RECOVERY_20261020 -->
+
+
+## Scratch image and analysis archival to Research Filestore
+
+All new Scratch-based diagnostic figures can be inventoried, SHA256-verified and copied to the shared Research Filestore using the repository-wide [cross-batch archival script](../../scripts/research_filestore/archive_scratch_analysis.py) and [step-by-step runbook](../../docs/SCRATCH_ANALYSIS_TO_RFS.md).
+
+**Batch:** `FLUXNET_MultiSite_8`. On an **IRIDIS6 login node** (not Slurm compute node):
+
+```bash
+cd ~/CLM-FATES-single-site-workflows
+python3 -B scripts/research_filestore/archive_scratch_analysis.py audit --batch FLUXNET_MultiSite_8
+python3 -B scripts/research_filestore/archive_scratch_analysis.py copy --batch FLUXNET_MultiSite_8
+```
+
+Copy receipts are written to `/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_8/scratch_analysis_archive/_receipts/`. Independently `verify --receipt <actual-RFS-receipt.json>` before optionally running `prune --receipt <actual-RFS-receipt.json> --confirm DELETE_VERIFIED_SCRATCH_IMAGES`. Only precisely verified **Scratch images** are removed; related analysis CSV/JSON, model history/restarts, raw forcing, CIME cases, GitHub figures and Home files are never deleted by this tool. The script skips uncertain locations, so audit actual results and use the established Home→RFS workflow where appropriate.
+
+**Status:** Documentation and reusable code published; no Scratch→RFS copy or deletion is claimed to have run on IRIDIS6 from this GitHub update.
