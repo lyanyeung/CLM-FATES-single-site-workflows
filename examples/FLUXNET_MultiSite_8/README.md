@@ -1,10 +1,25 @@
 # FLUXNET eight-site CLM-FATES workflow — upload, surface, QC v5 and dynamic-ZBOT DATM
 
-## 20 October 2026: 1000-year completion and Filestore audit
+## Spin-up progress snapshot — 20/10/2026 (IRIDIS6 read-only audit)
 
-The seven sites **CZ-BK1, IT-Ren, FR-FBn, DE-Hzd, CH-Dav, BE-Vie, IT-Lav** have verified *500-year* histories and a published 500-to-1000-year continuation workflow; **1000-year completion has not yet been independently confirmed in this repository**. FR-Hes has a separately documented recovery from a DATM/CIME failure and likewise requires a live check.
+**Measured on 20/10/2026**, based on the operator-supplied output of `audit_four_batches_live.py --batch FLUXNET_MultiSite_8`. These are the cumulative **model years elapsed**, not the meteorological forcing-window length. The recorded history-file count, consecutive annual h0a coverage and most recent archived restart model year were equal for every site. **No site had a Slurm job in the queue at this snapshot.** This is a dated snapshot, **not an automatically updating live status**.
 
-Use the repository-wide [read-only four-batch IRIDIS6 audit](../../scripts/research_filestore/audit_four_batches_live.py) with `--batch FLUXNET_MultiSite_8`. It reports contiguous annual history and archived restart milestones without modifying models. Once a subset genuinely reaches 1000 years, the [selective copy-and-SHA256 archiver](../../scripts/research_filestore/archive_completed_8_13.py) can archive **only that subset** to Southampton Research Filestore. Do not mark any remaining sites completed or migrate their history on the strength of a historic submission alone. Never delete Scratch data as part of this process.
+| Site | Annual h0a history | Consecutive model years | Archived restart elapsed years | Slurm queue | 1000-year milestone |
+| --- | ---: | ---: | ---: | --- | --- |
+| CZ-BK1 | 595 | 595 | 595 | NONE | Not reached |
+| IT-Ren | 580 | 580 | 580 | NONE | Not reached |
+| FR-Hes | 360 | 360 | 360 | NONE | Not reached; earlier DATM/CIME failure and recovery |
+| FR-FBn | 590 | 590 | 590 | NONE | Not reached |
+| DE-Hzd | 590 | 590 | 590 | NONE | Not reached |
+| CH-Dav | 585 | 585 | 585 | NONE | Not reached |
+| BE-Vie | 590 | 590 | 590 | NONE | Not reached |
+| IT-Lav | 590 | 590 | 590 | NONE | Not reached |
+
+**Summary: 0/8 confirmed at 1000 model years; 7/8 have exceeded 500, while FR-Hes is at 360.** `Queue=NONE` only means no jobs were visible in `squeue`; it does not diagnose why resubmission stopped. The year counts do not demonstrate ecological/carbon convergence, final scientific QC, or completion of Research Filestore archival.
+
+- Run the [read-only four-batch progress checker](../../scripts/research_filestore/audit_four_batches_live.py) again for a newer timestamp before revising these numbers.
+- Once a site has **1000 consecutive annual h0a files** and a corresponding archived 1000-year restart, and has no active jobs, use the [selective Research Filestore copy-and-SHA256 verification script](../../scripts/research_filestore/archive_completed_8_13.py) to archive that specific site. Preserve all Scratch originals and active continuation checkpoints.
+- [FR-Hes restart incident and earlier recovery evidence](docs/FR_Hes_DATM_XML_FILE_NOT_FOUND_RECOVERY_2026-10-18.md).
 
 **Forcing/data snapshot (2026-10-12):** Eight site datasets transferred and extracted on IRIDIS6; point surfaces created; forcing QC v5 run with targeted human reviews; three FR-Hes temperature/humidity time steps revised in a **separate** versioned forcing file. **188/188** annual candidate DATM NetCDF files validated. Each site has `STRUCTURE_OK_REVIEW`: this certifies structural/numerical checks, **not** complete scientific forcing, PFT or spin-up readiness.
 
