@@ -1,3 +1,24 @@
+<!-- IRIDIS_LIVE_20261020_LATEST_START -->
+## Latest IRIDIS6 run snapshot — 20 October 2026 (11 sites)
+
+| Site | Archived years / target | Remaining model years | Latest coordinated checkpoint | `RESUBMIT` | Slurm snapshot | Job IDs (as reported) |
+| --- | ---: | ---: | --- | ---: | --- | --- |
+| BE-Bra | 1000 / 1000 | 0 | `2996-01-01-00000` | 0 | **COMPLETE** | — |
+| FR-Fon | 1000 / 1000 | 0 | `3005-01-01-00000` | 0 | **COMPLETE** | — |
+| GL-ZaH | 1000 / 1000 | 0 | `3000-01-01-00000` | 0 | **COMPLETE** | — |
+| IT-Noe | 5 / 1000 | 995 | `2009-01-01-00000` | 198 | **IDLE** | — |
+| AT-Neu | 1000 / 1000 | 0 | `3002-01-01-00000` | 0 | **COMPLETE** | — |
+| FI-Sod | 1000 / 1000 | 0 | `3001-01-01-00000` | 0 | **COMPLETE** | — |
+| CH-Aws | unknown / 1000 | unknown | `NO_ARCHIVE` | 199 | **IDLE** | — |
+| CH-Cha | 1000 / 1000 | 0 | `3005-01-01-00000` | 0 | **COMPLETE** | — |
+| CH-Fru | 1000 / 1000 | 0 | `3005-01-01-00000` | 0 | **COMPLETE** | — |
+| CH-Lae | 1000 / 1000 | 0 | `3004-01-01-00000` | 0 | **COMPLETE** | — |
+| CZ-Stn | 1000 / 1000 | 0 | `3010-01-01-00000` | 0 | **COMPLETE** | — |
+
+**Summary:** **9 COMPLETE** at 1000 archived model years, **2 IDLE and unfinished**. IT-Noe has an intact-looking latest restart at **5/1000** (`2009-01-01-00000`) but no current job; `RESUBMIT=198` is only a stored CIME setting, **not** evidence of an active resubmission chain. CH-Aws has **NO_ARCHIVE**, so its elapsed model years **cannot be verified from this report**; treat as unresolved, not as a proven zero-year simulation. The published 9/11 completion is operational restart evidence, **not convergence or scientific validation**.
+
+Source: operator-provided, read-only IRIDIS6 `check_four_spinups.py` report on **20 October 2026**. The report shows the newest archived, minimally validated three-component CIME restart and the Slurm queue at that instant, **not the current model timestep**. This page is not live telemetry. `RUNNING`/`PENDING` do not prove the next five-year segment has completed; `COMPLETE` means a target-year restart was observed, not that all history has been rechecked or that carbon pools/FATES demography have converged. No submissions, restart edits, or Slurm actions were performed in this README update.
+<!-- IRIDIS_LIVE_20261020_LATEST_END -->
 
 ## 20 October 2026 — Nine completed 1000-year cases and Git inode maintenance
 
