@@ -165,3 +165,20 @@ Stage21 QC and decision reports:
 Source code [all stages](scripts) and the associated [ES-LJu v7 methodology](docs/ES-LJu_site_specific_QC_v7_METHOD.md) are in this folder. Code files were archived as supplied; actual numerical runs occurred on IRIDIS6, not inside GitHub.
 
 **Do not commit licensed raw FLUXNET/ICOS data, ERA JSON caches, derived met forcing, NetCDF, access tokens, site credentials or model archives.** Preserve original and per-trial SHA256 ledgers on IRIDIS. **Historical Stage21 BIF gate: CLOSED_PENDING_SCIENTIFIC_MET_QC.** The later Stage29b/30 research-only BIF/ZBOT/DATM products are described above; scientific approval remains open.
+
+
+## Scratch image and analysis archival to Research Filestore
+
+All new Scratch-based diagnostic figures can be inventoried, SHA256-verified and copied to the shared Research Filestore using the repository-wide [cross-batch archival script](../../scripts/research_filestore/archive_scratch_analysis.py) and [step-by-step runbook](../../docs/SCRATCH_ANALYSIS_TO_RFS.md).
+
+**Batch:** `FLUXNET_MultiSite_13`. On an **IRIDIS6 login node** (not Slurm compute node):
+
+```bash
+cd ~/CLM-FATES-single-site-workflows
+python3 -B scripts/research_filestore/archive_scratch_analysis.py audit --batch FLUXNET_MultiSite_13
+python3 -B scripts/research_filestore/archive_scratch_analysis.py copy --batch FLUXNET_MultiSite_13
+```
+
+Copy receipts are written to `/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_13/scratch_analysis_archive/_receipts/`. Independently `verify --receipt <actual-RFS-receipt.json>` before optionally running `prune --receipt <actual-RFS-receipt.json> --confirm DELETE_VERIFIED_SCRATCH_IMAGES`. Only precisely verified **Scratch images** are removed; related analysis CSV/JSON, model history/restarts, raw forcing, CIME cases, GitHub figures and Home files are never deleted by this tool. The script skips uncertain locations, so audit actual results and use the established Home→RFS workflow where appropriate.
+
+**Status:** Documentation and reusable code published; no Scratch→RFS copy or deletion is claimed to have run on IRIDIS6 from this GitHub update.
