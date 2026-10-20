@@ -686,3 +686,14 @@ python3 ~/recover_five_site_spinup3000_after_quota.py inspect
 
 **Status as documented:** checkpoint assessment complete; live repair/submit success **not yet evidenced** in this repository. The operator must validate each transition before claiming resumed jobs or full 3000-year completion.
 <!-- END FIVE_SITE_INODE_RECOVERY_20261019 -->
+
+<!-- DE_HAI_810_RECOVERY_20261020_START -->
+## DE-Hai recovery from 810 / 1000 years (20 October 2026)
+
+The DE-Hai continuation is **not yet confirmed resumed**. The latest operator-observed archive checkpoint was `2810-01-01-00000` (810 model years from 2000), after a successful archive job `4397990`; the following CESM job `4398068` failed. All three active run pointers still referred to an old 2670 checkpoint. Existing `RESUBMIT=37` corresponds to 38 remaining five-year segments, targeting `3000-01-01-00000`. The precise failure in the CESM log has **not** yet been verified.
+
+- [Incident record, observed state, safeguards and operator steps](docs/DE_Hai_810year_recovery_2026-10-20.md)
+- [DE-Hai-only guarded recovery script (inspect / prepare / submit)](scripts/24_recover_DE_Hai_810_to1000.py)
+
+Do not run the original six-site or five-site submission wrappers for this recovery. First confirm no active DE-Hai Slurm jobs, adequate Scratch inode headroom, and absence of newer valid unarchived restarts. `inspect` is read-only; `prepare` preserves existing state and stages the verified archived restart without submitting; `submit SESSION` makes a separately authorized, one-shot submission. Only claim success after Slurm, CaseStatus and subsequent checkpoint verification.
+<!-- DE_HAI_810_RECOVERY_20261020_END -->
