@@ -1,5 +1,26 @@
 # FLUXNET eight-site CLM-FATES workflow — upload, surface, QC v5 and dynamic-ZBOT DATM
 
+<!-- IRIDIS_LIVE_20261020_LATEST_START -->
+## Latest IRIDIS6 run snapshot — 20 October 2026 (8 sites)
+
+**This operator-observed status supersedes the earlier 20 October snapshot further down this README** (which recorded 595/580/etc. years with no queued jobs). The seven-site 500→1000-year continuation has since been submitted and advanced; FR-Hes is a separate 500-year recovery target.
+
+| Site | Archived years / target | Remaining model years | Latest coordinated checkpoint | `RESUBMIT` | Slurm snapshot | Job IDs (as reported) |
+| --- | ---: | ---: | --- | ---: | --- | --- |
+| CZ-BK1 | 655 / 1000 | 345 | `2659-01-01-00000` | 68 | **PENDING** | 4491684:PENDING, 4491685:PENDING |
+| IT-Ren | 635 / 1000 | 365 | `2634-01-01-00000` | 72 | **PENDING** | 4489461:PENDING |
+| FR-Hes | 360 / 500 | 140 | `2357-01-01-00000` | 27 | **IDLE** | — |
+| FR-FBn | 650 / 1000 | 350 | `2658-01-01-00000` | 69 | **PENDING** | 4491523:PENDING, 4491524:PENDING |
+| DE-Hzd | 645 / 1000 | 355 | `2655-01-01-00000` | 70 | **RUNNING** | 4490536:RUNNING, 4490537:PENDING |
+| CH-Dav | 640 / 1000 | 360 | `2637-01-01-00000` | 71 | **RUNNING** | 4490534:RUNNING, 4490535:PENDING |
+| BE-Vie | 645 / 1000 | 355 | `2641-01-01-00000` | 70 | **PENDING** | 4489678:PENDING |
+| IT-Lav | 650 / 1000 | 350 | `2653-01-01-00000` | 69 | **PENDING** | 4490898:PENDING, 4490899:PENDING |
+
+**Summary:** 2 RUNNING (DE-Hzd, CH-Dav), 5 PENDING, 1 IDLE (FR-Hes), 0 complete at the current targets. Across all eight cases, **4,880 of 7,500 target model-years** have verified checkpoints, **2,620 years remain**, and the seven 1000-year continuation cases are actively queued/running. FR-Hes is at **360/500**, has **no job** in this snapshot, and its earlier unarchived-success/archiving anomaly must be investigated before resubmission. No new FR-Hes submission is claimed.
+
+Source: operator-provided, read-only IRIDIS6 `check_four_spinups.py` report on **20 October 2026**. The report shows the newest archived, minimally validated three-component CIME restart and the Slurm queue at that instant, **not the current model timestep**. This page is not live telemetry. `RUNNING`/`PENDING` do not prove the next five-year segment has completed; `COMPLETE` means a target-year restart was observed, not that all history has been rechecked or that carbon pools/FATES demography have converged. No submissions, restart edits, or Slurm actions were performed in this README update.
+<!-- IRIDIS_LIVE_20261020_LATEST_END -->
+
 ## Spin-up progress snapshot — 20/10/2026 (IRIDIS6 read-only audit)
 
 **Measured on 20/10/2026**, based on the operator-supplied output of `audit_four_batches_live.py --batch FLUXNET_MultiSite_8`. These are the cumulative **model years elapsed**, not the meteorological forcing-window length. The recorded history-file count, consecutive annual h0a coverage and most recent archived restart model year were equal for every site. **No site had a Slurm job in the queue at this snapshot.** This is a dated snapshot, **not an automatically updating live status**.
