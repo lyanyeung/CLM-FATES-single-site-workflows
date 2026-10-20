@@ -411,3 +411,14 @@ model history, successful archives and restart records.
 Do not rerun production submission against active jobs.
 Do not upload FLUXNET data, NetCDF output, private
 cluster logs or restart archives to GitHub.
+
+<!-- EIGHT_SITE_QUOTA_RECOVERY_20261020 -->
+## Stage 10 — Checkpoint-safe recovery after Scratch inode interruption (20 October 2026)
+
+- [Single-site inspect/prepare/submit recovery script](scripts/21_resume_eight_site_after_quota.py)
+- [IRIDIS6 operation guide](docs/resume_after_inode_quota_2026-10-20.md)
+
+The script works on **existing** `SITE_FATES_SPINUP500` cases. For the seven sites already verified to have 500-year archives, the target is cumulative 1000 model years; for FR-Hes, the current target is cumulative 500 years. Live progress is determined from IRIDIS6 restart archives, not from dated GitHub status. It refuses submission if a site has queued/running Slurm jobs, already reached target, has newer unarchived restart files, inconsistent configuration, or incomplete checkpoint components.
+
+`inspect` is read-only; `prepare SITE` backs up case settings and stages a verified checkpoint but **does not submit**; `submit SESSION` requires an unchanged prepared manifest and runs `case.submit` once. Never run old creation/whole-batch scripts on active or previously submitted cases. Scientific convergence and actual subsequent 5-year model/archive completion require separate checks. This addition documents the method; it does **not** claim any jobs were resumed successfully.
+<!-- END EIGHT_SITE_QUOTA_RECOVERY_20261020 -->
