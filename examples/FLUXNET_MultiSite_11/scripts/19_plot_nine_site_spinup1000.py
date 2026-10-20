@@ -65,44 +65,96 @@ def load_script(path: Path, module_name: str):
     return module
 
 
-def locate_ec_csv(core, rawdir: Path, preference: str, override: str | None):
-    """Use proven six-site locator, then a broader header-audited fallback."""
-    try:
-        return core.find_flux_file(rawdir, preference, override)
-    except FileNotFoundError as original:
-        if override:
-            raise
-        if not rawdir.is_dir():
-            raise
-        # Some releases may place HH observation CSVs under other names.
-        valid = []
-        for p in sorted(rawdir.rglob("*.csv")):
-            if "HH" not in p.name.upper():
+def locate_ec_sources(forcing: Path, preference: str, override: str | None):
+    """Discover original HH tower carbon flux files from raw* directories.
+
+    Stage03's real eleven-site policy reads forcing/raw* (not forcing/raw
+    exclusively). Meteorological merge candidates and ERA are NOT EC data.
+    Priority for overlapping valid days is ICOS, ICOSETC, EUF, then FLX.
+    Missing individual daily values may fall back to a lower-priority source.
+    """
+    def inspect(path: Path):
+        with path.open("r", encoding="latin-1", newline="") as stream:
+            cols = set(next(csv.reader(stream)))
+        if not {"TIMESTAMP_START", "NEE_VUT_REF"}.issubset(cols):
+            return None
+        gpp = preference if preference in cols else next(
+            (v for v in ("GPP_DT_VUT_REF", "GPP_NT_VUT_REF") if v in cols), None
+        )
+        return gpp
+
+    if override:
+        chosen = Path(override).expanduser()
+        if not chosen.is_file():
+            raise FileNotFoundError(f"Explicit EC override not found: {chosen}")
+        gpp = inspect(chosen)
+        if not gpp:
+            raise ValueError(f"EC override lacks TIMESTAMP_START/NEE/GPP: {chosen}")
+        return [(chosen, gpp)]
+
+    if not forcing.is_dir():
+        raise FileNotFoundError(f"Missing forcing directory: {forcing}")
+    rawdirs = sorted(
+        p for p in forcing.iterdir()
+        if p.is_dir() and p.name.lower().startswith("raw")
+    )
+    candidates = []
+    for rawdir in rawdirs:
+        for path in sorted(rawdir.rglob("*.csv")):
+            upper = path.name.upper()
+            if not any(label in upper for label in
+                       ("FULLSET_HH", "FLUXMET_HH", "FLUXES_HH", "FLUX_HH")):
+                continue
+            # Never substitute ERA5, met-only merged series or flux coverage reports.
+            if any(label in upper for label in ("ERA5", "ERAI", "AUX", "BIF")):
                 continue
             try:
-                with p.open("r", encoding="latin-1", newline="") as f:
-                    fields = set(next(csv.reader(f)))
-            except (OSError, StopIteration, UnicodeError):
+                gpp = inspect(path)
+            except (OSError, UnicodeError, StopIteration):
                 continue
-            if not {"TIMESTAMP_START", "NEE_VUT_REF"}.issubset(fields):
+            if not gpp:
                 continue
-            gpp = preference if preference in fields else next(
-                (x for x in ("GPP_DT_VUT_REF", "GPP_NT_VUT_REF") if x in fields), None)
-            if gpp:
-                valid.append((p, gpp))
-        if len(valid) == 1:
-            return valid[0]
-        if len(valid) > 1:
-            raise ValueError(
-                f"Multiple possible EC HH files for {rawdir}: " +
-                "; ".join(str(p) for p, _ in valid) +
-                ". Specify --obs-csv SITE=/absolute/path.csv."
-            )
+            prefix = upper.split("_", 1)[0]
+            priority = {"ICOS": 0, "ICOSETC": 1, "EUF": 2, "FLX": 3}.get(prefix, 4)
+            candidates.append((priority, path, gpp))
+    if not candidates:
         raise FileNotFoundError(
-            f"No HH CSV with TIMESTAMP_START, NEE_VUT_REF and GPP_DT/NT_VUT_REF "
-            f"under {rawdir}. Original: {original}. "
-            "Inspect files (including FLUXES_HH), or use --obs-csv SITE=/path/file.csv."
+            f"No HH tower carbon flux CSV with NEE_VUT_REF and GPP DT/NT "
+            f"under raw* directories of {forcing}; checked {len(rawdirs)} raw dirs"
         )
+    # Exact duplicates are ignored; otherwise keep complementary historical
+    # releases, recording their source priority in output metadata.
+    seen = set()
+    sources = []
+    for _, path, gpp in sorted(candidates, key=lambda rec: (rec[0], str(rec[1]))):
+        if path in seen:
+            continue
+        sources.append((path, gpp))
+        seen.add(path)
+    return sources
+
+
+def merged_ec_daily(core, sources, first, last, min_halfhour):
+    """Pair original daily tower flux products; retain missing days as missing.
+
+    When releases overlap, use the higher-priority valid daily measurement
+    for each flux. This method does not fabricate observations or fill a
+    partially observed day using hourly values from unrelated releases.
+    """
+    combined = None
+    provenance = []
+    for path, gpp in sources:
+        one = core.ec_daily(path, gpp, first, last, min_halfhour)
+        data = one.set_index("date")[["EC_GPP", "EC_NEE"]]
+        provenance.append({
+            "path": str(path), "gpp_column": gpp,
+            "valid_GPP_days": int(data["EC_GPP"].notna().sum()),
+            "valid_NEE_days": int(data["EC_NEE"].notna().sum()),
+        })
+        combined = data if combined is None else combined.combine_first(data)
+    if combined is None or combined.empty:
+        raise ValueError("No daily tower observations overlap forcing years")
+    return combined.sort_index().reset_index(), provenance
 
 
 def plot_carbon(df, selected, units, site, dest, begin, end, suffix, title):
@@ -193,15 +245,23 @@ def process_site(site, args, base, core):
     print(f"  Last complete forcing cycle: model {model_cycle[0]}–{model_cycle[-1]} "
           f"<=> EC {first}–{last}", flush=True)
     status, ec_error, ec_path, gpp_col, scores = "CARBON_OK_EC_NOT_RUN", "", "", "", None
+    ec_sources_used = []
     if not args.carbon_only:
         try:
-            rawdir = args.sites_root / site / "forcing" / "raw"
-            obsfile, gpp_col = locate_ec_csv(core, rawdir, args.gpp_preference,
-                                             args.obs_csv.get(site))
-            ec_path = str(obsfile)
-            print(f"  EC source: {obsfile} [GPP={gpp_col}]", flush=True)
+            forcing = args.sites_root / site / "forcing"
+            ec_sources = locate_ec_sources(
+                forcing, args.gpp_preference, args.obs_csv.get(site)
+            )
+            ec_path = "; ".join(str(path) for path, _ in ec_sources)
+            gpp_col = "; ".join(dict.fromkeys(col for _, col in ec_sources))
+            print(f"  EC source count: {len(ec_sources)}; "
+                  f"overlap priority is ICOS > ICOSETC > EUF > FLX", flush=True)
+            for ecfile, ecol in ec_sources:
+                print(f"    {ecfile} [GPP={ecol}]", flush=True)
             model = core.fates_daily([(y, found1000[y]) for y in model_cycle], first, last)
-            obs = core.ec_daily(obsfile, gpp_col, first, last, args.min_halfhour)
+            obs, ec_sources_used = merged_ec_daily(
+                core, ec_sources, first, last, args.min_halfhour
+            )
             daily = model.merge(obs, on="date", how="left", validate="one_to_one")
             if len(daily) != (last - first + 1) * 365:
                 raise ValueError("Model–EC mapped cycle has wrong number of noleap days")
@@ -230,6 +290,8 @@ def process_site(site, args, base, core):
         "forcing_first_last": [first, last], "last_complete_model_cycle":
             [model_cycle[0], model_cycle[-1]],
         "ec_csv": ec_path, "ec_gpp_column": gpp_col,
+        "ec_source_daily_provenance": ec_sources_used,
+        "ec_merge_policy": "ICOS > ICOSETC > EUF > FLX; valid daily values only",
         "carbon_units": units, "carbon_variables": selected,
         "flux_units": "g C m-2 d-1", "model_nee": "-FATES_NEP",
         "ec_nee": "NEE_VUT_REF", "model_gpp": "FATES_GPP",
@@ -318,10 +380,12 @@ def main():
                       f"{years[0]}–{years[-1]}", flush=True)
                 if not args.carbon_only:
                     try:
-                        ecpath, gpp = locate_ec_csv(
-                            core, args.sites_root / site / "forcing" / "raw",
+                        ec_sources = locate_ec_sources(
+                            args.sites_root / site / "forcing",
                             args.gpp_preference, args.obs_csv.get(site))
-                        print(f"  EC: {ecpath} [{gpp}]", flush=True)
+                        print(f"  EC: {len(ec_sources)} usable HH source files", flush=True)
+                        for ecpath, gpp in ec_sources:
+                            print(f"    {ecpath} [{gpp}]", flush=True)
                     except Exception as err:
                         print(f"  EC NEEDS REVIEW: {type(err).__name__}: {err}", flush=True)
             except Exception as err:
