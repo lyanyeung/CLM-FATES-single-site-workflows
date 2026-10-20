@@ -21,6 +21,10 @@
 - Once a site has **1000 consecutive annual h0a files** and a corresponding archived 1000-year restart, and has no active jobs, use the [selective Research Filestore copy-and-SHA256 verification script](../../scripts/research_filestore/archive_completed_8_13.py) to archive that specific site. Preserve all Scratch originals and active continuation checkpoints.
 - [FR-Hes restart incident and earlier recovery evidence](docs/FR_Hes_DATM_XML_FILE_NOT_FOUND_RECOVERY_2026-10-18.md).
 
+### 20/10/2026 incomplete spin-up snapshot and Scratch retention
+
+The eight cases are incomplete at 360–595 model years. A [copy-only Research Filestore backup script](../../scripts/research_filestore/archive_eight_site_incomplete.py) copies historical NetCDF, archived restart, run snapshot, and selected case metadata, verifies source/destination SHA-256, and **never deletes Scratch originals**. The current continuation/recovery scripts may require Scratch-side `lnd/hist` files and coordinated restart pointers. Therefore successful copy alone is **not permission to delete** annual `h0a` files. Validate the full restart components and change dependent diagnostics/recovery workflow paths before any carefully controlled history-only cleanup; retain checkpoint `rest/`, live `run/`, `rpointer.*`, DATM forcing, executable, and CIME case.
+
 **Forcing/data snapshot (2026-10-12):** Eight site datasets transferred and extracted on IRIDIS6; point surfaces created; forcing QC v5 run with targeted human reviews; three FR-Hes temperature/humidity time steps revised in a **separate** versioned forcing file. **188/188** annual candidate DATM NetCDF files validated. Each site has `STRUCTURE_OK_REVIEW`: this certifies structural/numerical checks, **not** complete scientific forcing, PFT or spin-up readiness.
 
 This example parallels [`../FLUXNET_MultiSite_6/`](../FLUXNET_MultiSite_6/). It deliberately contains source scripts and decision documentation **only**. Do not commit or redistribute downloaded FLUXNET/ICOS/EUF ZIPs, raw or processed CSVs, weather data, output NetCDFs, or model archives. Respect each network's data licence and citation requirements.
