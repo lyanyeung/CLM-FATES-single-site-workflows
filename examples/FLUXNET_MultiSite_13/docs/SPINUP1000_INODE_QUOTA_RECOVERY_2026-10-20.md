@@ -94,3 +94,26 @@ python3 "$SCRIPT" inspect
 ```
 
 Only after the full `inspect` output confirms archived restart components, `RESUBMIT` and Slurm status, correct DE-Lnf launcher separately with `python3 "$SCRIPT" fix-mpi DE-Lnf`, then re-inspect. Use one-site `prepare SITE` and `submit SESSION` with checks between the two stages. **Do not batch-submit all 13 sites from this snapshot**; neither SHA256 verification nor actual restart execution has yet been established. This historical status snapshot is not proof of resumed simulation.
+
+## 20 October: eleven sites prepared; DE-Lnf memory allocation unresolved
+
+The operator reported eleven additional successful Stage37 `prepare` sessions: DE-Obe, ES-Agu, ES-LJu, IT-Col, DE-Gri, DE-RuR, FI-Hyy, FR-Pue, GF-Guy, IT-MBo and IT-Tor. FI-Let had already been prepared separately at 40 elapsed model years. These **PREPARED** states mean that restart staging and backup completed; they are **not** evidence of Slurm re-submission or a newly completed five-year segment.
+
+A separate batch audit reported all listed sites PASS except **DE-Lnf**, where both `.case.run` and `case.st_archive` lacked the required `#SBATCH --mem=8G`. DE-Lnf's `MPI_RUN_COMMAND` was already corrected to the PMIx `srun` command, and `CONTINUE_RUN=TRUE`, `RESUBMIT=189`, `BUILD_COMPLETE=TRUE` were observed.
+
+[Stage38 DE-Lnf memory repair](../scripts/stage38/38_fix_DE_Lnf_batch_memory_after_quota.py) addresses this as a distinct, guarded operation. `audit` is read-only; `repair` backs up the CIME batch/environment files, updates authoritative `env_batch.xml`, regenerates batch scripts via `case.setup --reset`, validates both model/archive 1CPU/8G/nonexclusive settings, and checks existing scientific configuration, executables and launcher. It does not submit jobs or modify RESUBMIT. If CIME regeneration or executable provenance fails, stop and inspect backups rather than editing generated batch files ad hoc.
+
+```bash
+cd ~/CLM-FATES-single-site-workflows
+git fetch origin main
+SCRIPT38=examples/FLUXNET_MultiSite_13/scripts/stage38/38_fix_DE_Lnf_batch_memory_after_quota.py
+mkdir -p "$(dirname "$SCRIPT38")"
+git show "origin/main:$SCRIPT38" > "$SCRIPT38"
+python3 -m py_compile "$SCRIPT38"
+python3 "$SCRIPT38" audit
+# After reading audit and verifying no active DE-Lnf Slurm jobs:
+# python3 "$SCRIPT38" repair
+# python3 examples/FLUXNET_MultiSite_13/scripts/stage37/37_recover_13site_spinup1000_after_inode_quota.py inspect
+```
+
+**Operator policy:** verify FI-Let's next five-year model execution and archive first, then submit the other individually prepared sessions exactly once and only after re-checking their Slurm status. No 1000-year completion or successful post-repair submission has been demonstrated by the reported output.
