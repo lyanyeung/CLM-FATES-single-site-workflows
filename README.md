@@ -8,7 +8,7 @@
 | Campaign | Confirmed 1000-year sites | Not confirmed at 1000 years |
 | --- | --- | --- |
 | [6 sites](examples/FLUXNET_MultiSite_6/) | **5/6:** RU-Fyo, DE-Tha, DK-Sor, NL-Loo, IL-Yat | DE-Hai (previously backup-only; 1000-year completion not verified) |
-| [8 sites](examples/FLUXNET_MultiSite_8/) | **Live verification pending.** Seven sites have prior verified 500-year results. | CZ-BK1, IT-Ren, FR-FBn, DE-Hzd, CH-Dav, BE-Vie, IT-Lav (500→1000 continuation), and FR-Hes (separate recovery) |
+| [8 sites](examples/FLUXNET_MultiSite_8/) | **0/8 at 1000 years (IRIDIS6 snapshot, 20/10/2026).** | CZ-BK1 **595**, IT-Ren **580**, FR-Hes **360**, FR-FBn **590**, DE-Hzd **590**, CH-Dav **585**, BE-Vie **590**, IT-Lav **590** model years; all Queue=NONE |
 | [11 sites](examples/FLUXNET_MultiSite_11/) | **9/11:** BE-Bra, FR-Fon, GL-ZaH, AT-Neu, FI-Sod, CH-Cha, CH-Fru, CH-Lae, CZ-Stn | IT-Noe, CH-Aws (failed/incomplete at last supplied snapshot) |
 | [13 sites](examples/FLUXNET_MultiSite_13/) | **Live verification pending.** | All 13 `_S30SHARED` cases require a fresh post-recovery inventory; old `_S30EXCL` cases must not be combined |
 
