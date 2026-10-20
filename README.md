@@ -1,16 +1,16 @@
 # CLM-FATES single-site workflows
 
 <!-- MULTIBATCH_SPINUP1000_STATUS_START -->
-## Four FLUXNET multi-site spin-up campaigns — IRIDIS6 status (20 October 2026)
+## ICOS sites — four multi-site spin-up campaigns (IRIDIS6 status, 20 October 2026)
 
 **Latest user-supplied IRIDIS6 checkpoint/Slurm snapshot** for batches 8, 11, and 13; for batch 6, no equivalent new snapshot was supplied in this update. All progress numbers represent **archived elapsed model years**, not forcing years or the current timestep within a running five-year job. Slurm statuses are a dated snapshot. Reaching a target does not demonstrate ecological convergence.
 
 | Campaign | Latest confirmed archival / current Slurm status | Next action |
 | --- | --- | --- |
-| [6 sites](examples/FLUXNET_MultiSite_6/) | Previous observation: five cases RU-Fyo, DE-Tha, DK-Sor, NL-Loo, IL-Yat reached 1000 years and were continued toward 3000; DE-Hai was recovered from a verified 810-year checkpoint and its Slurm run was accepted. **No new batch-6 status is included in the operator's current snapshot.** | Run a fresh batch-6 audit before claiming newer progress |
-| [8 sites](examples/FLUXNET_MultiSite_8/) | **0/8 current targets met.** Seven 1000-year cases: **2 RUNNING / 5 PENDING**, archived 635–655 years; FR-Hes **360/500**, IDLE. **2,620 target model-years remain** across all eight cases. | Monitor seven submitted chains; FR-Hes archiving requires separate investigation |
-| [11 sites](examples/FLUXNET_MultiSite_11/) | **9/11 completed 1000 archived years**; IT-Noe **5/1000**, IDLE; CH-Aws **NO_ARCHIVE**, IDLE, elapsed years unverified | Inspect IT-Noe and CH-Aws separately; do not mistake stored RESUBMIT for queued jobs |
-| [13 sites](examples/FLUXNET_MultiSite_13/) | **0/13 completed 1000 archived years**, **2 RUNNING / 11 PENDING**; archived model years total **6,360/13,000**, with **6,640 remaining** | Continue monitoring existing S30SHARED cases; do not resubmit active chains |
+| [ICOS Batch 6](examples/FLUXNET_MultiSite_6/) | Previous observation: five cases RU-Fyo, DE-Tha, DK-Sor, NL-Loo, IL-Yat reached 1000 years and were continued toward 3000; DE-Hai was recovered from a verified 810-year checkpoint and its Slurm run was accepted. **No new batch-6 status is included in the operator's current snapshot.** | Run a fresh batch-6 audit before claiming newer progress |
+| [ICOS Batch 8](examples/FLUXNET_MultiSite_8/) | **0/8 current targets met.** Seven 1000-year cases: **2 RUNNING / 5 PENDING**, archived 635–655 years; FR-Hes **360/500**, IDLE. **2,620 target model-years remain** across all eight cases. | Monitor seven submitted chains; FR-Hes archiving requires separate investigation |
+| [ICOS Batch 11](examples/FLUXNET_MultiSite_11/) | **9/11 completed 1000 archived years**; IT-Noe **5/1000**, IDLE; CH-Aws **NO_ARCHIVE**, IDLE, elapsed years unverified | Inspect IT-Noe and CH-Aws separately; do not mistake stored RESUBMIT for queued jobs |
+| [ICOS Batch 13](examples/FLUXNET_MultiSite_13/) | **0/13 completed 1000 archived years**, **2 RUNNING / 11 PENDING**; archived model years total **6,360/13,000**, with **6,640 remaining** | Continue monitoring existing S30SHARED cases; do not resubmit active chains |
 
 **Evidence:** operator-provided read-only `check_four_spinups.py` report dated 20 October 2026; batch-specific exact checkpoint, RESUBMIT and Slurm job IDs are recorded in each linked README. A `PENDING` job may be queued for priority or dependency reasons, and `RUNNING` only proves job activity at the snapshot, not that the next segment is complete. `NO_ARCHIVE` does not establish zero simulated years.
 
@@ -22,6 +22,8 @@
 
 **Research Filestore destination:** `/research/xclimatetbm/ly3n24/CLM_FATES/Spinup_Archives/<BATCH>/<SITE>/<CASE>/`. Confirm copy/checksum receipts before considering Scratch cleanup; do not delete active restart or original CIME cases.
 <!-- MULTIBATCH_SPINUP1000_STATUS_END -->
+
+**[ICOS sites — multi-site experiments](examples/ICOS_sites/)** collects the four existing European FLUXNET/ICOS batches (6, 8, 11 and 13). Dataset provenance remains site-specific. **AmeriFlux sites** are maintained separately, starting with [US-Ha1](examples/AmeriFlux_US-Ha1/). Existing workflow paths remain unchanged to avoid breaking IRIDIS6 jobs.
 
 Reproducible single-site CTSM/CLM-FATES workflows used on University of Southampton IRIDIS6.
 
