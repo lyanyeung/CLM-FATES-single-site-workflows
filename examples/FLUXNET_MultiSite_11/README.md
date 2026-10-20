@@ -111,3 +111,124 @@ The eleven-site candidate forcing now has a **user-approved dated-BIF TA_F ZBOT 
 Read the full scientific/methodological record: **[Dated BIF height and dynamic ZBOT, Stage13–15](docs/BIF_DYNAMIC_ZBOT_STAGE13_15.md)**. For exact executable scripts use `scripts/stage13b/`, `scripts/stage14/`, `scripts/stage15/`, and the Stage16 configuration-only inspection in `scripts/stage16/` after it has been published. The old sections below describing uncompleted BIF/DATM are preserved as a historical snapshot, superseded by this update.
 
 **Outstanding:** independent driver science review; CH-Aws winter modeled humidity uncertainty; gridded crop/PFT vs tower footprint; site-specific stream/namelist/CO₂ choice and GF-Guy executable preflight; short model tests. **Do not submit spin-up yet.**
+
+<!-- NINE_SITE_1000_FINAL_START -->
+## Nine-site 1000-year spin-up: convergence and EC comparisons
+
+Nine sites completed 1000 model years. IT-Noe and CH-Aws are excluded.
+The figures show annual carbon pools (1000 years), final 250-year
+carbon dynamics, and monthly GPP/NEE comparisons for the last
+complete forcing cycle.
+
+**Caution:** Model completion does not establish ecological convergence.
+Negative R² indicates performance worse than the observation-mean baseline.
+Some sites have incomplete EC observation periods.
+
+| Site | GPP monthly R² | NEE monthly R² |
+|---|---:|---:|
+| BE-Bra | 0.469 | 0.194 |
+| FR-Fon | 0.772 | 0.517 |
+| GL-ZaH | -38.551 | -60.050 |
+| AT-Neu | 0.847 | -0.650 |
+| FI-Sod | 0.035 | -2.245 |
+| CH-Cha | 0.465 | -1.785 |
+| CH-Fru | 0.772 | -0.761 |
+| CH-Lae | 0.850 | 0.535 |
+| CZ-Stn | 0.499 | -0.082 |
+
+[Nine-site summary CSV](figures/spinup1000_final/nine_site_spinup1000_summary.csv)
+
+### BE-Bra
+
+![BE-Bra carbon pools, 1000 years](figures/spinup1000_final/BE-Bra/BE-Bra_01_carbon_pools_annual_mean.png)
+
+![BE-Bra carbon pools, final 250 years](figures/spinup1000_final/BE-Bra/BE-Bra_02_carbon_pools_last250years.png)
+
+![BE-Bra monthly GPP and NEE](figures/spinup1000_final/BE-Bra/BE-Bra_GPP_NEE_monthly_overview.png)
+
+[Convergence metrics](figures/spinup1000_final/BE-Bra/BE-Bra_convergence_metrics.csv) · [EC metrics](figures/spinup1000_final/BE-Bra/BE-Bra_monthly_metrics.csv) · [Metadata](figures/spinup1000_final/BE-Bra/BE-Bra_metadata.json)
+
+### FR-Fon
+
+![FR-Fon carbon pools, 1000 years](figures/spinup1000_final/FR-Fon/FR-Fon_01_carbon_pools_annual_mean.png)
+
+![FR-Fon carbon pools, final 250 years](figures/spinup1000_final/FR-Fon/FR-Fon_02_carbon_pools_last250years.png)
+
+![FR-Fon monthly GPP and NEE](figures/spinup1000_final/FR-Fon/FR-Fon_GPP_NEE_monthly_overview.png)
+
+[Convergence metrics](figures/spinup1000_final/FR-Fon/FR-Fon_convergence_metrics.csv) · [EC metrics](figures/spinup1000_final/FR-Fon/FR-Fon_monthly_metrics.csv) · [Metadata](figures/spinup1000_final/FR-Fon/FR-Fon_metadata.json)
+
+### GL-ZaH
+
+![GL-ZaH carbon pools, 1000 years](figures/spinup1000_final/GL-ZaH/GL-ZaH_01_carbon_pools_annual_mean.png)
+
+![GL-ZaH carbon pools, final 250 years](figures/spinup1000_final/GL-ZaH/GL-ZaH_02_carbon_pools_last250years.png)
+
+![GL-ZaH monthly GPP and NEE](figures/spinup1000_final/GL-ZaH/GL-ZaH_GPP_NEE_monthly_overview.png)
+
+[Convergence metrics](figures/spinup1000_final/GL-ZaH/GL-ZaH_convergence_metrics.csv) · [EC metrics](figures/spinup1000_final/GL-ZaH/GL-ZaH_monthly_metrics.csv) · [Metadata](figures/spinup1000_final/GL-ZaH/GL-ZaH_metadata.json)
+
+### AT-Neu
+
+![AT-Neu carbon pools, 1000 years](figures/spinup1000_final/AT-Neu/AT-Neu_01_carbon_pools_annual_mean.png)
+
+![AT-Neu carbon pools, final 250 years](figures/spinup1000_final/AT-Neu/AT-Neu_02_carbon_pools_last250years.png)
+
+![AT-Neu monthly GPP and NEE](figures/spinup1000_final/AT-Neu/AT-Neu_GPP_NEE_monthly_overview.png)
+
+[Convergence metrics](figures/spinup1000_final/AT-Neu/AT-Neu_convergence_metrics.csv) · [EC metrics](figures/spinup1000_final/AT-Neu/AT-Neu_monthly_metrics.csv) · [Metadata](figures/spinup1000_final/AT-Neu/AT-Neu_metadata.json)
+
+### FI-Sod
+
+![FI-Sod carbon pools, 1000 years](figures/spinup1000_final/FI-Sod/FI-Sod_01_carbon_pools_annual_mean.png)
+
+![FI-Sod carbon pools, final 250 years](figures/spinup1000_final/FI-Sod/FI-Sod_02_carbon_pools_last250years.png)
+
+![FI-Sod monthly GPP and NEE](figures/spinup1000_final/FI-Sod/FI-Sod_GPP_NEE_monthly_overview.png)
+
+[Convergence metrics](figures/spinup1000_final/FI-Sod/FI-Sod_convergence_metrics.csv) · [EC metrics](figures/spinup1000_final/FI-Sod/FI-Sod_monthly_metrics.csv) · [Metadata](figures/spinup1000_final/FI-Sod/FI-Sod_metadata.json)
+
+### CH-Cha
+
+![CH-Cha carbon pools, 1000 years](figures/spinup1000_final/CH-Cha/CH-Cha_01_carbon_pools_annual_mean.png)
+
+![CH-Cha carbon pools, final 250 years](figures/spinup1000_final/CH-Cha/CH-Cha_02_carbon_pools_last250years.png)
+
+![CH-Cha monthly GPP and NEE](figures/spinup1000_final/CH-Cha/CH-Cha_GPP_NEE_monthly_overview.png)
+
+[Convergence metrics](figures/spinup1000_final/CH-Cha/CH-Cha_convergence_metrics.csv) · [EC metrics](figures/spinup1000_final/CH-Cha/CH-Cha_monthly_metrics.csv) · [Metadata](figures/spinup1000_final/CH-Cha/CH-Cha_metadata.json)
+
+### CH-Fru
+
+![CH-Fru carbon pools, 1000 years](figures/spinup1000_final/CH-Fru/CH-Fru_01_carbon_pools_annual_mean.png)
+
+![CH-Fru carbon pools, final 250 years](figures/spinup1000_final/CH-Fru/CH-Fru_02_carbon_pools_last250years.png)
+
+![CH-Fru monthly GPP and NEE](figures/spinup1000_final/CH-Fru/CH-Fru_GPP_NEE_monthly_overview.png)
+
+[Convergence metrics](figures/spinup1000_final/CH-Fru/CH-Fru_convergence_metrics.csv) · [EC metrics](figures/spinup1000_final/CH-Fru/CH-Fru_monthly_metrics.csv) · [Metadata](figures/spinup1000_final/CH-Fru/CH-Fru_metadata.json)
+
+### CH-Lae
+
+![CH-Lae carbon pools, 1000 years](figures/spinup1000_final/CH-Lae/CH-Lae_01_carbon_pools_annual_mean.png)
+
+![CH-Lae carbon pools, final 250 years](figures/spinup1000_final/CH-Lae/CH-Lae_02_carbon_pools_last250years.png)
+
+![CH-Lae monthly GPP and NEE](figures/spinup1000_final/CH-Lae/CH-Lae_GPP_NEE_monthly_overview.png)
+
+[Convergence metrics](figures/spinup1000_final/CH-Lae/CH-Lae_convergence_metrics.csv) · [EC metrics](figures/spinup1000_final/CH-Lae/CH-Lae_monthly_metrics.csv) · [Metadata](figures/spinup1000_final/CH-Lae/CH-Lae_metadata.json)
+
+### CZ-Stn
+
+![CZ-Stn carbon pools, 1000 years](figures/spinup1000_final/CZ-Stn/CZ-Stn_01_carbon_pools_annual_mean.png)
+
+![CZ-Stn carbon pools, final 250 years](figures/spinup1000_final/CZ-Stn/CZ-Stn_02_carbon_pools_last250years.png)
+
+![CZ-Stn monthly GPP and NEE](figures/spinup1000_final/CZ-Stn/CZ-Stn_GPP_NEE_monthly_overview.png)
+
+[Convergence metrics](figures/spinup1000_final/CZ-Stn/CZ-Stn_convergence_metrics.csv) · [EC metrics](figures/spinup1000_final/CZ-Stn/CZ-Stn_monthly_metrics.csv) · [Metadata](figures/spinup1000_final/CZ-Stn/CZ-Stn_metadata.json)
+
+Original EC CSV files, model NetCDF archives and restart files
+are not published to GitHub.
+
+<!-- NINE_SITE_1000_FINAL_END -->

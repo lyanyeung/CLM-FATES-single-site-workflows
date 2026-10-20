@@ -1,0 +1,97 @@
+{
+  "site": "CH-Cha",
+  "case": "CH-Cha_FATES_SPINUP500_11P",
+  "status": "OK",
+  "ec_error": "",
+  "archive_years_verified": 1000,
+  "archive_start_end": [
+    2005,
+    3004
+  ],
+  "forcing_first_last": [
+    2005,
+    2024
+  ],
+  "last_complete_model_cycle": [
+    2985,
+    3004
+  ],
+  "ec_csv": "/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/CH-Cha/forcing/raw/EUF_CH-Cha_FLUXNET_2005-2024_v1.3_r1/EUF_CH-Cha_FLUXNET_FLUXMET_HH_2005-2024_v1.3_r1.csv",
+  "ec_gpp_column": "GPP_DT_VUT_REF",
+  "ec_source_daily_provenance": [
+    {
+      "path": "/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/CH-Cha/forcing/raw/EUF_CH-Cha_FLUXNET_2005-2024_v1.3_r1/EUF_CH-Cha_FLUXNET_FLUXMET_HH_2005-2024_v1.3_r1.csv",
+      "gpp_column": "GPP_DT_VUT_REF",
+      "valid_GPP_days": 6744,
+      "valid_NEE_days": 6744
+    }
+  ],
+  "ec_merge_policy": "ICOS > ICOSETC > EUF > FLX; valid daily values only",
+  "carbon_units": {
+    "TOTECOSYSC": {
+      "original_units": "gC/m^2",
+      "factor": 1.0,
+      "plot_units": "g C m$^{-2}$",
+      "csv_units": "g C m-2"
+    },
+    "TOTSOMC": {
+      "original_units": "gC/m^2",
+      "factor": 1.0,
+      "plot_units": "g C m$^{-2}$",
+      "csv_units": "g C m-2"
+    },
+    "TOTLITC": {
+      "original_units": "gC/m^2",
+      "factor": 1.0,
+      "plot_units": "g C m$^{-2}$",
+      "csv_units": "g C m-2"
+    },
+    "FATES_VEGC": {
+      "original_units": "kg m-2",
+      "factor": 1.0,
+      "plot_units": "kg m-2",
+      "csv_units": "kg m-2"
+    },
+    "FATES_STOREC": {
+      "original_units": "kg m-2",
+      "factor": 1.0,
+      "plot_units": "kg m-2",
+      "csv_units": "kg m-2"
+    },
+    "FATES_STRUCTC": {
+      "original_units": "kg m-2",
+      "factor": 1.0,
+      "plot_units": "kg m-2",
+      "csv_units": "kg m-2"
+    },
+    "FATES_NONSTRUCTC": {
+      "original_units": "kg m-2",
+      "factor": 1.0,
+      "plot_units": "kg m-2",
+      "csv_units": "kg m-2"
+    }
+  },
+  "carbon_variables": [
+    "TOTECOSYSC",
+    "TOTSOMC",
+    "TOTLITC",
+    "FATES_VEGC",
+    "FATES_STOREC",
+    "FATES_STRUCTC",
+    "FATES_NONSTRUCTC"
+  ],
+  "flux_units": "g C m-2 d-1",
+  "model_nee": "-FATES_NEP",
+  "ec_nee": "NEE_VUT_REF",
+  "model_gpp": "FATES_GPP",
+  "sci_caveat": "1000 years does not imply carbon-pool or demographic convergence; inspect aligned cycle metrics and long-term trends",
+  "output_files": [
+    "CH-Cha_01_carbon_pools_annual_mean.png",
+    "CH-Cha_02_carbon_pools_last250years.png",
+    "CH-Cha_GPP_NEE_monthly_overview.png",
+    "CH-Cha_carbon_annual_means.csv",
+    "CH-Cha_convergence_metrics.csv",
+    "CH-Cha_monthly_FATES_vs_EC.csv",
+    "CH-Cha_monthly_metrics.csv"
+  ]
+}
