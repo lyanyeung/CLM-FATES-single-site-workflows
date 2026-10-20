@@ -117,3 +117,18 @@ python3 "$SCRIPT38" audit
 ```
 
 **Operator policy:** verify FI-Let's next five-year model execution and archive first, then submit the other individually prepared sessions exactly once and only after re-checking their Slurm status. No 1000-year completion or successful post-repair submission has been demonstrated by the reported output.
+
+## 20 October: all thirteen recovery sessions prepared; runtime result pending
+
+Follow-up operator log confirms **DE-Lnf** also completed Stage37 `prepare`, from the **50 elapsed model-year** archived checkpoint:
+
+```text
+SESSION=/scratch/ly3n24/CTSM_FATES_OUTPUTS/recovery_backups/FLUXNET_MultiSite_13/post_inode_quota/DE-Lnf_epyk79yt
+PREPARED DE-Lnf: archived checkpoint at 50 years
+```
+
+This is in addition to FI-Let and the eleven other Stage37-prepared cases. Therefore **13/13 sites have a reported PREPARED restart recovery session**. The complete source scripts are in GitHub, while CIME cases and restart files remain on IRIDIS6/Scratch or dedicated backup storage; committing code does not store the restart datasets.
+
+**Do not infer job success from PREPARED.** At this checkpoint there is no supplied proof that all 13 `case.submit` calls succeeded, reached `RUNNING` or completed their next 5-year/archive cycles, and no verified 1000-year outcomes. Check `SUBMIT_ATTEMPTED` and `submit.log` in each session, `squeue`, `sacct`, `CaseStatus`, latest coordinated archived restart, and `myfiles` inode usage. Do not rerun an attempted submit solely because it disappeared from `squeue`. Resubmission after a model segment requires a matching successful archive and valid updated CIME state.
+
+DE-Lnf pre-preparation configuration evidence: `CONTINUE_RUN=TRUE`, `RESUBMIT=189`, `BUILD_COMPLETE=TRUE`, corrected PMIx launcher. Its run/archive batch files were initially missing `--mem=8G`. Successful Stage37 prepare with the latest batch-directive validation indicates this blocker was cleared before preparation; the exact Stage38 repair log has not been independently provided.
