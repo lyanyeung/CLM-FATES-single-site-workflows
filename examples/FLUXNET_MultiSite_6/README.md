@@ -714,3 +714,7 @@ python3 -B scripts/research_filestore/archive_scratch_analysis.py copy --batch F
 Copy receipts are written to `/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/scratch_analysis_archive/_receipts/`. Independently `verify --receipt <actual-RFS-receipt.json>` before optionally running `prune --receipt <actual-RFS-receipt.json> --confirm DELETE_VERIFIED_SCRATCH_IMAGES`. Only precisely verified **Scratch images** are removed; related analysis CSV/JSON, model history/restarts, raw forcing, CIME cases, GitHub figures and Home files are never deleted by this tool. The script skips uncertain locations, so audit actual results and use the established Home→RFS workflow where appropriate.
 
 **Status:** Documentation and reusable code published; no Scratch→RFS copy or deletion is claimed to have run on IRIDIS6 from this GitHub update.
+
+### Home analysis archives (supplementary)
+
+Historical Home-based derived figures and companion statistical tables may be archived using [`archive_home_analyses.py`](../../scripts/research_filestore/archive_home_analyses.py) and its [no-clone IRIDIS6 runbook](../../docs/HOME_ANALYSIS_TO_RFS.md). Use `audit --batch FLUXNET_MultiSite_6` then `copy --batch FLUXNET_MultiSite_6` on a login node. Results go to Research Filestore under `FLUXNET_MultiSite_6/home_analysis_archive/` with SHA256 receipts; original Home files are **never deleted**. This link records available procedures, **not** confirmation that the Home transfer has executed.
