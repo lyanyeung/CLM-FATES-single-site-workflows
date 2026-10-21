@@ -120,3 +120,38 @@ interval solely on these flags is not appropriate. Note that the tool
 assumes VPD in hPa and PA in kPa in the source-audit CSV; verify
 metadata before using numerical conclusions. Preserve 2054 restart,
 all original and versioned DATM files, and the production case.
+
+
+## Next: READ-ONLY isolated CIME trial preflight (after 208-candidate scan)
+
+The latest correction candidate report is
+`/home/ly3n24/IT-Noe_source_diagnosis/correction_candidates_20261021_220229`.
+It reported 208 candidate episodes, 78 P0+P1 priorities, 208/208 ERA
+physical-triplet preflight passes, zero overlaps of 1-hour brackets, and
+64 hypothetical temperature boundary warnings. These results do not approve
+replacement of a single record.
+
+Before any model job, run
+[it_noe_isolated_test_preflight.py](it_noe_isolated_test_preflight.py)
+to verify the existing, separate **whole-May 2010 diagnostic trial**, its
+provenance SHA256, original 2004–2025 symlinks, the model's read-only CIME
+configuration and presence of the three 2054 restart components. This
+is an INPUT and compatibility inventory, not scientific approval for
+restart, and it DOES NOT submit jobs or edit files.
+
+~~~bash
+conda activate clm_fates_env
+DIR="$HOME/IT-Noe_source_diagnosis/scripts"
+mkdir -p "$DIR"
+SCRIPT="$DIR/it_noe_isolated_test_preflight.py"
+curl -fLsS "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/diagnostics/spinup_failures/IT-Noe/it_noe_isolated_test_preflight.py" -o "$SCRIPT" || exit 1
+python3 -m py_compile "$SCRIPT" || exit 1
+python3 "$SCRIPT" 2>&1 | tee "$HOME/IT-Noe_isolated_test_preflight_20261021.log"
+~~~
+
+Expected source trial: datm_11_IT-Noe_ERA5_may2010_diagnostic_20261021_214215.
+Production case: IT-Noe_ERA5_ABW_BRANCH2009, blocked after job 4613318.
+Restart inventory: archive of the production case at 2054-01-01-00000.
+Do not switch production DATM, edit the restart, or resubmit production.
+After reviewing preflight output, configure and verify an independently named
+test case; only then choose to submit a limited, reversible trial.
