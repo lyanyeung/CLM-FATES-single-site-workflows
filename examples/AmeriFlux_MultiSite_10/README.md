@@ -63,3 +63,19 @@ CSV output: `MY_EC_SITE/<SITE>/forcing/raw/<PACKAGE>/*.csv`. The script expands 
 `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage01_extraction_summary.json`
 
 No model files are deleted or relocated. The next work item is a **scientific source audit**: actual temporal coverage, variable headers/QC, meteorological gaps, BIF tower-height metadata, land cover and FATES PFT decisions, followed by forcing/DATM development. `CA-Man`'s 1994–2008 label is relatively short and warrants specific coverage review.
+
+
+## Stage 02: AmeriFlux BIF geolocation preflight (read-only)
+
+Stage 01 extraction and structural inventory succeeded at all 10 sites according to operator-provided IRIDIS output (16 CSV files per site, including one BIF, one FLUXMET_HH and one ERA5_HH). This **does not validate meteorological forcing, PFT or temporal coverage**. Before following the older ICOS surface-generation example, inspect every station's BIF coordinates using the [Stage 02 read-only preflight](scripts/stage02/02_check_10_bif_coordinates.py).
+
+```bash
+BASE="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10"
+REPO="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+mkdir -p "$BASE/scripts/stage02"
+curl -fL "$REPO/examples/AmeriFlux_MultiSite_10/scripts/stage02/02_check_10_bif_coordinates.py" -o "$BASE/scripts/stage02/02_check_10_bif_coordinates.py"
+curl -fL "$REPO/examples/AmeriFlux_MultiSite_10/sites.tsv" -o "$BASE/sites.tsv"
+python3 "$BASE/scripts/stage02/02_check_10_bif_coordinates.py" | tee "$HOME/AmeriFlux_10_stage02_bif.log"
+```
+
+The script does not create CTSM surfaces, modify ZIP/CSV input, or submit any Slurm jobs. It verifies that each release's BIF supplies one valid latitude/longitude pair, prints available IGBP labels, and highlights ambiguous metadata. Surface files should only be generated after coordinate and vegetation-representation review. CTSM year-2000 surface gridding does not establish EC footprint representativeness.
