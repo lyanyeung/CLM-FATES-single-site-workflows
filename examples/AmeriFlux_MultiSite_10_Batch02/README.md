@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 02
 
-Stages 00–04a upload, extract, inspect metadata, prepare reference surfaces and audit them for the ten exact releases in [sites.tsv](sites.tsv):
+Stages 00–04b prepare and audit reference surfaces and source meteorology for the ten exact releases in [sites.tsv](sites.tsv):
 US-BZS, US-CMW, US-EML, US-GLE, US-Ha1, US-Ho1, US-Ho2, US-Ho3,
 US-ICh and US-ICt. First-batch scripts and manifests are unchanged.
 
@@ -392,6 +392,107 @@ natural-PFT sum rejection; fill-value handling without invalid JSON; and
 rejection of nonstandard PFT index labels. Input hashes and modification
 times stayed unchanged. The netCDF4/HDF5 backend and actual IRIDIS surface
 values have not been exercised by this GitHub change.
+
+## Stage 04b: full-release primary / ERA5 source screening
+
+Operator-provided Stage 04a output confirms 10/10 structural surface passes.
+Surface representativeness remains under review: US-CMW has 3.622% trees
+within natural vegetation versus its DBF tower label; US-GLE has 36.139%
+versus ENF. The three OSH sites also retain their vegetation review flags.
+No PFT adjustment has been selected or applied.
+
+[Stage 04b](scripts/stage04/04b_audit_batch02_met_sources.py) audits all seven
+meteorological variables in each site's labelled release years, keeping
+primary FLUXMET/FULLSET and same-package ERA5 separate. Expected inputs are
+20 products: two FULLSET_HH primaries, seven FLUXMET_HH, US-Ha1 FLUXMET_HR,
+and matching ERA5_HH/HR companions. ERA5 file names may span extra years
+(e.g. 1981–2025); outside-window rows are counted separately, and only the
+pinned release window enters annual variable screening.
+
+Primary columns prefer `<VAR>_F`, using `<VAR>_F_MDS` only when the former
+column is absent. Companion columns require `<VAR>_ERA`. There is no row-wise
+fallback, combination of columns, interpolation or reanalysis replacement.
+Every selected field, available QC column, file header and source SHA256 is
+recorded in `source_inventory.json`. Missing required columns or ambiguous
+files produce explicit source failures. QC values are counted literally;
+absent QC columns are marked unavailable rather than interpreted as QC0.
+
+The audit scans chunked input and uses native 30-minute / 60-minute expected
+timestamps. It checks start/end interval length, off-grid and duplicate times,
+nonincreasing source order, missing records/values, variable ranges and
+TA/VPD/PA humidity consistency. Unique finite-value coverage cannot exceed
+100% when duplicate rows exist. The annual expected counts are 17,520 for HH
+and 8,760 for HR, after removing February 29 for prospective NO_LEAP analysis.
+Original leap-day rows remain unchanged; their counts are in the inventory.
+No time-zone conversion is made. Original site-local clock conventions still
+need verification before generating DATM.
+
+Variable units assumed from the source product convention are TA degC, VPD
+hPa, PA kPa, SW_IN/LW_IN W m-2, WS m s-1 and P mm per native interval. The
+same broad range limits as Batch 01 are exploratory screens. Liquid-water
+saturation is used for reconstructed RH, including cold sites; flagged RH is
+not automatically corrected or switched to an ice convention. RH <1%, <5%
+and <10% counts overlap and must not be added together. Humidity infeasibility,
+range flags and low RH are combined into a unique-per-source-record ledger.
+Companion ERA5 is not assumed independent validation of gap-filled FLUXMET.
+
+Outputs are isolated under:
+
+```text
+CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch02/reports/stage04b_met_<UTC>_<ID>/
+    annual_source_coverage_and_QC.csv
+    physical_anomaly_records.csv
+    timestamp_issues.csv
+    missing_episodes.csv
+    source_inventory.json
+    source_failures.csv
+```
+
+The anomaly ledger includes source filename, original CSV row number,
+timestamps, canonical variable values, original selected QC values and flag
+names. Missing episodes describe expected-grid timestamp/value availability,
+including unusable native intervals; timestamp and variable episodes can
+overlap. This is an inventory, not a decision to fill every gap. Source-level
+failures mean their annual audit is incomplete; any partial ledger entries
+for a failed source must not be treated as a completed source QC result.
+
+Run on IRIDIS:
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  "$PYTHON_BIN" -c 'import numpy, pandas'
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/ameriflux-batch02-transfer'
+  REL='examples/AmeriFlux_MultiSite_10_Batch02'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  SCRIPT="$BASE/scripts/stage04/04b_audit_batch02_met_sources.py"
+  mkdir -p "$BASE/scripts/stage04"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage04/04b_audit_batch02_met_sources.py" -o "$SCRIPT"
+  "$PYTHON_BIN" -B "$SCRIPT" --check
+  "$PYTHON_BIN" -B "$SCRIPT" \
+    2>&1 | tee "$HOME/AmeriFlux_Batch02_stage04b_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+`--check` reads headers only and writes nothing. A full run writes reports,
+leaving all source CSVs, surfaces, forcing, cases and Slurm jobs unchanged.
+Options include `--root`, `--report-root`, `--sites` and `--chunksize`.
+A successful audit prints `20/20 sources audited; 0 source failures`; REVIEW
+counts and anomaly ledgers still need inspection. `NO_FLAGS_IN_THIS_SCREEN`
+is not scientific forcing approval. No short-gap interpolation, ERA5 or
+ERA5-Land repair, forcing/DATM generation or spin-up has occurred in Batch02.
+
+Validation passed compilation and synthetic HH/HR/FULLSET/ERA5 CSV tests with
+chunk boundaries: source header pinning, read-only preflight, 8,760 / 17,520
+expected counts, leap-day exclusion without source changes, cross-chunk
+duplicates, missing values/timestamps, wrong intervals, off-grid times,
+humidity and radiation flags, unique coverage capped at 100%, source-row
+provenance, missing-episode ledgers and explicit missing-column failure.
+Source hashes and modification times remained unchanged. Real IRIDIS source
+values and complete release coverage have not yet been examined by this
+GitHub change.
 
 ## Validation boundary
 
