@@ -1,0 +1,11 @@
+*.zip
+*.nc
+*.nc4
+*.h5
+*.partial
+reports/
+data/
+forcing/
+output/
+__pycache__/
+*.pyc

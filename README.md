@@ -25,6 +25,8 @@
 
 **[ICOS sites — multi-site experiments](examples/ICOS_sites/)** collects the four existing European FLUXNET/ICOS batches (6, 8, 11 and 13). Dataset provenance remains site-specific. **AmeriFlux sites** are maintained separately, starting with [US-Ha1](examples/AmeriFlux_US-Ha1/). Existing workflow paths remain unchanged to avoid breaking IRIDIS6 jobs.
 
+**[AmeriFlux sites](examples/AmeriFlux_sites/)** now includes [AmeriFlux Batch 01 (10 sites)](examples/AmeriFlux_MultiSite_10/) with source ZIP transfer and extraction scripts. Stage 00/01 only; no spin-up submitted.
+
 Reproducible single-site CTSM/CLM-FATES workflows used on University of Southampton IRIDIS6.
 
 The repository is organized by observing network / case study:
