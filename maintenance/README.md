@@ -52,6 +52,25 @@ The script deliberately avoids `myfiles`, `ncdump`, recursive full-archive reads
 
 The checker keeps checkpoint progress linked to the **exact canonical batch case name**. As of the 21 October update it also detects different same-site CIME case names in Slurm, e.g. `run.IT-Noe_ERA5_ABW_BRANCH2009`. When the canonical batch case is idle but another case for the station is running or pending, the status is `RELATED_RUN` / `RELATED_WAIT`; `JOB IDs / NOTE` includes the **full different case name**. A related job is **not evidence of progress in the original spin-up case**. Use the full `squeue -o '%i|%j|%T|%R'` output to confirm exactly which case is being simulated. `RELATED_BLOCK` identifies a related blocked job. The latest archive can remain 5 years or missing despite a separate actively running simulation.
 
+### Independent branch and sensitivity case monitor (added 21 October 2026)
+
+The same `check_four_spinups.py` command now prints an **ADDITIONAL / BRANCH CASES** table below the canonical four-batch table. It includes `IT-Noe_ERA5_ABW_BRANCH2009`, `CH-Aws_FATES_SPINUP1000_RH34A`, `CH-Aws_FATES_SPINUP1000_RH29A`, and any other active same-station run/archive CIME case discovered from the full Slurm job names. These are kept separate from the original `_11P` spin-up and do not inherit its history/target.
+
+For each extra case, the script displays `RUN_STARTDATE`, archived years since that case's start (when its own coordinated restart is available), current Slurm model/archive job IDs, `RESUBMIT`, and an execution phase. Particularly, `MODEL_OK_ARCH_WAIT` means the newest `case.run` has a matching success record but its `st_archive` is still in the queue; **no unarchived model years are counted as completed**. An earlier model failure in `CaseStatus` is not misreported as the latest run if a newer submitted pair succeeded. `RELATED_*` in the canonical table is only a same-station signal, not a statement about progress in the original case.
+
+```bash
+# Main 38 canonical sites + independent IT-Noe and CH-Aws cases:
+python3 "$HOME/CLM_FATES_maintenance/check_four_spinups.py"
+
+# Only the 11-site batch plus related independent cases:
+python3 "$HOME/CLM_FATES_maintenance/check_four_spinups.py" --batch FLUXNET_MultiSite_11
+
+# Suppress the separate extra-case table when a compact report is preferred:
+python3 "$HOME/CLM_FATES_maintenance/check_four_spinups.py" --no-extra-cases
+```
+
+A successful CIME model step is not a complete archive. Check the latest `CaseStatus` and coordinated restart files before taking further action. This is read-only cluster monitoring.
+
 ### Safety and updates
 
 The checker reads Slurm queue, `env_run.xml`, `CaseStatus`, and existing archived restart paths only; it makes **no filesystem modifications or Slurm submissions**. Batch/site targets reflect the October 2026 experimental plan; if you change targets, update the `BATCHES` mapping and commit the change. Check `sacct`, CIME `CaseStatus`, all restart components, and long-term carbon pools separately before taking corrective action.
