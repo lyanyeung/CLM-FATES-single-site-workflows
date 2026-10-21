@@ -6,6 +6,7 @@ Input (existing IRIDIS6 files only):
   - DE-Hai_FATES_SPINUP500/CaseDocs/lnd_in and case surface/parameter paths
   - Point surfdata with PCT_NAT_PFT (CLM host PFT, not FATES PFT)
   - Optional final year archived CLM history FATES_*_PF
+  - Actual FATES .json (or legacy .nc) parameter file for candidate PFT names
   - Optional coordinated 3000-01-01 restart (1000 elapsed years since 2000)
 
 Outputs small CSV/JSON reports in HOME; never modifies inputs or jobs.
@@ -176,46 +177,153 @@ def actual_surface(nml):
 
 
 def fates_parameters(nml):
+    """Read the actual parameter file, which may be JSON or NetCDF.
+
+    FATES PFT rows are candidate functional types in the parameter file,
+    NOT the PFTs proven alive at model year 1000. For Full FATES, the
+    host-to-FATES fixed-biogeography map does not set the PFT area shares.
+    """
     raw = nml.get("fates_paramfile")
     f = resolve_model_path(raw, CASES / CASE_NAME) if raw else None
     result = {"configured": raw, "resolved": str(f) if f else None}
     say("\n==== 3. ACTIVE FATES CONFIGURATION ====")
     for k, v in sorted(nml.items()):
-        if ("fates" in k or k in ("fsurdat", "finidat")):
+        if "fates" in k or k in ("fsurdat", "finidat"):
             say(f"  {k} = {v}")
     if not f or not f.is_file():
         say("WARNING: fates_paramfile missing/unresolvable in CaseDocs/lnd_in.")
-        say("Check if parameter path is from user_nl_clm or case runtime.");
+        say("PFT candidates and names cannot be established without it.")
         return result
+    f = f.resolve()
     result["path"] = str(f)
-    with Dataset(f) as ds:
-        pft_dims = {k: len(v) for k, v in ds.dimensions.items()
-                    if "pft" in k.lower()}
-        result["pft_dimensions"] = pft_dims
-        say("FATES parameter file:", f)
-        say("FATES PFT dimensions:", pft_dims)
-        # Print only metadata and small likely categorical vectors. Numeric
-        # traits cannot safely be mapped to real tree species without a
-        # corresponding published parameter table.
-        selection = {}
-        for name, v in ds.variables.items():
-            if not any(token in name.lower() for token in
-                       ("pftname", "pft_name", "pft_id", "pft_label",
-                        "pft_hlm", "fates_hlm_pft_map")):
-                continue
-            if v.size > 2048:
-                continue
-            try:
-                z = v[:]
-                if getattr(z, "dtype", None) is not None and z.dtype.kind == "S":
-                    z = chartostring(z)
-                selection[name] = np.asarray(z).tolist()
-            except (ValueError, TypeError, IndexError):
-                selection[name] = "<cannot decode>"
-        result["pft_metadata"] = selection
-        say("PFT identification variables:", json.dumps(selection, default=str))
-        if not selection:
-            say("No self-describing PFT names found; PFT index is not a species name.")
+    result["format"] = f.suffix.lower()
+    result["full_fates_dynamic_competition_flags"] = {
+        k: nml.get(k, "NOT_EXPLICITLY_LISTED")
+        for k in ("use_fates", "use_fates_sp",
+                  "use_fates_fixed_biogeog", "use_fates_nocomp",
+                  "use_fates_ed_st3", "use_fates_ed_prescribed_phys")
+    }
+
+    def extract_parameter(entry, pft_count):
+        """Extract one numeric/string value per PFT; skip multivalued dimensions."""
+        if not isinstance(entry, dict) or "data" not in entry:
+            return None
+        dims = entry.get("dims", [])
+        if dims.count("fates_pft") != 1:
+            return None
+        x = np.asarray(entry["data"])
+        axis = dims.index("fates_pft")
+        if x.ndim != len(dims) or x.shape[axis] != pft_count:
+            raise RuntimeError("Parameter dimensions conflict with fates_pft: "
+                               + str(dims) + " " + str(x.shape))
+        x = np.moveaxis(x, axis, 0).reshape(pft_count, -1)
+        if x.shape[1] != 1:
+            return None  # Do not arbitrarily select one size/age/organ class.
+        result_values = []
+        for value in x[:, 0]:
+            if isinstance(value, np.generic):
+                value = value.item()
+            result_values.append(value)
+        return result_values
+
+    def to_json_value(value):
+        if isinstance(value, np.generic):
+            return value.item()
+        return value
+
+    if f.suffix.lower() == ".json":
+        with f.open(encoding="utf-8") as inp:
+            doc = json.load(inp)
+        dims = doc.get("dimensions")
+        params = doc.get("parameters")
+        if not isinstance(dims, dict) or not isinstance(params, dict):
+            raise RuntimeError("FATES JSON expected top-level dimensions and parameters")
+        count = dims.get("fates_pft")
+        if not isinstance(count, int) or count < 1:
+            raise RuntimeError("Invalid fates_pft dimension in actual FATES JSON")
+        names = extract_parameter(params.get("fates_pftname"), count)
+        if names is None:
+            names = [f"UNNAMED_FATES_PFT_{k+1}" for k in range(count)]
+        result["dimensions"] = dims
+        result["pft_count"] = count
+        result["parameter_count"] = len(params)
+        result["pft_names"] = names
+        chosen = (
+            "fates_woody", "fates_leaf_slatop", "fates_leaf_long",
+            "fates_leaf_vcmax25top", "fates_wood_density",
+            "fates_recruit_initd", "fates_phen_evergreen",
+            "fates_phen_season_decid", "fates_phen_evergreen_habit"
+        )
+        traits = {}
+        for key in chosen:
+            if key in params:
+                v = extract_parameter(params[key], count)
+                if v is not None:
+                    traits[key] = v
+        result["pft_traits"] = traits
+        mapping = params.get("fates_hlm_pft_map", {})
+        if isinstance(mapping, dict):
+            md = mapping.get("dims", [])
+            if md == ["fates_hlm_pftno", "fates_pft"]:
+                result["hlm_pft_mapping_available"] = True
+                result["hlm_pft_mapping_interpretation"] = (
+                    "Fixed-biogeography HLM-to-FATES mapping only. "
+                    "Not a Full FATES dynamic-PFT area percentage.")
+            else:
+                result["hlm_pft_mapping_available"] = False
+    elif f.suffix.lower() in (".nc", ".nc4"):
+        with Dataset(f) as ds:
+            count = len(ds.dimensions["fates_pft"])
+            names = [f"UNNAMED_FATES_PFT_{k+1}" for k in range(count)]
+            if "fates_pftname" in ds.variables:
+                x = ds["fates_pftname"][:]
+                if getattr(x, "dtype", None) is not None and x.dtype.kind == "S":
+                    x = chartostring(x)
+                flat = np.asarray(x).reshape(-1)
+                if len(flat) == count:
+                    names = [v.decode().strip() if isinstance(v, bytes)
+                             else str(v).strip() for v in flat]
+            result["dimensions"] = {k: len(v) for k, v in ds.dimensions.items()}
+            result["pft_count"] = count
+            result["pft_names"] = names
+            result["parameter_count"] = len(ds.variables)
+            result["pft_traits"] = {}
+            for key in ("fates_woody", "fates_leaf_slatop", "fates_leaf_long",
+                        "fates_wood_density", "fates_recruit_initd"):
+                if key not in ds.variables:
+                    continue
+                var = ds[key]
+                if var.dimensions == ("fates_pft",):
+                    result["pft_traits"][key] = [
+                        to_json_value(v) for v in values(var).reshape(-1)]
+    else:
+        say("WARNING: FATES parameter format not supported:", f.suffix)
+        say("Will continue to final-history and checkpoint checks.")
+        return result
+
+    result["pft_rows"] = []
+    for i, name in enumerate(result["pft_names"]):
+        row = {
+            "pft_slot_1based": i + 1,
+            "pft_name": str(name).strip(),
+            "status": "CANDIDATE_TYPE_IN_PARAMETER_FILE_NOT_FINAL_PRESENCE",
+        }
+        for trait, vals in result["pft_traits"].items():
+            row[trait] = to_json_value(vals[i])
+        result["pft_rows"].append(row)
+    say("Actual parameter file:", f)
+    say("File format:", result["format"],
+        "| FATES candidate PFT count:", result["pft_count"],
+        "| parameters:", result["parameter_count"])
+    say("PFT table (candidate types; NOT simulated end-state occupancy):")
+    for row in result["pft_rows"]:
+        extra = " ".join(
+            f"{k.removeprefix('fates_')}={v}"
+            for k, v in row.items() if k.startswith("fates_"))
+        say(f"  FATES PFT {row['pft_slot_1based']:2d}: "
+            f"{row['pft_name']:<43} {extra}")
+    say("IMPORTANT: fates_hlm_pft_map (if present) is for fixed-biogeography,")
+    say("not the current Full FATES land-cover fractions.")
     return result
 
 
@@ -314,6 +422,14 @@ def main():
     surfrows, land, surface_meta, surffile, active = actual_surface(nml)
     fates = fates_parameters(nml)
     pfrows, pf, histfile = final_history()
+    if pfrows and fates.get("pft_names"):
+        for row in pfrows:
+            n = row["pft_slot_1based"] - 1
+            names = fates["pft_names"]
+            row["pft_name"] = names[n] if n < len(names) else "UNMAPPED_SLOT"
+    else:
+        for row in pfrows:
+            row["pft_name"] = "NOT_VERIFIED"
     check = check_1000_restart()
     say("\n==== 5. 1000-YEAR RESTART ====")
     say(json.dumps(check, indent=2))
@@ -337,7 +453,13 @@ def main():
     csvout("02_CLM_surface_natural_PFT.csv", surfrows,
            ["index_0based", "index_1based", "pct_of_natural_landunit", "name"])
     csvout("03_FATES_final_1000yr_PFT_fields.csv", pfrows,
-           ["field", "pft_slot_1based", "mean_final_year", "units", "interpretation"])
+           ["field", "pft_slot_1based", "pft_name", "mean_final_year",
+            "units", "interpretation"])
+    pft_rows = fates.get("pft_rows", [])
+    pft_fields = ["pft_slot_1based", "pft_name", "status"]
+    if pft_rows:
+        pft_fields.extend(k for k in pft_rows[0] if k.startswith("fates_"))
+    csvout("05_FATES_parameter_PFT_table.csv", pft_rows, pft_fields)
     report = dict(site=SITE, case=CASE_NAME, original_igbp=igbp,
                   surface_file=surffile, surface_active_path_verified=active,
                   landunits=land, surface_metadata=surface_meta,
