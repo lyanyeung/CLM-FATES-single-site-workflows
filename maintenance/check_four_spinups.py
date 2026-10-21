@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
-"""Read-only IRIDIS6 status report for four CLM-FATES FLUXNET spin-up batches.
+"""Read-only, unified four-batch IRIDIS6 CLM-FATES spin-up monitoring.
 
-Recreates the detailed check_four_spinups.py-style terminal table:
-SITE, DONE/TARGET, LEFT, CHECKPOINT, RESUB, SLURM, JOB IDs / NOTE.
-
-Uses archived coordinated cpl/datm/clm2 restart components AND their dated
-rpointer files to count completed model years; queued/running Slurm jobs
-represent activity, not completed years. No case.submit, xmlchange, cleanup,
-or output-file writes. Python standard library only.
+Exactly one explicitly selected, current CIME case per site in each main table.
+For IT-Noe use ERA5 branch case; for CH-Aws use active RH34A case.
+Legacy _11P and RH29A may be displayed separately (--show-alternates).
+Reports independent MODEL/ARCHIVE phases and archived restart progress.
+Neither runs nor queue presence count as archived years. Python stdlib only.
+No case.submit, xmlchange, cleanup or filesystem writes.
 """
 from __future__ import annotations
 
 import argparse
 from collections import Counter
 from datetime import datetime, timezone
-import os
 from pathlib import Path
 import re
 import subprocess
@@ -61,12 +59,30 @@ PARTS = {"cpl": "cpl", "atm": "datm", "lnd": "clm2"}
 DATE_RX = re.compile(r"^\d{4}-01-01-00000$")
 
 
+PRIMARY_CASE_OVERRIDES = {
+    # These are the CURRENT experiments to monitor in the 11-site slot.
+    # Their older _11P cases remain untouched, and may be inspected with
+    # --show-alternates, but must not replace the active run in summary tables.
+    "FLUXNET_MultiSite_11": {
+        "IT-Noe": ("IT-Noe_ERA5_ABW_BRANCH2009", "ERA5-BR"),
+        "CH-Aws": ("CH-Aws_FATES_SPINUP1000_RH34A", "RH34A"),
+    }
+}
+
+
 def case_name(batch: str, site: str) -> str:
+    override = PRIMARY_CASE_OVERRIDES.get(batch, {}).get(site)
+    if override:
+        return override[0]
     if batch.endswith("_11"):
         return site + "_FATES_SPINUP500_11P"
     if batch.endswith("_13"):
         return site + "_FATES_SPINUP1000_S30SHARED"
     return site + "_FATES_SPINUP500"
+
+
+def variant(batch: str, site: str) -> str:
+    return PRIMARY_CASE_OVERRIDES.get(batch, {}).get(site, ("", "-"))[1]
 
 
 def slurm_jobs() -> list[dict]:
@@ -165,80 +181,6 @@ def unarchived_success(case: Path) -> bool:
         return False
 
 
-def site_report(batch: str, site: str, start: int, target: int,
-                jobs: list[dict]) -> dict:
-    name = case_name(batch, site)
-    case = CASE_ROOT / name
-    rest = OUTPUT_ROOT / "archive" / name / "rest"
-    done, stamp, warning = restart_status(rest, name, start)
-    matched = [job for job in jobs
-               if job["name"] in ("run." + name, "st_archive." + name)]
-    # Other Slurm jobs for the SAME STATION may belong to distinct cases.
-    # Never count a branch run as progress of the canonical batch case.
-    related = [job for job in jobs if job not in matched and
-               job["name"].startswith(("run." + site + "_",
-                                       "st_archive." + site + "_"))]
-    notes = []
-    if warning:
-        notes.append(warning)
-    if done is not None and done > target:
-        notes.append("PAST_TARGET")
-    # A completed CIME run without a newer successful archive is not yet a
-    # new archived checkpoint. This is especially important after quota errors.
-    if not matched and unarchived_success(case):
-        notes.append("UNARCHIVED_RUN_SUCCESS")
-    if matched:
-        if any(job["state"] == "RUNNING" for job in matched):
-            state = "RUNNING"
-        elif any("DependencyNeverSatisfied" in job["reason"]
-                 or "JobHeld" in job["reason"] for job in matched):
-            state = "BLOCKED"
-        elif any(job["state"] == "PENDING" for job in matched):
-            state = "PENDING"
-        else:
-            state = matched[0]["state"]
-    elif done is not None and done >= target and not warning:
-        state = "COMPLETE"
-    elif "UNARCHIVED_RUN_SUCCESS" in notes or warning.startswith(
-            ("NEWER_INCOMPLETE", "NO_VALID_CHECKPOINT", "ARCHIVE_IO_ERROR")):
-        state = "REVIEW"
-    else:
-        state = "IDLE"
-    # A branch/sensitivity case should be visible, without mislabeling the
-    # original SPINUP500_11P case as actually running.
-    if related and not matched and state in ("IDLE", "REVIEW"):
-        if any(j["state"] == "RUNNING" for j in related):
-            state = "RELATED_RUN"
-        elif any("DependencyNeverSatisfied" in j["reason"]
-                 or "JobHeld" in j["reason"] for j in related):
-            state = "RELATED_BLOCK"
-        else:
-            state = "RELATED_WAIT"
-    # A missing archive is unknown, not "0 simulated years".
-    status_jobs = ", ".join(f"{j['jobid']}:{j['state']}" for j in matched)
-    note_text = status_jobs
-    if related:
-        related_text = ", ".join(
-            f"{j['jobid']}:{j['state']}:{j['name']} [{j['reason']}]"
-            for j in related)
-        note_text += (" | " if note_text else "") + "OTHER_CASE: " + related_text
-    if notes:
-        note_text += (" | " if note_text else "") + "; ".join(notes)
-    return dict(site=site, target=target, completed=done, remaining=(
-                max(target - done, 0) if done is not None else None),
-                checkpoint=stamp or "-", resubmit=xml_value(case, "RESUBMIT"),
-                slurm=state, note=note_text or "-")
-
-
-# Specific independent campaigns the operator wants tracked even after jobs finish.
-# Any other active same-station Slurm cases are discovered automatically.
-KNOWN_EXTRA_CASES = {
-    "IT-Noe": ("IT-Noe_ERA5_ABW_BRANCH2009",),
-    "CH-Aws": ("CH-Aws_FATES_SPINUP1000_RH34A",
-               "CH-Aws_FATES_SPINUP1000_RH29A"),
-}
-
-
 def last_cime_cycle(case: Path) -> dict:
     """Read latest submitted run/archive PAIR; don't mistake prior success for it.
 
@@ -277,180 +219,212 @@ def last_cime_cycle(case: Path) -> dict:
     return cycle
 
 
-def extra_case_report(site: str, name: str, jobs: list[dict]) -> dict:
-    case = CASE_ROOT / name
-    case_exists = case.is_dir()
-    start_value = xml_value(case, "RUN_STARTDATE") if case_exists else "-"
-    start_match = re.match(r"^(\d{4})-\d\d-\d\d$", start_value)
-    start_year = int(start_match.group(1)) if start_match else None
-    archive_root = xml_value(case, "DOUT_S_ROOT") if case_exists else "-"
-    if archive_root == "-" or not archive_root.startswith("/"):
-        archive_root = str(OUTPUT_ROOT / "archive" / name)
-    # This independent case's 3-component restarts only. Never borrow
-    # the site's canonical _11P archive or its archived model years.
-    if start_year is not None:
-        done, stamp, warning = restart_status(Path(archive_root) / "rest",
-                                              name, start_year)
-    else:
-        done, stamp, warning = None, None, "RUN_STARTDATE_UNKNOWN"
+def current_case_phase(case: Path, name: str, jobs: list[dict],
+                       archived: int | None, warning: str) -> dict:
+    """Diagnose model and archive jobs independently for the SAME case."""
     matched = [j for j in jobs
                if j["name"] in ("run." + name, "st_archive." + name)]
     run_jobs = [j for j in matched if j["name"] == "run." + name]
-    arc_jobs = [j for j in matched if j["name"] == "st_archive." + name]
+    arch_jobs = [j for j in matched if j["name"] == "st_archive." + name]
     cycle = last_cime_cycle(case)
-    run_ok, arc_ok = cycle.get("run_ok", False), cycle.get("archive_ok", False)
-    run_err, arc_err = cycle.get("run_error", False), cycle.get("archive_error", False)
-    archive_blocked = any(
-        "DependencyNeverSatisfied" in j["reason"] or "JobHeld" in j["reason"]
-        for j in arc_jobs)
-    if any(j["state"] == "RUNNING" for j in run_jobs):
-        phase = "MODEL_RUNNING"
-    elif any(j["state"] == "PENDING" for j in run_jobs):
-        phase = "MODEL_QUEUED"
-    elif archive_blocked:
-        phase = "ARCHIVE_BLOCKED"
-    elif run_ok and not arc_ok and arc_jobs:
-        phase = ("ARCHIVING" if any(j["state"] == "RUNNING" for j in arc_jobs)
-                 else "MODEL_OK_ARCH_WAIT")
-    elif arc_err:
-        phase = "ARCHIVE_ERROR"
-    elif run_err and not run_ok:
-        phase = "MODEL_ERROR"
-    elif arc_ok and done is not None and not warning:
-        phase = "ARCHIVED"
-    elif arc_ok:
-        phase = "ARCHIVE_OK_VERIFY"
-    elif run_ok and not arc_ok:
-        phase = "MODEL_OK_ARCH_CHECK"
-    elif arc_jobs:
-        phase = "ARCHIVE_QUEUED"
-    elif not case_exists:
-        phase = "CASE_MISSING"
+    model_ok, archive_ok = cycle.get("run_ok", False), cycle.get("archive_ok", False)
+    model_error = cycle.get("run_error", False)
+    archive_error = cycle.get("archive_error", False)
+    running = any(j["state"] == "RUNNING" for j in run_jobs)
+    queued = any(j["state"] == "PENDING" for j in run_jobs)
+    archive_running = any(j["state"] == "RUNNING" for j in arch_jobs)
+    archive_pending = any(j["state"] == "PENDING" for j in arch_jobs)
+    blocked = any(("DependencyNeverSatisfied" in j["reason"]
+                   or "JobHeld" in j["reason"]) for j in matched)
+    if running:
+        phase = "RUNNING"
+    elif queued:
+        phase = "PENDING"
+    elif blocked:
+        phase = "BLOCKED"
+    elif model_ok and not archive_ok and (archive_pending or archive_running):
+        phase = "ARCH_WAIT" if archive_pending else "ARCHIVING"
+    elif model_error and not model_ok:
+        phase = "MODEL_FAIL"
+    elif archive_error:
+        phase = "ARCH_FAIL"
+    elif archive_running:
+        phase = "ARCHIVING"
+    elif archive_pending:
+        phase = "ARCH_WAIT"
+    elif archived is not None and archived >= 0 and not warning and archive_ok:
+        phase = "IDLE"  # caller converts to COMPLETE if at target
+    elif model_ok and not archive_ok:
+        phase = "CHECK_ARCHIVE"
+    elif warning and warning != "NO_ARCHIVE":
+        phase = "REVIEW"
     else:
-        phase = "NO_ACTIVE_JOB"
+        phase = "IDLE"
 
-    def job_text(which: str, active: list[dict], ok: bool, error: bool) -> str:
-        if active:
-            return ",".join(j["jobid"] + ":" + (
-                "R" if j["state"] == "RUNNING" else
-                "PD" if j["state"] == "PENDING" else j["state"])
-                for j in active)
-        ident = cycle.get(which + "_id", "-")
-        return ident + (":OK" if ok else ":ERROR" if error else ":?")
-    job_run = job_text("run", run_jobs, run_ok, run_err)
-    job_arc = job_text("archive", arc_jobs, arc_ok, arc_err)
-    notes = []
-    for j in arc_jobs + run_jobs:
-        if j["state"] == "PENDING":
-            notes.append(j["jobid"] + ":" + j["reason"])
-    if warning and warning != "NO_ARCHIVE":
-        notes.append(warning)
-    if start_year is not None and xml_value(case, "RUN_TYPE") == "branch":
-        notes.append("BRANCH_MODEL_YEARS_ONLY")
+    def describe(items, kind, success, error):
+        if items:
+            return ",".join(
+                j["jobid"] + ":" + (
+                    "R" if j["state"] == "RUNNING" else
+                    "PD" if j["state"] == "PENDING" else
+                    j["state"]) for j in items)
+        job_id = cycle.get(kind + "_id")
+        if job_id:
+            return job_id + (":OK" if success else ":ERR" if error else ":?")
+        return "-"
     return {
-        "site": site, "case": name, "start": start_value,
-        "archived_years": done, "checkpoint": stamp or "-",
-        "resubmit": xml_value(case, "RESUBMIT") if case_exists else "-",
-        "model_job": job_run, "archive_job": job_arc,
-        "phase": phase, "notes": "; ".join(notes) or "-",
+        "phase": phase,
+        "run_job": describe(run_jobs, "run", model_ok, model_error),
+        "arch_job": describe(arch_jobs, "archive", archive_ok, archive_error),
+        "queue_reasons": ";".join(
+            j["jobid"] + ":" + j["reason"]
+            for j in matched if j["state"] == "PENDING"),
     }
 
 
-def discover_extra_cases(sites: set[str], jobs: list[dict]) -> list[tuple[str, str]]:
-    canonical = {
-        case_name(batch, site)
-        for batch, group in BATCHES.items()
-        for site in group
+def site_report(batch: str, site: str, configured_start: int, target: int,
+                jobs: list[dict]) -> dict:
+    name = case_name(batch, site)
+    case = CASE_ROOT / name
+    live_start = xml_value(case, "RUN_STARTDATE") if case.is_dir() else "-"
+    match = re.match(r"^(\d{4})-\d{2}-\d{2}$", live_start)
+    # Never borrow the old canonical start if a new case has a different one.
+    start = int(match.group(1)) if match else (
+        configured_start if variant(batch, site) == "-" else None)
+    archive_root = xml_value(case, "DOUT_S_ROOT") if case.is_dir() else "-"
+    if archive_root == "-" or not archive_root.startswith("/"):
+        archive_root = str(OUTPUT_ROOT / "archive" / name)
+    if start is not None:
+        done, stamp, warning = restart_status(Path(archive_root) / "rest",
+                                              name, start)
+    else:
+        done, stamp, warning = None, None, "UNKNOWN_START_DATE"
+    phase = current_case_phase(case, name, jobs, done, warning)
+    status = phase["phase"]
+    if status == "IDLE" and done is not None and done >= target and not warning:
+        status = "COMPLETE"
+    if not case.is_dir():
+        status = "NO_CASE"
+    if done is None:
+        left = None
+    else:
+        left = max(0, target - done)
+    notes = []
+    if warning:
+        notes.append(warning)
+    if phase["queue_reasons"]:
+        notes.append(phase["queue_reasons"])
+    if done is not None and done > target:
+        notes.append("PAST_TARGET")
+    runtype = xml_value(case, "RUN_TYPE")
+    branch_years = None
+    if runtype.lower() == "branch" and stamp:
+        refdate = xml_value(case, "RUN_REFDATE")
+        refmatch = re.match(r"^(\d{4})-\d{2}-\d{2}$", refdate)
+        if refmatch and int(stamp[:4]) >= int(refmatch.group(1)):
+            branch_years = int(stamp[:4]) - int(refmatch.group(1))
+            notes.append(f"BRANCH_YEARS={branch_years} FROM={refdate}")
+        else:
+            notes.append("BRANCH_YEARS=UNKNOWN (check RUN_REFDATE)")
+    if status == "IDLE" and unarchived_success(case):
+        status = "CHECK_ARCHIVE"
+        notes.append("MODEL_SUCCESS_AFTER_LAST_ARCHIVE")
+    return {
+        "site": site, "variant": variant(batch, site), "case": name,
+        "target": target, "completed": done, "remaining": left,
+        "checkpoint": stamp or "-", "resubmit": xml_value(case, "RESUBMIT"),
+        "status": status, "model": phase["run_job"], "archive": phase["arch_job"],
+        "branch_years": branch_years, "note": "; ".join(notes) or "-",
     }
-    found = set()
-    for site in sites:
-        for extra in KNOWN_EXTRA_CASES.get(site, ()):
-            # Keep known monitoring targets visible even after Slurm finishes.
-            found.add((site, extra))
-    for j in jobs:
-        for prefix in ("run.", "st_archive."):
-            if not j["name"].startswith(prefix):
-                continue
-            name = j["name"][len(prefix):]
-            if name in canonical:
-                continue
-            # Match a site boundary, not merely an overlapping name prefix.
-            for site in sites:
-                if name.startswith(site + "_"):
-                    found.add((site, name))
-                    break
-    return sorted(found)
-
-
-def render_extra_cases(sites: set[str], jobs: list[dict]) -> None:
-    extras = discover_extra_cases(sites, jobs)
-    if not extras:
-        return
-    print("=" * 116)
-    print(f"ADDITIONAL / BRANCH CASES | {len(extras)} distinct CIME cases")
-    print("=" * 116)
-    print("These are NOT the canonical batch cases. ARCHIVED means years since")
-    print("that case's RUN_STARTDATE, NOT inherited spin-up years or a 1000-y target.")
-    print(f"{'SITE':<9} {'CASE':<40} {'YEARS':>6} {'CHECKPOINT':>22} "
-          f"{'RESUB':>5}  {'PHASE':<22}")
-    for site, name in extras:
-        r = extra_case_report(site, name, jobs)
-        elapsed = str(r["archived_years"]) if r["archived_years"] is not None else "?"
-        print(f"{site:<9} {name:<40} {elapsed:>6} "
-              f"{r['checkpoint']:>22} {r['resubmit']:>5}  {r['phase']}")
-        print(f"{'':9} MODEL={r['model_job']} ARCHIVE={r['archive_job']} "
-              f"RUN_STARTDATE={r['start']} | {r['notes']}")
-    print("MODEL_OK_ARCH_WAIT = CIME case.run success, archive job pending/running;")
-    print("no new years are credited until archived 3-component restart is present.\n")
 
 
 def render(batch: str, rows: list[dict]) -> None:
-    print("=" * 116)
-    print(f"{batch} | {len(rows)} sites")
-    print("=" * 116)
-    print(f"{'SITE':<9} {'DONE/TARGET':>12} {'LEFT':>7} "
-          f"{'CHECKPOINT':>23} {'RESUB':>7} {'SLURM':>12}  JOB IDs / NOTE")
+    print("=" * 147)
+    print(f"{batch} | {len(rows)} sites | CURRENT MONITORED CASE for each site")
+    print("=" * 147)
+    print(f"{'SITE':<9} {'CASE':<9} {'DONE/TARGET':>12} {'LEFT':>7} "
+          f"{'CHECKPOINT':>21} {'RESUB':>6} {'PHASE':<14} "
+          f"{'MODEL':<15} {'ARCHIVE':<15} NOTE")
     counts = Counter()
     for r in rows:
-        counts[r["slurm"]] += 1
-        progress = (str(r["completed"]) if r["completed"] is not None else "?")
-        left = str(r["remaining"]) if r["remaining"] is not None else "?"
-        print(f"{r['site']:<9} {progress + '/' + str(r['target']):>12} "
-              f"{left:>7} {r['checkpoint']:>23} {r['resubmit']:>7} "
-              f"{r['slurm']:>12}  {r['note']}")
-    print("SUMMARY: " + ", ".join(f"{k}={counts[k]}" for k in (
-        "COMPLETE", "BLOCKED", "REVIEW", "IDLE", "PENDING", "RUNNING",
-        "RELATED_RUN", "RELATED_WAIT", "RELATED_BLOCK")
-        if counts[k]) + "\n")
+        counts[r["status"]] += 1
+        progress = str(r["completed"]) if r["completed"] is not None else "?"
+        remaining = str(r["remaining"]) if r["remaining"] is not None else "?"
+        print(f"{r['site']:<9} {r['variant']:<9} "
+              f"{progress + '/' + str(r['target']):>12} "
+              f"{remaining:>7} {r['checkpoint']:>21} "
+              f"{r['resubmit']:>6} {r['status']:<14} "
+              f"{r['model']:<15} {r['archive']:<15} {r['note']}")
+        if r["variant"] != "-":
+            print(" " * 11 + "CASE=" + r["case"])
+    print("SUMMARY: " + ", ".join(f"{key}={count}" for key, count in sorted(
+        counts.items())) + "\n")
+
+
+def show_alternates(batches: dict, jobs: list[dict]) -> None:
+    """Optional separate legacy incidents, never included in primary summary."""
+    print("=" * 117)
+    print("OTHER / HISTORIC CASES (not counted in four-batch main status)")
+    print("=" * 117)
+    recorded = set()
+    for batch, sites in batches.items():
+        for site, (config_start, target) in sites.items():
+            primary = case_name(batch, site)
+            if (batch, site) not in [
+                ("FLUXNET_MultiSite_11", "IT-Noe"),
+                ("FLUXNET_MultiSite_11", "CH-Aws")
+            ]:
+                continue
+            extra_names = (
+                [site + "_FATES_SPINUP500_11P"]
+                + (["CH-Aws_FATES_SPINUP1000_RH29A"] if site == "CH-Aws" else [])
+            )
+            for name in extra_names:
+                if name == primary or name in recorded:
+                    continue
+                recorded.add(name)
+                case = CASE_ROOT / name
+                live_start = xml_value(case, "RUN_STARTDATE")
+                m = re.match(r"^(\d{4})-", live_start)
+                start = int(m.group(1)) if m else config_start
+                done, stamp, warning = restart_status(
+                    OUTPUT_ROOT / "archive" / name / "rest", name, start)
+                info = current_case_phase(case, name, jobs, done, warning)
+                print(f"{site:<9} {name}: archived={done if done is not None else '?'} "
+                      f"checkpoint={stamp or '-'} phase={info['phase']}"
+                      f" model={info['run_job']} archive={info['arch_job']}"
+                      f" note={warning or info['queue_reasons'] or '-'}")
+    print()
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--batch", default="all",
-                        choices=["all", *BATCHES],
-                        help="Select one batch (default: all four)")
+    parser.add_argument("--batch", default="all", choices=["all", *BATCHES],
+                        help="Select one batch (default all four)")
+    parser.add_argument("--show-alternates", action="store_true",
+                        help="Show older IT-Noe/CH-Aws cases in a separate section")
     parser.add_argument("--no-extra-cases", action="store_true",
-                        help="Hide independent branch/sensitivity case details")
+                        help="Deprecated legacy option; no effect on unified output")
     args = parser.parse_args()
     try:
         jobs = slurm_jobs()
     except (OSError, subprocess.CalledProcessError) as exc:
-        print("ERROR: squeue query failed; refusing a misleading IDLE report:",
+        print("ERROR: squeue unavailable; refusing misleading IDLE statuses:",
               exc, file=sys.stderr)
         return 1
-    print("READ-ONLY four-batch CLM-FATES progress")
-    print("UTC:", datetime.now(timezone.utc).isoformat())
-    print("Checkpoint: latest archived restart with 3 components + dated pointers.")
-    print("RUNNING/PENDING refer to this specific batch case, not completed years.")
-    print("RELATED_* means a DIFFERENT case is active for the same site.\n")
-    batches = BATCHES if args.batch == "all" else {
-        args.batch: BATCHES[args.batch]}
+    print("READ-ONLY CLM-FATES PROGRESS |", datetime.now(timezone.utc).isoformat())
+    print("ONE current case per station. MODEL and ARCHIVE states are independent.")
+    print("DONE = archived three-component checkpoint years from that case's"
+          " RUN_STARTDATE.")
+    print("For BRANCH runs, BRANCH_YEARS (if RUN_REFDATE is valid) is separately"
+          " reported; not added to DONE.")
+    batches = BATCHES if args.batch == "all" else {args.batch: BATCHES[args.batch]}
     for batch, sites in batches.items():
-        render(batch, [site_report(batch, site, *config, jobs)
-                       for site, config in sites.items()])
-    if not args.no_extra_cases:
-        render_extra_cases({site for group in batches.values() for site in group}, jobs)
-    print("No model cases, restart files, Slurm jobs or scratch archives modified.")
+        render(batch, [site_report(batch, site, start, target, jobs)
+                       for site, (start, target) in sites.items()])
+    if args.show_alternates:
+        show_alternates(batches, jobs)
+    print("READ ONLY: no model files, CIME configuration, or jobs modified.")
     return 0
 
 
