@@ -272,8 +272,7 @@ def scan(fetch):
     summary_frame = pd.DataFrame(summary)
     need(len(selected) <= MAX_GLOBAL_EDITS,
          f"Too many edits {len(selected)} > {MAX_GLOBAL_EDITS}, manual review required")
-    twenty = selected.loc["2020"] if not selected.empty and
-        any(selected.index.year == 2020) else pd.DataFrame()
+    twenty = selected.loc[selected.index.year == 2020] if not selected.empty else pd.DataFrame()
     need(len(twenty) == 14,
          f"Expected 2020 Stage41 exact 14 strict rows, got {len(twenty)}")
     need(EVENT_2020 in selected.index,
