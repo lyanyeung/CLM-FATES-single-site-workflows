@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 02
 
-Stages 00–05 prepare reference surfaces and audit source meteorology and paired events for the ten exact releases in [sites.tsv](sites.tsv):
+Stages 00–06 prepare reference surfaces, audit source meteorology and diagnose paired events for the ten exact releases in [sites.tsv](sites.tsv):
 US-BZS, US-CMW, US-EML, US-GLE, US-Ha1, US-Ho1, US-Ho2, US-Ho3,
 US-ICh and US-ICt. First-batch scripts and manifests are unchanged.
 
@@ -573,6 +573,81 @@ counterpart review without automatic approval. Ledger value mismatch and raw
 checksum changes were rejected. Source and Stage04b report hashes and
 modification times stayed unchanged. Actual IRIDIS counterpart values and
 category totals have not been evaluated by this GitHub change.
+
+## Stage 06: primary-product repair scope diagnosis
+
+The operator's Stage05 log reports 96,773 verified source rows, zero ledger
+mismatches and 16,494 episodes. Its 30,718 high-priority/clear-counterpart
+records mix both source directions and are not a primary repair count.
+Primary-only totals from that log are 25,804 P0, 933 P1, 4,951 P2 and 27,626
+P3 records (59,314 total). US-Ho1 has 16,717 primary P0 records; US-CMW has
+20,444 primary P3 records. The log does not yet identify the P0 predicates
+or justify altering dry conditions.
+
+[Stage 06](scripts/stage06/06_diagnose_batch02_repair_scope.py) consumes the
+explicit Stage04b and Stage05 snapshots. It verifies Stage04b input hashes
+against Stage05, reconciles paired row keys/values/QC with the original
+event ledger, checks verified counts/status totals and recomputes both
+source screens. It does not rescan live raw files; Stage05 supplied the
+raw-file verification for these report snapshots.
+
+The report separates primary events from ERA5 backup issues and exposes
+each range predicate and humidity predicate: nonpositive vapor pressure,
+RH above 101%, invalid denominator and specific-humidity predicates.
+Humidity causes can overlap and must not be summed as unique events.
+These reproduce the exploratory liquid-water screen and do not establish
+which of TA/VPD/PA should be changed. Each cause includes original QC,
+values, counterpart evidence and its original paired status.
+
+Comparison of a single range-flagged variable checks the corresponding
+ERA5 variable. An unrelated ERA5 flag does not itself disqualify that
+variable. Humidity comparison checks TA/VPD/PA jointly and RH at least
+10%; native-time and row-identity holds still apply. All clear-comparison
+labels mean REVIEW, not approval to replace data. P1 remains extreme-dryness
+review; P2/P3 remain retained pending low-RH review, without replacement.
+
+Primary missing episodes, descriptive duration bands, native HH/HR priority
+episodes and timestamp/coverage summaries accompany the cause tables.
+Duration bands are not interpolation thresholds. Missing-timestamp and
+per-variable gap hours overlap and must not be added as outage hours.
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/ameriflux-batch02-transfer'
+  REL='examples/AmeriFlux_MultiSite_10_Batch02'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage06"
+  FILE='scripts/stage06/06_diagnose_batch02_repair_scope.py'
+  curl -fLsS --retry 3 "$RAW/$REL/$FILE" -o "$BASE/$FILE"
+  "$PYTHON_BIN" -B "$BASE/$FILE" \
+    --source-report '/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch02/reports/stage04b_met_20261021T233344Z_ff3b9f20' \
+    --review-report '/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch02/reports/stage05_event_review_20261021T234428Z_d4fa7426' \
+    2>&1 | tee "$HOME/AmeriFlux_Batch02_stage06_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+Outputs go to a new `stage06_repair_scope_<UTC>_<ID>/` directory:
+`direction_summary.csv`, `primary_issue_details.csv`,
+`primary_cause_summary.csv`, `primary_event_review_queue.csv`,
+`primary_review_summary.csv`, `primary_missing_episodes.csv`,
+`primary_gap_summary.csv`, `primary_source_quality.csv`,
+`primary_priority_episodes.csv` and `repair_scope_summary.json`.
+The terminal prints primary priorities, detailed P0 causes, review queues,
+coverage, longest gaps and ERA5 events with a numerically clear primary.
+Inputs are preserved; no interpolation, source replacement, surface changes,
+forcing/DATM generation or model jobs occur.
+
+Local validation used 3,004 numerical cases against Stage05 plus a complete
+synthetic Stage04b/05/06 pipeline with twenty HH/HR/FULLSET sources. It
+checked primary/ERA5 direction, overlapping humidity causes, variable-specific
+counterpart comparisons with unrelated flags, time/duplicate holds, QC0
+retention, low-RH retention and missing-episode outputs. Reruns created
+separate reports. Modified paired values and changed pinned Stage04b reports
+were rejected before output creation; source/prior-report hashes and
+modification times were preserved. Live IRIDIS Stage06 results remain pending.
 
 ## Validation boundary
 
