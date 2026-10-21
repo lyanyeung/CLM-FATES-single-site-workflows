@@ -1,5 +1,21 @@
 # FLUXNET six-site CLM-FATES workflow: surface, forcing, DATM and spin-up
 
+## DE-Hai: EC-tower vegetation vs CLM surface vs FATES PFT (21 October 2026)
+
+Use the **read-only** [DE-Hai PFT comparison script](scripts/25_audit_DE_Hai_PFT_vs_EC.py) to inspect the original `ICOS_DE-Hai_FLUXNET_2000-2025_v1.3_r1` BIF landcover metadata, the surface that the actual CIME `CaseDocs/lnd_in` selects, the FATES parameter-file PFT dimensionality and identifying variables, and PFT-resolved fields *if available* in model-year 2999 history from `DE-Hai_FATES_SPINUP500`. It checks whether the 3000-01-01 three-component restart is present; 1000 elapsed years is not a guarantee of ecological equilibration.
+
+On IRIDIS6, from the local repository (even if the working tree has unresolved merges):
+
+```bash
+cd ~/CLM-FATES-single-site-workflows
+git fetch origin main
+git show origin/main:examples/FLUXNET_MultiSite_6/scripts/25_audit_DE_Hai_PFT_vs_EC.py |
+  /home/ly3n24/.conda/envs/clm_fates_env/bin/python -
+```
+
+Reports are written only to `~/DE_Hai_PFT_comparison/` (three CSVs and a summary JSON). This check does **not** edit or restart any case, surface, model, archive or scheduler job. If per-PFT history variables were not enabled in the existing history tape, the script explicitly reports the limitation; it cannot reconstruct a PFT area distribution from total `FATES_VEGC`. The `PCT_NAT_PFT` vector is a **host CLM** natural-landunit distribution (15 or 16 slots depending on dataset), *not* FATES dynamic-PFT names or percentages. Even `FATES_VEGC_PF` measures vegetation **carbon share**, not fractional forest area. Additional field-survey data are required to determine species-level agreement with the DE-Hai EC tower.
+
+
 **Current implementation (2026-10-11):** Six point surface datasets generated; QC v5 processed; 167/167 candidate annual DATM files validated; six independent 500-year CLM-FATES spin-ups submitted. Scientific QC, vegetation representation and measurement-height uncertainties remain under review.
 
 **Record updated:** 2026-10-11. This is a reproducibility / decision log, not a statement that all site forcing has passed scientific quality assurance.
