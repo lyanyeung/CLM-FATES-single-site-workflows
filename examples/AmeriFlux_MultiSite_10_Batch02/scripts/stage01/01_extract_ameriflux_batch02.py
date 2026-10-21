@@ -144,8 +144,11 @@ def audit(site, release, raw_dir):
     cats = {
         "BIF": [p for p in products if "_BIF_" in p.name.upper()],
         "FLUXMET_HH": [p for p in products if "FLUXMET_HH" in p.name.upper()],
+        "FLUXMET_HR": [p for p in products if "FLUXMET_HR" in p.name.upper()],
         "ERA5_HH": [p for p in products if "ERA5_HH" in p.name.upper()],
+        "ERA5_HR": [p for p in products if "ERA5_HR" in p.name.upper()],
         "FLUXES_HH": [p for p in products if "FLUXES_HH" in p.name.upper()],
+        "FLUXES_HR": [p for p in products if "FLUXES_HR" in p.name.upper()],
         "FULLSET_HH": [p for p in products if "FULLSET_HH_" in p.name.upper()],
         "FULLSET_HR": [p for p in products if "FULLSET_HR_" in p.name.upper()],
     }
@@ -154,21 +157,23 @@ def audit(site, release, raw_dir):
     notes = []
     fullset = "_FULLSET_" in release["package"]
     if fullset:
-        met_files = cats["FULLSET_HH"] or cats["FULLSET_HR"]
+        met_files = cats["FULLSET_HH"] + cats["FULLSET_HR"]
         if not met_files:
             raise RuntimeError("FULLSET HH/HR CSV missing; inspect actual package structure")
         if not cats["FULLSET_HH"]:
             notes.append("Hourly FULLSET found; do not assume 30-minute resolution")
         if not cats["BIF"]:
             notes.append("FULLSET has no BIF; coordinates/metadata still needed at next stage")
-        if not cats["ERA5_HH"]:
-            notes.append("No separate ERA5_HH CSV; FULLSET is a distinct source format")
+        if not cats["ERA5_HH"] and not cats["ERA5_HR"]:
+            notes.append("No separate ERA5 HH/HR CSV; FULLSET is a distinct source format")
     else:
-        if not cats["BIF"] or not cats["FLUXMET_HH"]:
-            raise RuntimeError("BIF or FLUXMET_HH CSV missing; inspect package")
-        met_files = cats["FLUXMET_HH"]
-        if not cats["ERA5_HH"]:
-            notes.append("ERA5_HH absent; companion source availability needs review")
+        met_files = cats["FLUXMET_HH"] + cats["FLUXMET_HR"]
+        if not cats["BIF"] or not met_files:
+            raise RuntimeError("BIF or FLUXMET HH/HR CSV missing; inspect package")
+        if cats["FLUXMET_HR"]:
+            notes.append("Hourly FLUXMET_HR found; preserve native hourly resolution for later forcing review")
+        if not cats["ERA5_HH"] and not cats["ERA5_HR"]:
+            notes.append("ERA5 HH/HR absent; companion source availability needs review")
     headers = {}
     for path in met_files:
         with path.open(encoding="utf-8-sig", newline="") as stream:
@@ -178,7 +183,9 @@ def audit(site, release, raw_dir):
         if (not {"TIMESTAMP_START", "TIMESTAMP_END"}.issubset(header)
                 or not sample or len(sample) != len(header)):
             raise RuntimeError("Missing timestamp columns or invalid first data row: " + path.name)
-        headers[path.name] = {"columns": header, "first_timestamp_start": sample[header.index("TIMESTAMP_START")],
+        resolution = "HR" if re.search(r"_(?:FLUXMET|FULLSET)_HR_", path.name, re.I) else "HH"
+        headers[path.name] = {"columns": header, "product_resolution_label": resolution,
+                              "first_timestamp_start": sample[header.index("TIMESTAMP_START")],
                               "first_timestamp_end": sample[header.index("TIMESTAMP_END")]}
         print("  MET HEADER:", path.name, "|", len(header), "columns", flush=True)
     for note in notes:

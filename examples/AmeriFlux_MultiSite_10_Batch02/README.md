@@ -114,14 +114,20 @@ file before retrying rather than deleting existing raw files indiscriminately.
 
 Inventory recognizes the two formats separately:
 
-- Eight v1.3 releases: require site-specific BIF and FLUXMET_HH CSVs; report
-  presence of ERA5_HH and FLUXES_HH. Missing ERA5_HH is a note.
+- Eight v1.3 releases: require site-specific BIF and a FLUXMET_HH or FLUXMET_HR
+  CSV; report HH and HR variants of ERA5 and FLUXES separately. Missing a
+  separate ERA5 HH/HR product is a note. US-Ha1 supplies FLUXMET_HR and ERA5_HR
+  according to the operator's extraction log; the earlier HH-only condition
+  incorrectly failed its structural inventory after successful extraction.
+  HR is accepted and explicitly recorded without resampling or renaming.
 - US-BZS and US-Ho1 FULLSET releases: require a site-specific FULLSET_HH or
   FULLSET_HR CSV. Missing BIF is a metadata follow-up, not an extraction
   failure. Hourly data and missing separate ERA5 products are reported.
 - Meteorological headers must contain TIMESTAMP_START/TIMESTAMP_END and one
   structurally valid first data row. Columns and the first timestamp pair
-  are written to the inventory; this does not scan or validate the time series.
+  and native product resolution labels are written to the inventory; this
+  does not scan or validate the time series. Later forcing must account for
+  the hourly source rather than assuming all ten sites are half-hourly.
 
 The summary reports `BATCH02 SUMMARY: 10/10 PASS (extraction/structure only)`
 only when all ten complete. Each extraction run writes its own JSON report,
@@ -159,3 +165,10 @@ and wrong-site meteorology rejection. Source ZIP hashes remained unchanged,
 TOC files were skipped and traversal-shaped names stayed inside the raw
 directory. These tests are not live extraction or scientific validation of
 the operator's IRIDIS packages. Standard-library-only code supports Python 3.9.
+
+The hourly-source correction was verified with US-Ha1-like FLUXMET_HR and
+ERA5_HR fixtures alongside the other nine HH/FULLSET releases, a repeat
+read-only inventory with no raw writes, and rejection of an hourly release
+missing BIF. The extraction code and original source data are unchanged.
+After downloading the corrected script, run `--audit-only` to recheck all
+ten already-extracted sites; no upload or extraction is required.
