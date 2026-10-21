@@ -48,6 +48,10 @@ Output: `SITE`, `DONE/TARGET`, `LEFT`, `CHECKPOINT`, `RESUB`, `SLURM` and `JOB I
 
 The script deliberately avoids `myfiles`, `ncdump`, recursive full-archive reads, and `git` commands so it is lightweight enough for operator checks. The older simple history audit remains at [`scripts/research_filestore/audit_four_batches_live.py`](../scripts/research_filestore/audit_four_batches_live.py), with its optional JSON output and 1000-year history-continuity checks.
 
+### Other active cases for the same station
+
+The checker keeps checkpoint progress linked to the **exact canonical batch case name**. As of the 21 October update it also detects different same-site CIME case names in Slurm, e.g. `run.IT-Noe_ERA5_ABW_BRANCH2009`. When the canonical batch case is idle but another case for the station is running or pending, the status is `RELATED_RUN` / `RELATED_WAIT`; `JOB IDs / NOTE` includes the **full different case name**. A related job is **not evidence of progress in the original spin-up case**. Use the full `squeue -o '%i|%j|%T|%R'` output to confirm exactly which case is being simulated. `RELATED_BLOCK` identifies a related blocked job. The latest archive can remain 5 years or missing despite a separate actively running simulation.
+
 ### Safety and updates
 
 The checker reads Slurm queue, `env_run.xml`, `CaseStatus`, and existing archived restart paths only; it makes **no filesystem modifications or Slurm submissions**. Batch/site targets reflect the October 2026 experimental plan; if you change targets, update the `BATCHES` mapping and commit the change. Check `sacct`, CIME `CaseStatus`, all restart components, and long-term carbon pools separately before taking corrective action.
