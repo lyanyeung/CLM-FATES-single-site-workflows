@@ -16,7 +16,8 @@
 
 ### Read-only monitoring and protected Research Filestore archival
 
-- [Check all four campaigns on IRIDIS6](scripts/research_filestore/audit_four_batches_live.py).
+- **[Preferred live four-batch monitor](maintenance/check_four_spinups.py)** ([instructions](maintenance/README.md)): 38 sites, one active CIME case per site, separate model/archive status, checkpoint/resubmit details, and provenance-checked CH-Aws RH42A v8 inherited restart baseline. On IRIDIS6: `git fetch origin main && git show origin/main:maintenance/check_four_spinups.py | python3 -` (no local merge required).
+- [Secondary Filestore-oriented four-batch history audit](scripts/research_filestore/audit_four_batches_live.py) uses legacy case naming; **not** the preferred live RH42A monitor.
 - [Selective 8-/13-site transfer and SHA-256 verification](scripts/research_filestore/archive_completed_8_13.py): only run after verifying completed, idle cases.
 - [Established 11-site transfer tool](scripts/research_filestore/archive_eleven_site_1000yr.py), [Filestore guidance](docs/research_filestore/README.md), [11-site operational record](docs/research_filestore/FLUXNET_MultiSite_11.md).
 
