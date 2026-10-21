@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 02
 
-Stages 00–03 upload, extract, inspect metadata and prepare reference surfaces for the ten exact releases in [sites.tsv](sites.tsv):
+Stages 00–04a upload, extract, inspect metadata, prepare reference surfaces and audit them for the ten exact releases in [sites.tsv](sites.tsv):
 US-BZS, US-CMW, US-EML, US-GLE, US-Ha1, US-Ho1, US-Ho2, US-Ho3,
 US-ICh and US-ICt. First-batch scripts and manifests are unchanged.
 
@@ -319,6 +319,79 @@ blocks recovery for inspection. No other surface or source directory is moved.
 Regression checks additionally exercised an unusable tool shebang, dependency
 failure before any output creation/move, read-only recovery checks, exact
 config-only preservation and retry, and rejection of an additional output file.
+
+## Stage 04a: audit actual surface landunits and CLM natural PFTs
+
+Operator output confirms Stage 03 completed all ten sites:
+`created=10 skipped_verified=0 total=10/10`. Next run
+[Stage 04a](scripts/stage04/04a_audit_batch02_surfaces.py) against each exact
+`subset_data_batch02_surf2000/` directory. It reads generated inputs and
+writes only small, timestamped CSV/JSON reports under:
+
+```text
+/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch02/reports/stage04a_surface_<UTC>_<ID>/
+    surface_summary.csv
+    natural_pft_detail.csv
+    surface_summary.json
+```
+
+Checks include Stage 03 completion receipts and generated file inventories /
+SHA256 values; one surface/config/user_mods set per site; landunit percentage
+ranges and sums; single-point natural-PFT dimensions, ranges and sums; and
+surface coordinates. Longitude comparisons account for 0–360 versus
+-180–180 representations. A point/grid coordinate difference over 0.05 degrees
+is an exploratory review note, not a site-coordinate replacement.
+
+Reports explicitly distinguish `pct_of_natural` from `pct_of_grid`, with
+`pct_of_grid = PCT_NATVEG * pct_of_natural / 100`. Tree/shrub/grass/bare totals
+use the standard CLM natural PFT indices 0–14, not FATES parameter indices.
+A 16th slot is labelled `extra_index_needs_review`, kept in the inventory and
+excluded from assumed vegetation groups. A nonstandard explicit natpft
+coordinate is rejected before assigning group names.
+
+US-EML, US-ICh and US-ICt are always flagged for OSH/tundra representation
+review. The script does not impose a majority-shrub requirement, change
+PFTs, select FATES shrub parameters, or automatically exclude sites. Forest
+subtype fractions below 50%, crop over 20%, natural vegetation under 50%, and
+nonzero lake/wetland fractions are exploratory review screens, not official
+acceptance thresholds. Percentage sum tolerance is 0.5 percentage points;
+this checks numerical structure and does not establish ecological validity.
+The HH/HR identity from Stage 03 remains in the report, including hourly Ha1.
+
+Run on IRIDIS with the explicit environment interpreter:
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  "$PYTHON_BIN" -c 'import numpy; from netCDF4 import Dataset'
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/ameriflux-batch02-transfer'
+  REL='examples/AmeriFlux_MultiSite_10_Batch02'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage04"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage04/04a_audit_batch02_surfaces.py" -o "$BASE/scripts/stage04/04a_audit_batch02_surfaces.py"
+  "$PYTHON_BIN" -B "$BASE/scripts/stage04/04a_audit_batch02_surfaces.py" \
+    2>&1 | tee "$HOME/AmeriFlux_Batch02_stage04a_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+The final summary is `STAGE04A SUMMARY: N/10 structural passes; M structural
+failures`. Review every printed warning and the report tables even when all
+ten pass. No raw meteorology, existing surfaces, forcing/DATM, model cases
+or Slurm jobs are changed. Full meteorological coverage/quality auditing is
+still the next source-data task; no repairs or model runs occur here.
+
+Options: `--root`, `--report-root`, and `--stdout-only` (no reports written).
+The preferred backend is netCDF4; SciPy can read classic NetCDF fixtures if
+netCDF4 is unavailable, but cannot read NetCDF4/HDF5 surfaces.
+Validation passed compilation and six real classic-NetCDF fixture checks:
+ten valid HH/HR and 15/16-PFT cases with correctly weighted grid fractions;
+stdout-only with no report writes; changed file checksum rejection; invalid
+natural-PFT sum rejection; fill-value handling without invalid JSON; and
+rejection of nonstandard PFT index labels. Input hashes and modification
+times stayed unchanged. The netCDF4/HDF5 backend and actual IRIDIS surface
+values have not been exercised by this GitHub change.
 
 ## Validation boundary
 
