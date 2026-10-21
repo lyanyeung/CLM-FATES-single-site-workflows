@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Single-site, checkpoint-safe NL-Loo restart after failed run 4459256.
 
-Modes: inspect, cancel-blocked, prepare-test, verify-test,
-       prepare-continuation, submit SESSION.
+Modes: inspect, cancel-blocked, prepare-test, promote-test TEST_SESSION,
+       verify-test, prepare-continuation, submit SESSION.
 Only 'cancel-blocked' invokes scancel; only 'submit' starts a CIME job.
-The test runs ONE 5-year segment with RESUBMIT=0; the continuation
-is allowed only after a coordinated 3372 restart is archived.
+The optional test runs ONE 5-year segment with RESUBMIT=0.
+'promote-test' converts a never-submitted prepared test to a guarded
+direct 1370->3000 continuation (RESUBMIT=325); no intervening model run.
+The standard continuation follows a tested 3372 checkpoint.
 No other site is readied, edited, submitted, or cancelled.
 """
 import argparse
@@ -240,13 +242,96 @@ def prepare(mode):
     print(f"Then: python3 {Path(__file__).resolve()} submit '{session}'")
 
 
+
+def promote_test(test_session_arg):
+    """Convert an UNSUBMITTED prepared 3367 test into a direct 3000-y plan.
+
+    Validate its recorded CIME and restart state, retire the old TEST session,
+    change only RESUBMIT=325, and issue a NEW one-shot direct session.
+    No Slurm job submitted here.
+    """
+    test_session = Path(test_session_arg).resolve()
+    if (test_session.parent != BACKUP.resolve()
+            or not (test_session / "PREPARED").is_file()):
+        raise Stop("Not a valid prepared NL-Loo test session")
+    m = json.loads((test_session / "manifest.json").read_text())
+    if (m.get("case") != NAME or m.get("mode") != "test" or
+            m.get("checkpoint") != "3367-01-01-00000" or
+            m.get("done") != 1370 or m.get("resubmit") != 0 or
+            m.get("left_segments") != 326):
+        raise Stop("Test manifest is not the expected 1370-year one-segment preparation")
+    if (test_session / "SUBMIT_ATTEMPTED").exists():
+        raise Stop("Test session may already have been submitted; refusing promotion")
+    if (test_session / "SUPERSEDED_BY").exists():
+        raise Stop("Test session already superseded; refusing repeat promotion")
+
+    refs = preflight(m["checkpoint"])
+    if xml("RESUBMIT") != "0":
+        raise Stop("Current RESUBMIT must still be 0 from prepare-test")
+    if (digest(CASE / "env_run.xml") != m["env_run_sha256"] or
+            digest(CASE / "CaseStatus") != m["casestatus_sha256"]):
+        raise Stop("Case changed since prepare-test; refusing promotion")
+    for comp, d in refs.items():
+        if d["sha256"] != m["restarts"][comp]["sha256"]:
+            raise Stop(f"Archived {comp} restart changed")
+        staged = RUN / d["filename"]
+        if not staged.is_file() or digest(staged) != d["sha256"]:
+            raise Stop(f"Staged {comp} restart mismatch")
+        pointer = RUN / f"rpointer.{comp}"
+        if (not pointer.is_file() or
+                pointer.read_text(errors="replace").splitlines()[0].strip().removeprefix("./")
+                != d["filename"]):
+            raise Stop(f"Staged {comp} pointer mismatch")
+
+    new_session = BACKUP / ("direct_" +
+                            datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+                            + "_" + str(os.getpid()))
+    new_session.mkdir(parents=True, exist_ok=False)
+    # Retire the old TEST session BEFORE changing the XML so it cannot be
+    # submitted accidentally even if a later operation fails.
+    old_marker = test_session / "SUPERSEDED_BY"
+    fd = os.open(old_marker, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(fd, "w") as out:
+        out.write(str(new_session) + "\n")
+    for fname in ("CaseStatus", "env_run.xml", "env_batch.xml",
+                  "env_mach_specific.xml"):
+        src = CASE / fname
+        if src.is_file():
+            shutil.copy2(src, new_session / fname)
+
+    command([str(CASE / "xmlchange"), "RESUBMIT=325"], cwd=CASE)
+    if xml("RESUBMIT") != "325":
+        raise Stop("RESUBMIT=325 change failed; do not submit")
+    preview = command([str(CASE / "preview_run")], cwd=CASE, timeout=120)
+    (new_session / "preview_run.log").write_text(preview + "\n")
+    # Recheck after CIME's setup before recording a prepared session.
+    preflight("3367-01-01-00000")
+    manifest = {
+        "case": NAME, "mode": "direct", "checkpoint": "3367-01-01-00000",
+        "done": 1370, "target": 3000, "left_segments": 326,
+        "resubmit": 325, "restarts": refs,
+        "superseded_test_session": str(test_session),
+        "env_run_sha256": digest(CASE / "env_run.xml"),
+        "casestatus_sha256": digest(CASE / "CaseStatus"),
+    }
+    (new_session / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    (new_session / "PREPARED").write_text(datetime.now(timezone.utc).isoformat() + "\n")
+    print(f"SESSION={new_session}", flush=True)
+    print("DIRECT PREPARED: 1370/3000, 326 five-year segments, RESUBMIT=325")
+    print("NO JOB SUBMITTED. Prior test session is superseded.")
+    print(f"Review: cat '{new_session}/manifest.json'")
+    print(f"Then: python3 {Path(__file__).resolve()} submit '{new_session}'")
+
+
 def submit(session_arg):
     session = Path(session_arg).resolve()
     if session.parent != BACKUP.resolve() or not (session / "PREPARED").is_file():
         raise Stop("Not a valid NL-Loo PREPARED session")
     m = json.loads((session / "manifest.json").read_text())
-    if m["case"] != NAME or m["mode"] not in ("test", "continuation"):
+    if m["case"] != NAME or m["mode"] not in ("test", "continuation", "direct"):
         raise Stop("Unexpected session")
+    if (session / "SUPERSEDED_BY").exists():
+        raise Stop("TEST SESSION SUPERSEDED: use the new direct session instead")
     if (session / "SUBMIT_ATTEMPTED").exists():
         raise Stop("SUBMIT ALREADY ATTEMPTED: do not retry blindly")
     refs = preflight(m["checkpoint"])
@@ -280,6 +365,9 @@ def submit(session_arg):
     print("Submission accepted. Check squeue, CaseStatus and archive success.")
     if m["mode"] == "test":
         print("TEST MODE: only one 5-year segment (RESUBMIT=0).")
+    elif m["mode"] == "direct":
+        print("DIRECT CONTINUATION: 326 five-year segments to 3000; RESUBMIT=325.")
+        print("If the first run fails again, inspect logs; do not resubmit blindly.")
 
 
 def verify_test():
@@ -299,6 +387,7 @@ def main():
     for mode in ("inspect", "cancel-blocked", "prepare-test",
                  "verify-test", "prepare-continuation"):
         sp.add_parser(mode)
+    sp.add_parser("promote-test").add_argument("test_session")
     sp.add_parser("submit").add_argument("session")
     args = p.parse_args()
     try:
@@ -310,6 +399,8 @@ def main():
             prepare("test")
         elif args.mode == "prepare-continuation":
             prepare("continuation")
+        elif args.mode == "promote-test":
+            promote_test(args.test_session)
         elif args.mode == "submit":
             submit(args.session)
         elif args.mode == "verify-test":
