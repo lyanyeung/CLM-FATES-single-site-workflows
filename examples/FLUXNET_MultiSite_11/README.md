@@ -1,3 +1,13 @@
+## Current CH-Aws monitoring — Stage42 v8 / Stage43 branch (21 October 2026)
+
+The **current** CH-Aws monitoring case is `CH-Aws_FATES_SPINUP1000_RH42A_V8_CONT2016` using a 2006–2024 all-year QC1 low-RH v8 forcing sensitivity. It reuses the three-component RH34A `2016-01-01-00000` restart (10 elapsed years), then aims to add 990 model years in 198 five-year segments (`RESUBMIT=197` at initial submission). The first Slurm pair, `4614961` (run) and `4614962` (archive), **was submitted**, but submission/PENDING does not establish model success or a new archived checkpoint. Earlier RH29A, RH34A and RH38A cases failed and are historical trials.
+
+- [Stage42 all-19-year v8 forcing generation / verification](scripts/stage42/44_chaws_all19year_qc1_v8.py)
+- [Stage43 v8 branch continuation script](scripts/stage43/45_chaws_v8_direct_990year_branch.py)
+- [Preferred four-batch read-only monitor](../../maintenance/check_four_spinups.py), [usage and progress interpretation](../../maintenance/README.md)
+
+A main-table value of `10*/1000` means **source RH34A baseline only**, after provenance and component-file checks; no RH42A archive has yet been verified by that marker. Actual additional progress requires RH42A's own archived three-component restart. The sensitivity forcing is provisional; no 1000-year completion or model stability is implied. Historical 20 October snapshots below are retained for provenance and must not be used as live Slurm status.
+
 ## CH-Aws Stage28 humidity sensitivity candidate — 21 October 2026
 
 CH-Aws's RH25A 16-day diagnostic job `4496106` failed with the original `HumanIndexMod.F90:1019` negative 2-m RH (`-1.07855%`). Offline source and hourly-output review localized a forcing source discontinuity at 2006-01-14 14:30. An independent **nine-half-hour QBOT-only 2006 ERA5-Land sensitivity candidate** was created and verified against RH25A v3; it **has not** been used in a successfully running case. Another **68 QC2/EUF_F RH<10%** records remain for source-aware review. **No further diagnostic Slurm jobs are part of Stage28.** See [Stage28 evidence, limitations and commands](docs/CH_Aws_STAGE28_RH25A_v4_2026-10-21.md), [Stage28 non-overwriting reproduction and verification script](scripts/stage28/28_chaws_jan14_v4.py) and [remaining-68 read-only audit](scripts/stage28/29_chaws_remaining_rh_readonly.py). GitHub contains *no* tower source CSVs, reanalysis caches, NetCDF or cases.
