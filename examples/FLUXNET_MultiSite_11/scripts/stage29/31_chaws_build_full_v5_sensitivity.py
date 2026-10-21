@@ -49,7 +49,7 @@ def reference_2014(model, dates):
     x = x.reindex(x.index.union(dates)).sort_index().interpolate(
         method='time',limit=1,limit_area='inside').reindex(dates)
     require(x[['T','Td']].notna().all().all(),f'2014 reference gap: {model}')
-    return pd.Series(100*sat(x.Td.to_numpy())/sat(x.T.to_numpy()),index=dates)
+    return pd.Series(100*sat(x['Td'].to_numpy())/sat(x['T'].to_numpy()),index=dates)
 
 def main(mode):
     if mode=='write':require(not OUT.exists(),f'Output already exists: {OUT}')
