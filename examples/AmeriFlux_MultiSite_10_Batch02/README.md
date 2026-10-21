@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 02
 
-Stages 00 and 01 upload and extract the ten exact releases in [sites.tsv](sites.tsv):
+Stages 00–02 upload, extract and inspect metadata for the ten exact releases in [sites.tsv](sites.tsv):
 US-BZS, US-CMW, US-EML, US-GLE, US-Ha1, US-Ho1, US-Ho2, US-Ho3,
 US-ICh and US-ICt. First-batch scripts and manifests are unchanged.
 
@@ -146,6 +146,68 @@ python3 "$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_B
 are available. Audit-only writes no report or raw output. Next inspect BIF
 or FULLSET metadata, actual coverage and meteorological QC before preparing
 surfaces, forcing or model experiments.
+
+## Stage 02: read-only metadata and coordinate preflight
+
+Operator output now confirms `BATCH02 SUMMARY: 10/10 PASS` after the hourly
+inventory fix. Next inspect metadata before preparing CTSM point surfaces.
+
+[Stage 02](scripts/stage02/02_check_batch02_metadata.py) reads the exact
+release directories. Eight v1.3 sites use their release BIF. The two FULLSET
+sites without BIF use [metadata_fallbacks.tsv](metadata_fallbacks.tsv):
+
+| Site | Latitude | Longitude | IGBP | Source |
+| --- | --- | --- | --- | --- |
+| US-BZS | 64.6963 | -148.3235 | ENF | [AmeriFlux site page](https://ameriflux.lbl.gov/sites/siteinfo/US-BZS) |
+| US-Ho1 | 45.2040 | -68.7402 | ENF | [AmeriFlux site page](https://ameriflux.lbl.gov/sites/siteinfo/US-Ho1) |
+
+These are official site-page search extracts retrieved on 21 October 2026;
+direct page opens were blocked by HTTP 403. They are current site metadata,
+not embedded release-specific BIF. Provenance, exact package names and this
+limitation are preserved in the fallback table. Do not borrow Ho2/Ho3
+coordinates for Ho1. BZS is described as black spruce on a permafrost peat
+plateau; its ENF label alone does not validate soil or footprint representation.
+
+The script prints unique valid coordinates, original IGBP labels, coordinate
+provenance, available height metadata, and the first HH/HR timestamp interval.
+It checks 30 minutes for HH and 60 minutes for HR, retaining US-Ha1's hourly
+identity. It does not inspect full time-series completeness or choose ZBOT,
+PFT fractions, spin-up periods, or replacement meteorology. Non-forest and
+study-inclusion classes are flagged for review without excluding sites.
+Missing height information is reported for follow-up.
+
+Run on IRIDIS, with direct GitHub downloads and no `git pull`:
+
+```bash
+(
+  set -euo pipefail
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/ameriflux-batch02-transfer'
+  REL='examples/AmeriFlux_MultiSite_10_Batch02'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage02"
+  for FILE in sites.tsv metadata_fallbacks.tsv scripts/stage02/02_check_batch02_metadata.py; do
+    curl -fLsS --retry 3 "$RAW/$REL/$FILE" -o "$BASE/$FILE"
+  done
+  python3 -m py_compile "$BASE/scripts/stage02/02_check_batch02_metadata.py"
+  python3 "$BASE/scripts/stage02/02_check_batch02_metadata.py" \
+    2>&1 | tee "$HOME/AmeriFlux_Batch02_stage02_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+Expected summary, if real input checks pass:
+`STAGE02 SUMMARY: 10/10 coordinate + first-interval checks PASS; failures: none`.
+The script writes no files; the shell saves its output log. No source data,
+forcing, surfaces, cases or Slurm jobs are changed. Inspect the printed table
+and review notes before the next surface-generation stage. A coordinate PASS
+is not approval of vegetation representation or meteorological forcing.
+
+Stage 02 passed Python compilation and six synthetic-input checks: eight BIF
+plus two fallback sites with native HH/HR intervals; ambiguous coordinate
+rejection; missing-value coordinate rejection; no silent fallback for a
+missing v1.3 BIF; rejection of HR/first-interval mismatch; and study-inclusion
+flagging without automatic exclusion. Input file hashes and modification
+times stayed unchanged in every check. Live IRIDIS Stage 02 has not been run
+by the GitHub change.
 
 ## Validation boundary
 
