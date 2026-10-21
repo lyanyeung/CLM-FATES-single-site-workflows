@@ -111,8 +111,16 @@ def main():
                     h.update(chunk)
             checksum.append(h.hexdigest()+"  "+f.relative_to(snapshot).as_posix())
         (dest/"SHA256SUMS.txt").write_text("\n".join(checksum)+"\n")
-        run("git","add","--",str(PUBLISH_PARENT / snapshot.name),cwd=clone)
+        # The six-site .gitignore intentionally excludes generated .png/.csv/.json.
+        # Force-add ONLY the explicitly validated output files, never a directory.
+        allowlisted = [str(PUBLISH_PARENT / snapshot.name / f.relative_to(snapshot))
+                       for f in files]
+        allowlisted.append(str(PUBLISH_PARENT / snapshot.name / "SHA256SUMS.txt"))
+        run("git","add","-f","--",*allowlisted,cwd=clone)
         staged = run("git","diff","--cached","--name-only",cwd=clone)
+        unexpected = set(staged.splitlines()) - set(allowlisted)
+        if unexpected:
+            raise RuntimeError("Unexpected staged files: " + str(sorted(unexpected)))
         if not staged:
             raise RuntimeError("No Git files staged; check .gitignore before pushing.")
         run("git","-c","user.name=IRIDIS6 CLM-FATES",
