@@ -1,3 +1,7 @@
+## CH-Aws Stage28 humidity sensitivity candidate — 21 October 2026
+
+CH-Aws's RH25A 16-day diagnostic job `4496106` failed with the original `HumanIndexMod.F90:1019` negative 2-m RH (`-1.07855%`). Offline source and hourly-output review localized a forcing source discontinuity at 2006-01-14 14:30. An independent **nine-half-hour QBOT-only 2006 ERA5-Land sensitivity candidate** was created and verified against RH25A v3; it **has not** been used in a successfully running case. Another **68 QC2/EUF_F RH<10%** records remain for source-aware review. **No further diagnostic Slurm jobs are part of Stage28.** See [Stage28 evidence, limitations and commands](docs/CH_Aws_STAGE28_RH25A_v4_2026-10-21.md), [Stage28 non-overwriting reproduction and verification script](scripts/stage28/28_chaws_jan14_v4.py) and [remaining-68 read-only audit](scripts/stage28/29_chaws_remaining_rh_readonly.py). GitHub contains *no* tower source CSVs, reanalysis caches, NetCDF or cases.
+
 <!-- IRIDIS_LIVE_20261020_LATEST_START -->
 ## Latest IRIDIS6 run snapshot — 20 October 2026 (11 sites)
 
