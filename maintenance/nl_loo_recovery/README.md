@@ -4,6 +4,29 @@
 
 **Preserved state:** Last known fully archived checkpoint: `3367-01-01-00000`, equal to 1370 cumulative years since `RUN_STARTDATE=1997-01-01`. The operator confirmed that CPL, DATM and CLM NetCDF restarts have readable headers, and all three dated archived restart pointers match the checkpoint. Target: 3000 years, 1630 remaining.
 
+## Direct continuation from an already prepared, unsubmitted test session
+
+On 21 October the operator reported successful `prepare-test`, but **no test job had been submitted**, with:
+
+```text
+/home/ly3n24/NL_Loo_recovery_20261021/test_20261021T021325Z_1701922
+```
+
+If the operator prefers to resume directly to 3000 model years, **do not submit that old test session** and do not edit its manifest manually. The updated script offers `promote-test` to verify the unsubmitted prepared test's unchanged `3367` checkpoint, CIME state, archived and staged restart checksums, and absence of NL-Loo Slurm jobs. It then marks the test session `SUPERSEDED_BY`, sets `RESUBMIT=325`, and creates a **new direct session**, without submitting any job. A single subsequent `submit NEW_SESSION` starts 326 five-year segments (first plus 325 automatic re-submissions). All other experiments remain untouched.
+
+```bash
+SCRIPT="$HOME/NL_Loo_recovery_tools/recover_nl_loo.py"
+TEST="/home/ly3n24/NL_Loo_recovery_20261021/test_20261021T021325Z_1701922"
+python3 "$SCRIPT" inspect
+python3 "$SCRIPT" promote-test "$TEST" | tee "$HOME/NL_Loo_direct_prepare_20261021.log"
+SESSION=$(sed -n 's/^SESSION=//p' "$HOME/NL_Loo_direct_prepare_20261021.log" | tail -n 1)
+cat "$SESSION/manifest.json"
+# Only after validating manifest, and only once:
+python3 "$SCRIPT" submit "$SESSION"
+```
+
+**Risk:** The original `red6134` SIGSEGV / `Cannot allocate memory` cause remains unconfirmed. Direct multi-segment continuation deliberately omits the protective single-segment test; if the new job fails, diagnose before resubmitting. Monitor `squeue`, `sacct`, archived checkpoint date and `CaseStatus`.
+
 ## Recovery script
 
 [`recover_nl_loo.py`](recover_nl_loo.py) is a **single-case** script with intentionally separated phases; it does not modify the other five-site experiments. It performs preflight checks before changing files. This code has been published to GitHub but **has not been executed or tested on the live IRIDIS6 case**.
