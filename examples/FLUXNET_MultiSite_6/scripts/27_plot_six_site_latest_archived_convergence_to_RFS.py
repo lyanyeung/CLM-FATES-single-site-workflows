@@ -484,7 +484,9 @@ def main():
     dest = args.output_root or OUT_PARENT / (stamp+"_archive_snapshot")
     if dest.exists():
         raise RuntimeError("Refusing to overwrite existing RFS snapshot: "+str(dest))
-    if not dest.resolve().is_relative_to(OUT_PARENT.resolve()):
+    try:
+        dest.resolve().relative_to(OUT_PARENT.resolve())
+    except ValueError:
         raise RuntimeError("Output path must be inside designated Research Filestore folder")
     dest.mkdir(parents=True)
     log("RESEARCH FILESTORE OUTPUT:",dest)
