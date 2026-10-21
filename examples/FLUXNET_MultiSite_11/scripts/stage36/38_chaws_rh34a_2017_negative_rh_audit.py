@@ -112,7 +112,10 @@ def reference_at(model, desired):
     arr = (arr.reindex(arr.index.union(desired)).sort_index()
            .interpolate(method="time", limit=1, limit_area="inside")
            .reindex(desired))
-    require(arr.notna().all().all(), model + ": 2017 reference interpolation has gaps")
+    # UTC+1 conversion leaves the first two local-standard half hours outside
+    # a single calendar-year UTC cache; preserve them as NaN, not zero.
+    window = arr.loc[DATE - pd.Timedelta(days=3):DATE + pd.Timedelta(days=3, hours=23, minutes=30)]
+    require(window.notna().all().all(), model + ": missing reference inside failure window")
     return 100 * sat_hpa(arr["Td"]) / sat_hpa(arr["T"])
 
 
