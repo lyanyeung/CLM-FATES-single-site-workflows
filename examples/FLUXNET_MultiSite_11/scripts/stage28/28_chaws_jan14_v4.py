@@ -75,7 +75,7 @@ def build_proposal():
     need = pd.date_range(START, END, freq="30min")
     require(len(need) == 9, "Expected nine records")
     rows = df.set_index("time").reindex(need)
-    require(rows.notna(subset=["TA_F", "PA_F", "VPD_F", "RH_IMPLIED_PCT"]).all().all(),
+    require(rows[["TA_F", "PA_F", "VPD_F", "RH_IMPLIED_PCT"]].notna().all().all(),
             "Missing forcing values")
     require((rows["VPD_F_SOURCE"] == "EUF_F").all()
             and pd.to_numeric(rows["VPD_F_QC"], errors="coerce").eq(2).all()
