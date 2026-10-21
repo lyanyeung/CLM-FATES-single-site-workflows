@@ -2,8 +2,11 @@
 """Read-only, unified four-batch IRIDIS6 CLM-FATES spin-up monitoring.
 
 Exactly one explicitly selected, current CIME case per site in each main table.
-For IT-Noe use ERA5 branch case; for CH-Aws use active RH34A case.
-Legacy _11P and RH29A may be displayed separately (--show-alternates).
+For IT-Noe use ERA5 branch case; for CH-Aws use current RH42A v8 case.
+Legacy CH-Aws RH29A/RH34A/RH38A and _11P cases may be shown separately.
+For RH42A only, a structurally verified 2016 RH34A source restart can
+provide an explicitly marked 10-year inherited baseline before the first
+RH42A archive; never count queued/unarchived model years as done.
 Reports independent MODEL/ARCHIVE phases and archived restart progress.
 Neither runs nor queue presence count as archived years. Python stdlib only.
 No case.submit, xmlchange, cleanup or filesystem writes.
@@ -11,6 +14,7 @@ No case.submit, xmlchange, cleanup or filesystem writes.
 from __future__ import annotations
 
 import argparse
+import json
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -65,7 +69,7 @@ PRIMARY_CASE_OVERRIDES = {
     # --show-alternates, but must not replace the active run in summary tables.
     "FLUXNET_MultiSite_11": {
         "IT-Noe": ("IT-Noe_ERA5_ABW_BRANCH2009", "ERA5-BR"),
-        "CH-Aws": ("CH-Aws_FATES_SPINUP1000_RH34A", "RH34A"),
+        "CH-Aws": ("CH-Aws_FATES_SPINUP1000_RH42A_V8_CONT2016", "RH42A-V8"),
     }
 }
 
@@ -161,6 +165,65 @@ def restart_status(rest: Path, name: str, start: int) -> tuple:
         warn = "NEWER_INCOMPLETE:" + first_bad if first_bad else ""
         return done, stamp, warn
     return None, None, "NO_VALID_CHECKPOINT:" + (first_bad or "UNKNOWN")
+
+
+
+# Only RH42A uses this explicit, provenance-backed inherited checkpoint.
+# The ordinary archived checkpoint count for every other site is unchanged.
+CH_AWS_CURRENT = "CH-Aws_FATES_SPINUP1000_RH42A_V8_CONT2016"
+CH_AWS_SOURCE = "CH-Aws_FATES_SPINUP1000_RH34A"
+CH_AWS_SOURCE_STAMP = "2016-01-01-00000"
+
+
+def verified_chaws_branch_baseline(case: Path, name: str, start: int,
+                                   target: int) -> tuple[int | None, str]:
+    """Read-only structural check of the 10-y RH34A baseline used by RH42A.
+
+    A branch's 2016 source checkpoint is NOT an RH42A archive. This is
+    therefore returned separately and clearly marked in report notes.
+    Reject missing/mismatched provenance and partial source component files.
+    No expensive file hashing or NetCDF data read in a monitor.
+    """
+    if name != CH_AWS_CURRENT:
+        return None, ""
+    receipt = case / ".stage43_restart_provenance.json"
+    try:
+        raw = json.loads(receipt.read_text())
+    except (OSError, ValueError) as exc:
+        return None, "INHERITED_BASELINE_UNVERIFIED:PROVENANCE_" + type(exc).__name__
+    try:
+        if not (
+            raw.get("case") == name
+            and raw.get("source_case") == CH_AWS_SOURCE
+            and raw.get("source_checkpoint") == CH_AWS_SOURCE_STAMP
+            and raw.get("elapsed_original_years") == 10
+            and raw.get("remaining_years") == 990
+            and raw.get("five_year_segments") == 198
+            and raw.get("initial_RESUBMIT") == 197
+            and start == 2006 and target == 1000
+            and xml_value(case, "RUN_STARTDATE") == "2006-01-01"
+            and xml_value(case, "RUN_REFCASE") == CH_AWS_SOURCE
+            and xml_value(case, "RUN_REFDATE") == "2016-01-01"
+        ):
+            return None, "INHERITED_BASELINE_UNVERIFIED:METADATA"
+    except (TypeError, AttributeError):
+        return None, "INHERITED_BASELINE_UNVERIFIED:INVALID_RECEIPT"
+    root = OUTPUT_ROOT / "archive" / CH_AWS_SOURCE / "rest" / CH_AWS_SOURCE_STAMP
+    for comp, prefix in PARTS.items():
+        filename = f"{CH_AWS_SOURCE}.{prefix}.r.{CH_AWS_SOURCE_STAMP}.nc"
+        restart = root / filename
+        pointer = root / f"rpointer.{comp}.{CH_AWS_SOURCE_STAMP}"
+        try:
+            if not restart.is_file() or restart.stat().st_size < 1024:
+                return None, "INHERITED_BASELINE_UNVERIFIED:" + comp + "_NC"
+            if not pointer.is_file():
+                return None, "INHERITED_BASELINE_UNVERIFIED:" + comp + "_PTR"
+            contents = pointer.read_text(errors="replace").splitlines()
+            if len(contents) != 1 or contents[0].strip().removeprefix("./") != filename:
+                return None, "INHERITED_BASELINE_UNVERIFIED:" + comp + "_PTR"
+        except OSError:
+            return None, "INHERITED_BASELINE_UNVERIFIED:" + comp + "_IO"
+    return 10, "VERIFIED_INHERITED_10Y_RH34A_RESTART"
 
 
 def unarchived_success(case: Path) -> bool:
@@ -295,11 +358,22 @@ def site_report(batch: str, site: str, configured_start: int, target: int,
     if archive_root == "-" or not archive_root.startswith("/"):
         archive_root = str(OUTPUT_ROOT / "archive" / name)
     if start is not None:
-        done, stamp, warning = restart_status(Path(archive_root) / "rest",
-                                              name, start)
+        archived_done, archived_stamp, warning = restart_status(
+            Path(archive_root) / "rest", name, start)
     else:
-        done, stamp, warning = None, None, "UNKNOWN_START_DATE"
-    phase = current_case_phase(case, name, jobs, done, warning)
+        archived_done, archived_stamp, warning = None, None, "UNKNOWN_START_DATE"
+    # Treat an inherited RH34A checkpoint as an explicit baseline, never as
+    # a new RH42A archive; once RH42A archives exist use their model clock.
+    baseline, baseline_note = verified_chaws_branch_baseline(
+        case, name, start, target) if start is not None else (None, "")
+    done, stamp = archived_done, archived_stamp
+    inherited_only = False
+    if baseline is not None and archived_done is None:
+        done, stamp = baseline, CH_AWS_SOURCE_STAMP
+        inherited_only = True
+    if archived_done is not None and baseline is not None and archived_done < baseline:
+        warning = (warning + ";" if warning else "") + "ARCHIVE_BEFORE_BRANCH_BASE"
+    phase = current_case_phase(case, name, jobs, archived_done, warning)
     status = phase["phase"]
     if status == "IDLE" and done is not None and done >= target and not warning:
         status = "COMPLETE"
@@ -310,6 +384,12 @@ def site_report(batch: str, site: str, configured_start: int, target: int,
     else:
         left = max(0, target - done)
     notes = []
+    if baseline_note:
+        notes.append(baseline_note)
+    if inherited_only:
+        notes.append("BASE_ONLY;NO_RH42A_ARCHIVE_YET")
+    elif baseline is not None and archived_done is not None:
+        notes.append(f"RH42A_ARCHIVED_POST_BRANCH_YEARS={max(0, archived_done - baseline)}")
     if warning:
         notes.append(warning)
     if phase["queue_reasons"]:
@@ -318,7 +398,7 @@ def site_report(batch: str, site: str, configured_start: int, target: int,
         notes.append("PAST_TARGET")
     runtype = xml_value(case, "RUN_TYPE")
     branch_years = None
-    if runtype.lower() == "branch" and stamp:
+    if runtype.lower() == "branch" and stamp and not inherited_only:
         refdate = xml_value(case, "RUN_REFDATE")
         refmatch = re.match(r"^(\d{4})-\d{2}-\d{2}$", refdate)
         if refmatch and int(stamp[:4]) >= int(refmatch.group(1)):
@@ -329,12 +409,15 @@ def site_report(batch: str, site: str, configured_start: int, target: int,
     if status == "IDLE" and unarchived_success(case):
         status = "CHECK_ARCHIVE"
         notes.append("MODEL_SUCCESS_AFTER_LAST_ARCHIVE")
+    if status == "IDLE" and baseline_note.startswith("INHERITED_BASELINE_UNVERIFIED"):
+        status = "REVIEW"
     return {
         "site": site, "variant": variant(batch, site), "case": name,
         "target": target, "completed": done, "remaining": left,
         "checkpoint": stamp or "-", "resubmit": xml_value(case, "RESUBMIT"),
         "status": status, "model": phase["run_job"], "archive": phase["arch_job"],
-        "branch_years": branch_years, "note": "; ".join(notes) or "-",
+        "branch_years": branch_years, "inherited_only": inherited_only,
+        "note": "; ".join(notes) or "-",
     }
 
 
@@ -349,6 +432,8 @@ def render(batch: str, rows: list[dict]) -> None:
     for r in rows:
         counts[r["status"]] += 1
         progress = str(r["completed"]) if r["completed"] is not None else "?"
+        if r["inherited_only"]:
+            progress += "*"
         remaining = str(r["remaining"]) if r["remaining"] is not None else "?"
         print(f"{r['site']:<9} {r['variant']:<9} "
               f"{progress + '/' + str(r['target']):>12} "
@@ -375,10 +460,13 @@ def show_alternates(batches: dict, jobs: list[dict]) -> None:
                 ("FLUXNET_MultiSite_11", "CH-Aws")
             ]:
                 continue
-            extra_names = (
-                [site + "_FATES_SPINUP500_11P"]
-                + (["CH-Aws_FATES_SPINUP1000_RH29A"] if site == "CH-Aws" else [])
-            )
+            extra_names = [site + "_FATES_SPINUP500_11P"]
+            if site == "CH-Aws":
+                extra_names += [
+                    "CH-Aws_FATES_SPINUP1000_RH29A",
+                    "CH-Aws_FATES_SPINUP1000_RH34A",
+                    "CH-Aws_FATES_SPINUP1000_RH38A_CONT2016",
+                ]
             for name in extra_names:
                 if name == primary or name in recorded:
                     continue
@@ -414,10 +502,10 @@ def main() -> int:
         return 1
     print("READ-ONLY CLM-FATES PROGRESS |", datetime.now(timezone.utc).isoformat())
     print("ONE current case per station. MODEL and ARCHIVE states are independent.")
-    print("DONE = archived three-component checkpoint years from that case's"
-          " RUN_STARTDATE.")
-    print("For BRANCH runs, BRANCH_YEARS (if RUN_REFDATE is valid) is separately"
-          " reported; not added to DONE.")
+    print("DONE = verified archived three-component checkpoint model years from"
+          " RUN_STARTDATE; RH42A 10* is a verified RH34A inherited baseline only.")
+    print("RH42A inherited 10* is NOT an RH42A archive or a completed queued"
+          " five-year segment. BRANCH_YEARS are separately reported.")
     batches = BATCHES if args.batch == "all" else {args.batch: BATCHES[args.batch]}
     for batch, sites in batches.items():
         render(batch, [site_report(batch, site, start, target, jobs)
