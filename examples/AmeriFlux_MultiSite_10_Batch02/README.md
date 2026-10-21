@@ -250,6 +250,9 @@ Run on IRIDIS in the existing `clm_fates_env`, directly downloading from GitHub:
 ```bash
 (
   set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  "$PYTHON_BIN" -c 'import sys, numpy; print("Python:", sys.executable, "NumPy:", numpy.__version__)'
   RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/ameriflux-batch02-transfer'
   REL='examples/AmeriFlux_MultiSite_10_Batch02'
   BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
@@ -258,8 +261,8 @@ Run on IRIDIS in the existing `clm_fates_env`, directly downloading from GitHub:
     curl -fLsS --retry 3 "$RAW/$REL/$FILE" -o "$BASE/$FILE"
   done
   SCRIPT="$BASE/scripts/stage03/03_make_batch02_surfaces.py"
-  python3 -B "$SCRIPT" --check
-  python3 -B "$SCRIPT" --run \
+  "$PYTHON_BIN" -B "$SCRIPT" --check
+  "$PYTHON_BIN" -B "$SCRIPT" --run \
     2>&1 | tee "$HOME/AmeriFlux_Batch02_stage03_$(date +%Y%m%d_%H%M%S).log"
 )
 ```
@@ -279,6 +282,43 @@ US-Ha1's original surface fixture stayed unchanged and its hourly provenance
 remained in the receipt. These checks test orchestration, not real CTSM
 execution or scientific NetCDF correctness; live generation is performed by
 the operator on IRIDIS.
+
+### Interpreter preflight and config-only recovery
+
+The first live US-BZS attempt failed during CTSM import with
+`ModuleNotFoundError: No module named 'numpy'`. The driver had invoked
+`subset_data` as an executable, allowing its shebang to choose Python.
+The shell's `(clm_fates_env)` prompt by itself did not establish which
+interpreter that child used. The log alone also cannot rule out a missing
+dependency in the intended environment.
+
+The corrected driver explicitly invokes `[sys.executable, '-B', subset_data, ...]`
+and first runs `point --help` with the same interpreter to test CTSM imports,
+before creating or moving output directories. It prints the interpreter
+and Conda environment. Use `$CONDA_PREFIX/bin/python` after activating
+`clm_fates_env`; no automatic package installation or environment changes
+are performed by the Python driver.
+
+For the failed attempt above, after downloading the corrected script:
+
+```bash
+PYTHON_BIN="$CONDA_PREFIX/bin/python"
+SCRIPT="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Batch02/scripts/stage03/03_make_batch02_surfaces.py"
+"$PYTHON_BIN" -B "$SCRIPT" --check --recover-config-only
+"$PYTHON_BIN" -B "$SCRIPT" --run --recover-config-only
+```
+
+Recovery is permitted only when an incomplete output directory contains
+exactly the unchanged, expected `<SITE>_data.cfg`, with no other files or
+directories. `--check` only describes that plan. `--run` rechecks and renames
+the old directory to `subset_data_batch02_surf2000.incomplete_<UTC>_<ID>`
+before creating a fresh output directory. It does not delete the old attempt
+or adopt unverified NetCDF files. Any additional entry or config difference
+blocks recovery for inspection. No other surface or source directory is moved.
+
+Regression checks additionally exercised an unusable tool shebang, dependency
+failure before any output creation/move, read-only recovery checks, exact
+config-only preservation and retry, and rejection of an additional output file.
 
 ## Validation boundary
 

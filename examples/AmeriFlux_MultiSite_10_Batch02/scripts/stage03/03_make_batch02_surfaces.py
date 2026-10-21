@@ -5,6 +5,7 @@ Default --check is read-only. --run preflights all ten sites before writing.
 Reuse Batch 01 subset settings; no --dompft, forcing, cases or Slurm jobs.
 """
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import importlib.util
 import json
@@ -13,6 +14,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+from uuid import uuid4
 
 # Keep default check mode free of bytecode-cache writes when importing Stage 02.
 sys.dont_write_bytecode = True
@@ -91,12 +93,34 @@ def outputs_complete(out, site):
     return surfaces[0]
 
 
+def config_only(out, site, expected_hash):
+    cfg = out / (site + "_data.cfg")
+    return (out.is_dir() and not out.is_symlink() and list(out.iterdir()) == [cfg]
+            and cfg.is_file() and not cfg.is_symlink() and digest(cfg) == expected_hash)
+
+
+def interpreter_preflight(subset, ctsm):
+    print("PYTHON:", sys.executable, flush=True)
+    print("CONDA ENV:", os.environ.get("CONDA_DEFAULT_ENV", "not reported"), flush=True)
+    # Run the actual tool's imports with the SAME interpreter as this driver.
+    # Do not let the tool's shebang silently select a different Python.
+    result = subprocess.run([sys.executable, "-B", str(subset), "point", "--help"],
+                            cwd=str(ctsm), capture_output=True, text=True, timeout=60)
+    if result.returncode:
+        raise RuntimeError("CTSM dependency preflight failed under " + sys.executable
+                           + "; no output directories created or moved.\n"
+                           + result.stdout[-2000:] + result.stderr[-5000:])
+    print("PYTHON/CTSM IMPORT PREFLIGHT: PASS", flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--check", action="store_true")
     mode.add_argument("--run", action="store_true")
     parser.add_argument("--clm-root", type=Path, default=DEFAULT_ROOT)
+    parser.add_argument("--recover-config-only", action="store_true",
+                        help="Preserve and restart an incomplete directory ONLY if it contains the exact expected config and nothing else")
     args = parser.parse_args()
     root = args.clm_root.expanduser().resolve()
     ctsm, inputdata = root / "CTSM", root / "inputdata"
@@ -107,6 +131,7 @@ def main():
             or not os.access(subset, os.X_OK)):
         raise RuntimeError("Missing CTSM template, inputdata directory, or executable subset_data")
     text = config_text(template)
+    interpreter_preflight(subset, ctsm)
     metadata = load_metadata(sites_root)
     plans = []
     print("MODE:", "--run" if args.run else "--check", flush=True)
@@ -124,17 +149,22 @@ def main():
         if out.exists():
             receipt = out / RECEIPT
             if not out.is_dir() or not receipt.is_file() or receipt.is_symlink():
-                raise RuntimeError("Existing output without completion receipt; inspect: " + str(out))
-            saved = json.loads(receipt.read_text(encoding="utf-8"))
-            outputs_complete(out, site)
-            if saved.get("request") != expected or saved.get("files") != snapshot(out):
-                raise RuntimeError("Existing output differs from request/receipt; preserved: " + str(out))
-            status = "skip"
+                if args.recover_config_only and config_only(out, site, expected["config_sha256"]):
+                    status = "recover"
+                else:
+                    raise RuntimeError("Existing output without completion receipt; inspect: " + str(out)
+                                       + ". --recover-config-only accepts only an unchanged config file, with no other entries.")
+            else:
+                saved = json.loads(receipt.read_text(encoding="utf-8"))
+                outputs_complete(out, site)
+                if saved.get("request") != expected or saved.get("files") != snapshot(out):
+                    raise RuntimeError("Existing output differs from request/receipt; preserved: " + str(out))
+                status = "skip"
         else:
             status = "new"
         plans.append((info, out, expected, status))
         print("{}: {} lat={} lon={} IGBP={} MET={} SOURCE={}".format(
-            "SKIP VERIFIED" if status == "skip" else "READY", site, info["latitude"],
+            {"skip": "SKIP VERIFIED", "recover": "RECOVER CONFIG ONLY", "new": "READY"}[status], site, info["latitude"],
             info["longitude"], "/".join(info["igbp_codes"]) or "NOT_REPORTED",
             "/".join(m["resolution"] for m in info["meteorology"]), info["coordinate_source"]), flush=True)
     skipped = sum(p[3] == "skip" for p in plans)
@@ -148,12 +178,21 @@ def main():
             continue
         site = info["site"]
         print("\n========== GENERATE {} ==========".format(site), flush=True)
+        if status == "recover":
+            if not config_only(out, site, expected["config_sha256"]):
+                raise RuntimeError("Recovery directory changed after preflight; preserved: " + str(out))
+            stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "_" + uuid4().hex[:8]
+            backup = out.with_name(out.name + ".incomplete_" + stamp)
+            if backup.exists():
+                raise RuntimeError("Recovery backup already exists: " + str(backup))
+            out.rename(backup)
+            print("PRESERVED CONFIG-ONLY ATTEMPT:", backup, flush=True)
         # Atomic directory creation also blocks a concurrent run from overwriting.
         out.mkdir()
         cfg = out / (site + "_data.cfg")
         with cfg.open("x", encoding="utf-8") as stream:
             stream.write(text)
-        command = [str(subset), "point", "--lat", str(info["latitude"]),
+        command = [sys.executable, "-B", str(subset), "point", "--lat", str(info["latitude"]),
                    "--lon", str(info["longitude"]), "--lon-type", "180",
                    "--site", site, "--surf-year", "2000", "--create-surface",
                    "--create-user-mods", "--inputdata-dir", str(inputdata),
@@ -179,7 +218,8 @@ def main():
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (OSError, ValueError, RuntimeError, KeyError, subprocess.CalledProcessError) as exc:
+    except (OSError, ValueError, RuntimeError, KeyError, subprocess.CalledProcessError,
+            subprocess.TimeoutExpired) as exc:
         print("ERROR:", exc, file=sys.stderr)
         print("Existing outputs are preserved. Inspect partial output before rerunning.", file=sys.stderr)
         raise SystemExit(1)
