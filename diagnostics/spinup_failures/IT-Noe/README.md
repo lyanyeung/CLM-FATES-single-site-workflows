@@ -83,3 +83,40 @@ python3 "$SCRIPT" --joined "$JOINED" --episodes "$EPISODES" --out "$OUT" --conte
 New local outputs: event_decision_ledger.csv, flagged_records_with_event_key.csv, event_context_plus_minus_hours.csv, yearly_review_summary.csv, review_provenance.json, and README.md.
 
 Priority P0 identifies incidents on 2010-05-13 and 2010-05-28; all thresholds are triage only. Episode start/end are FIRST/LAST flagged records, not final replacement boundaries. Review original FLUXNET/ICOS provenance, date conventions, ERA5 corroboration, and the wider unflagged context before approving any corrections. Test proposed versioned DATM in an isolated CIME case. Do NOT resume the production 1000-year spin-up on these automated flags alone.
+
+
+## Next step: unapproved correction brackets and ERA boundary checks
+
+The review ledger was successfully built at
+`/home/ly3n24/IT-Noe_source_diagnosis/ledger_20261021_215448`
+with 385,440 observations, 922 flagged records and 208 events:
+3 P0 incidents, 75 P1 high priority, and 130 P2 review.
+
+Run [it_noe_prepare_correction_candidates.py](it_noe_prepare_correction_candidates.py)
+on those existing CSVs. The script creates review-only hypothetical replacement
+brackets with optional one-hour buffers, compares selected source with independent
+ERA observations, recalculates implied relative humidity and humidity physical
+limits, and checks temperature jumps at both hypothetical replacement boundaries.
+All decisions remain scientifically **UNAPPROVED**.
+
+~~~bash
+conda activate clm_fates_env
+DIR="$HOME/IT-Noe_source_diagnosis"
+mkdir -p "$DIR/scripts"
+SCRIPT="$DIR/scripts/it_noe_prepare_correction_candidates.py"
+curl -fLsS "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/diagnostics/spinup_failures/IT-Noe/it_noe_prepare_correction_candidates.py" -o "$SCRIPT" || exit 1
+python3 -m py_compile "$SCRIPT" || exit 1
+JOINED="$DIR/full_2004_2025_20261021_213316/selected_years_joined_readonly.csv"
+LEDGER="$DIR/ledger_20261021_215448/event_decision_ledger.csv"
+OUT="$DIR/correction_candidates_$(date +%Y%m%d_%H%M%S)"
+python3 "$SCRIPT" --joined "$JOINED" --ledger "$LEDGER" --out "$OUT" --buffer-hours 1
+~~~
+
+Outputs: candidate_review_brackets_UNAPPROVED.csv,
+priority_P0_P1_UNAPPROVED.csv, hypothetical_boundary_checks.csv,
+review_priority_summary.csv, provenance.json, README.md.
+The proposed bounds are NOT scientifically approved. Replacing a full
+interval solely on these flags is not appropriate. Note that the tool
+assumes VPD in hPa and PA in kPa in the source-audit CSV; verify
+metadata before using numerical conclusions. Preserve 2054 restart,
+all original and versioned DATM files, and the production case.
