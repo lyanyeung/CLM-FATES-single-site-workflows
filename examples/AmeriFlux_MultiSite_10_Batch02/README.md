@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 02
 
-Stage 00 prepares and uploads the ten exact releases in [sites.tsv](sites.tsv):
+Stages 00 and 01 upload and extract the ten exact releases in [sites.tsv](sites.tsv):
 US-BZS, US-CMW, US-EML, US-GLE, US-Ha1, US-Ho1, US-Ho2, US-Ho3,
 US-ICh and US-ICt. First-batch scripts and manifests are unchanged.
 
@@ -70,12 +70,76 @@ Completion is reported only by:
 UPLOAD VERIFIED: 10/10 (AmeriFlux Batch 02). Originals retained. No extraction or model jobs started.
 ```
 
-This upload does not unpack releases or change any existing raw data,
-US-Ha1 forcing, surfaces, cases or Slurm jobs. Next inspect package contents
-before adapting extraction: FULLSET releases must not be assumed to contain
-the same BIF/FLUXMET_HH files as the other eight releases. After extraction,
-use the existing `forcing/raw/<PACKAGE>/` convention. No simulation period,
-forcing cycle or spin-up duration has been chosen for this batch.
+Operator-provided output confirms `UPLOAD VERIFIED: 10/10` for Stage 00.
+This is evidence of transfer/checksum success, not extraction or source QC.
+No simulation period, forcing cycle or spin-up duration has been chosen.
+
+## Stage 01: recursive extraction on IRIDIS
+
+Run the following in an **IRIDIS terminal**, after Stage 00. Download directly
+from GitHub without `git pull`:
+
+```bash
+(
+  set -euo pipefail
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/ameriflux-batch02-transfer'
+  REL='examples/AmeriFlux_MultiSite_10_Batch02'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage01"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage01/01_extract_ameriflux_batch02.py" -o "$BASE/scripts/stage01/01_extract_ameriflux_batch02.py"
+  python3 -m py_compile "$BASE/scripts/stage01/01_extract_ameriflux_batch02.py"
+  python3 "$BASE/scripts/stage01/01_extract_ameriflux_batch02.py" \
+    2>&1 | tee "$HOME/AmeriFlux_Batch02_stage01_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+Outputs:
+
+```text
+/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/<SITE>/forcing/raw/<PACKAGE>/*.csv
+/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch02/reports/stage01_extraction_<UTC>_<ID>.json
+```
+
+The script preflights all selected source packages, recursively reads nested
+ZIPs (up to eight levels), and extracts CSVs to the exact release directory.
+CSV basenames are flattened; `toc.csv` and `!toc.csv` are excluded. Source
+ZIPs, folders and non-CSV members remain intact in `forcing/packages`.
+CSV size/CRC32 is checked before installation; identical existing CSVs are
+skipped and different existing CSVs are rejected. Conflicting basenames in
+nested folders are also rejected. Installation uses a hard link from a
+temporary file in the same directory, so it cannot replace a concurrent
+destination. An interrupted process may leave a `.partial`; inspect that
+file before retrying rather than deleting existing raw files indiscriminately.
+
+Inventory recognizes the two formats separately:
+
+- Eight v1.3 releases: require site-specific BIF and FLUXMET_HH CSVs; report
+  presence of ERA5_HH and FLUXES_HH. Missing ERA5_HH is a note.
+- US-BZS and US-Ho1 FULLSET releases: require a site-specific FULLSET_HH or
+  FULLSET_HR CSV. Missing BIF is a metadata follow-up, not an extraction
+  failure. Hourly data and missing separate ERA5 products are reported.
+- Meteorological headers must contain TIMESTAMP_START/TIMESTAMP_END and one
+  structurally valid first data row. Columns and the first timestamp pair
+  are written to the inventory; this does not scan or validate the time series.
+
+The summary reports `BATCH02 SUMMARY: 10/10 PASS (extraction/structure only)`
+only when all ten complete. Each extraction run writes its own JSON report,
+including source ZIP SHA256 values and per-site failures. Successful sites
+remain intact if another site fails. No meteorological CSV values, existing
+forcing/DATM, surfaces, CIME cases or Slurm jobs are modified. In particular,
+US-Ha1 uses only the exact release's raw output directory.
+
+For a read-only inventory after extraction:
+
+```bash
+python3 "$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Batch02/scripts/stage01/01_extract_ameriflux_batch02.py" --audit-only
+```
+
+`--sites US-BZS US-Ho1`, `--sites-root`, `--incoming-dir` and `--reports-dir`
+are available. Audit-only writes no report or raw output. Next inspect BIF
+or FULLSET metadata, actual coverage and meteorological QC before preparing
+surfaces, forcing or model experiments.
 
 ## Validation boundary
 
@@ -86,3 +150,12 @@ file, and master disconnection. The mock checks one master launch and the
 batch-only options on subsequent operations. Live SSH authentication and
 multiplexing have not been tested here. No check authenticates to IRIDIS,
 accesses the operator's D drive, or establishes a real upload.
+
+Stage 01 passed Python compilation and seven synthetic-data checks: missing
+package preflight with no raw writes; nested extraction of ten releases,
+including two FULLSET releases without BIF; identical rerun; audit-only with
+no file writes; conflicting existing CSV preservation; corrupt ZIP failure;
+and wrong-site meteorology rejection. Source ZIP hashes remained unchanged,
+TOC files were skipped and traversal-shaped names stayed inside the raw
+directory. These tests are not live extraction or scientific validation of
+the operator's IRIDIS packages. Standard-library-only code supports Python 3.9.
