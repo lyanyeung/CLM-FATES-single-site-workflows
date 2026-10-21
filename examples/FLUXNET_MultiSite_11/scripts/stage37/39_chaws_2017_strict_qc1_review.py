@@ -97,8 +97,10 @@ def reference(model, desired):
     # Preserve missing values as NaN; never extrapolate or fill with zero.
     require(tmp.loc["2017-09-01":"2017-09-04"].notna().all().all(),
             model + " event-window reference missing")
-    return pd.Series(100 * es_hpa(tmp.Td.to_numpy())
-                     / es_hpa(tmp.T.to_numpy()), index=desired)
+    # Explicit column indexing: DataFrame.T is the transpose, NOT column "T".
+    rh = 100 * es_hpa(tmp["Td"].to_numpy(dtype=float)) / es_hpa(tmp["T"].to_numpy(dtype=float))
+    require(rh.shape == (len(desired),), model + ": unexpected RH output shape")
+    return pd.Series(rh, index=desired, dtype=float)
 
 
 def noleap_clock(step):
