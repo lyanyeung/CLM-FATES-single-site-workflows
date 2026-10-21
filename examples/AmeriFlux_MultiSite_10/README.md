@@ -79,3 +79,29 @@ python3 "$BASE/scripts/stage02/02_check_10_bif_coordinates.py" | tee "$HOME/Amer
 ```
 
 The script does not create CTSM surfaces, modify ZIP/CSV input, or submit any Slurm jobs. It verifies that each release's BIF supplies one valid latitude/longitude pair, prints available IGBP labels, and highlights ambiguous metadata. Surface files should only be generated after coordinate and vegetation-representation review. CTSM year-2000 surface gridding does not establish EC footprint representativeness.
+
+## Stage 03 — CTSM point surfaces (reference year 2000)
+
+**Observed prerequisite:** user-provided 21 October 2026 IRIDIS6 logs show **10/10 Stage 01 extraction and Stage 02 BIF geolocation checks PASS**. The BIF classes are six ENF sites (CA-Ca3, CA-LP1, CA-Man, CA-TP1, CA-TP3, CA-TP4), two DBF (CA-Cbo, US-Bar), one EBF (BR-Ma2) and one GRA (US-Aud).
+
+[Stage 03 guarded surface generation](scripts/stage03/03_make_10_surfaces.sh) adapts the existing [13-site surface script](../FLUXNET_MultiSite_13/scripts/stage02/02_make_13_surfaces.sh) for exactly the ten AmeriFlux source releases. It reads BIF `LOCATION_LAT` and `LOCATION_LONG` afresh and uses CTSM `tools/site_and_regional/subset_data point --surf-year 2000 --create-surface --create-user-mods`. The same default_data_2000.cfg edits as the four prior ICOS experiments are retained for comparability.
+
+**Safety:** `--check` (default) is read-only and checks all 10 coordinates, exact release paths, CTSM tools/inputdata, and any existing output. `--run` must be requested explicitly; it never overwrites a different or partial surface/configuration and preflights all 10 sites before writing anything. Completed existing outputs are skipped. A failed generation may leave a partial site output, which is intentionally blocked from automatic overwrite/retry until investigated.
+
+Use **direct GitHub downloads** on IRIDIS6; do not use `git pull`:
+
+```bash
+BASE="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10"
+RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+mkdir -p "$BASE/scripts/stage03"
+curl -fL --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10/sites.tsv" -o "$BASE/sites.tsv"
+curl -fL --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10/scripts/stage03/03_make_10_surfaces.sh" -o "$BASE/scripts/stage03/03_make_10_surfaces.sh"
+bash -n "$BASE/scripts/stage03/03_make_10_surfaces.sh"
+bash "$BASE/scripts/stage03/03_make_10_surfaces.sh" --check
+# When all ten have passed the dry-run and outputs have been reviewed:
+bash "$BASE/scripts/stage03/03_make_10_surfaces.sh" --run
+```
+
+Expected output for each site: `<SITE>/subset_data/surfdata*.nc`, `<SITE>/subset_data/user_mods/`, and `<SITE>/<SITE>_data.cfg`. These are **not** meteorological forcing or spin-up runs.
+
+**Scientific warning:** a coarse-grid year-2000 CTSM surface is not automatically representative of the tower EC footprint or of the BIF IGBP classification. **US-Aud is a grassland (GRA)** and requires particular scrutiny if using forest-focused FATES parameterization; the BIF vegetation label by itself does not validate a CLM-FATES natural-PFT configuration. Similarly, CA-TP1/CA-TP3/CA-TP4 are geographically close but physically distinct tower sites. Surface crop/natural-vegetation fractions, land cover, and selected FATES PFTs need a separate scientific audit before forcing/CIME. Source FLUXMET/ERA5 coverage and meteorological QC are still pending.
