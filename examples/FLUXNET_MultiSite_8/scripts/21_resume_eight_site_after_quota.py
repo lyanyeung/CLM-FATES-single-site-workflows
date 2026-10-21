@@ -4,7 +4,7 @@
 Usage: python3 THIS_SCRIPT inspect | prepare SITE | submit SESSION
        python3 THIS_SCRIPT list
 
-Seven sites target 1000 cumulative model years; FR-Hes targets 500.
+All eight sites target 1000 cumulative model years, including FR-Hes.
 Never starts from year zero, never deletes old restarts, and never submits
 another site's case. The user explicitly runs each site's submit step.
 """
@@ -29,7 +29,7 @@ MPI = 'srun --mpi=pmix --ntasks=1 --cpus-per-task=1 --cpu-bind=cores'
 SITES = {
     'CZ-BK1': (2004, 2025, 376.95, 1000),
     'IT-Ren': (1999, 2025, 367.80, 1000),
-    'FR-Hes': (1997, 2025, 363.04, 500),
+    'FR-Hes': (1997, 2025, 363.04, 1000),
     'FR-FBn': (2008, 2024, 385.02, 1000),
     'DE-Hzd': (2010, 2025, 388.75, 1000),
     'CH-Dav': (1997, 2025, 363.04, 1000),
