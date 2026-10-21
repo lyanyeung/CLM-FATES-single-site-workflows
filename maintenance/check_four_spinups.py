@@ -173,6 +173,11 @@ def site_report(batch: str, site: str, start: int, target: int,
     done, stamp, warning = restart_status(rest, name, start)
     matched = [job for job in jobs
                if job["name"] in ("run." + name, "st_archive." + name)]
+    # Other Slurm jobs for the SAME STATION may belong to distinct cases.
+    # Never count a branch run as progress of the canonical batch case.
+    related = [job for job in jobs if job not in matched and
+               job["name"].startswith(("run." + site + "_",
+                                       "st_archive." + site + "_"))]
     notes = []
     if warning:
         notes.append(warning)
@@ -199,9 +204,24 @@ def site_report(batch: str, site: str, start: int, target: int,
         state = "REVIEW"
     else:
         state = "IDLE"
+    # A branch/sensitivity case should be visible, without mislabeling the
+    # original SPINUP500_11P case as actually running.
+    if related and not matched and state in ("IDLE", "REVIEW"):
+        if any(j["state"] == "RUNNING" for j in related):
+            state = "RELATED_RUN"
+        elif any("DependencyNeverSatisfied" in j["reason"]
+                 or "JobHeld" in j["reason"] for j in related):
+            state = "RELATED_BLOCK"
+        else:
+            state = "RELATED_WAIT"
     # A missing archive is unknown, not "0 simulated years".
     status_jobs = ", ".join(f"{j['jobid']}:{j['state']}" for j in matched)
     note_text = status_jobs
+    if related:
+        related_text = ", ".join(
+            f"{j['jobid']}:{j['state']}:{j['name']} [{j['reason']}]"
+            for j in related)
+        note_text += (" | " if note_text else "") + "OTHER_CASE: " + related_text
     if notes:
         note_text += (" | " if note_text else "") + "; ".join(notes)
     return dict(site=site, target=target, completed=done, remaining=(
@@ -225,7 +245,8 @@ def render(batch: str, rows: list[dict]) -> None:
               f"{left:>7} {r['checkpoint']:>23} {r['resubmit']:>7} "
               f"{r['slurm']:>12}  {r['note']}")
     print("SUMMARY: " + ", ".join(f"{k}={counts[k]}" for k in (
-        "COMPLETE", "BLOCKED", "REVIEW", "IDLE", "PENDING", "RUNNING")
+        "COMPLETE", "BLOCKED", "REVIEW", "IDLE", "PENDING", "RUNNING",
+        "RELATED_RUN", "RELATED_WAIT", "RELATED_BLOCK")
         if counts[k]) + "\n")
 
 
@@ -244,7 +265,8 @@ def main() -> int:
     print("READ-ONLY four-batch CLM-FATES progress")
     print("UTC:", datetime.now(timezone.utc).isoformat())
     print("Checkpoint: latest archived restart with 3 components + dated pointers.")
-    print("RUNNING/PENDING describe Slurm jobs, not a completed model year.\n")
+    print("RUNNING/PENDING refer to this specific batch case, not completed years.")
+    print("RELATED_* means a DIFFERENT case is active for the same site.\n")
     batches = BATCHES if args.batch == "all" else {
         args.batch: BATCHES[args.batch]}
     for batch, sites in batches.items():
