@@ -115,7 +115,7 @@ from pathlib import Path
 root=Path(sys.argv[1])
 manifest=json.loads((root/'stage29_manifest.json').read_text())
 assert manifest.get('version')=='STAGE29_FULL_77_QBOT_SENSITIVITY_V5', 'Unexpected Stage29 version'
-assert manifest.get('changed_vs_RH29A_v3')==77, 'Wrong Stage29 modified-row count'
+assert manifest.get('changed_vs_RH25A_v3')==77, 'Wrong Stage29 modified-row count'
 by=manifest.get('by_year',{})
 assert len(by)==19, 'Need all 19 years in manifest'
 independent,links,edits=0,0,0
