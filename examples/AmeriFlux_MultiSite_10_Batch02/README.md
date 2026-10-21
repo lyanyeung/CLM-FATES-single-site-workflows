@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 02
 
-Stages 00–02 upload, extract and inspect metadata for the ten exact releases in [sites.tsv](sites.tsv):
+Stages 00–03 upload, extract, inspect metadata and prepare reference surfaces for the ten exact releases in [sites.tsv](sites.tsv):
 US-BZS, US-CMW, US-EML, US-GLE, US-Ha1, US-Ho1, US-Ho2, US-Ho3,
 US-ICh and US-ICt. First-batch scripts and manifests are unchanged.
 
@@ -208,6 +208,77 @@ missing v1.3 BIF; rejection of HR/first-interval mismatch; and study-inclusion
 flagging without automatic exclusion. Input file hashes and modification
 times stayed unchanged in every check. Live IRIDIS Stage 02 has not been run
 by the GitHub change.
+
+## Stage 03: isolated CTSM reference point surfaces (year 2000)
+
+Operator-provided Stage 02 output confirms 10/10 coordinate and first-interval
+checks. IGBP labels are five ENF (US-BZS, US-GLE, US-Ho1/2/3), two DBF
+(US-CMW, US-Ha1), and three OSH (US-EML, US-ICh, US-ICt). US-Ha1 is hourly.
+These observations do not establish FATES PFT fractions or forcing quality.
+
+[Stage 03](scripts/stage03/03_make_batch02_surfaces.py) imports the Stage 02
+metadata reader, rechecks all ten sources and preserves the explicit FULLSET
+coordinate provenance. It uses the same reference settings as Batch 01:
+CTSM `subset_data point --surf-year 2000 --create-surface --create-user-mods`,
+`--lon-type 180`, and **no `--dompft`**. The template's surfdata directory is
+changed from ctsm5.4.0 to ctsm5.3.0, the 16-PFT file is
+`surfdata_0.9x1.25_hist_2000_16pfts_c240908.nc`, and the mesh is
+`fv0.9x1.25_141008_ESMFmesh.nc`, as in the preceding experiments.
+
+Batch-specific output is isolated from the existing single-site US-Ha1
+experiment and all ordinary `subset_data/` directories:
+
+```text
+/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/<SITE>/subset_data_batch02_surf2000/
+    <SITE>_data.cfg
+    surfdata*.nc
+    user_mods/
+    batch02_surface_receipt.json
+```
+
+The default `--check` is read-only. `--run` preflights all ten sites before
+creating any output. Existing batch outputs are skipped only if their request
+(including coordinates, package, year, config and subset tool hash) and file
+checksums agree with the completion receipt. Missing or changed receipts,
+incomplete directories and changed outputs stop the run without overwriting.
+A failed CTSM call may leave a partial directory; inspect it before retrying.
+No raw data, old surface/configuration, forcing/DATM, cases or Slurm jobs are
+modified. `CLM_FATES_ROOT` or `--clm-root` can override the installation root.
+
+Run on IRIDIS in the existing `clm_fates_env`, directly downloading from GitHub:
+
+```bash
+(
+  set -euo pipefail
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/ameriflux-batch02-transfer'
+  REL='examples/AmeriFlux_MultiSite_10_Batch02'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage02" "$BASE/scripts/stage03"
+  for FILE in sites.tsv metadata_fallbacks.tsv scripts/stage02/02_check_batch02_metadata.py scripts/stage03/03_make_batch02_surfaces.py; do
+    curl -fLsS --retry 3 "$RAW/$REL/$FILE" -o "$BASE/$FILE"
+  done
+  SCRIPT="$BASE/scripts/stage03/03_make_batch02_surfaces.py"
+  python3 -B "$SCRIPT" --check
+  python3 -B "$SCRIPT" --run \
+    2>&1 | tee "$HOME/AmeriFlux_Batch02_stage03_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+Successful first-run summary:
+`STAGE03 SUMMARY: created=10 skipped_verified=0 total=10/10`.
+The next stage audits actual NetCDF landunit and natural-PFT fractions,
+especially at the three OSH sites, and then audits full source meteorology.
+The year-2000 grid sample is not a validated tower footprint or an automatic
+mapping of OSH to FATES shrub parameters. No spin-up is launched here.
+
+Validation: Python compilation plus five lifecycle checks with a mock CTSM
+executable: read-only preflight, batch-wide rejection of a final site's
+partial output before any new writes, ten isolated outputs, checksum-verified
+rerun without writes, and preservation/rejection of a changed surface.
+US-Ha1's original surface fixture stayed unchanged and its hourly provenance
+remained in the receipt. These checks test orchestration, not real CTSM
+execution or scientific NetCDF correctness; live generation is performed by
+the operator on IRIDIS.
 
 ## Validation boundary
 
