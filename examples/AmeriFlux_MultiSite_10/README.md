@@ -105,3 +105,26 @@ bash "$BASE/scripts/stage03/03_make_10_surfaces.sh" --run
 Expected output for each site: `<SITE>/subset_data/surfdata*.nc`, `<SITE>/subset_data/user_mods/`, and `<SITE>/<SITE>_data.cfg`. These are **not** meteorological forcing or spin-up runs.
 
 **Scientific warning:** a coarse-grid year-2000 CTSM surface is not automatically representative of the tower EC footprint or of the BIF IGBP classification. **US-Aud is a grassland (GRA)** and requires particular scrutiny if using forest-focused FATES parameterization; the BIF vegetation label by itself does not validate a CLM-FATES natural-PFT configuration. Similarly, CA-TP1/CA-TP3/CA-TP4 are geographically close but physically distinct tower sites. Surface crop/natural-vegetation fractions, land cover, and selected FATES PFTs need a separate scientific audit before forcing/CIME. Source FLUXMET/ERA5 coverage and meteorological QC are still pending.
+
+## Stage 04 — read-only surface/PFT and FLUXMET/ERA5 source quality audits
+
+**Prerequisites confirmed by operator on 21 October 2026:** Stage 01 extraction 10/10; Stage 02 BIF coordinates 10/10; Stage 03 CTSM point surfaces created 10/10 (year-2000 reference, no `--dompft`). These are structural/operational achievements; they are **not proof of valid FATES vegetation representation or approved meteorological forcing**.
+
+- [Stage 04a surface auditor](scripts/stage04/04a_audit_10_surfaces.py): read-only checks `surfdata*.nc`, required files, landunit fractions, `PCT_NAT_PFT` length (15 or 16, with caution for index 15), and CLM natural tree/grass/shrub percentages. It flags gridded cropland and BIF forest/grass mismatches **for review**, without assuming `--dompft` should be set. Particularly inspect US-Aud GRA and the CA-TP1/TP3/TP4 sites.
+- [Stage 04b source meteorology auditor](scripts/stage04/04b_audit_10_met_sources.py): reads **only the exact pinned FLUXMET_HH/ERA5_HH** files from each release, chunk by chunk; checks annual NO_LEAP half-hourly timestamps, duplicates, `TA/VPD/PA/SW_IN/LW_IN/WS/P` completeness, numerical limits, original QC code counts, and the humidity feasibility reconstructed from TA (°C), VPD (hPa), PA (kPa). ERA companion products are **not assumed independent ground truth**. Original source files are never changed.
+
+**Execution on IRIDIS6 with direct GitHub downloads (no git pull)**:
+
+```bash
+BASE="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10"
+RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+mkdir -p "$BASE/scripts/stage04"
+curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10/sites.tsv" -o "$BASE/sites.tsv"
+curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10/scripts/stage04/04a_audit_10_surfaces.py" -o "$BASE/scripts/stage04/04a_audit_10_surfaces.py"
+curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10/scripts/stage04/04b_audit_10_met_sources.py" -o "$BASE/scripts/stage04/04b_audit_10_met_sources.py"
+python3 -m py_compile "$BASE/scripts/stage04/"*.py
+python3 "$BASE/scripts/stage04/04a_audit_10_surfaces.py"
+python3 "$BASE/scripts/stage04/04b_audit_10_met_sources.py"
+```
+
+Small timestamped CSV/JSON reports are kept on IRIDIS under `CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage04[a,b]_*`; no tower CSV, NetCDF, or report is committed to GitHub. The scripts do not create or submit CIME/Slurm jobs. **Do not interpret Stage 04 structural PASS as permission to start spin-up.** Next: inspect individual flagged source-year events, tower measurement heights/ZBOT, PFT/soil/landunit representativeness, and only then prepare an isolated provisional forcing candidate and DATM.

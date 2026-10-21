@@ -4,6 +4,6 @@ This collection keeps the new AmeriFlux batches separate from the existing [ICOS
 
 | Batch | Sites | Phase |
 | --- | ---: | --- |
-| [AmeriFlux Batch 01](../AmeriFlux_MultiSite_10/) | 10 | Stage 01 extraction + Stage 02 BIF coordinates PASS (10/10); Stage 03 surface script available (not yet executed) |
+| [AmeriFlux Batch 01](../AmeriFlux_MultiSite_10/) | 10 | Stage 01/02 PASS (10/10); Stage 03 surfaces created (10/10); Stage 04 source and PFT auditors ready (not yet executed) |
 
 These new inputs are not yet validated forcing, DATM or CLM-FATES cases. No Slurm jobs were submitted by this repository update. Raw, licensed tower data and large model NetCDF remain on local/IRIDIS storage rather than GitHub.
