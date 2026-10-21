@@ -49,6 +49,10 @@ Current software context for the ES-LJu example:
 
 - `examples/FLUXNET_MultiSite_6/` — Six-site FLUXNET input preparation, surface extraction, meteorological QC v1–v5, and documented outstanding issues.
 
+## CLM-FATES Spin-up Failure Diagnostics
+
+[**Failed-site diagnostics and incident tracking**](diagnostics/spinup_failures/) gathers read-only investigations for interrupted or scientifically suspect spin-ups. Start with the [IT-Noe negative-RH failure investigation](diagnostics/spinup_failures/IT-Noe/README.md) and its [independent ICOS ERA5 source-audit script](diagnostics/spinup_failures/IT-Noe/it_noe_era_source_audit.py). The original 11-site, CH-Aws, and FR-Hes experiment records remain unchanged. **Diagnostic flags do not imply approved meteorological correction or successful restart.**
+
 ## IRIDIS6 MPI / Slurm CPU affinity
 
 **Read [IRIDIS6 MPI, Slurm CPU affinity and OpenMPI troubleshooting](IRIDIS6_MPI_CPU_AFFINITY.md)** before launching multiple single-core CLM-FATES cases on shared IRIDIS6 nodes. It documents a reproduced mismatch between a one-core Slurm allocation and OpenMPI's actual binding, both MPI test launchers, the tested `srun --mpi=pmix` fix, and the difference between CPU allocation, affinity, walltime, and real model progress. Runnable diagnostics are in [`diagnostics/iridis6/`](diagnostics/iridis6/).
