@@ -180,8 +180,8 @@ def plot_station(entry,row,pairs,means,out):
     fig.savefig(out/(site+"_01_fullcycle_nested_VegC_trends.png"),dpi=200)
     plt.close(fig)
 
-    fig,axes=plt.subplots(2,1,figsize=(12.5,8.8),
-                           gridspec_kw={"height_ratios":[3,2]})
+    fig,axes=plt.subplots(3,1,figsize=(12.5,11.4),
+                           gridspec_kw={"height_ratios":[3,1.5,1.5]})
     colors=("#31688e","#238b45","#c35d12")
     k100=math.ceil(100/L)
     for i in range(3):
@@ -198,16 +198,21 @@ def plot_station(entry,row,pairs,means,out):
     axes[0].grid(alpha=.22)
     axes[0].legend(frameon=False,fontsize=8.5)
     bx=np.arange(len(pairs))
-    axes[1].bar(bx-.16,pairs.SignedDrift_pct_per100yr,width=.32,
-                label="Signed mean drift (%/century)",color="#31688e")
-    axes[1].bar(bx+.16,pairs.PhaseMatchedMeanAbsoluteDiff_pct,width=.32,
-                label="Phase-aligned abs difference (%)",color="#c35d12")
+    pair_labels=[f"{int(a)}→{int(b)}" for a,b in zip(pairs.PreviousCycle,pairs.CurrentCycle)]
+    axes[1].bar(bx,pairs.SignedDrift_pct_per100yr,width=.65,color="#31688e")
     axes[1].axhline(0,color="0.3",lw=.8)
-    axes[1].set_xticks(bx,[f"{int(a)}→{int(b)}" for a,b in zip(pairs.PreviousCycle,pairs.CurrentCycle)])
-    axes[1].set_title("Latest four adjacent forcing-cycle pairs (two different units shown in legend)")
-    axes[1].set_ylabel("Difference / drift (units as indicated)")
-    axes[1].legend(frameon=False,fontsize=8)
+    axes[1].set_xticks(bx,pair_labels)
+    axes[1].set_title("Signed VegC drift, annualized across each forcing-cycle pair")
+    axes[1].set_ylabel("% per 100 years")
     axes[1].grid(axis="y",alpha=.22)
+    axes[2].bar(bx,pairs.PhaseMatchedMeanAbsoluteDiff_pct,width=.65,color="#c35d12")
+    axes[2].axhline(1,color="0.3",lw=1,ls="--",label="1% exploratory")
+    axes[2].axhline(2,color="0.3",lw=1,ls=":",label="2% exploratory")
+    axes[2].set_xticks(bx,pair_labels)
+    axes[2].set_title("Phase-matched mean ABSOLUTE VegC difference")
+    axes[2].set_ylabel("% of previous cycle")
+    axes[2].legend(frameon=False,fontsize=8)
+    axes[2].grid(axis="y",alpha=.22)
     fig.tight_layout()
     fig.savefig(out/(site+"_02_independent_blocks_and_cycle_drift.png"),dpi=200)
     plt.close(fig)
