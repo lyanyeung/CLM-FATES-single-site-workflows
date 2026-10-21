@@ -63,14 +63,16 @@ The **default** `check_four_spinups.py` output now uses **one selected current C
 | Batch/site | Current monitored CIME case | Case label |
 | --- | --- | --- |
 | 11 / IT-Noe | `IT-Noe_ERA5_ABW_BRANCH2009` | `ERA5-BR` |
-| 11 / CH-Aws | `CH-Aws_FATES_SPINUP1000_RH34A` | `RH34A` |
+| 11 / CH-Aws | `CH-Aws_FATES_SPINUP1000_RH42A_V8_CONT2016` | `RH42A-V8` |
 | All remaining sites | The established four-batch case names | `-` |
 
 Each main-table row gives `SITE`, `CASE` label, `DONE/TARGET`, `LEFT`, the current case's three-component archived `CHECKPOINT`, `RESUB`, execution `PHASE`, and separate `MODEL` and `ARCHIVE` Slurm job IDs/states. `RUNNING`, `PENDING`, `ARCH_WAIT`, `ARCHIVING`, and `BLOCKED` are phase labels. A successful model run waiting for short-term archive remains `ARCH_WAIT`, not a new checkpoint.
 
+**CH-Aws v8 branch continuation (updated 21 October 2026):** The main table now selects `CH-Aws_FATES_SPINUP1000_RH42A_V8_CONT2016` (Stage43) instead of failed RH34A/RH38A trials. This case uses Stage42 global 19-year QC1 RH sensitivity forcing v8. It branches from the RH34A 2016-01-01 restart after the 2006–2015 ten-year baseline, with a target of 1000 cumulative model years (990 remaining at submit; 198 five-year segments; original `RESUBMIT=197`). The special `10*/1000` display is **only the inherited, structurally verified RH34A restart baseline**, not an RH42A archived checkpoint. It requires the Stage43 provenance receipt, matching CIME branch metadata and all three archived source restarts. Once an RH42A archive exists, displayed progress comes from its own validated three-component archive. If provenance cannot be validated, progress remains unknown and notes flag the issue. Neither an active job nor a completed but unarchived segment adds years. First submitted Slurm pair was `4614961` (model) / `4614962` (archive); these are historical submission identifiers, not a claim of current status. Run the checker for live Slurm state.
+
 **Progress caveat for IT-Noe:** A `branch` case's `DONE` is the elapsed model-clock years since its own `RUN_STARTDATE` (e.g. 2014 minus 2004 = 10); those are *not* necessarily the years independently simulated since a 2009 branch restart. The script also displays `BRANCH_YEARS` when `RUN_REFDATE` can be read, and otherwise marks that quantity unknown. It does not inherit the old `_11P` case's progress or count a queued/active model segment as archived.
 
-Older `IT-Noe_FATES_SPINUP500_11P`, `CH-Aws_FATES_SPINUP500_11P`, and failed `CH-Aws_FATES_SPINUP1000_RH29A` are optional **historical** entries rather than interfering with the current-case status. Use:
+Older `IT-Noe_FATES_SPINUP500_11P`, `CH-Aws_FATES_SPINUP500_11P`, and failed CH-Aws RH29A, RH34A and RH38A are optional **historical** entries rather than interfering with the current-case status. Use:
 
 ```bash
 python3 ~/CLM_FATES_maintenance/check_four_spinups.py
@@ -106,4 +108,4 @@ python3 maintenance/check_four_spinups.py
 
 The operator can also limit the operation to one site, e.g. `python3 maintenance/recover_blocked_spinups.py run --site FR-Hes`, or one batch, e.g. `--batch FLUXNET_MultiSite_13`. Logs, original configurations and interrupted outputs are retained under `/scratch/ly3n24/CTSM_FATES_OUTPUTS/recovery_backups/four_batches_dependency_20261021/bulk_*/`. A site reported `REVIEW` has not been successfully resubmitted; inspect the corresponding `result.json`. A site reported `SUBMITTED` only means `case.submit` returned successfully, **not** that CESM or short-term archive finished. The local Slurm state, quota, and output validity must still be checked.
 
-Note: FR-Hes has a 500-year monitor target; IT-Noe monitors the ERA5 branch case, and CH-Aws monitors the RH34A case. This recovery does not change scientific forcing, branch reference state, or input namelists.
+Note: FR-Hes has a 500-year monitor target; IT-Noe monitors the ERA5 branch case, and CH-Aws monitoring now uses RH42A v8; this recovery tool is a distinct, potentially mutating workflow and must not be used casually against the new RH42A case. This recovery does not change scientific forcing, branch reference state, or input namelists.
