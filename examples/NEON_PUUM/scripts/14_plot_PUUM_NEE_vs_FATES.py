@@ -206,7 +206,7 @@ print("Valid half-hours:", ec["NEE_raw"].notna().sum())
 ec = ec.set_index("time").sort_index()
 
 # Half-hourly -> daily mean
-# 这里先不做太严格筛选，只要求至少 1 个值就先画出来
+# Use a permissive filter for plotting: at least one valid value is sufficient.
 ec_daily = ec["NEE_raw"].resample("D").mean() * EC_FACTOR
 ec_daily_n = ec["NEE_raw"].resample("D").count()
 
