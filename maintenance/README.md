@@ -79,3 +79,23 @@ The checker reads Slurm queue, `env_run.xml`, `CaseStatus`, and existing archive
 ## Other maintenance workflows
 
 See [`cime_git_cleanup/`](cime_git_cleanup/README.md) for the **separate**, potentially mutating CIME Git/inode maintenance tools. Do not confuse a read-only progress check with Git garbage collection or Scratch cleanup.
+
+## One-command recovery of blocked multisite spin-ups (October 2026)
+
+[`recover_blocked_spinups.py`](recover_blocked_spinups.py) provides one-session recovery for the four batches covered by `check_four_spinups.py`: 6 + 8 + 11 + 13 sites. The October 21 incident has 29 blocked sites and nine completed sites.
+
+On IRIDIS6 as `ly3n24`:
+
+```bash
+cd ~/CLM-FATES-single-site-workflows
+git pull --ff-only origin main
+python3 maintenance/recover_blocked_spinups.py inspect
+python3 maintenance/recover_blocked_spinups.py run
+python3 maintenance/check_four_spinups.py
+```
+
+`inspect` is read-only with respect to CIME and Slurm, and flags sites requiring review. `run` independently attempts every selected site; before modifying a case it cancels **only** that case's exact-match `PENDING (DependencyNeverSatisfied)` Slurm jobs. It verifies the archived three-component restart, retains any interrupted output and backs up case configuration, stages a coordinated restart and updates MPI/RESUBMIT settings before one `case.submit` attempt. Other queued or active jobs are not touched. It refuses to overwrite a newer complete unarchived checkpoint or a model success that has not been archived.
+
+The operator can also limit the operation to one site, e.g. `python3 maintenance/recover_blocked_spinups.py run --site FR-Hes`, or one batch, e.g. `--batch FLUXNET_MultiSite_13`. Logs, original configurations and interrupted outputs are retained under `/scratch/ly3n24/CTSM_FATES_OUTPUTS/recovery_backups/four_batches_dependency_20261021/bulk_*/`. A site reported `REVIEW` has not been successfully resubmitted; inspect the corresponding `result.json`. A site reported `SUBMITTED` only means `case.submit` returned successfully, **not** that CESM or short-term archive finished. The local Slurm state, quota, and output validity must still be checked.
+
+Note: FR-Hes has a 500-year monitor target; IT-Noe monitors the ERA5 branch case, and CH-Aws monitors the RH34A case. This recovery does not change scientific forcing, branch reference state, or input namelists.
