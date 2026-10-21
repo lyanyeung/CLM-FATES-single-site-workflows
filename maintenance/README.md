@@ -11,24 +11,32 @@ Utilities for checking and maintaining existing CLM-FATES experiments. **Monitor
 - `FLUXNET_MultiSite_11` — 11 sites (1000-year targets).
 - `FLUXNET_MultiSite_13` — 13 sites (1000-year targets).
 
-### Run on IRIDIS6
+### Run on IRIDIS6 (recommended: works even if the local clone is missing files)
 
-Download the script to Home if your local source repository contains unfinished Git changes or a merge conflict:
+The Python checker **exists in GitHub's `main` branch**, but it is **not guaranteed to be installed in `~/CLM-FATES-single-site-workflows` on IRIDIS6**. GitHub and the IRIDIS6 working copy are separate. In particular, an unresolved local Git merge prevents `git pull`, and running `python3 maintenance/check_four_spinups.py` will fail with `No such file or directory` until that file is present locally.
+
+**Recommended: download a fresh, read-only checker to a separate Home folder; no `git pull` required. Run this from any IRIDIS6 directory:**
 
 ```bash
 mkdir -p "$HOME/CLM_FATES_maintenance"
-curl -fL --retry 3 \
+curl --fail --location --show-error --silent --retry 3 \
   "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/maintenance/check_four_spinups.py" \
-  -o "$HOME/CLM_FATES_maintenance/check_four_spinups.py"
+  --output "$HOME/CLM_FATES_maintenance/check_four_spinups.py" &&
+python3 "$HOME/CLM_FATES_maintenance/check_four_spinups.py"
+```
 
+To retain a timestamped log **after downloading**:
+
+```bash
 python3 "$HOME/CLM_FATES_maintenance/check_four_spinups.py" \
   | tee "$HOME/four_spinups_status_$(date +%Y%m%d_%H%M%S).log"
 ```
 
-If the local repository is clean and updated, run it in place:
+The optional in-repository command below only works after confirming the file exists in that *particular IRIDIS6 working tree*. The GitHub web page alone does not establish local availability:
 
 ```bash
-python3 ~/CLM-FATES-single-site-workflows/maintenance/check_four_spinups.py
+test -f "$HOME/CLM-FATES-single-site-workflows/maintenance/check_four_spinups.py" &&
+python3 "$HOME/CLM-FATES-single-site-workflows/maintenance/check_four_spinups.py"
 ```
 
 For a single batch:
