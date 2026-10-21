@@ -54,3 +54,32 @@ Requires Python, NumPy and pandas in the `clm_fates_env` environment. Input file
 5. Only resume a long spin-up after short-run numerical and scientific verification. Keep the original case and archival restart intact.
 
 No corrected forcing, resolved RH abort, or successful 1000-year continuation is claimed here.
+
+
+## 21 October 2026 — Full-cycle review ledger (diagnostic only)
+
+The IT-Noe ERA5 branch continuation job 4613318 failed because CLM calculated negative 2-m RH at HumanIndexMod.F90:1019. The May 2010 ERA5 trial has been created but is NOT a validated production forcing. The 2054-01-01 restart is retained pending validation.
+
+The 2004–2025 source audit covered 385,440 half-hours, marking 922 records. The two-hour-gap grouping found 208 review episodes: 26 in 2010, 69 in 2024, 92 in 2025, and 21 in other years. Screening results are NOT automatic correction decisions.
+
+New script: [it_noe_build_review_ledger.py](it_noe_build_review_ledger.py). It checks that all flagged records map to exactly one episode, adds four hours of original context on both sides, includes source and QC provenance, assigns triage priorities, and defaults every review decision to PENDING_SCIENTIFIC_REVIEW. It NEVER edits forcing, restart, CIME or Slurm.
+
+### Run on IRIDIS6 without git pull
+
+~~~bash
+conda activate clm_fates_env
+mkdir -p "$HOME/IT-Noe_source_diagnosis/scripts"
+SCRIPT="$HOME/IT-Noe_source_diagnosis/scripts/it_noe_build_review_ledger.py"
+curl -fLsS "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/diagnostics/spinup_failures/IT-Noe/it_noe_build_review_ledger.py" -o "$SCRIPT" || exit 1
+python3 -m py_compile "$SCRIPT" || exit 1
+ROOT="$HOME/IT-Noe_source_diagnosis"
+JOINED="$ROOT/full_2004_2025_20261021_213316/selected_years_joined_readonly.csv"
+EPISODES="$(find "$ROOT" -maxdepth 2 -type f -name meteorological_review_episodes.csv -printf '%T@ %p\n' | sort -nr | head -1 | cut -d' ' -f2-)"
+test -s "$JOINED" && test -s "$EPISODES" || { echo "Missing audit or episode input"; exit 1; }
+OUT="$ROOT/ledger_$(date +%Y%m%d_%H%M%S)"
+python3 "$SCRIPT" --joined "$JOINED" --episodes "$EPISODES" --out "$OUT" --context-hours 4
+~~~
+
+New local outputs: event_decision_ledger.csv, flagged_records_with_event_key.csv, event_context_plus_minus_hours.csv, yearly_review_summary.csv, review_provenance.json, and README.md.
+
+Priority P0 identifies incidents on 2010-05-13 and 2010-05-28; all thresholds are triage only. Episode start/end are FIRST/LAST flagged records, not final replacement boundaries. Review original FLUXNET/ICOS provenance, date conventions, ERA5 corroboration, and the wider unflagged context before approving any corrections. Test proposed versioned DATM in an isolated CIME case. Do NOT resume the production 1000-year spin-up on these automated flags alone.
