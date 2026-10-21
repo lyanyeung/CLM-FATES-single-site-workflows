@@ -1,5 +1,22 @@
 # FLUXNET six-site CLM-FATES workflow: surface, forcing, DATM and spin-up
 
+## Five other sites: compare year-1000 Full FATES PFT against original EC vegetation (21 October 2026)
+
+Use the **read-only** [five-site PFT vs EC comparison](scripts/26_audit_five_site_PFT_year1000_vs_EC.py), which builds on the working [DE-Hai single-site audit](scripts/25_audit_DE_Hai_PFT_vs_EC.py). Default stations: **RU-Fyo, DE-Tha, DK-Sor, NL-Loo, IL-Yat**. Add `--include-de-hai` to obtain a comparable six-site table.
+
+```bash
+cd ~/CLM-FATES-single-site-workflows
+git fetch origin main
+git show origin/main:examples/FLUXNET_MultiSite_6/scripts/26_audit_five_site_PFT_year1000_vs_EC.py |
+  /home/ly3n24/.conda/envs/clm_fates_env/bin/python - --include-de-hai |
+  tee ~/FLUXNET6_year1000_PFT_audit.log
+```
+
+The script reads original station BIF IGBP; the *effective* `CaseDocs/lnd_in` surface, landunit fractions, FATES configuration and actual JSON PFT names; and year-1000 (not latest 3000-year) `FATES_VEGC_PF` if archived h0a is available. It checks CIME start year against the known original start, and detects archived h0a either at the active Scratch archive or the documented Research Filestore destination `Spinup_Archives/FLUXNET_MultiSite_6/<SITE>/<CASE>/archive/lnd/hist`. A model year must be converted correctly: **RU-Fyo 2997, DE-Tha 2995, DK-Sor 2995, NL-Loo 2996, IL-Yat 2999, DE-Hai 2999**. Model-year 1000 is the final `RUN_START_YEAR+999` year, and the corresponding 1000-year restart has stamp `RUN_START_YEAR+1000`.
+
+The final report `~/FLUXNET_MultiSite_6_PFT_year1000/00_five_site_PFT_vs_EC_summary.csv` contains each site's original IGBP, original `PCT_CROP`, inferred crop landunit merge, dominant *dynamic FATES* PFT at 1000 years and its percentage of vegetation carbon. Subdirectories provide source metadata, individual CLM PFT fractions, FATES PFT resolved fields and a JSON provenance/limitations report. The criteria `DOMINANT_PFT_MATCHES_IGBP` only checks broad ENF/DBF functional type, *not* species similarity, real land-cover area, carbon-balance convergence, or EC flux validation. Missing old history returns `NO_VALID_PFT_VEGC` without fabricating results; a missing 1000-year checkpoint in Scratch may have already been migrated or pruned and does not by itself imply the experiment did not finish. The entire check is **read only** and does not touch CIME, model input/output files or Slurm.
+
+
 ## DE-Hai: EC-tower vegetation vs CLM surface vs FATES PFT (21 October 2026)
 
 Use the **read-only** [DE-Hai PFT comparison script](scripts/25_audit_DE_Hai_PFT_vs_EC.py) to inspect the original `ICOS_DE-Hai_FLUXNET_2000-2025_v1.3_r1` BIF landcover metadata, the surface that the actual CIME `CaseDocs/lnd_in` selects, the FATES parameter-file PFT dimensionality and identifying variables, and PFT-resolved fields *if available* in model-year 2999 history from `DE-Hai_FATES_SPINUP500`. It checks whether the 3000-01-01 three-component restart is present; 1000 elapsed years is not a guarantee of ecological equilibration.
