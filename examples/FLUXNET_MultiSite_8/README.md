@@ -1,5 +1,16 @@
 # FLUXNET eight-site CLM-FATES workflow — upload, surface, QC v5 and dynamic-ZBOT DATM
 
+<!-- FR_HES_ARCHIVE_RECOVERY_20261021_START -->
+## FR-Hes archive recovery and continuation — 21 October 2026
+
+**More recent FR-Hes-only operator update; the eight-site snapshot below remains a historical 20 October observation.** On 18 October, `run` job `4398054` finished the 360→365-year segment, but `st_archive` job `4398055` failed: CIME could not create `.git/index.lock` during `git add CaseStatus` because Scratch reported **Disk quota exceeded**. This is an archiving/Git/quota failure, not demonstrated evidence of a surface-file or FATES simulation error.
+
+After checking quota and retaining all three 2362 restart components, the operator reran only `case.st_archive` with `RESUBMIT=0`. Job **4504414 completed (0:0)** and `CaseStatus` recorded **`st_archive success 4504414`** on 21 October at 02:13:15 BST; archive stdout recorded copies to the **2362-01-01** checkpoint folder (365 elapsed years). A subsequent operator `squeue` observation showed **run job 4505446 RUNNING** on red6086 and dependent **archive job 4505447 PENDING**. **The continuation has resumed but is not yet verified complete.** If the 2362 checkpoint passes complete component/pointer verification, the planned remainder is 135 model years (27 five-year segments) to the 500-year target. This is not a claim of 500-year completion, scientific convergence, or later successful archiving.
+
+[Incident diagnosis, safe recovery record and monitoring commands](docs/FR_Hes_SCRATCH_QUOTA_ARCHIVE_RECOVERY_2026-10-21.md). Do not submit a second FR-Hes job while this run/archive pair remains active.
+
+<!-- FR_HES_ARCHIVE_RECOVERY_20261021_END -->
+
 <!-- IRIDIS_LIVE_20261020_LATEST_START -->
 ## Latest IRIDIS6 run snapshot — 20 October 2026 (8 sites)
 
