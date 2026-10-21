@@ -203,3 +203,9 @@ restart staging must be audited separately before the job is submitted.
 the defective forcing in prior model years. Report as legacy-state
 continuation unless an equivalence/restart-consistency assessment supports
 the intended scientific interpretation.
+
+## Full-cycle IT-Noe QC forcing candidate (October 2026)
+
+[New builder](it_noe_qc_v2_builder.py) constructs a distinct 2004–2025 DATM candidate, using ICOS ERA5 TA/VPD/PA within the 208 unapproved review brackets and cosine shoulder interpolation of TBOT/QBOT/PSRF. It does NOT approve data or change the production CIME case. It copies all 22 annual NetCDFs, keeps SHA256 provenance and a row-level edit log. Inspect annual residual QC before considering model submission.
+
+IRIDIS6: download the builder directly from GitHub, run `python3 it_noe_qc_v2_builder.py --out /new/unique/forcing/path` for dry run, then repeat with `--write-candidate` for a NEW path. The input defaults are the existing 20261021 213316 audit and 220229 bracket reports. Run with `-h` to review parameters. Original forcing, checkpoint 2054 and Slurm jobs are untouched. The generated `CANDIDATE_PROVENANCE.json` explicitly marks the result UNAPPROVED; do not fabricate production approval or use the production recovery command yet.
