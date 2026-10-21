@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 02
 
-Stages 00–04b prepare and audit reference surfaces and source meteorology for the ten exact releases in [sites.tsv](sites.tsv):
+Stages 00–05 prepare reference surfaces and audit source meteorology and paired events for the ten exact releases in [sites.tsv](sites.tsv):
 US-BZS, US-CMW, US-EML, US-GLE, US-Ha1, US-Ho1, US-Ho2, US-Ho3,
 US-ICh and US-ICt. First-batch scripts and manifests are unchanged.
 
@@ -493,6 +493,86 @@ provenance, missing-episode ledgers and explicit missing-column failure.
 Source hashes and modification times remained unchanged. Real IRIDIS source
 values and complete release coverage have not yet been examined by this
 GitHub change.
+
+## Stage 05: one-pass event, gap, QC and counterpart review
+
+Operator-provided Stage 04b output confirms 20/20 sources, zero source
+failures, 430 source-years, 285 REVIEW source-years and 96,773 flagged native
+source records. The count comprises 59,314 primary-product records and
+37,459 companion ERA5 records; overlapping timestamps between sources and
+hourly versus half-hourly records must not be treated as independent events
+or equal duration. US-Ho1 primary has 22,167 and US-CMW primary 21,326 flags.
+The terminal log does not yet identify their dominant variables or episodes.
+
+[Stage 05](scripts/stage05/05_review_batch02_source_events.py) reads the exact
+Stage04b report and checksum-verifies all twenty raw source products. It
+reconciles annual, inventory and event counts; retrieves both sources at the
+union of flagged site-local timestamps; verifies each ledger row against its
+original CSV row and recomputes the same screen. No UTC/time-zone conversion
+or independent clock alignment is inferred. Companion ERA5 is still not
+independent ground truth.
+
+Four mutually exclusive review priorities are used:
+
+- P0: any numerical range or humidity-feasibility screen.
+- P1: RH below 1%, without P0.
+- P2: RH 1–5%, without higher priorities.
+- P3: RH 5–10%, without higher priorities.
+
+These are prioritization bins, not official repair rules. Low positive RH
+can represent dry conditions. P2/P3 are never classified as high-priority
+replacement review merely because ERA5 is wetter. Original relevant-variable
+QC codes (including QC0) are retained and tabulated without universal
+provenance assumptions. Exact episode lengths use native minutes and
+NO_LEAP consecutiveness; duplicate timestamps are not counted twice within
+an episode of one priority. Timestamp/variable missing episodes remain a
+separate table and can overlap.
+
+Paired statuses explicitly hold missing/duplicate counterparts, missing
+variables, incompatible native intervals, flagged companions, or ledger
+mismatches. A high-priority event with a numerically clear counterpart is
+still labelled REVIEW, never approved or applied. Identical TA/VPD/PA is
+reported as a potential source relationship, not validation. Every paired
+row includes both sources' values/QC, original row IDs and review status.
+
+Run on IRIDIS with the completed report pinned explicitly:
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/ameriflux-batch02-transfer'
+  REL='examples/AmeriFlux_MultiSite_10_Batch02'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage04" "$BASE/scripts/stage05"
+  for FILE in scripts/stage04/04b_audit_batch02_met_sources.py scripts/stage05/05_review_batch02_source_events.py; do
+    curl -fLsS --retry 3 "$RAW/$REL/$FILE" -o "$BASE/$FILE"
+  done
+  "$PYTHON_BIN" -B "$BASE/scripts/stage05/05_review_batch02_source_events.py" \
+    --source-report '/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch02/reports/stage04b_met_20261021T233344Z_ff3b9f20' \
+    2>&1 | tee "$HOME/AmeriFlux_Batch02_stage05_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+Outputs go to a new sibling `stage05_event_review_<UTC>_<ID>/` directory:
+`priority_summary.csv`, `flag_type_summary.csv`, `event_episodes.csv`,
+`source_quality_summary.csv`, `missing_episode_summary.csv`,
+`relevant_QC_summary.csv`, `paired_event_review.csv`,
+`paired_review_summary.csv` and `review_summary.json`.
+The console prints mutually exclusive priorities, paired status counts and
+source-row verification totals. Any `ledger_mismatches` causes a nonzero exit;
+a source checksum change blocks use of that source and requires a fresh audit.
+No source file or earlier report is changed. No interpolation, ERA5/ERA5-Land
+repair, edited forcing, DATM or model run has occurred in this batch.
+
+Tests passed compilation and a synthetic end-to-end 20-source HH/HR/FULLSET
+review, including all four priorities, counterpart flag/missing-time/duplicate/
+bad-interval holds, QC0 retention, identical TA/VPD/PA detection and clear
+counterpart review without automatic approval. Ledger value mismatch and raw
+checksum changes were rejected. Source and Stage04b report hashes and
+modification times stayed unchanged. Actual IRIDIS counterpart values and
+category totals have not been evaluated by this GitHub change.
 
 ## Validation boundary
 
