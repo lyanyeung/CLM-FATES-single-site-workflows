@@ -155,3 +155,51 @@ Restart inventory: archive of the production case at 2054-01-01-00000.
 Do not switch production DATM, edit the restart, or resubmit production.
 After reviewing preflight output, configure and verify an independently named
 test case; only then choose to submit a limited, reversible trial.
+
+
+## Direct 1000-year continuation policy (operator decision, 21 October 2026)
+
+**Operator choice:** skip the separately submitted short model test and, after
+complete forcing repairs and validations, proceed directly to the remaining
+**950 model years** of the existing 1000-year experiment. Existing case
+`IT-Noe_ERA5_ABW_BRANCH2009`, checkpoint
+`2054-01-01-00000` = 50/1000 years, STOP_N=5 and RESUBMIT=189,
+represent 190 remaining five-year model segments.
+
+**Not ready for production:** the current `may2010` trial only replaces 1488
+May-2010 half-hour records; 21 other years are unchanged. The existing CIME
+DATM stream still points at the previous abort-window sensitivity dataset.
+All 208 flagged source/QC review episodes require resolution, and 64
+hypothetical replacement boundaries raised temperature-jump warnings.
+The 2054 restart file inventory does not prove scientifically consistent
+states under subsequently corrected forcing.
+
+An additional fail-closed, **read-only** gate is provided in
+[it_noe_1000yr_direct_resume_gate.py](it_noe_1000yr_direct_resume_gate.py).
+It checks all 22 annual forcing paths, CIME stream references, 2054 restart
+components, Slurm jobs, plus a version-specific scientific approval manifest
+with SHA256 hashes and complete source/boundary/full-cycle QC attestation.
+No actual production approval has been created; do not fabricate it.
+The tool never changes any files or submits/cancels Slurm jobs.
+
+~~~bash
+conda activate clm_fates_env
+mkdir -p "$HOME/IT-Noe_source_diagnosis/scripts"
+SCRIPT="$HOME/IT-Noe_source_diagnosis/scripts/it_noe_1000yr_direct_resume_gate.py"
+curl -fLsS "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/diagnostics/spinup_failures/IT-Noe/it_noe_1000yr_direct_resume_gate.py" -o "$SCRIPT" || exit 1
+python3 -m py_compile "$SCRIPT" || exit 1
+python3 "$SCRIPT" 2>&1 | tee "$HOME/IT-Noe_direct_resume_gate.log"
+~~~
+
+Expect READY_FOR_DIRECT_RESUME=NO until a real full-cycle corrected
+`datm_11_IT-Noe_corrected_v2` and provenance-checked approval exist,
+and until the production DATM references that approved directory.
+Do not invoke `maintenance/recover_blocked_spinups.py run --site IT-Noe`
+before then: the recovery tool preserves the science namelists and could
+re-submit the SAME defective forcing. After approvals, production case and
+restart staging must be audited separately before the job is submitted.
+
+**Scientific caveat:** continuing from 2054 does not erase the effects of
+the defective forcing in prior model years. Report as legacy-state
+continuation unless an equivalence/restart-consistency assessment supports
+the intended scientific interpretation.
