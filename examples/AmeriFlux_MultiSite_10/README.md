@@ -128,3 +128,27 @@ python3 "$BASE/scripts/stage04/04b_audit_10_met_sources.py"
 ```
 
 Small timestamped CSV/JSON reports are kept on IRIDIS under `CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage04[a,b]_*`; no tower CSV, NetCDF, or report is committed to GitHub. The scripts do not create or submit CIME/Slurm jobs. **Do not interpret Stage 04 structural PASS as permission to start spin-up.** Next: inspect individual flagged source-year events, tower measurement heights/ZBOT, PFT/soil/landunit representativeness, and only then prepare an isolated provisional forcing candidate and DATM.
+
+## Stage 06–09: Event-level QC provenance and humidity diagnostics (21 October 2026)
+
+**Evidence from operator-provided IRIDIS6 reports, not live execution by GitHub:**
+
+- Stage 06 reconstructed **1,744 flagged source/site/half-hour records** and 12 groups with at least three stations sharing the same **local** clock timestamp; **0 differences** relative to Stage 04 source-year anomaly counts.
+- Stage 07 paired **all 1,744** source records with the other source at the same site-local time. **1,672** flagged records had a counterpart not triggering the same physical check; **72** had a counterpart triggering the same physical flag. These categories are **not** an authorization to overwrite FLUXMET with ERA5.
+- Stage 08 identified **1,708 unique site-local timestamps**, with **36 timestamps** flagged in both sources (72 source records). Among the 1,672 source-specific rows, **1,665** received a high-priority humidity physical flag and **7** a hard-range flag. The same site/source/calendar-day/clock-time pattern did **not** recur in both 2004 and 2016 under the strict Stage 08 matching rule; this does not establish independence of the source data.
+- Particularly high source-event counts: **CA-LP1 869**, **CA-Man 578**. Stage08 leaves **every record on HOLD**. A matching ERA5_HH timestamp or a numerically plausible companion is not independent validation. Where FLUXMET QC=2 the release may already rely on ERA-derived meteorology.
+
+**[Stage 09: diagnose humidity severity and episodes](scripts/stage09/09_diagnose_humidity_severity.py)** operates solely on Stage 07's `paired_anomaly_events.csv`. It categorizes RH <= 0, RH > 101/102/105, specific-humidity anomalies, hard-range violations, source QA/QC provenance for affected variables, identical TA/VPD/PA values, and consecutive 30-minute anomaly episodes. Liquid-water RH conventions are retained for comparability, with no automatic switch to ice saturation or inferred replacement values.
+
+IRIDIS6 execution: **download directly from GitHub rather than using `git pull`**:
+
+```bash
+BASE="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10"
+RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+mkdir -p "$BASE/scripts/stage09"
+curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10/scripts/stage09/09_diagnose_humidity_severity.py" -o "$BASE/scripts/stage09/09_diagnose_humidity_severity.py"
+python3 -m py_compile "$BASE/scripts/stage09/09_diagnose_humidity_severity.py"
+python3 "$BASE/scripts/stage09/09_diagnose_humidity_severity.py" | tee "$HOME/AmeriFlux_10_stage09.log"
+```
+
+Reports are isolated on IRIDIS in timestamped `stage09_humidity_severity_*` directories. **Nothing is changed in raw tower/ERA data, generated surfaces, DATM, CIME cases or Slurm jobs.** Do not infer ecological equilibrium or validated spin-up readiness from numerical completeness. Separate landcover/PFT review is still required for CA-TP1/3/4, CA-Cbo and US-Aud.
