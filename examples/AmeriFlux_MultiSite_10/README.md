@@ -81,6 +81,15 @@ python3 "$ROOT/AmeriFlux_sites/scripts/28_audit_shared_BASE_measurement_heights.
 
 **Remaining science gate:** do not assign EC tower/WS heights as ZBOT by assumption; confirm matching `TA` / `TA_PI_F` / indexed sensor variable and effective dates, including undated or partial dates, before constructing provisional dynamic ZBOT. Met Stage25 science approval also remains open, and no DATM or spin-up exists for Batch01.
 
+
+### Stage32 open ZBOT issue — CA-Cbo and CA-Man
+
+The **corrected and successfully completed** [shared Stage32 sensor-height audit](../AmeriFlux_sites/scripts/32_review_CA_Cbo_CA_Man_TA_mapping_and_dates.py) found **14 possible TA sensor heights** for CA-Cbo (1.7, 3.3, 6.3, 10.4, 13.5, 16.5, 19.6, 22.6, 25.7, 29, 33, 34.8, 40.7, 42 m; WS 33, 42.7, 44 m) and **3** for CA-Man (2, 10, 30 m; WS 29 m). **Neither site has a verified BASE sensor-to-FLUXNET `TA_F` crosswalk; both remain ZBOT BLOCKED.** Do not assume CA-Cbo 42 m or CA-Man 30 m on the basis of upper-canopy or WS proximity alone. Original sensor, instrument and comment evidence is saved in the IRIDIS6 Stage32 report:
+
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage32_CA_Cbo_CA_Man_height_decision_20261022T023048634999Z/`
+
+Full blocker explanation, original-sensor source, next evidence required and dynamic date-policy cautions are in the [shared AmeriFlux README](../AmeriFlux_sites/README.md#stage32-unresolved-scientific-issue--multi-layer-ta-heights-in-ca-cbo-and-ca-man-22-october-2026). For the other eight sites, Stage31 has **five static and three dynamic provisional** models; their source mapping and early-height assumptions remain scientific review items. **No production DATM/ZBOT or spin-up is scientifically approved** by the height audits; Stage25 meteorological review and PFT checks remain separate.
+
 ### Data version policy
 
 Never edit official release CSVs, the original shared QC-v5 engine, or previously generated numerical candidates in place. All site-specific remedies must create new versioned site-limited trial folders and replacement ledgers. The separate Stage20 US-Bar sensitivity is **not** a global change to QCv5 humidity thresholds. ERA5_HH used by the official FLUXNET release is **not** verified independent ERA5-Land; do not claim ERA5-Land replacement occurred. Do not delete or change the Stage18 incomplete marker to imply unified approval.
