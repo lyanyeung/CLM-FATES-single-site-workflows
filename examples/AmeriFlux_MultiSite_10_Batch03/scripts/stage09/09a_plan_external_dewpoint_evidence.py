@@ -3,7 +3,7 @@
 
 Reads Stage08e yearly acquisition inventory, Stage08f MDS screening,
 checks original Batch03 BIF UTC_OFFSET metadata without inferring it from
-longitude, and drafts CDS ERA5-Land hourly time-series per-site-year requests.
+longitude, and drafts CDS ERA5-Land hourly time-series per-site-year requests. Date is a single ISO interval string.
 --check writes nothing; --run creates a fresh report, NOT forcing or DATM.
 """
 import argparse
@@ -131,7 +131,7 @@ def main():
             # ordinary continental-US UTC offsets once separately approved.
             # Do not resample or align timestamps in this stage.
             request = {"data_format":"netcdf",
-                "date":[f"{year-1}-12-29", f"{year+1}-01-03"],
+                "date":[f"{year-1}-12-29/{year+1}-01-03"],
                 "location":{"latitude":float(row["latitude"]),
                             "longitude":float(row["longitude"])},
                 "variable":VARIABLES}
@@ -175,6 +175,7 @@ def main():
       "site_manifest_sha256":sha(HERE/"sites.tsv"),
       "requests":len(plans),"event_count":1924,
       "notes":["CDS API is NOT invoked by this script.",
+        "CDS time-series date uses ONE ISO interval string YYYY-MM-DD/YYYY-MM-DD, not a list of endpoint dates.",
         "CDS hourly series represents a 0.1-degree grid point, not tower readings.",
         "The time variable in ERA5-Land is UTC; FLUXNET timestamps are local standard.",
         "Require documented source UTC_OFFSET for each site before merging.",
