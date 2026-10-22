@@ -90,11 +90,11 @@ def main():
     for site in SITES:
         ta=[r for r in by[site] if r["Variable"].upper().startswith("TA")]
         ws=[r for r in by[site] if r["Variable"].upper().startswith("WS")]
-        heights=[ashheight(x["Height"]) for x in ws]
+        heights=[asheight(x["Height"]) for x in ws]
         ws_heights=sorted({x for x in heights if x is not None})
         ws_reference[site]=ws_heights
         for r in ta+ws:
-            h=ashheight(r["Height"])
+            h=asheight(r["Height"])
             if h is None:raise RuntimeError(site+": invalid sensor measurement height")
             is_ta=r["Variable"].upper().startswith("TA")
             comment=r.get("Comment","")
@@ -119,7 +119,7 @@ def main():
                 evidence_flags="|".join(flags),
                 FLUXNET_TA_F_match_verified="NO",
                 scientific_decision="UNRESOLVED_MAPPING_REQUIRES_SOURCE_PROOF"))
-        ta_options=sorted(set(ashheight(r["Height"]) for r in ta))
+        ta_options=sorted(set(asheight(r["Height"]) for r in ta))
         for h in ta_options:
             related=[r for r in ta if asheight(r["Height"])==h]
             above=any(re.search(r"ABV.?CNPY|ABOVE.?CANOPY",r.get("Comment",""),re.I) for r in related)
