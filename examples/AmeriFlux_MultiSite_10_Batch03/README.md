@@ -223,6 +223,44 @@ Stage04a should subsequently audit actual landunit and PFT fractions;
 specifically review US-Kon/US-NR3 grassland, US-Mpj mixed IGBP and US-Me2
 disturbance history. No DATM, case or Slurm jobs are created.
 
+## Stage04a: audit generated landunits and natural PFTs
+
+The operator's Stage03 log confirms `created=10 skipped_verified=0 total=10/10`.
+Run the independent [Stage04a surface audit](scripts/stage04/04a_audit_batch03_surfaces.py)
+on IRIDIS. It verifies Stage03 file inventories/SHA256 receipts, NetCDF
+structure, landunit sums, and natural CLM PFT fractions. It reports separate
+`pct_of_natural` and `pct_of_grid` values without replacing natural PFTs
+or asserting a FATES parameter mapping. US-Mpj is reviewed against the
+current WSA listing while retaining all original ENF/OSH/WSA BIF labels.
+US-Me2 disturbance and the US-Kon/US-NR3 grassland sites are explicit
+science-review flags. Site-level review remains required even if all
+structural checks pass.
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  "$PYTHON_BIN" -c 'import numpy; from netCDF4 import Dataset'
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch03'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage04"
+  SCRIPT="$BASE/scripts/stage04/04a_audit_batch03_surfaces.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage04/04a_audit_batch03_surfaces.py" -o "$SCRIPT"
+  "$PYTHON_BIN" -B "$SCRIPT" \
+    2>&1 | tee "$HOME/AmeriFlux_Batch03_stage04a_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+The report contains `surface_summary.csv`, `natural_pft_detail.csv`
+and `surface_summary.json`, saved to
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage04a_surface_<UTC>_<ID>/`.
+A complete structural run prints `STAGE04A SUMMARY: 10/10 structural passes; 0 structural failures`.
+This **does not** approve the ecological representativeness of gridded PFT
+fractions or establish time-invariant post-disturbance conditions.
+No surface, DATM, forcing, case or Slurm job is modified.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
@@ -244,7 +282,7 @@ humidity decisions must not be copied as Batch03 evidence.
 6. Establish ZBOT/PFT and forcing-loop settings, then generate DATM and
    prepare spin-up cases after those checks.
 
-Stages00–03 are implemented here; surface output still requires Stage04a and PFT review. Later stages will use the actual
+Stages00–04a are implemented here; PFT science review and meteorological QC remain pending. Later stages will use the actual
 Batch03 results. No forcing cycle, CO2 setting or spin-up length is selected.
 
 ## Implementation and validation
