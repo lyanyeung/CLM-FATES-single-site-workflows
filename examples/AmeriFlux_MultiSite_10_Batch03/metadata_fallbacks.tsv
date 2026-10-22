@@ -1,0 +1,2 @@
+site	package	latitude	longitude	igbp	source_url	retrieved_date	notes
+US-Me2	AMF_US-Me2_FLUXNET_FULLSET_2002-2022_4-6	44.4526	-121.5589	ENF	https://ameriflux.lbl.gov/sites/siteinfo/US-Me2	2026-10-22	Current official AmeriFlux site-page metadata, not embedded FULLSET BIF. Disturbance history including 2020 fire and time-varying vegetation must be reviewed before surface and PFT decisions; measurement heights and historical tower coordinates remain unverified for this release.
