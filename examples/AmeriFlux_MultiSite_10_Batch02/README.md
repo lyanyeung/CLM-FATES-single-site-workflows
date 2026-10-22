@@ -1,12 +1,12 @@
 # AmeriFlux MultiSite 10 — Batch 02
 
-Stages 00–08 prepare reference surfaces, audit source meteorology and build isolated native-resolution QC candidates for the ten exact releases in [sites.tsv](sites.tsv):
+Stages 00–10 prepare reference surfaces, build native-resolution QC candidates and perform Post-v5 gates for the ten exact releases in [sites.tsv](sites.tsv):
 US-BZS, US-CMW, US-EML, US-GLE, US-Ha1, US-Ho1, US-Ho2, US-Ho3,
 US-ICh and US-ICt. First-batch scripts and manifests are unchanged.
 
 ## Current operational checkpoint — 22 October 2026
 
-This is the separate Batch02 case under `main/examples/`. Stages00–08 and
+This is the separate Batch02 case under `main/examples/`. Stages00–10 and
 the exact manifests are published here. Transfer, extraction, metadata and
 isolated reference-surface generation have completed for all ten releases;
 source and surface audits remain scientific evidence, not model approval.
@@ -33,6 +33,9 @@ humidity rule. Their raw products contain `RH`, but its usability at these
 exact rows has not yet been established. The [Stage08 same-release-RH
 sensitivity](#stage-08-same-release-rh-sensitivity-for-stage07-blockers)
 is published with synthetic validation; live IRIDIS execution is pending.
+After Stage08 completes a ten-site selection, follow the
+[Post-v5 gates and pipeline](#stages-0910-post-v5-gates-and-pipeline)
+below. Candidate construction alone does not complete Post-v5.
 
 Preserve the existing Stage07 trial, its five successful candidates and its
 incomplete marker:
@@ -892,6 +895,115 @@ rejected. Missing, zero and out-of-range RH produced a four-plus-five partial
 selection, an excluded failed site and a retained incomplete marker, with
 no added RH floor. These tests do not predict how many of the actual 4,904
 IRIDIS blockers have usable raw RH.
+
+## Stages 09/10: Post-v5 gates and pipeline
+
+Batch02 follows the uploaded Batch01 Post-v5 operation, with explicit native
+HH/HR and candidate-selection adaptations:
+
+| Batch01 operation | Batch02 equivalent |
+| --- | --- |
+| [Stage21 independent numeric/provenance audit](../AmeriFlux_MultiSite_10/scripts/stage21/21_verify_ten_qcv5_candidates.py) | Stage09 numeric, conversions and raw-to-event ledger audit |
+| [Stage22 extreme meteorology / source switches](../AmeriFlux_MultiSite_10/scripts/stage22/22_post_qcv5_extremes_source_switches.py) | Stage09 extremes, source/QC switches and every QC0 modification |
+| [Stage23 Post-v5 runner](../AmeriFlux_MultiSite_10/scripts/stage23/23_run_post_qcv5_science_gates.sh) | Stage10 Stage08-to-Post-v5 pipeline, with failure gating |
+
+[Stage09](scripts/stage09/09_post_qcv5_batch02.py) reads only the exact
+completed Stage08 selection: five preserved Stage07 candidates plus five
+same-release-RH sensitivities. An incomplete selection is rejected before
+report creation. Raw/report/code, selected forcing and event/manual/status
+hashes are verified before and after the audit.
+
+The first Post-v5 gate reuses the checksum-pinned independent numeric audit
+helper, with its audit JSON writer redirected into the new report directory.
+It rechecks full native NO_LEAP chronology, forcing ranges, native rainfall
+conversion, independent QBOT, seven-variable source-to-candidate changes,
+original values/QC and the complete replacement ledger. It never rewrites
+the earlier independent-audit JSONs in either candidate trial.
+
+The second gate reproduces Batch01's HH extreme screens and adds actual
+candidate-source switches alongside original QC switches. It reports new
+and retained temperature jumps, isolated spikes, temperature differences
+from ERA, TA below -25 or above 45 C, VPD/pressure jumps, heavy rainfall,
+low positive RH and all original-source QC0 edits. QC0 totals come from this
+batch's independently reconciled events; Batch01's fixed 518 is not reused.
+Low positive RH in the 1–5 and 5–10% bins is also counted. These are review
+screens, not automatic edits or proof that cold/dry observations are wrong.
+
+Rate thresholds retain the HH values and use their nominal hourly equivalent
+for US-Ha1:
+
+| Screen | HH / 30 min | HR / 60 min |
+| --- | ---: | ---: |
+| TA step | >8 C | >16 C |
+| VPD step | >5 hPa | >10 hPa |
+| Pressure step | >5000 Pa | >10000 Pa |
+| Accumulated rain | >18 mm | >36 mm |
+
+Hourly data cannot resolve within-hour extremes. Rate flags use the native
+model-grid step; event context includes the actual source clock gap so
+leap-day-removal boundaries can be reviewed separately. Episode grouping
+uses the Batch01 two-hour separation. RH bin edges use the same 1e-9
+percentage-point reporting tolerance as the Batch02 candidate audit.
+
+[Stage10](scripts/stage10/10_run_batch02_qcv5_post.sh) provides these modes:
+
+- `build-and-audit`: run Stage08 into a fresh, explicitly named directory;
+  only if all ten selections pass, run both Stage09 Post-v5 gates.
+- `audit SELECTION_ROOT`: re-audit an exact completed Stage08 selection
+  without rebuilding candidates.
+- `check SELECTION_ROOT`: verify selection and input hashes without new
+  reports or candidates.
+
+For the last uploaded Stage07 result, run the combined next step on IRIDIS:
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch02'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage08" "$BASE/scripts/stage09" "$BASE/scripts/stage10"
+  for FILE in \
+    scripts/stage08/qcv5_raw_rh.py \
+    scripts/stage08/08_resolve_blockers_with_raw_rh.py \
+    scripts/stage09/09_post_qcv5_batch02.py \
+    scripts/stage10/10_run_batch02_qcv5_post.sh
+  do
+    curl -fLsS --retry 3 "$RAW/$REL/$FILE" -o "$BASE/$FILE"
+  done
+  PYTHON="$PYTHON_BIN" bash "$BASE/scripts/stage10/10_run_batch02_qcv5_post.sh" build-and-audit \
+    2>&1 | tee "$HOME/AmeriFlux_Batch02_QCv5_Postv5_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+Existing Stage07 helper/engine/manifest files stay in place because the
+original trial pinned their hashes. The pipeline chooses and prints its
+exact Stage08 output directory; it never searches for a latest trial.
+If Stage08 still fails at unusable RH, execution stops before Post-v5.
+
+Post-v5 creates only a fresh `reports/stage09_postqcv5_<UTC>_<ID>/`, containing
+`numeric_audits/`, `numeric_and_ledger_summary.csv`,
+`site_extremes_and_sources_summary.csv`, `timestamped_event_context.csv`,
+`all_original_QC0_edits.csv`, `annual_extreme_counts.csv`,
+`site_failures.csv`, `input_manifest.json`, `input_preservation_check.json`
+and `postv5_summary.json`. Any numeric/ledger or input-preservation failure
+returns nonzero. Science flags remain `REVIEW_PRE_DATM` even if numeric
+checks pass; source/candidate files, surfaces, DATM, cases and jobs are not
+modified by Post-v5. ZBOT, PFT representation and scientific changes remain
+separate decisions before model setup.
+
+Validation used the synthetic Stage04b–08 chain, completed ten-site selection
+and both Post-v5 gates. All ten candidates passed; the actual fixture QC0
+total was 55, demonstrating that no Batch01 total was hard-coded. All matching
+HH screen counts agreed with fixed Batch01 Stage22. HR temperature/pressure
+and rainfall threshold cases, full end-year tables, report-only JSON routing,
+input/candidate hashes and modification times were checked. An incomplete
+Stage08 selection blocked Post-v5 before report writes. Separate mocked
+runner checks verified failure stopping, passing the exact fresh selection
+path and auditing/checking an existing selection without rebuilding it.
+Live Batch02 Stage08/Post-v5 outcomes remain pending operator execution.
 
 ## Validation boundary
 
