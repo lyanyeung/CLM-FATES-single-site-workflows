@@ -1,0 +1,3 @@
+site	package	group_id	latitude	longitude	basis	review_note
+US-Mpj	AMF_US-Mpj_FLUXNET_2008-2025_v1.3_r1	1495	34.4385	-106.2377	Dated BIF LOCATION_DATE_START=200701010000 and elevation=2196m (matches current AmeriFlux listing)	Keep GROUP_ID 1479 coordinates unchanged in BIF; official current 34.4382,-106.2385 differs by approximately 81m; review PFT/WSA vs historical BIF ENF-OSH-WSA before surface selection
+US-MtB	AMF_US-MtB_FLUXNET_2009-2024_v1.3_r1	1397	32.4160	-110.7256	Dated BIF LOCATION_DATE_START=2002 and elevation=2573m; exact match to current AmeriFlux listing	Keep GROUP_ID 1377 coordinates unchanged in BIF; choose one internally paired record for representative model point
