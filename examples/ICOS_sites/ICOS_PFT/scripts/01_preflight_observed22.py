@@ -35,14 +35,14 @@ def read_kv(path: Path) -> dict[str, str]:
     for line in path.read_text(errors="replace").splitlines():
         match = re.match(r"^\s*([A-Za-z][A-Za-z0-9_]*)\s*=\s*(.*?)\s*(?:!.*)?$", line)
         if match:
-            result[match.group(1).lower()] = match.group(2).strip().rstrip(",").strip().strip("'\\"")
+            result[match.group(1).lower()] = match.group(2).strip().rstrip(",").strip().strip(chr(39) + chr(34))
     return result
 
 
 def abs_path(raw: str, base: Path, root: Path) -> Path | None:
     if not raw:
         return None
-    x = raw.strip().strip("'\\\"").replace("${DIN_LOC_ROOT}", str(root / "inputdata"))
+    x = raw.strip().strip(chr(39) + chr(34)).replace("${DIN_LOC_ROOT}", str(root / "inputdata"))
     x = x.replace("$DIN_LOC_ROOT", str(root / "inputdata"))
     if "$" in x or "{" in x:
         return None
