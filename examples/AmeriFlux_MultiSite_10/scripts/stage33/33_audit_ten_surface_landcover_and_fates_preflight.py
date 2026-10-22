@@ -53,6 +53,15 @@ HEURISTIC_FOREST_THRESHOLD=50.0
 HEURISTIC_GRASS_THRESHOLD=50.0
 
 
+
+def write(path,records,columns):
+    """Write a diagnostic-only CSV to the new, unique Stage33 report directory."""
+    with path.open("w",newline="",encoding="utf-8") as f:
+        writer=csv.DictWriter(f,fieldnames=columns,extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(records)
+
+
 def read_manifest(p):
     with p.open(newline="",encoding="utf-8") as f:
         rd=csv.DictReader(f,delimiter="\t")
