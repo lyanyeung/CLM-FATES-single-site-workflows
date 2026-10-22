@@ -4,38 +4,43 @@
 
 > **2026-10-22 PFT realism update:** Stage 0 now checks actual modeled FATES PFT identity against the EC site before deciding further spin-up. Four of six verified dynamic-competition cases have a broad-type mismatch (RU-Fyo, DE-Tha, NL-Loo, IL-Yat). The 22 October 2026 IRIDIS6 audit has now identified final dominant FATES PFTs for all 15 sites. Major mismatches include grassland sites simulated as broadleaf forest and CZ-Stn simulated as grassland. FR-Fon passes both the flux screen and broad PFT type check, while more detailed surface/footprint QC remains. See [PFT_REALISM_AND_FIXED_PFT.md](PFT_REALISM_AND_FIXED_PFT.md) and [15-site PFT table](data/15_site_pft_realism_screen.csv). **Do not blindly submit extensions based on the previous flux-only table; Stage 0 PFT realism gates decisions.**
 
-> **Initial vegetation audit:** The original extracted CLM surface PFT, first-year modeled FATES PFT and frozen final FATES PFT are distinct. All 15 FATES first-year PFT dominants are now known (six archived annual CSVs and nine newly audited h0a files). The effective CLM surface PFT vectors were extracted on IRIDIS6, but the source CSV needs to be synced to GitHub to complete the originally extracted CLM PFT column. See [INITIAL_VEGETATION_AND_PFT_TRANSITIONS.md](INITIAL_VEGETATION_AND_PFT_TRANSITIONS.md), [15-site initial-vs-final CSV](data/15_site_initial_surface_vs_fates_summary.csv) and [script 09](scripts/09_audit_initial_surface_vs_fates.py).
+> **Initial vegetation audit:** The original extracted CLM surface PFT, first-year modeled FATES PFT and frozen final FATES PFT are distinct. All 15 FATES first-year PFT dominants are now known (six archived annual CSVs and nine newly audited h0a files). The effective CLM surface PFT vectors and landunit fractions have now been copied from the IRIDIS6 audit, decoded with the CTSM CLM5 natpft index convention, and added to the 15-site table and CSV evidence. See [INITIAL_VEGETATION_AND_PFT_TRANSITIONS.md](INITIAL_VEGETATION_AND_PFT_TRANSITIONS.md), [15-site initial-vs-final CSV](data/15_site_initial_surface_vs_fates_summary.csv) and [script 09](scripts/09_audit_initial_surface_vs_fates.py).
 
 This folder is the stand-alone, reproducible record of a two-stage **spin-up screening** workflow. It covers six sites from `FLUXNET_MultiSite_6` and nine completed sites from the original `FLUXNET_MultiSite_11` cohort. **Study-defined thresholds are operational decisions, not official CTSM/FATES equilibrium criteria.** This material is not a model–tower accuracy assessment.
 
 <!-- INITIAL_VEGETATION_15_START -->
-## 15-site EC vegetation, originally extracted CLM PFT, initial FATES PFT and final FATES PFT
+## 15-site original land cover vs initial and final FATES PFT
 
-| EC site | EC tower vegetation (IGBP) | Original extracted CLM surface PFT | FATES year-1 dominant PFT (VegC %) | FATES frozen-end dominant PFT (VegC %) |
-|---|---|---|---|---|
-| DE-Hai | DBF | **Pending effective fsurdat CSV** | BET (evergreen broadleaf) (26.97%) | BDT (cold-deciduous broadleaf) (99.31%) |
-| RU-Fyo | ENF | **Pending effective fsurdat CSV** | BET (evergreen broadleaf) (32.92%) | BDT (cold-deciduous broadleaf) (96.06%) |
-| DE-Tha | ENF | **Pending effective fsurdat CSV** | BET (evergreen broadleaf) (29.96%) | BDT (cold-deciduous broadleaf) (99.58%) |
-| DK-Sor | DBF | **Pending effective fsurdat CSV** | BET (evergreen broadleaf) (28.90%) | BDT (cold-deciduous broadleaf) (99.59%) |
-| NL-Loo | ENF | **Pending effective fsurdat CSV** | BET (evergreen broadleaf) (27.98%) | BDT (cold-deciduous broadleaf) (99.47%) |
-| IL-Yat | ENF | **Pending effective fsurdat CSV** | C4 grass (26.85%) | C4 grass (100.00%) |
-| AT-Neu | GRA | **Pending effective fsurdat CSV** | BET (evergreen broadleaf) (30.91%) | BDT (cold-deciduous broadleaf) (99.08%) |
-| BE-Bra | MF | **Pending effective fsurdat CSV** | BET (evergreen broadleaf) (27.16%) | BDT (cold-deciduous broadleaf) (99.44%) |
-| CH-Cha | GRA | **Pending effective fsurdat CSV** | BDT (cold-deciduous broadleaf) (21.23%) | BDT (cold-deciduous broadleaf) (99.41%) |
-| CH-Fru | GRA | **Pending effective fsurdat CSV** | BET (evergreen broadleaf) (27.15%) | BDT (cold-deciduous broadleaf) (99.61%) |
-| CH-Lae | MF | **Pending effective fsurdat CSV** | BET (evergreen broadleaf) (27.80%) | BDT (cold-deciduous broadleaf) (99.21%) |
-| CZ-Stn | DBF | **Pending effective fsurdat CSV** | BET (evergreen broadleaf) (28.08%) | C3 grass (100.00%) |
-| FI-Sod | ENF | **Pending effective fsurdat CSV** | BET (evergreen broadleaf) (33.23%) | BDT (cold-deciduous broadleaf) (91.72%) |
-| FR-Fon | DBF | **Pending effective fsurdat CSV** | BDT (cold-deciduous broadleaf) (20.06%) | BDT (cold-deciduous broadleaf) (99.60%) |
-| GL-ZaH | GRA / Arctic tundra | **Pending effective fsurdat CSV** | BET (evergreen broadleaf) (29.42%) | Arctic C3 grass (69.83%) |
+### Original CLM surface PFT distribution — 15 site source audit
 
-**Key:** BET = `broadleaf_evergreen_extratrop_tree`; BDT = `broadleaf_colddecid_extratrop_tree`. ENF = evergreen needleleaf forest; DBF = deciduous broadleaf forest; MF = mixed forest; GRA = grassland. GL-ZaH is high-Arctic tundra despite its broad GRA code. Percentages are **relative shares of living vegetation carbon**, not cover-area fractions.
+The table below derives from `CaseDocs/lnd_in` → **effective `fsurdat`** and the user's read-only terminal output. `PCT_NAT_PFT` is the **percentage within the natural-vegetation landunit** (including bare ground index 0), whereas `PCT_NATVEG` and `PCT_CROP` describe percentages of the **whole site/grid cell**. These columns have distinct denominators.
 
-**Why the original extracted PFT column is pending:** all 15 effective CLM point-surface `PCT_NAT_PFT` vectors were just extracted by script `09_audit_initial_surface_vs_fates.py` to the user's IRIDIS6 Home directory, but that CSV has not been provided to GitHub. We will publish each verified **host CLM PFT index and percentage** first. We will decode an index to a vegetation name only after confirming the PFT convention of the exact source surface; CLM surface indices are **not FATES parameter PFT slots**. The original surface's `PCT_CROP` and `PCT_NATVEG` are separate landunit statistics, not dynamic FATES PFT shares.
+The standard **CLM5 `natpft` (0–14)** mapping is cross-checked with the [CTSM CLM5 technical note](https://escomp.github.io/CTSM/release-clm5.0/tech_note/Ecosystem/CLM50_Tech_Note_Ecosystem.html) and [CESM staff indexing explanation](https://bb.cgd.ucar.edu/cesm/threads/how-to-obtain-the-indices-of-natural-pfts-of-each-grid-of-surface-data.6153/). This is **not** the PFT-slot numbering inside `fates_params_default.json`. Preserve the version/path of the actual `fsurdat` when changing the surface or code; custom surface definitions must be independently checked.
 
-**Important distinction:** “FATES year 1” is its simulated *first year's mean*, **not** the exact time-zero initialization. Six year-1 PFT rows (DE-Hai, RU-Fyo, DE-Tha, DK-Sor, NL-Loo, IL-Yat) were recovered from archived per-year PFT CSVs because the original first-year `h0a` is absent from the current Scratch archive. The other nine rows were verified from the user's 22 October 2026 read-only `h0a` log. Final PFT shares are from the frozen spin-up endpoints.
+| Site | Tower class | Original CLM surface dominant natural PFT | Natural-unit share | PCT_NATVEG | PCT_CROP | FATES year 1, dominant VegC PFT | FATES frozen final VegC PFT |
+|---|---|---|---:|---:|---:|---|---|
+| DE-Hai | DBF | **C3_GRASS** (index 13) | 53.15% | 61.88% | 38.12% | Evergreen broadleaf tree 26.97% | Deciduous broadleaf tree 99.31% |
+| RU-Fyo | ENF | **NET_TEMP** (index 1) | 45.39% | 96.69% | 3.31% | Evergreen broadleaf tree 32.92% | Deciduous broadleaf tree 96.06% |
+| DE-Tha | ENF | **C3_GRASS** (index 13) | 55.79% | 62.67% | 37.33% | Evergreen broadleaf tree 29.96% | Deciduous broadleaf tree 99.58% |
+| DK-Sor | DBF | **C3_GRASS** (index 13) | 73.45% | 55.40% | 44.60% | Evergreen broadleaf tree 28.90% | Deciduous broadleaf tree 99.59% |
+| NL-Loo | ENF | **C3_GRASS** (index 13) | 71.63% | 66.84% | 33.16% | Evergreen broadleaf tree 27.98% | Deciduous broadleaf tree 99.47% |
+| IL-Yat | ENF | **BARE** (index 0) | 52.23% | 81.60% | 18.40% | C4 grass 26.85% | C4 grass 100.00% |
+| AT-Neu | GRA | **C3_ARCTIC** (index 12) | 43.53% | 95.81% | 4.19% | Evergreen broadleaf tree 30.91% | Deciduous broadleaf tree 99.08% |
+| BE-Bra | MF | **C3_GRASS** (index 13) | 73.75% | 62.59% | 37.41% | Evergreen broadleaf tree 27.16% | Deciduous broadleaf tree 99.44% |
+| CH-Cha | GRA | **C3_GRASS** (index 13) | 53.09% | 77.77% | 22.23% | Deciduous broadleaf tree 21.23% | Deciduous broadleaf tree 99.41% |
+| CH-Fru | GRA | **C3_ARCTIC** (index 12) | 44.70% | 96.06% | 3.94% | Evergreen broadleaf tree 27.15% | Deciduous broadleaf tree 99.61% |
+| CH-Lae | MF | **C3_GRASS** (index 13) | 53.09% | 77.77% | 22.23% | Evergreen broadleaf tree 27.80% | Deciduous broadleaf tree 99.21% |
+| CZ-Stn | DBF | **C3_GRASS** (index 13) | 58.99% | 52.18% | 47.82% | Evergreen broadleaf tree 28.08% | Cool C3 grass 100.00% |
+| FI-Sod | ENF | **NET_BOREAL** (index 2) | 54.78% | 99.82% | 0.18% | Evergreen broadleaf tree 33.23% | Deciduous broadleaf tree 91.72% |
+| FR-Fon | DBF | **C3_GRASS** (index 13) | 71.84% | 49.20% | 50.80% | Deciduous broadleaf tree 20.06% | Deciduous broadleaf tree 99.60% |
+| GL-ZaH | GRA / Arctic tundra | **BARE** (index 0) | 74.41% | 100.00% | 0.00% | Evergreen broadleaf tree 29.42% | Arctic C3 grass 69.83% |
 
-The table is a *vegetation-representation diagnostic*, not a spin-up equilibrium certificate. Where the modeled PFT differs from field vegetation, investigate surface provenance, initialization and PFT competition before extending the dynamic case. View [initial PFT transition evidence](INITIAL_VEGETATION_AND_PFT_TRANSITIONS.md) and [15-site evidence CSV](data/15_site_initial_surface_vs_fates_summary.csv).
+**PFT key:** NET_TEMP = needleleaf evergreen temperate tree; NET_BOREAL = needleleaf evergreen boreal tree; C3_GRASS = non-Arctic C3 grass; C3_ARCTIC = Arctic C3 grass; BARE = bare soil. FATES first-year/final percentages are shares of **living vegetation carbon**; they are not CLM natural-landunit percentages or canopy-area shares.
+
+**Main scientific findings:** The extracted CLM natural vegetation is dominated by **C3 non-Arctic grass** at DE-Hai, DE-Tha, DK-Sor, NL-Loo, BE-Bra, CH-Cha, CH-Lae, CZ-Stn and FR-Fon (9 sites). RU-Fyo and FI-Sod have natural-landunit PFTs led by **temperate and boreal evergreen needleleaf trees**, respectively, but dynamic FATES later strongly favored deciduous broadleaf trees. IL-Yat's extracted natural component is **52.23% bare ground**, with only **0.96% temperate evergreen needleleaf tree** even though the EC tower is ENF; dynamic FATES became entirely C4 grass. AT-Neu and CH-Fru are led by Arctic C3 grasses in the coarse CLM surface; this may be unsuitable for some managed alpine grasslands and must be checked against local vegetation. GL-ZaH's source is mainly bare ground plus Arctic C3 grass, broadly plausible for Arctic tundra, but canopy, bryophyte and shrub representation is unresolved. The reported `PCT_CROP` is unusually high at several forest sites; whether a separate crop landunit is active under full FATES depends on case flags and must not be inferred from surface data alone.
+
+The source printout included **only PFT indices with share ≥0.1%**. The complete original vector may contain smaller entries that were not printed. [Full reported CLM PFT distribution](data/15_site_clm_surface_pft_distribution.csv); [mapped CLM index lookup](data/clm5_natpft_index_lookup.csv); [combined analysis CSV](data/15_site_initial_surface_vs_fates_summary.csv).
+
 <!-- INITIAL_VEGETATION_15_END -->
 
 ## Screening logic
