@@ -135,6 +135,43 @@ python3 -B "$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_1
 `--sites US-Me2`, `--sites-root`, `--incoming-dir` and `--reports-dir`
 are available. Audit-only creates no report or raw files.
 
+## Stage02: read-only metadata and source-interval preflight on IRIDIS
+
+After Stage01 finishes with `BATCH03 SUMMARY: 10/10 PASS`, run this in an
+**IRIDIS terminal** (no `git pull` required):
+
+```bash
+(
+  set -euo pipefail
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch03'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage02"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  curl -fLsS --retry 3 "$RAW/$REL/metadata_fallbacks.tsv" -o "$BASE/metadata_fallbacks.tsv"
+  SCRIPT="$BASE/scripts/stage02/02_check_batch03_metadata.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage02/02_check_batch03_metadata.py" -o "$SCRIPT"
+  python3 -B "$SCRIPT" 2>&1 | tee "$HOME/AmeriFlux_Batch03_stage02_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+Stage02 reads BIF coordinates/IGBP/height records for nine releases, reads
+the explicit official AmeriFlux site-page fallback for US-Me2 (the FULLSET
+without BIF), and verifies only the *first* HH/HR source interval. It
+does not write site data, surfaces, forcing, model cases or Slurm jobs.
+Expected summary is `STAGE02 SUMMARY: 10/10 coordinate + first-interval checks PASS; failures: none`
+if the actual data match the checks.
+
+**Scientific hold:** US-Me2's official site page reports the 20 August
+2020 Green Ridge Fire, 2021 salvage logging and later tower changes;
+the current ENF label is not proof of a stationary ENF land cover
+through 2002–2022. Surface/PFT choices need an explicit disturbance
+history review. Its site-page coordinates (44.4526, -121.5589) are an
+external metadata fallback, not coordinates read from the FULLSET release.
+US-MMS has native hourly meteorology; preserve HR in later workflows.
+Do not use BIF height records as a final ZBOT decision; compare the
+curated BASE_MeasurementHeight reference and site-specific evidence.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
@@ -156,7 +193,7 @@ humidity decisions must not be copied as Batch03 evidence.
 6. Establish ZBOT/PFT and forcing-loop settings, then generate DATM and
    prepare spin-up cases after those checks.
 
-Only Stages00–01 are implemented here. Later stages will use the actual
+Only Stages00–02 are implemented here. Later stages will use the actual
 Batch03 results. No forcing cycle, CO2 setting or spin-up length is selected.
 
 ## Implementation and validation
