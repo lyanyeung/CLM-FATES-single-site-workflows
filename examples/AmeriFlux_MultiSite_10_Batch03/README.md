@@ -514,6 +514,45 @@ remains blocked, the incomplete marker is retained and a further
 scientific decision is needed. A complete selection is still not
 Post-v5 accepted and is never sufficient to start DATM/spin-up.
 
+## Stage08b: residual RH blocker classification (no candidate edits)
+
+Stage08 ended `preserved=3 sensitivity_pass=0 failed=7 selected=3/10
+inputs_unchanged=True`. Among 2,273 original unresolved humidity pairs,
+349 met same-release RH numerical criteria but **none of the seven
+sensitivity runs completed**; 1,924 remained unresolved. Same-release
+`RH_QC` was unavailable for all 349 numerically eligible records.
+
+[Stage08b](scripts/stage08/08b_diagnose_remaining_rh.py) verifies the
+unchanged preserved Stage08 output and classifies the 1,924 remaining rows
+by documented hold reason, missing/out-of-range RH, cold temperatures,
+negative implied vapor pressure, and ERA RH screen status. These counts
+may overlap and are **not** independent repair approvals. The output
+is evidence only, not revised QCv5 or Post-v5 acceptance.
+
+Run in IRIDIS:
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch03'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage08"
+  SCRIPT="$BASE/scripts/stage08/08b_diagnose_remaining_rh.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage08/08b_diagnose_remaining_rh.py" -o "$SCRIPT"
+  TRIAL='/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/raw_RH_sensitivity_20261022T025645Z_3c43eb8b'
+  "$PYTHON_BIN" -B "$SCRIPT" --stage08-root "$TRIAL" --check
+)
+```
+
+If the preflight passes, run the same command with `--run` in place of
+`--check` to create a new isolated
+`reports/stage08b_rh_cause_<timestamp>_<id>` report with
+`site_hold_summary.csv`, `unresolved_rh_records.csv`, and
+`unresolved_by_year_and_reason.csv`. No inputs are modified.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
