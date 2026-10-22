@@ -147,11 +147,13 @@ def run(site,origpath,erapath,finalpath,eventpath,first,last):
     selected=np.flatnonzero(mask)
     detailed=[]
     episode=0
-    last=None
+    last_flagged_time=None  # Never shadow `last` (the site end year).
     for i in selected:
         when=final.time.iloc[i]
-        if last is None or (when-last).total_seconds()>2*3600:episode+=1
-        last=when
+        if (last_flagged_time is None or
+                (when-last_flagged_time).total_seconds()>2*3600):
+            episode+=1
+        last_flagged_time=when
         ts=times[i]
         reasons=[k for k,m in flags.items() if m[i]]
         if ts in qc0_by_time:reasons.append("QC0_MEASURED_EDIT")
