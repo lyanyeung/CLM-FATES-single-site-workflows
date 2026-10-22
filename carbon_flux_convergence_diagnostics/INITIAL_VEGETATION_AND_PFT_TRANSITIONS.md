@@ -1,6 +1,6 @@
 # Initial land-cover extraction vs year-one FATES vegetation
 
-**Status 22 October 2026: all 15 sites have frozen final simulated PFT observations; year-one actual FATES shares were independently recovered for six sites; original effective CLM surface vectors and the remaining nine first-year histories await IRIDIS6 read-only extraction.**
+**Status 22 October 2026: all 15 sites have frozen final simulated PFT observations; year-one FATES shares are now recovered for all 15 sites (six from archived annual CSV, nine from 22 October 2026 h0a audit). Effective original CLM surface host PFT vectors have been extracted into a Home CSV but have not yet been synced to GitHub.**
 
 There are **three different** "initial vegetation" concepts and they must not be conflated:
 
@@ -23,19 +23,19 @@ There are **three different** "initial vegetation" concepts and they must not be
 
 **The five forest sites' similar year-one PFT mixture and rapid convergence to deciduous broadleaf dominance suggest a shared model configuration/competitive advantage worth investigating.** This is a hypothesis, not proof that the original surface data were incorrectly extracted; testing original effective surfdata and the FATES initial cohort-seeding recipe is still necessary.
 
-## Other nine sites: end-state verified, first-year and effective surface pending
+## Other nine sites: year-one and end-state verified; effective surface CSV awaiting upload
 
 | Site | EC broad class | Frozen final PFT | First-year modeled PFT | Effective initial CLM surface |
 |---|---|---|---|---|
-| AT-Neu | GRA | broadleaf_colddecid_extratrop_tree (99.08%) | Pending `h0a` year 1 | Pending `fsurdat` read |
-| BE-Bra | MF | broadleaf_colddecid_extratrop_tree (99.44%) | Pending `h0a` year 1 | Pending `fsurdat` read |
-| CH-Cha | GRA | broadleaf_colddecid_extratrop_tree (99.41%) | Pending `h0a` year 1 | Pending `fsurdat` read |
-| CH-Fru | GRA | broadleaf_colddecid_extratrop_tree (99.61%) | Pending `h0a` year 1 | Pending `fsurdat` read |
-| CH-Lae | MF | broadleaf_colddecid_extratrop_tree (99.21%) | Pending `h0a` year 1 | Pending `fsurdat` read |
-| CZ-Stn | DBF | cool_c3_grass (100.00%) | Pending `h0a` year 1 | Pending `fsurdat` read |
-| FI-Sod | ENF | broadleaf_colddecid_extratrop_tree (91.72%) | Pending `h0a` year 1 | Pending `fsurdat` read |
-| FR-Fon | DBF | broadleaf_colddecid_extratrop_tree (99.60%) | Pending `h0a` year 1 | Pending `fsurdat` read |
-| GL-ZaH | GRA | arctic_c3_grass (69.83%) | Pending `h0a` year 1 | Pending `fsurdat` read |
+| AT-Neu | GRA | broadleaf_colddecid_extratrop_tree (99.08%) | broadleaf_evergreen_extratrop_tree (30.91%) | Source CSV on IRIDIS6 Home; GitHub sync pending |
+| BE-Bra | MF | broadleaf_colddecid_extratrop_tree (99.44%) | broadleaf_evergreen_extratrop_tree (27.16%) | Pending `fsurdat` read |
+| CH-Cha | GRA | broadleaf_colddecid_extratrop_tree (99.41%) | broadleaf_colddecid_extratrop_tree (21.23%) | Pending `fsurdat` read |
+| CH-Fru | GRA | broadleaf_colddecid_extratrop_tree (99.61%) | broadleaf_evergreen_extratrop_tree (27.15%) | Pending `fsurdat` read |
+| CH-Lae | MF | broadleaf_colddecid_extratrop_tree (99.21%) | broadleaf_evergreen_extratrop_tree (27.80%) | Pending `fsurdat` read |
+| CZ-Stn | DBF | cool_c3_grass (100.00%) | broadleaf_evergreen_extratrop_tree (28.08%) | Pending `fsurdat` read |
+| FI-Sod | ENF | broadleaf_colddecid_extratrop_tree (91.72%) | broadleaf_evergreen_extratrop_tree (33.23%) | Pending `fsurdat` read |
+| FR-Fon | DBF | broadleaf_colddecid_extratrop_tree (99.60%) | broadleaf_colddecid_extratrop_tree (20.06%) | Pending `fsurdat` read |
+| GL-ZaH | GRA | arctic_c3_grass (69.83%) | broadleaf_evergreen_extratrop_tree (29.42%) | Pending `fsurdat` read |
 
 ## Reproducible next action
 
