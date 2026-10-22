@@ -309,6 +309,63 @@ Outputs are isolated under
 The target summary is 20/20 source audits with no source failures;
 REVIEW flags are expected to need further evidence and site-specific decisions.
 
+## Stage05: paired review of exact Stage04b anomalies
+
+Operator results confirmed `STAGE04B SUMMARY: 20/20 sources audited;
+0 source failures; 292 REVIEW source-years; 83082 flagged native records`.
+The exact input directory is:
+
+```text
+/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage04b_met_20261022T022701Z_d845a292
+```
+
+[Stage05](scripts/stage05/05_review_batch03_source_events.py) classifies the
+83,082 flagged native source records into mutually exclusive priorities,
+reconciles Stage04b annual and event counts, compares primary to paired
+ERA5 on exact original site timestamps, checks raw source-row values and
+hashes, and records source QC. US-MMS keeps its native hourly step. A
+numerically clear counterpart is never automatic evidence for replacement.
+
+On IRIDIS, download Stage04b helper and Stage05 script. Run `--check`
+first; it verifies manifest/source identities and reconciles counts without
+writing outputs. Full Stage05 writes a separate timestamped report.
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch03'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage04" "$BASE/scripts/stage05"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  for FILE in scripts/stage04/04b_audit_batch03_met_sources.py \
+              scripts/stage05/05_review_batch03_source_events.py; do
+    curl -fLsS --retry 3 "$RAW/$REL/$FILE" -o "$BASE/$FILE"
+  done
+  REPORT='/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage04b_met_20261022T022701Z_d845a292'
+  SCRIPT="$BASE/scripts/stage05/05_review_batch03_source_events.py"
+  "$PYTHON_BIN" -B "$SCRIPT" --source-report "$REPORT" --check
+)
+```
+
+If Stage05 preflight passes, run the same downloaded script without
+`--check`:
+
+```bash
+PYTHON_BIN="$CONDA_PREFIX/bin/python"
+REPORT='/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage04b_met_20261022T022701Z_d845a292'
+SCRIPT="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage05/05_review_batch03_source_events.py"
+"$PYTHON_BIN" -B "$SCRIPT" --source-report "$REPORT" \
+  2>&1 | tee "$HOME/AmeriFlux_Batch03_stage05_$(date +%Y%m%d_%H%M%S).log"
+```
+
+A valid run should show `STAGE05 SUMMARY: events=83082` and
+`ledger_mismatches=0`; complete success still requires examining
+the event-priority/status reports. No source, surface, forcing, DATM,
+case or Slurm job is changed.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
