@@ -7,18 +7,18 @@
 
 **Source of status:** operator-provided IRIDIS6 Stage18/20/21/22 logs. These are historical snapshots, not live telemetry. No HPC data or CIME cases were changed by the GitHub documentation update.
 
-- Official AmeriFlux \`FLUXMET_HH\` \`*_F\` already incorporates release-provided gap-filling (QC0 measured, QC1 MDS, QC2 downscaled reanalysis). Our *additional* QC v5 follows the original [8-site QC v5 engine](../FLUXNET_MultiSite_8/scripts/03_prepare_eight_site_forcing_v5.py): physics checks, short isolated-gap interpolation (2 half-hours SW, 4 most other variables), ERA5_HH fallback for longer gaps, humidity reconciliation and review ledgers.
-- [Stage18 pinned adapter](scripts/stage18/18_run_original_qcv5_for_ten_pinned_sites.py) produced nine candidates in \`qcv5_trial_20261021T232839Z\`. That historical run was **9/10 with US-Bar FAIL**, so its \`INCOMPLETE\` marker must **not** be removed merely because the site was separately recovered. The original eight-site engine SHA256 was \`61be3c46b69ee77739019fab499c94dd1fc1f66a77b1c830815e33baf5351a35\`.
-- [Stage20 US-Bar isolated QC v5 sensitivity](scripts/stage20/20_us_bar_scoped_qcv5_sensitivity.py) generated a tenth **numerical candidate**, independently stored under \`usbar_scoped_trial_20261021T234357Z\`. The three QC2 records on 2004-01-14 08:00, 08:30, and 09:00 used the historical code's RH 1% floor after a narrowly scoped extra negative-RH allowance. Both source FLUXMET and ERA5 shared the anomaly; **independent observational validation is absent**.
+- Official AmeriFlux `FLUXMET_HH` `*_F` already incorporates release-provided gap-filling (QC0 measured, QC1 MDS, QC2 downscaled reanalysis). Our *additional* QC v5 follows the original [8-site QC v5 engine](../FLUXNET_MultiSite_8/scripts/03_prepare_eight_site_forcing_v5.py): physics checks, short isolated-gap interpolation (2 half-hours SW, 4 most other variables), ERA5_HH fallback for longer gaps, humidity reconciliation and review ledgers.
+- [Stage18 pinned adapter](scripts/stage18/18_run_original_qcv5_for_ten_pinned_sites.py) produced nine candidates in `qcv5_trial_20261021T232839Z`. That historical run was **9/10 with US-Bar FAIL**, so its `INCOMPLETE` marker must **not** be removed merely because the site was separately recovered. The original eight-site engine SHA256 was `61be3c46b69ee77739019fab499c94dd1fc1f66a77b1c830815e33baf5351a35`.
+- [Stage20 US-Bar isolated QC v5 sensitivity](scripts/stage20/20_us_bar_scoped_qcv5_sensitivity.py) generated a tenth **numerical candidate**, independently stored under `usbar_scoped_trial_20261021T234357Z`. The three QC2 records on 2004-01-14 08:00, 08:30, and 09:00 used the historical code's RH 1% floor after a narrowly scoped extra negative-RH allowance. Both source FLUXMET and ERA5 shared the anomaly; **independent observational validation is absent**.
 - [Stage21 ten-site numerical/provenance auditor](scripts/stage21/21_verify_ten_qcv5_candidates.py) reported **10/10 numerical PASS, 1,292 logged variable-time edits, 528 manual-review records, 518 changes carrying official QC0 flags, 0 residual RH<=0, and 27 positive RH<1%**. PASS is *not* science approval.
-- [Stage22 extreme/source-continuity auditor](scripts/stage22/22_post_qcv5_extremes_source_switches.py) (verified build \`20261022_stage22_end_year_fix_v2\`) reported **894 candidate half-hour TA jumps >8°C (0 new jumps introduced by QCv5), 2,306 candidate TA differences from ERA5 >15°C, 518 official QC0 edits and 0 nonpositive RH**. These are **review flags**, not proof that observations are wrong.
+- [Stage22 extreme/source-continuity auditor](scripts/stage22/22_post_qcv5_extremes_source_switches.py) (verified build `20261022_stage22_end_year_fix_v2`) reported **894 candidate half-hour TA jumps >8°C (0 new jumps introduced by QCv5), 2,306 candidate TA differences from ERA5 >15°C, 518 official QC0 edits and 0 nonpositive RH**. These are **review flags**, not proof that observations are wrong.
 - Example QC0 distributions from Stage21: CA-LP1 400; CA-Man 97; CA-Ca3 10; US-Aud 11. CA-LP1 alone has 1,943 post-QCv5 TA–ERA differences >15°C; investigate time/source, footprint and physical plausibility, not blind reanalysis replacement. All BIF-derived ZBOT, grid/footprint PFT representativeness, dynamic DATM time records and FATES spin-up remain to do.
 
 ### Single post-v5 audit entry point (stages 21 and 22)
 
 [Stage23 post-QCv5 runner](scripts/stage23/23_run_post_qcv5_science_gates.sh) is a **reproducible read-only launcher**, not a new QC algorithm. It fetches an explicitly pinned revision of stages 21/22 into a temporary directory, runs preflight, then optionally writes only timestamped QC report CSVs. It **does not** rerun stages 18/20 or alter either historical candidate, source ZIP, DATM, surface, or spin-up. Run on IRIDIS6 with **direct GitHub download instead of git pull**:
 
-\`\`\`bash
+```bash
 BASE="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10"
 RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
 mkdir -p "$BASE/scripts/stage23"
@@ -28,7 +28,7 @@ bash -n "$BASE/scripts/stage23/23_run_post_qcv5_science_gates.sh"
 bash "$BASE/scripts/stage23/23_run_post_qcv5_science_gates.sh" check
 # Re-run the already completed audits ONLY when needed:
 # bash "$BASE/scripts/stage23/23_run_post_qcv5_science_gates.sh" audit
-\`\`\`
+```
 
 **Scientific acceptance gates before DATM (all pending):**
 
