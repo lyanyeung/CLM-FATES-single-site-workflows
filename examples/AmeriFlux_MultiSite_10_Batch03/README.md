@@ -419,6 +419,53 @@ SCRIPT="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Ba
 Stage06 creates only timestamped reports in `reports/stage06_repair_scope_...`;
 no source files, surfaces, forcing, cases or Slurm jobs are modified.
 
+## Stage07: checksum-gated native QCv5 candidate trial (NOT DATM-ready)
+
+The operator Stage06 report `stage06_repair_scope_20261022T023738Z_0a4d314f`
+confirms 42,892 primary and 40,190 paired-ERA source events,
+10,469 primary P0 numeric-screen events, 31,732 P2/P3 low-positive-RH
+events, and no missing primary source timestamps/variable gaps. These
+screens do not establish which values are genuine sensor errors.
+
+[Stage07 driver](scripts/stage07/07_build_batch03_qcv5_candidates.py)
+and [historical native engine](scripts/stage07/qcv5_native.py) adapt the
+Batch02 isolated trial. The former verifies pinned Stage06 report hashes,
+manifest years, primary/ERA file hashes, and native HH/HR source identity.
+US-MMS remains hourly, US-Me2 uses FULLSET_HH, and every other site uses
+FLUXMET_HH. Run `--check` before any candidate construction.
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch03'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage07"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  for FILE in scripts/stage07/qcv5_native.py \
+              scripts/stage07/07_build_batch03_qcv5_candidates.py; do
+    curl -fLsS --retry 3 "$RAW/$REL/$FILE" -o "$BASE/$FILE"
+  done
+  SCOPE='/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage06_repair_scope_20261022T023738Z_0a4d314f'
+  "$PYTHON_BIN" -B "$BASE/scripts/stage07/07_build_batch03_qcv5_candidates.py" \
+    --scope-report "$SCOPE" --check
+)
+```
+
+A successful preflight prints `PREFLIGHT: 10/10 exact releases, 20/20 raw
+SHA256 verified` and `CHECK ONLY: no outputs created`. Do not use any
+trial for DATM or spin-up until a full post-QCv5 independent science review
+passes. For trial build, explicitly run the same driver with `--run`
+instead of `--check`, after reviewing the preflight. A trial writes
+only into a fresh `qcv5_native_trial_...` directory; no raw products,
+original surfaces, cases or Slurm jobs are modified. The engine retains
+the historical QCv5 treatment, including logged humidity reconstruction
+and 1% ERA-RH floor events requiring manual review. It is **not** a
+claim that the historical rules are optimal for arid Batch03 sites;
+particularly inspect US-MtB, US-Mpj and US-NR3 outcomes.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
