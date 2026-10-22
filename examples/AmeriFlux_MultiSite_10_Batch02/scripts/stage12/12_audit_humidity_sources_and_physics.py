@@ -10,6 +10,7 @@ HEADER ONLY; existence is not evidence of independent or reliable coverage.
 NO repairs, forcing overlays, DATM, CIME, queue changes or overwrites.
 """
 import argparse
+import csv
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -24,6 +25,22 @@ ROOT = Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_
 DEFAULT_STAGE11 = ROOT / "stage11_cold_humidity_review_20261022T020911Z_2ad6f27b"
 EXPECTED = {"US-EML":1327,"US-GLE":295,"US-Ho1":917,"US-ICh":169,"US-ICt":2176}
 MOISTURE = re.compile(r"(^RH($|_)|DEW|TDEW|DEWP|D2M|(^|_)TD($|_)|HUMID|HUSS|SPECIFIC[_ ]?HUM|QBOT|(^|_)Q_ERA$)", re.I)
+
+def csv_header_only(path):
+    """Inventory header only, without asking pandas to tokenize the file body.
+
+    Several AmeriFlux auxiliary CSVs contain legacy cp1252/Latin-1 bytes,
+    including 0xb5 (micro sign), which can occur inside pandas' read buffer
+    even for read_csv(nrows=0). Replacing undecodable characters is only
+    permitted here for a non-scientific column-name inventory; actual numeric
+    source parsing and hash checks remain strict and unmodified.
+    """
+    with path.open("r", encoding="utf-8-sig", errors="replace", newline="") as stream:
+        try:
+            return next(csv.reader(stream))
+        except StopIteration:
+            return []
+
 
 def digest(path):
     h = hashlib.sha256()
@@ -83,7 +100,7 @@ def run(args):
             pins[str(file)]=pinned
         # Preserve native release provenance: do not search another site's files.
         for f in sorted(primary.parent.glob("*.csv")):
-            columns=list(pd.read_csv(f,nrows=0).columns)
+            columns=csv_header_only(f)
             hits=[c for c in columns if MOISTURE.search(str(c))]
             if hits:
                 source_inventory.append(dict(
