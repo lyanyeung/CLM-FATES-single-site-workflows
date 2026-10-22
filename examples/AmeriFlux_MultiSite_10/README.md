@@ -60,13 +60,26 @@ python3 "$BASE/scripts/stage24/24_build_post_qcv5_science_review_queue.py" --run
 
 [Stage25 source-context reviewer](scripts/stage25/25_review_qc0_extremes_with_original_context.py) combines the completed Stage24 review queue with exact pinned FLUXMET/ERA5 and the ten separate QCv5 candidate outputs. It reports the 518 official-QC0 changes, near-zero RH, TA/VPD extremes, and ±4-hour local evidence without changing any forcing. **Not an automatic replacement and not a science approval.** Run with `--check` then `--run`; reports are isolated in `reports/stage25_targeted_science_evidence_*`.
 
-### Stage26 BIF height evidence (parallel to unresolved meteorological science gate)
+### Shared AmeriFlux BASE measurement-height source (22 October 2026)
 
-[Stage26 read-only BIF TA/WS height audit](scripts/stage26/26_audit_ten_BIF_TA_WS_ZBOT_evidence.py) uses the exact ten pinned release BIF CSV files to find dated air-temperature sensor `TA_F` and wind sensor `WS_F` heights, including duplicates, conflicting epochs, height date precision, SHA256, early NO_LEAP coverage gaps and height mismatches. For model DATM, `ZBOT` should reference the relevant air-temperature measurement height, **not** automatically the EC or wind sensor level. Missing/undated periods are not filled without an explicit policy. This stage never writes a DATM or modifies any candidate forcing. The meteorological Stage25 science gate remains HOLD.
+The complete user-provided [BASE measurement-height CSV (2026-09-08 snapshot)](../AmeriFlux_sites/metadata/BASE_MeasurementHeight_20260908.csv) is now stored **once**, centrally for all AmeriFlux batches. It includes 40,306 measurement-variable rows for 587 sites. The raw upload SHA256 as received was `1c1e4171d295406a13d503f877b58661a651c88ffb6f0b6ec498f56bb1fcec5a`. On read/download, verify the archived GitHub file as the source-of-truth snapshot; its immutable name identifies the data-vintage date. Do not overwrite this historical snapshot with future monthly updates.
 
-### Stage26/27 BIF height interpretation update
+**Do not run old BIF height Stage26 or Stage27:** those scripts were removed because the FLUXNET BIF release files lack `VAR_INFO_*` source fields. The old BIF *geolocation* code stays because it solves an unrelated problem. Use [shared BASE height reviewer](../AmeriFlux_sites/scripts/28_audit_shared_BASE_measurement_heights.py) with [exact ten-site manifest](sites.tsv) instead. This produces candidate TA/WS variable-height tables and flags multi-sensor assignments and undated start periods; neither the CSV nor the reader proves which tower temperature level corresponds to FLUXNET `TA_F`.
 
-Operator Stage26 (22 October 2026) opened 10/10 exact-release BIF files but found **zero** exact TA_F and WS_F dated height epochs in all ten stations. **This is a parsing/metadata coverage result, not evidence that site instrument heights are zero, missing everywhere, or 2 m.** Do not extrapolate ZBOT or create DATM. [Stage27 diagnostic](scripts/stage27/27_inspect_ameriflux_BIF_structure_and_height_aliases.py) inventories the original CSV schema, VAR_INFO fields, grouping and alternate variable names without making height assumptions; next step is to inspect Stage27 and, if necessary, source separately documented AmeriFlux measurement-height/site metadata.
+To run on IRIDIS6 without `git pull`:
+
+```bash
+ROOT="$HOME/CLM-FATES-single-site-workflows/examples"
+mkdir -p "$ROOT/AmeriFlux_sites/metadata" "$ROOT/AmeriFlux_sites/scripts"
+RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_sites/metadata/BASE_MeasurementHeight_20260908.csv" -o "$ROOT/AmeriFlux_sites/metadata/BASE_MeasurementHeight_20260908.csv"
+curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_sites/scripts/28_audit_shared_BASE_measurement_heights.py" -o "$ROOT/AmeriFlux_sites/scripts/28_audit_shared_BASE_measurement_heights.py"
+curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10/sites.tsv" -o "$ROOT/AmeriFlux_MultiSite_10/sites.tsv"
+python3 "$ROOT/AmeriFlux_sites/scripts/28_audit_shared_BASE_measurement_heights.py" --check
+python3 "$ROOT/AmeriFlux_sites/scripts/28_audit_shared_BASE_measurement_heights.py" --audit
+```
+
+**Remaining science gate:** do not assign EC tower/WS heights as ZBOT by assumption; confirm matching `TA` / `TA_PI_F` / indexed sensor variable and effective dates, including undated or partial dates, before constructing provisional dynamic ZBOT. Met Stage25 science approval also remains open, and no DATM or spin-up exists for Batch01.
 
 ### Data version policy
 
