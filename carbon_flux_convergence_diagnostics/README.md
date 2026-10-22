@@ -35,6 +35,28 @@ The standard **CLM5 `natpft` (0–14)** mapping is cross-checked with the [CTSM 
 | FR-Fon | DBF | **C3_GRASS** (index 13) | 71.84% | 49.20% | 50.80% | Deciduous broadleaf tree 20.06% | Deciduous broadleaf tree 99.60% |
 | GL-ZaH | GRA / Arctic tundra | **BARE** (index 0) | 74.41% | 100.00% | 0.00% | Evergreen broadleaf tree 29.42% | Arctic C3 grass 69.83% |
 
+### Ground-truthed EC vegetation vs FATES end-state
+
+| Station | EC tower actual dominant vegetation | FATES final dominant PFT | Scientific match |
+|---|---|---|---|
+| DE-Hai | Beech-dominated deciduous forest | Broadleaf deciduous | BROAD MATCH |
+| RU-Fyo | Spruce forest with birch / moss | Broadleaf deciduous | MISMATCH |
+| DE-Tha | Norway spruce forest | Broadleaf deciduous | MISMATCH |
+| DK-Sor | European beech forest | Broadleaf deciduous | BROAD MATCH |
+| NL-Loo | Scots pine plantation (~89% land cover within 500 m) | Broadleaf deciduous | MISMATCH |
+| IL-Yat | Planted Aleppo pine forest | C4 grass | MISMATCH |
+| AT-Neu | Managed grass/forb meadow | Broadleaf deciduous | MISMATCH |
+| BE-Bra | Scots pine tower stand; mixed landscape | Broadleaf deciduous | MISMATCH |
+| CH-Cha | Managed ryegrass/clover grassland | Broadleaf deciduous | MISMATCH |
+| CH-Fru | Grassland/pasture with grasses and legumes | Broadleaf deciduous | MISMATCH |
+| CH-Lae | Mixed beech/ash/maple/fir/spruce forest | Broadleaf deciduous | PARTIAL |
+| CZ-Stn | European beech forest | Cool C3 grass | MISMATCH |
+| FI-Sod | Scots pine boreal forest | Broadleaf deciduous | MISMATCH |
+| FR-Fon | Deciduous oak forest with hornbeam | Broadleaf deciduous | BROAD MATCH |
+| GL-ZaH | Arctic Cassiope dwarf-shrub heath | Arctic C3 grass | MISMATCH |
+
+**Classification:** 3 broad-type matches, 1 partial mixed-forest match, 11 dominant vegetation mismatches. Real species/community descriptions are supported by station information and research references in [EC_TOWER_VEGETATION_AND_MODEL_MATCH.md](EC_TOWER_VEGETATION_AND_MODEL_MATCH.md). These are broad functional-composition judgments, not a numerical validation of species cover fractions against FATES vegetation-carbon shares. **A model can pass VegC/NEE/GPP convergence and still represent the wrong tower vegetation.**
+
 **PFT key:** NET_TEMP = needleleaf evergreen temperate tree; NET_BOREAL = needleleaf evergreen boreal tree; C3_GRASS = non-Arctic C3 grass; C3_ARCTIC = Arctic C3 grass; BARE = bare soil. FATES first-year/final percentages are shares of **living vegetation carbon**; they are not CLM natural-landunit percentages or canopy-area shares.
 
 **Main scientific findings:** The extracted CLM natural vegetation is dominated by **C3 non-Arctic grass** at DE-Hai, DE-Tha, DK-Sor, NL-Loo, BE-Bra, CH-Cha, CH-Lae, CZ-Stn and FR-Fon (9 sites). RU-Fyo and FI-Sod have natural-landunit PFTs led by **temperate and boreal evergreen needleleaf trees**, respectively, but dynamic FATES later strongly favored deciduous broadleaf trees. IL-Yat's extracted natural component is **52.23% bare ground**, with only **0.96% temperate evergreen needleleaf tree** even though the EC tower is ENF; dynamic FATES became entirely C4 grass. AT-Neu and CH-Fru are led by Arctic C3 grasses in the coarse CLM surface; this may be unsuitable for some managed alpine grasslands and must be checked against local vegetation. GL-ZaH's source is mainly bare ground plus Arctic C3 grass, broadly plausible for Arctic tundra, but canopy, bryophyte and shrub representation is unresolved. The reported `PCT_CROP` is unusually high at several forest sites; whether a separate crop landunit is active under full FATES depends on case flags and must not be inferred from surface data alone.
