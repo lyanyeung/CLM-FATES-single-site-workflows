@@ -1,9 +1,12 @@
 # AmeriFlux sites — CLM-FATES experiment collection
 
-This collection keeps the new AmeriFlux batches separate from the existing [ICOS multi-site campaigns](../ICOS_sites/) and the [AmeriFlux US-Ha1 single-site example](../AmeriFlux_US-Ha1/).
+This collection keeps AmeriFlux batches separate from the existing [ICOS multi-site campaigns](../ICOS_sites/) and the [AmeriFlux US-Ha1 single-site example](../AmeriFlux_US-Ha1/).
 
-| Batch | Sites | Phase |
+| Batch | Sites | Current record |
 | --- | ---: | --- |
-| [AmeriFlux Batch 01](../AmeriFlux_MultiSite_10/) | 10 | Stage 01/02 PASS (10/10); Stage 03 surfaces created (10/10); Stage 04 source and PFT auditors ready (not yet executed) |
+| [AmeriFlux Batch 01](../AmeriFlux_MultiSite_10/) | 10 | See the batch-specific operational record and scripts |
+| **[AmeriFlux Batch 02](../AmeriFlux_MultiSite_10_Batch02/)** | 10 | Stages00–07 published. Operator Stage07: 5 numeric candidates; 5 sites blocked by 4,904 unresolved humidity pairs. Stage08 RH sensitivity is in preparation. |
 
-These new inputs are not yet validated forcing, DATM or CLM-FATES cases. No Slurm jobs were submitted by this repository update. Raw, licensed tower data and large model NetCDF remain on local/IRIDIS storage rather than GitHub.
+Batch02 sites: US-BZS, US-CMW, US-EML, US-GLE, US-Ha1, US-Ho1, US-Ho2, US-Ho3, US-ICh and US-ICt. Its [exact releases](../AmeriFlux_MultiSite_10_Batch02/sites.tsv), [operating instructions](../AmeriFlux_MultiSite_10_Batch02/README.md) and [stage scripts](../AmeriFlux_MultiSite_10_Batch02/scripts/) are maintained as a separate case under `main/examples/`.
+
+Batch02 candidates are not approved forcing or model cases. No DATM or Slurm jobs were created for this batch. Raw tower packages and large model NetCDFs remain on local/IRIDIS storage rather than GitHub.

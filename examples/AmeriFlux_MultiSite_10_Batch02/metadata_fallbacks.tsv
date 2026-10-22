@@ -1,0 +1,3 @@
+site	package	latitude	longitude	igbp	source_url	retrieved_date	notes
+US-BZS	AMF_US-BZS_FLUXNET_FULLSET_2010-2024_5-7	64.6963	-148.3235	ENF	https://ameriflux.lbl.gov/sites/siteinfo/US-BZS	2026-10-21	Official site-page search extract; current site metadata, not embedded release BIF. Mature black spruce on permafrost peat plateau; soil and footprint review remains pending.
+US-Ho1	AMF_US-Ho1_FLUXNET_FULLSET_1996-2023_3-6	45.2040	-68.7402	ENF	https://ameriflux.lbl.gov/sites/siteinfo/US-Ho1	2026-10-21	Official site-page search extract; current site metadata, not embedded release BIF. Howland main tower; do not substitute nearby Ho2 or Ho3 coordinates.
