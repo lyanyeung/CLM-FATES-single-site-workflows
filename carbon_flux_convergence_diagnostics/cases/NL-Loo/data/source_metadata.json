@@ -1,0 +1,122 @@
+{
+  "site": "NL-Loo",
+  "case": "NL-Loo_FATES_SPINUP500",
+  "data_assessed_at_utc": "2026-10-21T22:29:08.052304+00:00",
+  "initial_model_start_year": 1997,
+  "forcing_years": [
+    1997,
+    2025
+  ],
+  "source_model_years": [
+    1997,
+    3456
+  ],
+  "archived_history_count": 1460,
+  "last_three_component_checkpoint": "/scratch/ly3n24/CTSM_FATES_OUTPUTS/archive/NL-Loo_FATES_SPINUP500/rest/3457-01-01-00000",
+  "last_three_component_checkpoint_modelyear": 3457,
+  "checkpoint_verified_by_file_presence_only": true,
+  "missing_years_before_checkpoint": [],
+  "missing_years_total": 0,
+  "IGBP_from_original_BIF": [
+    "ENF"
+  ],
+  "repository_IGBP": "ENF",
+  "fates_flags": {
+    "use_fates": ".true.",
+    "use_fates_sp": ".false.",
+    "use_fates_fixed_biogeog": ".false.",
+    "use_fates_nocomp": ".false.",
+    "create_crop_landunit": ".false.",
+    "use_crop": ".false."
+  },
+  "fates_paramfile": "/iridisfs/scratch/ly3n24/CLM_FATES/CTSM/cime/../src/fates/parameter_files/fates_params_default.json",
+  "PFT": {
+    "last_PFT_model_year": 3456,
+    "dominant_PFT_name": "broadleaf_colddecid_extratrop_tree",
+    "dominant_PFT_slot": 6,
+    "dominant_VEGC_pct": 99.47220014777966
+  },
+  "plots": [
+    "/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/convergence_snapshots/20261021T222202Z_archive_snapshot/NL-Loo/NL-Loo_01_carbon_pools_annual_mean.png",
+    "/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/convergence_snapshots/20261021T222202Z_archive_snapshot/NL-Loo/NL-Loo_02_carbon_pools_last250years.png",
+    "/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/convergence_snapshots/20261021T222202Z_archive_snapshot/NL-Loo/NL-Loo_04_FATES_PFT_VEGC_evolution.png",
+    "/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/convergence_snapshots/20261021T222202Z_archive_snapshot/NL-Loo/NL-Loo_GPP_NEE_monthly_overview.png"
+  ],
+  "flux": {
+    "cycle_model_years": [
+      3418,
+      3446
+    ],
+    "original_ec_flux_file": "/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/NL-Loo/forcing/raw/ICOS_NL-Loo_FLUXNET_1997-2026_v1.3_r1/ICOS_NL-Loo_FLUXNET_FLUXMET_HH_1997-2026_v1.3_r1.csv",
+    "gpp_column": "GPP_DT_VUT_REF",
+    "monthly_metrics": [
+      {
+        "Site": "NL-Loo",
+        "Flux": "GPP",
+        "Scale": "monthly",
+        "N": 348,
+        "R": 0.9148670501107369,
+        "R2": -0.04132570956164949,
+        "RMSE": 2.39517700159581,
+        "MAE": 1.8495383336519478,
+        "Bias": 1.0397867655467001,
+        "ModelCycleFirst": 3418,
+        "ModelCycleLast": 3446
+      },
+      {
+        "Site": "NL-Loo",
+        "Flux": "NEE",
+        "Scale": "monthly",
+        "N": 348,
+        "R": 0.8258321793846504,
+        "R2": -1.7404866288218233,
+        "RMSE": 2.3603633060810374,
+        "MAE": 2.0607183925801524,
+        "Bias": 1.2772980801633438,
+        "ModelCycleFirst": 3418,
+        "ModelCycleLast": 3446
+      }
+    ]
+  },
+  "flux_error": null,
+  "carbon_units": {
+    "TOTECOSYSC": {
+      "factor": 1.0,
+      "input": "gC/m^2",
+      "output": "g C m-2"
+    },
+    "TOTSOMC": {
+      "factor": 1.0,
+      "input": "gC/m^2",
+      "output": "g C m-2"
+    },
+    "TOTLITC": {
+      "factor": 1.0,
+      "input": "gC/m^2",
+      "output": "g C m-2"
+    },
+    "FATES_VEGC": {
+      "factor": 1.0,
+      "input": "kg m-2",
+      "output": "kg m-2"
+    },
+    "FATES_STOREC": {
+      "factor": 1.0,
+      "input": "kg m-2",
+      "output": "kg m-2"
+    },
+    "FATES_STRUCTC": {
+      "factor": 1.0,
+      "input": "kg m-2",
+      "output": "kg m-2"
+    }
+  },
+  "important_limitations": [
+    "Numerical 1%/100yr is an exploratory drift SCREEN, not an equilibrium certificate.",
+    "Forcing phase alignment uses complete adjacent original DATM cycles.",
+    "Observed IGBP and simulated PFT biomass percentages are different metrics.",
+    "NetCDF h0a may have been moved to Research Filestore; no active run files are read.",
+    "Missing checkpoints or annual histories prohibit a complete run claim.",
+    "No site-specific tree inventory or harvesting was applied in the original Full FATES run."
+  ]
+}

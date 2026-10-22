@@ -1,0 +1,122 @@
+{
+  "site": "DE-Hai",
+  "case": "DE-Hai_FATES_SPINUP500",
+  "data_assessed_at_utc": "2026-10-21T22:22:46.334105+00:00",
+  "initial_model_start_year": 2000,
+  "forcing_years": [
+    2000,
+    2025
+  ],
+  "source_model_years": [
+    2000,
+    2999
+  ],
+  "archived_history_count": 1000,
+  "last_three_component_checkpoint": "/scratch/ly3n24/CTSM_FATES_OUTPUTS/archive/DE-Hai_FATES_SPINUP500/rest/3000-01-01-00000",
+  "last_three_component_checkpoint_modelyear": 3000,
+  "checkpoint_verified_by_file_presence_only": true,
+  "missing_years_before_checkpoint": [],
+  "missing_years_total": 0,
+  "IGBP_from_original_BIF": [
+    "DBF"
+  ],
+  "repository_IGBP": "DBF",
+  "fates_flags": {
+    "use_fates": ".true.",
+    "use_fates_sp": ".false.",
+    "use_fates_fixed_biogeog": ".false.",
+    "use_fates_nocomp": ".false.",
+    "create_crop_landunit": ".false.",
+    "use_crop": ".false."
+  },
+  "fates_paramfile": "/iridisfs/scratch/ly3n24/CLM_FATES/CTSM/cime/../src/fates/parameter_files/fates_params_default.json",
+  "PFT": {
+    "last_PFT_model_year": 2999,
+    "dominant_PFT_name": "broadleaf_colddecid_extratrop_tree",
+    "dominant_PFT_slot": 6,
+    "dominant_VEGC_pct": 99.3097519483806
+  },
+  "plots": [
+    "/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/convergence_snapshots/20261021T222202Z_archive_snapshot/DE-Hai/DE-Hai_01_carbon_pools_annual_mean.png",
+    "/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/convergence_snapshots/20261021T222202Z_archive_snapshot/DE-Hai/DE-Hai_02_carbon_pools_last250years.png",
+    "/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/convergence_snapshots/20261021T222202Z_archive_snapshot/DE-Hai/DE-Hai_04_FATES_PFT_VEGC_evolution.png",
+    "/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/convergence_snapshots/20261021T222202Z_archive_snapshot/DE-Hai/DE-Hai_GPP_NEE_monthly_overview.png"
+  ],
+  "flux": {
+    "cycle_model_years": [
+      2962,
+      2987
+    ],
+    "original_ec_flux_file": "/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/DE-Hai/forcing/raw/ICOS_DE-Hai_FLUXNET_2000-2025_v1.3_r1/ICOS_DE-Hai_FLUXNET_FLUXMET_HH_2000-2025_v1.3_r1.csv",
+    "gpp_column": "GPP_DT_VUT_REF",
+    "monthly_metrics": [
+      {
+        "Site": "DE-Hai",
+        "Flux": "GPP",
+        "Scale": "monthly",
+        "N": 307,
+        "R": 0.941643242796823,
+        "R2": 0.8785022866809976,
+        "RMSE": 1.5435270650120778,
+        "MAE": 1.0457986107798452,
+        "Bias": 0.39513128762033484,
+        "ModelCycleFirst": 2962,
+        "ModelCycleLast": 2987
+      },
+      {
+        "Site": "DE-Hai",
+        "Flux": "NEE",
+        "Scale": "monthly",
+        "N": 307,
+        "R": 0.8665581894702499,
+        "R2": 0.6065857295420547,
+        "RMSE": 2.189929408937272,
+        "MAE": 1.7285068653011033,
+        "Bias": 1.3248706564010329,
+        "ModelCycleFirst": 2962,
+        "ModelCycleLast": 2987
+      }
+    ]
+  },
+  "flux_error": null,
+  "carbon_units": {
+    "TOTECOSYSC": {
+      "factor": 1.0,
+      "input": "gC/m^2",
+      "output": "g C m-2"
+    },
+    "TOTSOMC": {
+      "factor": 1.0,
+      "input": "gC/m^2",
+      "output": "g C m-2"
+    },
+    "TOTLITC": {
+      "factor": 1.0,
+      "input": "gC/m^2",
+      "output": "g C m-2"
+    },
+    "FATES_VEGC": {
+      "factor": 1.0,
+      "input": "kg m-2",
+      "output": "kg m-2"
+    },
+    "FATES_STOREC": {
+      "factor": 1.0,
+      "input": "kg m-2",
+      "output": "kg m-2"
+    },
+    "FATES_STRUCTC": {
+      "factor": 1.0,
+      "input": "kg m-2",
+      "output": "kg m-2"
+    }
+  },
+  "important_limitations": [
+    "Numerical 1%/100yr is an exploratory drift SCREEN, not an equilibrium certificate.",
+    "Forcing phase alignment uses complete adjacent original DATM cycles.",
+    "Observed IGBP and simulated PFT biomass percentages are different metrics.",
+    "NetCDF h0a may have been moved to Research Filestore; no active run files are read.",
+    "Missing checkpoints or annual histories prohibit a complete run claim.",
+    "No site-specific tree inventory or harvesting was applied in the original Full FATES run."
+  ]
+}

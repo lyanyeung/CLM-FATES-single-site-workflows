@@ -1,0 +1,109 @@
+{
+  "site": "BE-Bra",
+  "case": "BE-Bra_FATES_SPINUP500_11P",
+  "status": "OK",
+  "ec_error": "",
+  "archive_years_verified": 1000,
+  "archive_start_end": [
+    1996,
+    2995
+  ],
+  "forcing_first_last": [
+    1996,
+    2025
+  ],
+  "last_complete_model_cycle": [
+    2956,
+    2985
+  ],
+  "ec_csv": "/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/BE-Bra/forcing/raw/ICOS/ICOS_BE-Bra_FLUXNET_FLUXMET_HH_1999-2024_v1.3_r1.csv; /iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/BE-Bra/forcing/raw/ICOSETC/ICOSETC_BE-Bra_FLUXNET_FLUXMET_HH_2020-2025_v1.3_r1.csv; /iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/BE-Bra/forcing/raw/FLX/FLX_BE-Bra_FLUXNET2015_FULLSET_HH_1996-2020_beta-3.csv",
+  "ec_gpp_column": "GPP_DT_VUT_REF",
+  "ec_source_daily_provenance": [
+    {
+      "path": "/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/BE-Bra/forcing/raw/ICOS/ICOS_BE-Bra_FLUXNET_FLUXMET_HH_1999-2024_v1.3_r1.csv",
+      "gpp_column": "GPP_DT_VUT_REF",
+      "valid_GPP_days": 8499,
+      "valid_NEE_days": 8499
+    },
+    {
+      "path": "/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/BE-Bra/forcing/raw/ICOSETC/ICOSETC_BE-Bra_FLUXNET_FLUXMET_HH_2020-2025_v1.3_r1.csv",
+      "gpp_column": "GPP_DT_VUT_REF",
+      "valid_GPP_days": 1909,
+      "valid_NEE_days": 1909
+    },
+    {
+      "path": "/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/BE-Bra/forcing/raw/FLX/FLX_BE-Bra_FLUXNET2015_FULLSET_HH_1996-2020_beta-3.csv",
+      "gpp_column": "GPP_DT_VUT_REF",
+      "valid_GPP_days": 8030,
+      "valid_NEE_days": 8760
+    }
+  ],
+  "ec_merge_policy": "ICOS > ICOSETC > EUF > FLX; valid daily values only",
+  "carbon_units": {
+    "TOTECOSYSC": {
+      "original_units": "gC/m^2",
+      "factor": 1.0,
+      "plot_units": "g C m$^{-2}$",
+      "csv_units": "g C m-2"
+    },
+    "TOTSOMC": {
+      "original_units": "gC/m^2",
+      "factor": 1.0,
+      "plot_units": "g C m$^{-2}$",
+      "csv_units": "g C m-2"
+    },
+    "TOTLITC": {
+      "original_units": "gC/m^2",
+      "factor": 1.0,
+      "plot_units": "g C m$^{-2}$",
+      "csv_units": "g C m-2"
+    },
+    "FATES_VEGC": {
+      "original_units": "kg m-2",
+      "factor": 1.0,
+      "plot_units": "kg m-2",
+      "csv_units": "kg m-2"
+    },
+    "FATES_STOREC": {
+      "original_units": "kg m-2",
+      "factor": 1.0,
+      "plot_units": "kg m-2",
+      "csv_units": "kg m-2"
+    },
+    "FATES_STRUCTC": {
+      "original_units": "kg m-2",
+      "factor": 1.0,
+      "plot_units": "kg m-2",
+      "csv_units": "kg m-2"
+    },
+    "FATES_NONSTRUCTC": {
+      "original_units": "kg m-2",
+      "factor": 1.0,
+      "plot_units": "kg m-2",
+      "csv_units": "kg m-2"
+    }
+  },
+  "carbon_variables": [
+    "TOTECOSYSC",
+    "TOTSOMC",
+    "TOTLITC",
+    "FATES_VEGC",
+    "FATES_STOREC",
+    "FATES_STRUCTC",
+    "FATES_NONSTRUCTC"
+  ],
+  "flux_units": "g C m-2 d-1",
+  "model_nee": "-FATES_NEP",
+  "ec_nee": "NEE_VUT_REF",
+  "model_gpp": "FATES_GPP",
+  "sci_caveat": "1000 years does not imply carbon-pool or demographic convergence; inspect aligned cycle metrics and long-term trends",
+  "output_files": [
+    "BE-Bra_01_carbon_pools_annual_mean.png",
+    "BE-Bra_02_carbon_pools_last250years.png",
+    "BE-Bra_GPP_NEE_monthly_overview.png",
+    "BE-Bra_carbon_annual_means.csv",
+    "BE-Bra_convergence_metrics.csv",
+    "BE-Bra_monthly_FATES_vs_EC.csv",
+    "BE-Bra_monthly_metrics.csv"
+  ]
+}
