@@ -583,6 +583,37 @@ writes only isolated `reports/stage08c_era_humidity_...` files.
 The prior Stage07 and Stage08 incomplete markers must remain in place;
 no forcing, DATM, PFT/case changes or Slurm submissions are authorized.
 
+## Stage08f: independent read-only MDS humidity-pair screen
+
+Stage08e completed a SHA256-pinned inventory of all 1,924 residual humidity
+blockers. It found both MDS TA and MDS VPD populated at 1,625 native
+timestamps, while 299 lacked that pair. This is **availability only**,
+not evidence of correct or independent humidity.
+
+[Stage08f](scripts/stage08/08f_audit_mds_humidity_pairs.py) independently
+checks physically consistent MDS TA/VPD pairing, the corresponding QC
+fields, whether MDS VPD remains valid at retained TA, and numerical
+similarity with the original F and ERA companions. It does not modify
+forcing, prior trials, DATM, or jobs; a science review is still mandatory.
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  BASE="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Batch03"
+  mkdir -p "$BASE/scripts/stage08"
+  SCRIPT="$BASE/scripts/stage08/08f_audit_mds_humidity_pairs.py"
+  curl -fLsS --retry 3 \
+    "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage08/08f_audit_mds_humidity_pairs.py" \
+    -o "$SCRIPT"
+  "$CONDA_PREFIX/bin/python" -B "$SCRIPT" --check
+)
+```
+
+After the read-only check, run `"$CONDA_PREFIX/bin/python" -B "$SCRIPT" --run`
+for an isolated `reports/stage08f_mds_pairs_...` report. Successful
+numerical screens are review cues, **not repair approvals**.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
