@@ -366,6 +366,59 @@ A valid run should show `STAGE05 SUMMARY: events=83082` and
 the event-priority/status reports. No source, surface, forcing, DATM,
 case or Slurm job is changed.
 
+## Stage06: primary repair-scope diagnosis (no edits)
+
+Operator Stage05 verified all **83,082/83,082** flagged source rows with
+**zero ledger mismatches**, grouped into 16,820 episodes. Its exact report
+is `stage05_event_review_20261022T023135Z_32b20d9c`, paired with
+`stage04b_met_20261022T022701Z_d845a292` (both in the Batch03
+experiment `reports/` directory). Of the 83,082 source records,
+42,892 are primary product records and 40,190 are companion ERA5 records.
+
+[Stage06](scripts/stage06/06_diagnose_batch03_repair_scope.py)
+cross-validates the Stage04b/Stage05 report snapshots and isolates **primary**
+meteorological issues: numeric/humidity predicates, same-timestamp source
+comparison, original source QC, contiguous episodes and missing-data
+durations. Flags and companion screening are review evidence only, **not**
+an automatic ERA5 replacement or candidate approval. An independent QCv5
+candidate and Post-v5 science gate remain mandatory before DATM.
+
+Run on IRIDIS:
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch03'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage06"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  SCRIPT="$BASE/scripts/stage06/06_diagnose_batch03_repair_scope.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage06/06_diagnose_batch03_repair_scope.py" -o "$SCRIPT"
+  REPORT_ROOT='/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports'
+  SOURCE="$REPORT_ROOT/stage04b_met_20261022T022701Z_d845a292"
+  REVIEW="$REPORT_ROOT/stage05_event_review_20261022T023135Z_32b20d9c"
+  "$PYTHON_BIN" -B "$SCRIPT" --source-report "$SOURCE" --review-report "$REVIEW" --check
+)
+```
+
+After the check passes, execute the same script without `--check`:
+
+```bash
+PYTHON_BIN="$CONDA_PREFIX/bin/python"
+REPORT_ROOT='/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports'
+SCRIPT="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage06/06_diagnose_batch03_repair_scope.py"
+"$PYTHON_BIN" -B "$SCRIPT" \
+  --source-report "$REPORT_ROOT/stage04b_met_20261022T022701Z_d845a292" \
+  --review-report "$REPORT_ROOT/stage05_event_review_20261022T023135Z_32b20d9c" \
+  2>&1 | tee "$HOME/AmeriFlux_Batch03_stage06_$(date +%Y%m%d_%H%M%S).log"
+```
+
+Stage06 creates only timestamped reports in `reports/stage06_repair_scope_...`;
+no source files, surfaces, forcing, cases or Slurm jobs are modified.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
