@@ -234,7 +234,7 @@ def main():
         if digest(p.read_bytes()) != digest(data): raise ValueError("Input report changed during diagnosis: " + str(p))
     if args.check:
         print("STAGE06 PREFLIGHT: 20/20 sources, {} verified events, {} primary events, {} companion events; no reports written".format(
-            len(pairs), len(pairs), len(events), int((~primary).sum())))
+            len(pairs), len(events), int((~primary).sum())))
         print("SOURCE REPORT:", source)
         print("STAGE05 REPORT:", review)
         return 0
