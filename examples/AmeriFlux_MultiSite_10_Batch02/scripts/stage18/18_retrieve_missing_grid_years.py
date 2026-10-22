@@ -242,6 +242,7 @@ def read_receipt(path,folder,key,plan_sha):
     return data
 
 def main():
+    global PLAN
     p=argparse.ArgumentParser(description=__doc__)
     m=p.add_mutually_exclusive_group(required=True)
     m.add_argument("--check",action="store_true")
@@ -251,7 +252,6 @@ def main():
     p.add_argument("--max-new",type=int,default=3,
                    help="Maximum new unique grid-year CDS requests this run (1-10, default 3)")
     args=p.parse_args()
-    global PLAN
     PLAN=args.plan.expanduser().resolve(strict=True)
     if not 1<=args.max_new<=10:
         raise ValueError("--max-new must be between 1 and 10")
