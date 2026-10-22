@@ -261,6 +261,54 @@ This **does not** approve the ecological representativeness of gridded PFT
 fractions or establish time-invariant post-disturbance conditions.
 No surface, DATM, forcing, case or Slurm job is modified.
 
+## Stage04b: full native source meteorology and paired ERA5 screening
+
+The operator's Stage04a log confirms **10/10 surface structural passes**.
+Scientific vegetation representation remains unapproved, especially US-MOz,
+US-MtB, US-Me2/US-Me6, US-Mpj and US-NR1. This does not block separate
+meteorological source screening.
+
+[Stage04b](scripts/stage04/04b_audit_batch03_met_sources.py) audits the
+seven primary meteorological variables and the matching ERA5 products
+for the exact Batch03 release windows. US-MMS is native **HR (60 min)**;
+all other Batch03 primary series are **HH (30 min)**.
+No source repairs, interpolation, DATM or model jobs occur.
+The review bounds and liquid-water RH reconstruction are exploratory,
+not scientific acceptance. Time conventions still require verification.
+
+Run on IRIDIS, first with `--check`:
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  "$PYTHON_BIN" -c 'import numpy, pandas'
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch03'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage04"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  SCRIPT="$BASE/scripts/stage04/04b_audit_batch03_met_sources.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage04/04b_audit_batch03_met_sources.py" -o "$SCRIPT"
+  "$PYTHON_BIN" -B "$SCRIPT" --check
+)
+```
+
+Only after `SOURCE PREFLIGHT: 20/20 sources; 0 failures`, run:
+
+```bash
+PYTHON_BIN="$CONDA_PREFIX/bin/python"
+"$PYTHON_BIN" -B \
+  "$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage04/04b_audit_batch03_met_sources.py" \
+  2>&1 | tee "$HOME/AmeriFlux_Batch03_stage04b_$(date +%Y%m%d_%H%M%S).log"
+```
+
+Outputs are isolated under
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage04b_met_<UTC>_<ID>/`.
+The target summary is 20/20 source audits with no source failures;
+REVIEW flags are expected to need further evidence and site-specific decisions.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
