@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 02
 
-Stages 00–06 prepare reference surfaces, audit source meteorology and diagnose paired events for the ten exact releases in [sites.tsv](sites.tsv):
+Stages 00–07 prepare reference surfaces, audit source meteorology and build isolated native-resolution QC candidates for the ten exact releases in [sites.tsv](sites.tsv):
 US-BZS, US-CMW, US-EML, US-GLE, US-Ha1, US-Ho1, US-Ho2, US-Ho3,
 US-ICh and US-ICt. First-batch scripts and manifests are unchanged.
 
@@ -648,6 +648,120 @@ retention, low-RH retention and missing-episode outputs. Reruns created
 separate reports. Modified paired values and changed pinned Stage04b reports
 were rejected before output creation; source/prior-report hashes and
 modification times were preserved. Live IRIDIS Stage06 results remain pending.
+
+## Stage 07: isolated native HH/HR QC-v5 candidates
+
+The operator's Stage06 log reports 59,314 primary events, 37,459 ERA5 events,
+zero primary missing episodes and zero primary timestamp/interval defects.
+There are 19,723 primary P0 records with screen-clear counterpart support
+and 6,081 without such support. Most primary P0 predicates are nonpositive
+vapor pressure and negative specific humidity from the same TA/VPD/PA
+combination; these causes overlap. The companion also contains anomalies,
+so Stage06 support counts do not establish how many repairs will succeed.
+
+[Stage 07](scripts/stage07/07_build_batch02_qcv5_candidates.py) now builds
+actual, separate candidate CSVs. It uses a
+[native-resolution adaptation](scripts/stage07/qcv5_native.py) of the
+historical eight-site QC-v5 engine, the same method used by AmeriFlux Batch01.
+The historical source is
+`examples/FLUXNET_MultiSite_8/scripts/03_prepare_eight_site_forcing_v5.py`,
+Git blob `f82e43c7d379bfaea370a349e7fe9f842bdc93b3`.
+This is a documented adaptation, not a claim of an unchanged algorithm or
+independent scientific validation. The original eight-site script is untouched.
+
+Before output creation, the driver verifies the Stage06-linked report hashes,
+Stage05 verification totals, manifest year/release/native-interval selection
+and all twenty raw SHA256 values against Stage04b. It prints available
+primary RH column names, but retains the historical TA/VPD humidity method;
+it does not silently substitute another RH field. The standalone ERA5
+product has explicit precedence over embedded ERA columns, matching the
+sources actually compared in Stages04b–06.
+
+The candidate method retains the historical hard screens, corroborated
+isolated-spike and joint-artifact checks, tiny-negative handling, short-gap
+then ERA fallback, and final VPD reconciliation from ERA RH while preserving
+otherwise plausible tower TA. Zero initial missing values does not remove
+the interpolation step: flagged values can become gaps during secondary QC.
+Positive low RH alone does not trigger replacement. The historical
+strong-near-zero-vapor rule still requires corroborating ERA moisture and
+temperature evidence; every such reconstruction remains reviewable.
+
+The native adaptation explicitly handles:
+
+- Native 30-minute data at nine sites and 60-minute data at US-Ha1, without
+  hourly upsampling or duplicated records.
+- Complete internal gaps up to 120 minutes for TA/VPD/PA/LW/WS and 60 minutes
+  for SW. A longer gap is never partly interpolated. Both usable boundaries
+  must be in the same year. Precipitation is not interpolated.
+- At least 180 minutes for the historical joint plateau rule.
+- Accumulated precipitation divided by 1800 seconds for HH or 3600 for HR.
+
+The inherited final humidity rule allows ERA RH in [-2,100.05]% and clips
+the RH used for reconstruction to [1,100]%. This can affect mildly negative
+or positive-below-1% ERA RH when final reconciliation is needed. Every floor
+adjustment is logged and counted explicitly; it is a research candidate,
+not an observed humidity value or a model-stability guarantee. Severe
+unsupported humidity still raises a site failure. No new blanket low-RH
+floor is applied to otherwise retained source records.
+
+After each successful site build, a separate audit checks full NO_LEAP
+chronology, native precipitation units, seven forcing fields, independent
+QBOT reconstruction, raw-to-candidate changes and one-to-one replacement
+events, original source values and original QC codes. It counts actual
+modified QC0 variable records, interpolation/ERA/reconstruction origins,
+manual-review records, RH-floor changes and residual RH bins. Only bin-edge
+classification uses a 1e-9 percentage-point tolerance; candidate data and
+physical validity checks are not changed by that reporting tolerance.
+All input hashes are checked again after the run.
+
+Run both source preflight and candidate generation in one command:
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/ameriflux-batch02-transfer'
+  REL='examples/AmeriFlux_MultiSite_10_Batch02'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage07"
+  for FILE in sites.tsv scripts/stage07/qcv5_native.py scripts/stage07/07_build_batch02_qcv5_candidates.py; do
+    curl -fLsS --retry 3 "$RAW/$REL/$FILE" -o "$BASE/$FILE"
+  done
+  "$PYTHON_BIN" -B "$BASE/scripts/stage07/07_build_batch02_qcv5_candidates.py" \
+    --run \
+    --scope-report '/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch02/reports/stage06_repair_scope_20261021T235441Z_edc8e9e8' \
+    2>&1 | tee "$HOME/AmeriFlux_Batch02_stage07_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+`--check` performs checksum preflight without creating outputs. `--run`
+creates a fresh `qcv5_native_trial_<UTC>_<ID>/` under this batch's experiment
+directory. Per-site candidate CSVs are under `SITE/forcing/processed_v5/`;
+replacement, manual-review, low-RH, status and independent-audit files are
+under `SITE/forcing/qc_v5/`. The root contains `exact_input_manifest.json`,
+`candidate_run_summary.csv`, `input_preservation_check.json` and
+`output_sha256.json`.
+
+Any site failure retains `INCOMPLETE_DO_NOT_USE_FOR_DATM_OR_SPINUP`, preserves
+the other site candidates and exits nonzero. An all-site numeric pass writes
+`COMPLETE_NUMERIC_CANDIDATES_REVIEW_REQUIRED`. Neither marker approves QC0
+changes, RH floors, ZBOT, surface/PFT representation or model use. Existing
+outputs are never overwritten; inputs, surfaces, cases and jobs are untouched.
+Native ERA5-Land is not downloaded. DATM and model runs are not created.
+
+Validation used complete synthetic years for all twenty source products,
+including leap-year source data and the actual Stage04b/05/06 report chain.
+HH candidate forcing, replacement events, manual-review and low-RH CSVs
+matched the historical engine. Ten native candidates passed independent
+audits; tests covered standalone precedence over conflicting embedded ERA,
+HR precipitation rates, duration-limited whole-gap interpolation, retained
+positive low RH, recorded QC0/floor changes, and unchanged source/report
+hashes and modification times. Altered source-QC provenance, changed raw
+hashes and existing output destinations were rejected. Severe unsupported
+companion humidity blocked candidate emission; a failed site retained the
+incomplete marker and the other candidates. These are synthetic validation
+results; live IRIDIS Stage07 results remain pending.
 
 ## Validation boundary
 
