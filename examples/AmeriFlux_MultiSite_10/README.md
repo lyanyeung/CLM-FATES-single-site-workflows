@@ -90,6 +90,10 @@ The **corrected and successfully completed** [shared Stage32 sensor-height audit
 
 Full blocker explanation, original-sensor source, next evidence required and dynamic date-policy cautions are in the [shared AmeriFlux README](../AmeriFlux_sites/README.md#stage32-unresolved-scientific-issue--multi-layer-ta-heights-in-ca-cbo-and-ca-man-22-october-2026). For the other eight sites, Stage31 has **five static and three dynamic provisional** models; their source mapping and early-height assumptions remain scientific review items. **No production DATM/ZBOT or spin-up is scientifically approved** by the height audits; Stage25 meteorological review and PFT checks remain separate.
 
+### Stage33 — pre-spinup surface ecology and host CLM / FATES distinction
+
+[Stage33 read-only surface / ecosystem / PFT audit](scripts/stage33/33_audit_ten_surface_landcover_and_fates_preflight.py) compares all ten exact-release BIF tower IGBP labels against the already generated CTSM 2000 point-surface landunits and host `PCT_NAT_PFT` vectors. It reports crop/natveg percentages, tree/grass PFT surrogates, raw BIF evidence, source SHA256 and scientific review templates. **CLM natural PFT indices are not FATES PFTs**; actual FATES initialization requires inspecting the eventual effective case, FATES parameter file and its initialization choice. Tower footprint does not automatically equal sampled global-grid land cover. No existing surface is edited or recreated; no model case, forcing, DATM or Slurm jobs are started. Execute `--check` then `--audit`, and keep scientific approval pending.
+
 ### Data version policy
 
 Never edit official release CSVs, the original shared QC-v5 engine, or previously generated numerical candidates in place. All site-specific remedies must create new versioned site-limited trial folders and replacement ledgers. The separate Stage20 US-Bar sensitivity is **not** a global change to QCv5 humidity thresholds. ERA5_HH used by the official FLUXNET release is **not** verified independent ERA5-Land; do not claim ERA5-Land replacement occurred. Do not delete or change the Stage18 incomplete marker to imply unified approval.
