@@ -21,3 +21,7 @@ Use the versioned, **complete** user-supplied [2026-09-08 BASE Measurement Heigh
 The older Batch01 Stage26/27 BIF-height scripts were retired and deleted; they assumed FLUXNET BIF `VAR_INFO_*` fields that the ten AmeriFlux BIF files do not contain. **BIF coordinates remain valid as a separate workflow.**
 
 For any batch, supply that batch's `sites.tsv` via `--sites-tsv`. All candidate TA/WS heights retain their original variable names, missing/partial dates, instruments and comments. Do not automatically map an indexed TA level, wind height or EC measurement height to model `ZBOT`. Create a new separately versioned snapshot when the monthly BASE metadata changes; do not overwrite this source file. The numerical QC and meteorological science gates are also separate from the height source audit.
+
+## Stage29 — TA sensor mapping to provisional ZBOT candidates
+
+After the [shared BASE height inventory](scripts/28_audit_shared_BASE_measurement_heights.py), run [Stage29 TA-to-ZBOT mapping review](scripts/29_prepare_BASE_ZBOT_sensor_mapping_candidates.py). It verifies the immutable 2026-09-08 snapshot SHA256, proposes **unapproved** PI/TA candidate mappings, preserves partial START_DATE uncertainty (year-only/month-only), blocks unresolvable multi-level TA records and writes a blank scientific approval template. It creates **no ZBOT time series or DATM**. For Batch01 use its default `sites.tsv`; for later AmeriFlux batches supply `--sites-tsv /path/to/sites.tsv`. Original meteorological science reviews remain open.
