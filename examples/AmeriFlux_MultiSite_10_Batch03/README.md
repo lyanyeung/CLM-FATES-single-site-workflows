@@ -466,6 +466,54 @@ and 1% ERA-RH floor events requiring manual review. It is **not** a
 claim that the historical rules are optimal for arid Batch03 sites;
 particularly inspect US-MtB, US-Mpj and US-NR3 outcomes.
 
+## Stage08: same-release RH sensitivity for seven humidity-blocked sites
+
+The operator's Stage07 live candidate trial:
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/qcv5_native_trial_20261022T024559Z_36c46e58`
+completed **3/10** numeric candidates (US-MOz, US-Mpj, US-NC2);
+seven failed with **2,273** unresolved humidity pairs (US-Kon 359,
+US-Me2 4, US-Me6 1, US-MMS 22, US-MtB 15, US-NR1 173, US-NR3 1699).
+The original trial and incomplete marker must remain untouched.
+
+[Stage08 sensitivity driver](scripts/stage08/08_resolve_blockers_with_raw_rh.py)
+uses the [separate RH engine](scripts/stage08/qcv5_raw_rh.py) to preserve
+the three successful Stage07 candidates by SHA256 and rerun only seven
+blocked sites. Only exact replicated humidity blocker rows may use
+same-release `RH` to reconstruct VPD while preserving the candidate's TA
+and PA. Valid RH does not establish independent measurement provenance;
+all reconstructions require manual QC0/RH provenance review. The driver
+never changes the Stage07 trial or primary sources.
+
+On IRIDIS, **first run the read-only check**:
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch03'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage07" "$BASE/scripts/stage08"
+  for FILE in scripts/stage07/qcv5_native.py \
+              scripts/stage07/07_build_batch03_qcv5_candidates.py \
+              scripts/stage08/qcv5_raw_rh.py \
+              scripts/stage08/08_resolve_blockers_with_raw_rh.py; do
+    curl -fLsS --retry 3 "$RAW/$REL/$FILE" -o "$BASE/$FILE"
+  done
+  TRIAL='/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/qcv5_native_trial_20261022T024559Z_36c46e58'
+  "$PYTHON_BIN" -B "$BASE/scripts/stage08/08_resolve_blockers_with_raw_rh.py" \
+    --stage07-root "$TRIAL" --check
+)
+```
+
+Expected `STAGE08 PREFLIGHT: preserved=3 blocked=7 unresolved_records=2273`
+if all original trial and script hashes match. After reviewing this
+result, `--run` can build the separate sensitivity trial; if any site
+remains blocked, the incomplete marker is retained and a further
+scientific decision is needed. A complete selection is still not
+Post-v5 accepted and is never sufficient to start DATM/spin-up.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
