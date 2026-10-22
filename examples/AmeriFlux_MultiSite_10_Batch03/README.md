@@ -614,6 +614,39 @@ After the read-only check, run `"$CONDA_PREFIX/bin/python" -B "$SCRIPT" --run`
 for an isolated `reports/stage08f_mds_pairs_...` report. Successful
 numerical screens are review cues, **not repair approvals**.
 
+## Stage09a — external dewpoint evidence planning (read-only)
+
+Stage08f finished: 1,535 physically valid MDS TA/VPD pairs (all QC2/3),
+421 VPD values valid at retained TA, 90 physically inconsistent pairs
+and 299 incomplete pairs. **None are approved substitutes.** The
+[Stage09a plan script](scripts/stage09/09a_plan_external_dewpoint_evidence.py)
+produces a 7-site/year CDS ERA5-Land hourly dewpoint/temperature/pressure
+request manifest based on the 1,924 residual blockers. It also inventories
+BIF `UTC_OFFSET` records and labels missing or inconsistent clock metadata
+as unresolved, rather than assuming a timezone. It does not submit API
+requests, interpolate, or change any forcing or model runs.
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch03'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage09"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  SCRIPT="$BASE/scripts/stage09/09a_plan_external_dewpoint_evidence.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage09/09a_plan_external_dewpoint_evidence.py" -o "$SCRIPT"
+  "$CONDA_PREFIX/bin/python" -B "$SCRIPT" --check
+)
+```
+
+After successful check, use `"$CONDA_PREFIX/bin/python" -B "$SCRIPT" --run`
+to produce an isolated `reports/stage09a_external_dewpoint_plan_...`
+containing `era5land_request_plan.json`, `site_utc_offset_inventory.json`
+and `request_summary.csv`. External series need actual time alignment
+and source-evidence review before any further QCv5 candidate trials.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
