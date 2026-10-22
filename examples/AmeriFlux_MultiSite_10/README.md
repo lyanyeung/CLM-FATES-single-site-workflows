@@ -56,6 +56,10 @@ python3 "$BASE/scripts/stage24/24_build_post_qcv5_science_review_queue.py" --run
 
 **Next gate:** human decisions about flagged QC0, temperature episodes, low RH and site ecological representation. No site has scientific approval or DATM yet.
 
+### Stage25 targeted science evidence (next action)
+
+[Stage25 source-context reviewer](scripts/stage25/25_review_qc0_extremes_with_original_context.py) combines the completed Stage24 review queue with exact pinned FLUXMET/ERA5 and the ten separate QCv5 candidate outputs. It reports the 518 official-QC0 changes, near-zero RH, TA/VPD extremes, and ±4-hour local evidence without changing any forcing. **Not an automatic replacement and not a science approval.** Run with `--check` then `--run`; reports are isolated in `reports/stage25_targeted_science_evidence_*`.
+
 ### Data version policy
 
 Never edit official release CSVs, the original shared QC-v5 engine, or previously generated numerical candidates in place. All site-specific remedies must create new versioned site-limited trial folders and replacement ledgers. The separate Stage20 US-Bar sensitivity is **not** a global change to QCv5 humidity thresholds. ERA5_HH used by the official FLUXNET release is **not** verified independent ERA5-Land; do not claim ERA5-Land replacement occurred. Do not delete or change the Stage18 incomplete marker to imply unified approval.
