@@ -38,6 +38,24 @@ bash "$BASE/scripts/stage23/23_run_post_qcv5_science_gates.sh" check
 4. **Forcing-to-DATM inputs:** Verify BIF time-varying ZBOT, station-local timestamps, noleap 30-minute alignment, units, full seven-variable coverage, independent humidity reconstruction and deterministic per-site source checksums.
 5. **Surface ecology:** Site IGBP/PFT/landunits for CA-TP1/3/4 (gridded high cropland), CA-Cbo (grid cropping), US-Aud (grassland), and other stations require footprint-aware scientific approval. **Do not submit spin-up solely because numerical QC passes.**
 
+### Stage24 science-review queue (not another repair)
+
+[Stage24 decision-matrix script](scripts/stage24/24_build_post_qcv5_science_review_queue.py) consumes the **already completed** Stage21 and Stage22 report directories, checks their site totals, and writes prioritized site/episode/timestamp queues plus an explicit list of the 518 source-QC0 edits. It does **not** reread the entire original meteorology or modify any candidates. Historical pinned report paths are defaulted, and can be overridden with `--stage21-dir` / `--stage22-dir`.
+
+Run via direct GitHub download (no `git pull`):
+
+```bash
+BASE="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10"
+RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+mkdir -p "$BASE/scripts/stage24"
+curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10/scripts/stage24/24_build_post_qcv5_science_review_queue.py" -o "$BASE/scripts/stage24/24_build_post_qcv5_science_review_queue.py"
+python3 -m py_compile "$BASE/scripts/stage24/24_build_post_qcv5_science_review_queue.py"
+python3 "$BASE/scripts/stage24/24_build_post_qcv5_science_review_queue.py" --check
+python3 "$BASE/scripts/stage24/24_build_post_qcv5_science_review_queue.py" --run
+```
+
+**Next gate:** human decisions about flagged QC0, temperature episodes, low RH and site ecological representation. No site has scientific approval or DATM yet.
+
 ### Data version policy
 
 Never edit official release CSVs, the original shared QC-v5 engine, or previously generated numerical candidates in place. All site-specific remedies must create new versioned site-limited trial folders and replacement ledgers. The separate Stage20 US-Bar sensitivity is **not** a global change to QCv5 humidity thresholds. ERA5_HH used by the official FLUXNET release is **not** verified independent ERA5-Land; do not claim ERA5-Land replacement occurred. Do not delete or change the Stage18 incomplete marker to imply unified approval.
