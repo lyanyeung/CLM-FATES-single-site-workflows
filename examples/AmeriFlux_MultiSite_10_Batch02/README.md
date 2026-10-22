@@ -1,12 +1,12 @@
 # AmeriFlux MultiSite 10 — Batch 02
 
-Stages 00–07 prepare reference surfaces, audit source meteorology and build isolated native-resolution QC candidates for the ten exact releases in [sites.tsv](sites.tsv):
+Stages 00–08 prepare reference surfaces, audit source meteorology and build isolated native-resolution QC candidates for the ten exact releases in [sites.tsv](sites.tsv):
 US-BZS, US-CMW, US-EML, US-GLE, US-Ha1, US-Ho1, US-Ho2, US-Ho3,
 US-ICh and US-ICt. First-batch scripts and manifests are unchanged.
 
 ## Current operational checkpoint — 22 October 2026
 
-This is the separate Batch02 case under `main/examples/`. Stages00–07 and
+This is the separate Batch02 case under `main/examples/`. Stages00–08 and
 the exact manifests are published here. Transfer, extraction, metadata and
 isolated reference-surface generation have completed for all ten releases;
 source and surface audits remain scientific evidence, not model approval.
@@ -30,9 +30,9 @@ numeric candidates and five failed sites**, with all inputs unchanged.
 The five blocked sites total **4,904 unresolved humidity pairs**. Their
 site-downscaled ERA5 support did not satisfy the inherited QC-v5 final
 humidity rule. Their raw products contain `RH`, but its usability at these
-exact rows has not yet been established. A Stage08 same-release-RH
-sensitivity is being prepared; it is not published or executed at this
-checkpoint.
+exact rows has not yet been established. The [Stage08 same-release-RH
+sensitivity](#stage-08-same-release-rh-sensitivity-for-stage07-blockers)
+is published with synthetic validation; live IRIDIS execution is pending.
 
 Preserve the existing Stage07 trial, its five successful candidates and its
 incomplete marker:
@@ -805,6 +805,93 @@ companion humidity blocked candidate emission; a failed site retained the
 incomplete marker and the other candidates. These are synthetic validation
 results; the operator's live Stage07 outcome is recorded in the current
 operational checkpoint above.
+
+## Stage 08: same-release RH sensitivity for Stage07 blockers
+
+[Stage08](scripts/stage08/08_resolve_blockers_with_raw_rh.py) preserves the
+five successful Stage07 candidates by path and checksum and reruns only the
+five documented humidity-blocked sites. Its separate
+[sensitivity engine](scripts/stage08/qcv5_raw_rh.py) reproduces the Stage07
+failure counts and example rows. All other QC-v5 rules remain as in Stage07.
+The original Stage07 script/engine and its incomplete marker remain intact.
+
+Only the reproduced unresolved rows may use the raw primary-product `RH`
+value at the same native timestamp. RH must be finite and in (0,100]%, with
+plausible current TA/PA and a screened VPD/QBOT reconstruction:
+
+```text
+VPD_candidate = es(TA_after_prior_QC) * (1 - RH_raw / 100)
+```
+
+This fallback changes VPD only and preserves the TA/PA reached by prior QC.
+It adds no RH floor or RH interpolation. Missing, zero, out-of-range RH or
+failed reconstruction remains on HOLD and prevents that site's candidate
+from being selected. RH may share sensor or processing provenance with VPD;
+its source quality is not independently established. Original RH/RH_QC,
+VPD/QC, source CSV row number, TA/PA, ERA evidence, proposed values and
+decisions are recorded for every blocker, including rejected candidates.
+All accepted reconstructions receive explicit manual-review entries.
+
+The driver verifies the Stage07 raw/report/code and output hashes before
+importing its reusable audit helper. It independently checks original RH
+row/timestamp/value/QC, blocker scope, the reconstruction formula, retained
+TA/PA, event scope and manual-review completeness. Successful candidate
+files also pass the Stage07 full numeric/conversion/change-ledger audit.
+Every input and all five preserved candidates are rehashed after execution.
+
+Run on IRIDIS against the exact existing Stage07 trial:
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch02'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage08"
+  for FILE in scripts/stage08/qcv5_raw_rh.py scripts/stage08/08_resolve_blockers_with_raw_rh.py; do
+    curl -fLsS --retry 3 "$RAW/$REL/$FILE" -o "$BASE/$FILE"
+  done
+  "$PYTHON_BIN" -B "$BASE/scripts/stage08/08_resolve_blockers_with_raw_rh.py" \
+    --run \
+    --stage07-root '/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch02/qcv5_native_trial_20261022T010124Z_dfae01c2' \
+    2>&1 | tee "$HOME/AmeriFlux_Batch02_stage08_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+Reuse the exact existing Stage07 helper, engine and manifest files; their
+hashes were pinned by that trial. The Stage08 command downloads only its
+two new files. `--check` verifies inputs without creating outputs.
+
+`--run` creates a fresh `raw_RH_sensitivity_<UTC>_<ID>/` under this batch's
+experiment directory. Per-site `qc_v5/*_native_RH_resolution_attempts.csv`
+and `*_RH_provenance_audit.json` document attempted/rejected RH fallback.
+Complete sites also have candidate forcing, event/manual-review ledgers and
+independent audits. Root `raw_RH_run_summary.csv`,
+`input_preservation_check.json`, `exact_input_manifest.json`,
+`selected_candidates.json`/`.csv` and `output_sha256.json` describe the
+selection without copying the five preserved Stage07 forcing CSVs.
+
+Any failure retains `INCOMPLETE_SENSITIVITY_DO_NOT_USE_FOR_DATM`, excludes
+that site from selection and exits nonzero. An all-site result creates
+`COMPLETE_TEN_SELECTED_CANDIDATES_REVIEW_REQUIRED`: five preserved Stage07
+candidates plus five raw-RH sensitivities. This is a numeric selection,
+not scientific or DATM/model approval. The Stage07 incomplete marker is
+always preserved. ZBOT, surface/PFT representation and all QC0/floor/RH
+changes still require appropriate review.
+
+Synthetic validation used the real Stage04b/05/06/07 report chain and ten
+complete native-year sources with exactly five humidity-blocked sites.
+It checked successful five-plus-five selection, blocker count/example
+reproduction, raw-row/RH/QC evidence, VPD-only changes with retained TA/PA,
+manual-review entries, and unchanged source/report/Stage07 candidate hashes
+and modification times. Successful HH/HR CSVs matched Stage07 when the new
+fallback was unnecessary. Tampered RH evidence and preserved forcing were
+rejected. Missing, zero and out-of-range RH produced a four-plus-five partial
+selection, an excluded failed site and a retained incomplete marker, with
+no added RH floor. These tests do not predict how many of the actual 4,904
+IRIDIS blockers have usable raw RH.
 
 ## Validation boundary
 

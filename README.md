@@ -26,7 +26,7 @@
 
 **[ICOS sites — multi-site experiments](examples/ICOS_sites/)** collects the four existing European FLUXNET/ICOS batches (6, 8, 11 and 13). Dataset provenance remains site-specific. **AmeriFlux sites** are maintained separately, starting with [US-Ha1](examples/AmeriFlux_US-Ha1/). Existing workflow paths remain unchanged to avoid breaking IRIDIS6 jobs.
 
-**[AmeriFlux sites](examples/AmeriFlux_sites/)** includes [Batch 01 (10 sites)](examples/AmeriFlux_MultiSite_10/) and **[Batch 02 (10 sites)](examples/AmeriFlux_MultiSite_10_Batch02/)**. Batch02 publishes Stages00–07, its exact release manifest and operating instructions. The operator's 22 October 2026 Stage07 result is **5 numerically verified candidates / 5 humidity-blocked sites (4,904 unresolved records)**; no DATM or model jobs have been created for Batch02. See the [experiment index](examples/README.md) and the Batch02 README for current scope.
+**[AmeriFlux sites](examples/AmeriFlux_sites/)** includes [Batch 01 (10 sites)](examples/AmeriFlux_MultiSite_10/) and **[Batch 02 (10 sites)](examples/AmeriFlux_MultiSite_10_Batch02/)**. Batch02 publishes Stages00–08, its exact release manifest and operating instructions. The operator's 22 October 2026 Stage07 result is **5 numerically verified candidates / 5 humidity-blocked sites (4,904 unresolved records)**; Stage08 same-release-RH sensitivity is ready for execution; no DATM or model jobs have been created for Batch02. See the [experiment index](examples/README.md) and the Batch02 README for current scope.
 
 Reproducible single-site CTSM/CLM-FATES workflows used on University of Southampton IRIDIS6.
 

@@ -5,7 +5,7 @@ This collection keeps AmeriFlux batches separate from the existing [ICOS multi-s
 | Batch | Sites | Current record |
 | --- | ---: | --- |
 | [AmeriFlux Batch 01](../AmeriFlux_MultiSite_10/) | 10 | See the batch-specific operational record and scripts |
-| **[AmeriFlux Batch 02](../AmeriFlux_MultiSite_10_Batch02/)** | 10 | Stages00–07 published. Operator Stage07: 5 numeric candidates; 5 sites blocked by 4,904 unresolved humidity pairs. Stage08 RH sensitivity is in preparation. |
+| **[AmeriFlux Batch 02](../AmeriFlux_MultiSite_10_Batch02/)** | 10 | Stages00–08 published. Operator Stage07: 5 numeric candidates; 5 sites blocked by 4,904 unresolved humidity pairs. Stage08 same-release-RH sensitivity is ready for execution. |
 
 Batch02 sites: US-BZS, US-CMW, US-EML, US-GLE, US-Ha1, US-Ho1, US-Ho2, US-Ho3, US-ICh and US-ICt. Its [exact releases](../AmeriFlux_MultiSite_10_Batch02/sites.tsv), [operating instructions](../AmeriFlux_MultiSite_10_Batch02/README.md) and [stage scripts](../AmeriFlux_MultiSite_10_Batch02/scripts/) are maintained as a separate case under `main/examples/`.
 
