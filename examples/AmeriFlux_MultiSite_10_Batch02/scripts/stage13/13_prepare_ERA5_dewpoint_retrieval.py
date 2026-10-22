@@ -105,8 +105,7 @@ def main():
         # Two extra UTC calendar days cover local-standard offsets at both boundaries.
         request = dict(variable=list(VARIABLES),
             location={"longitude": met["longitude"], "latitude": met["latitude"]},
-            date=[f"{int(row['first_year'])-1}-12-30",
-                  f"{int(row['last_year'])+1}-01-02"],
+            date=[f"{int(row['first_year'])-1}-12-30/{int(row['last_year'])+1}-01-02"],
             data_format="netcdf")
         entry = dict(site=site, first_year=row["first_year"],
                      last_year=row["last_year"], native_minutes=row["native_minutes"],
@@ -131,8 +130,9 @@ def main():
     if root.exists() or any(root == x or x in root.parents or x in root.parents for x in source_roots):
         raise ValueError("Output must be fresh and outside source trees")
     root.mkdir(parents=True, exist_ok=False)
-    receipt=dict(schema="Stage13_ERA5_TD2M_REQUEST_PLAN_v1", algorithm="CDS_ERA5_POINT_SERIES_DEWPOINT",
+    receipt=dict(schema="Stage13_ERA5_TD2M_REQUEST_PLAN_v2", algorithm="CDS_ERA5_POINT_SERIES_DEWPOINT",
                  dataset=DATASET, variables=list(VARIABLES),
+                 date_request_format="one YYYY-MM-DD/YYYY-MM-DD interval string in a one-element list",
                  stage11_root=str(Path(args.stage11_root).resolve()),
                  stage11_manifest_sha256=sha(Path(args.stage11_root)/"manifest.json"),
                  stage11_proposals_sha256=sha(Path(args.stage11_root)/"cold_humidity_repair_proposals.csv"),
