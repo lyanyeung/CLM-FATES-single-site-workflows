@@ -553,6 +553,36 @@ If the preflight passes, run the same command with `--run` in place of
 `site_hold_summary.csv`, `unresolved_rh_records.csv`, and
 `unresolved_by_year_and_reason.csv`. No inputs are modified.
 
+## Stage08c: ERA5 humidity rejections for 1,924 residual events
+
+Stage08b confirmed that all **1,924** remaining Stage08 blockers have
+`HOLD_RH_MISSING_OR_NONFINITE`. The next evidence-only audit,
+[Stage08c](scripts/stage08/08c_diagnose_era_humidity_blockers.py),
+classifies **why companion ERA5 humidity does not meet the existing
+QCv5 numeric preconditions**, and compares water/ice saturation
+formulations below freezing only as a sensitivity (not a repair).
+
+IRIDIS read-only preflight:
+
+```bash
+(
+  set -euo pipefail
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch03'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage08"
+  SCRIPT="$BASE/scripts/stage08/08c_diagnose_era_humidity_blockers.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage08/08c_diagnose_era_humidity_blockers.py" -o "$SCRIPT"
+  "$PYTHON_BIN" -B "$SCRIPT" --check
+)
+```
+
+After a successful preflight, `"$PYTHON_BIN" -B "$SCRIPT" --run`
+writes only isolated `reports/stage08c_era_humidity_...` files.
+The prior Stage07 and Stage08 incomplete markers must remain in place;
+no forcing, DATM, PFT/case changes or Slurm submissions are authorized.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
