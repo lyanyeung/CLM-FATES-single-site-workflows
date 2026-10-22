@@ -149,13 +149,14 @@ After Stage01 finishes with `BATCH03 SUMMARY: 10/10 PASS`, run this in an
   mkdir -p "$BASE/scripts/stage02"
   curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
   curl -fLsS --retry 3 "$RAW/$REL/metadata_fallbacks.tsv" -o "$BASE/metadata_fallbacks.tsv"
+  curl -fLsS --retry 3 "$RAW/$REL/coordinate_decisions.tsv" -o "$BASE/coordinate_decisions.tsv"
   SCRIPT="$BASE/scripts/stage02/02_check_batch03_metadata.py"
   curl -fLsS --retry 3 "$RAW/$REL/scripts/stage02/02_check_batch03_metadata.py" -o "$SCRIPT"
   python3 -B "$SCRIPT" 2>&1 | tee "$HOME/AmeriFlux_Batch03_stage02_$(date +%Y%m%d_%H%M%S).log"
 )
 ```
 
-Stage02 reads BIF coordinates/IGBP/height records for nine releases, reads
+Stage02 reads BIF coordinates/IGBP/height records for nine releases, honors\nexplicit GROUP_ID-paired site coordinate decisions in coordinate_decisions.tsv\nfor US-Mpj and US-MtB (preserving their source BIF), and reads
 the explicit official AmeriFlux site-page fallback for US-Me2 (the FULLSET
 without BIF), and verifies only the *first* HH/HR source interval. It
 does not write site data, surfaces, forcing, model cases or Slurm jobs.
