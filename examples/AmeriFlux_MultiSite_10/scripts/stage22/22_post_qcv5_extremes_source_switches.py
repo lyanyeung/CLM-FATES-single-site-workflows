@@ -21,6 +21,7 @@ import pandas as pd
 
 SITE_ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE")
 REPORTS=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports")
+STAGE22_BUILD = "20261022_stage22_end_year_fix_v2"
 MANIFEST=Path(__file__).resolve().parents[2]/"sites.tsv"
 MET=("TA","VPD","PA","SW_IN","LW_IN","WS","P")
 FINAL=("TA_USE","VPD_USE","PSRF","FSDS","FLDS","WIND","PRECTmms","QBOT")
@@ -87,12 +88,12 @@ def peaks(series,threshold):
             (np.sign(left)!=np.sign(right)))
 
 
-def run(site,origpath,erapath,finalpath,eventpath,first,last):
+def run(site,origpath,erapath,finalpath,eventpath,first,end_year):
     qcs=[v+"_F_QC" for v in MET]
     origin=frame(origpath,["TIMESTAMP_START"]+
-                 [v+"_F" for v in MET]+qcs,first,last,True)
-    era=frame(erapath,["TIMESTAMP_START","TA_ERA","VPD_ERA","PA_ERA"],first,last,True)
-    final=frame(finalpath,["time",*FINAL],first,last,False)
+                 [v+"_F" for v in MET]+qcs,first,end_year,True)
+    era=frame(erapath,["TIMESTAMP_START","TA_ERA","VPD_ERA","PA_ERA"],first,end_year,True)
+    final=frame(finalpath,["time",*FINAL],first,end_year,False)
     if not np.array_equal(origin.time.to_numpy(),era.time.to_numpy()) or not np.array_equal(
         origin.time.to_numpy(),final.time.to_numpy()):
         raise RuntimeError(site+": source and candidate timestamps differ")
@@ -183,7 +184,7 @@ def run(site,origpath,erapath,finalpath,eventpath,first,last):
                       science_status="HOLD_PRE_DATM"))
     byyear=[]
     years=final.time.dt.year.to_numpy()
-    for year in range(first,last+1):
+    for year in range(first,end_year+1):
         chosen=years==year
         byyear.append(dict(site=site,year=year,**{
             key:int((np.asarray(val,dtype=bool)&chosen).sum())
@@ -224,6 +225,7 @@ def main():
             if not path.is_file():raise RuntimeError("Missing required input: "+str(path))
         jobs.append((site,paths,first,last))
         print("CHECK OK %-7s %s" %(site,trial.name),flush=True)
+    print("STAGE22 BUILD:", STAGE22_BUILD, flush=True)
     print("STAGE22 PREFLIGHT: 10/10 candidates",flush=True)
     if args.check:
         print("CHECK ONLY; no changes");return
