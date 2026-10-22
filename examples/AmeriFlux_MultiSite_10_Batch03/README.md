@@ -173,6 +173,56 @@ US-MMS has native hourly meteorology; preserve HR in later workflows.
 Do not use BIF height records as a final ZBOT decision; compare the
 curated BASE_MeasurementHeight reference and site-specific evidence.
 
+## Stage03: isolated CTSM year-2000 reference point surfaces
+
+After Stage02 passes 10/10, fetch the Stage03 driver and its exact metadata
+dependencies to IRIDIS. Run `--check` first; `--run` only after the preflight
+passes. The script is adapted from Batch02 and creates outputs exclusively in
+`sites/MY_EC_SITE/<SITE>/subset_data_batch03_surf2000/` with a SHA256 receipt
+for each station. It uses `CTSM/tools/site_and_regional/subset_data point`
+with `--surf-year 2000 --create-surface --create-user-mods --lon-type 180`
+and **does not** use `--dompft`. It retains the documented ctsm5.3.0
+surfdata/mesh reference settings. Site metadata and the explicit selected BIF
+GROUP_ID for US-Mpj/US-MtB are read and rechecked on every attempt.
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PYTHON_BIN="$CONDA_PREFIX/bin/python"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch03'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage02" "$BASE/scripts/stage03"
+  for FILE in sites.tsv metadata_fallbacks.tsv coordinate_decisions.tsv \
+    scripts/stage02/02_check_batch03_metadata.py \
+    scripts/stage03/03_make_batch03_surfaces.py
+  do
+    curl -fLsS --retry 3 "$RAW/$REL/$FILE" -o "$BASE/$FILE"
+  done
+  "$PYTHON_BIN" -B "$BASE/scripts/stage03/03_make_batch03_surfaces.py" --check \
+    2>&1 | tee "$HOME/AmeriFlux_Batch03_stage03_check.log"
+)
+```
+
+If it prints `PREFLIGHT: 10 ready + 0 verified existing = 10/10`
+(or ten total across ready and verified), generate the reference surfaces:
+
+```bash
+PYTHON_BIN="$CONDA_PREFIX/bin/python"
+"$PYTHON_BIN" -B \
+  "$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage03/03_make_batch03_surfaces.py" --run \
+  2>&1 | tee "$HOME/AmeriFlux_Batch03_stage03_run_$(date +%Y%m%d_%H%M%S).log"
+```
+
+Successful fresh generation prints `STAGE03 SUMMARY: created=10
+skipped_verified=0 total=10/10`. Any existing incomplete output is retained
+and blocks unsafe automatic overwrite. These are **exploratory reference**
+surfaces, not scientifically approved PFT configurations or model input.
+Stage04a should subsequently audit actual landunit and PFT fractions;
+specifically review US-Kon/US-NR3 grassland, US-Mpj mixed IGBP and US-Me2
+disturbance history. No DATM, case or Slurm jobs are created.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
@@ -194,7 +244,7 @@ humidity decisions must not be copied as Batch03 evidence.
 6. Establish ZBOT/PFT and forcing-loop settings, then generate DATM and
    prepare spin-up cases after those checks.
 
-Only Stages00–02 are implemented here. Later stages will use the actual
+Stages00–03 are implemented here; surface output still requires Stage04a and PFT review. Later stages will use the actual
 Batch03 results. No forcing cycle, CO2 setting or spin-up length is selected.
 
 ## Implementation and validation
