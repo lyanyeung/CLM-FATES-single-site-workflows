@@ -60,6 +60,10 @@ python3 "$BASE/scripts/stage24/24_build_post_qcv5_science_review_queue.py" --run
 
 [Stage25 source-context reviewer](scripts/stage25/25_review_qc0_extremes_with_original_context.py) combines the completed Stage24 review queue with exact pinned FLUXMET/ERA5 and the ten separate QCv5 candidate outputs. It reports the 518 official-QC0 changes, near-zero RH, TA/VPD extremes, and ±4-hour local evidence without changing any forcing. **Not an automatic replacement and not a science approval.** Run with `--check` then `--run`; reports are isolated in `reports/stage25_targeted_science_evidence_*`.
 
+### Stage26 BIF height evidence (parallel to unresolved meteorological science gate)
+
+[Stage26 read-only BIF TA/WS height audit](scripts/stage26/26_audit_ten_BIF_TA_WS_ZBOT_evidence.py) uses the exact ten pinned release BIF CSV files to find dated air-temperature sensor `TA_F` and wind sensor `WS_F` heights, including duplicates, conflicting epochs, height date precision, SHA256, early NO_LEAP coverage gaps and height mismatches. For model DATM, `ZBOT` should reference the relevant air-temperature measurement height, **not** automatically the EC or wind sensor level. Missing/undated periods are not filled without an explicit policy. This stage never writes a DATM or modifies any candidate forcing. The meteorological Stage25 science gate remains HOLD.
+
 ### Data version policy
 
 Never edit official release CSVs, the original shared QC-v5 engine, or previously generated numerical candidates in place. All site-specific remedies must create new versioned site-limited trial folders and replacement ledgers. The separate Stage20 US-Bar sensitivity is **not** a global change to QCv5 humidity thresholds. ERA5_HH used by the official FLUXNET release is **not** verified independent ERA5-Land; do not claim ERA5-Land replacement occurred. Do not delete or change the Stage18 incomplete marker to imply unified approval.
