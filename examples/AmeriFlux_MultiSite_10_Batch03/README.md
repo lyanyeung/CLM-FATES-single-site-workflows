@@ -647,6 +647,48 @@ containing `era5land_request_plan.json`, `site_utc_offset_inventory.json`
 and `request_summary.csv`. External series need actual time alignment
 and source-evidence review before any further QCv5 candidate trials.
 
+## Stage09b — one-site/year ERA5-Land pilot, not forcing
+
+Stage09a returned 32 requested site-years spanning 7 sites and 1,924
+source-event blockers. BIF UTC offsets are recorded for six stations but
+require provenance validation; US-Me2 has no release BIF. The
+[Stage09b pilot](scripts/stage09/09b_download_era5land_pilot.py) validates
+the pinned Stage09a request receipt and offers one explicit CDS retrieval
+(default **US-NR3 2022**) rather than automatically submitting all 32.
+The current CDS product for point hourly ERA5-Land is
+`reanalysis-era5-land-timeseries`. Returned payload can be a NetCDF
+or ZIP of NetCDF groups. The pilot preserves the raw response in isolated
+`external_evidence/` storage, and SHA256-receipts both request and
+response. No data are interpolated, aligned or used for any repair.
+
+On IRIDIS6, first **read-only**:
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch03'
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  mkdir -p "$BASE/scripts/stage09"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  SCRIPT="$BASE/scripts/stage09/09b_download_era5land_pilot.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage09/09b_download_era5land_pilot.py" -o "$SCRIPT"
+  "$CONDA_PREFIX/bin/python" -B "$SCRIPT" --site US-NR3 --year 2022 --check
+)
+```
+
+The preflight reports whether `cdsapi` and credentials exist; it does not
+print a token or initiate any API calls. Set up a Copernicus CDS account,
+accept the dataset licence and configure `~/.cdsapirc` securely on the
+cluster prior to explicitly selecting `--run`. Never commit the API token.
+After confirming the request format on the live CDS dataset, a single
+pilot can be run with `--site US-NR3 --year 2022 --run`. Inspect the
+returned raw NetCDF/ZIP and UTC coverage before any expansion to the
+remaining 31 requests. Six BIF clock offsets and the US-Me2 fallback
+still need verified local-standard-time alignment before joining
+downloaded evidence with the site series.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
