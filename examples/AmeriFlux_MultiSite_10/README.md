@@ -64,6 +64,10 @@ python3 "$BASE/scripts/stage24/24_build_post_qcv5_science_review_queue.py" --run
 
 [Stage26 read-only BIF TA/WS height audit](scripts/stage26/26_audit_ten_BIF_TA_WS_ZBOT_evidence.py) uses the exact ten pinned release BIF CSV files to find dated air-temperature sensor `TA_F` and wind sensor `WS_F` heights, including duplicates, conflicting epochs, height date precision, SHA256, early NO_LEAP coverage gaps and height mismatches. For model DATM, `ZBOT` should reference the relevant air-temperature measurement height, **not** automatically the EC or wind sensor level. Missing/undated periods are not filled without an explicit policy. This stage never writes a DATM or modifies any candidate forcing. The meteorological Stage25 science gate remains HOLD.
 
+### Stage26/27 BIF height interpretation update
+
+Operator Stage26 (22 October 2026) opened 10/10 exact-release BIF files but found **zero** exact TA_F and WS_F dated height epochs in all ten stations. **This is a parsing/metadata coverage result, not evidence that site instrument heights are zero, missing everywhere, or 2 m.** Do not extrapolate ZBOT or create DATM. [Stage27 diagnostic](scripts/stage27/27_inspect_ameriflux_BIF_structure_and_height_aliases.py) inventories the original CSV schema, VAR_INFO fields, grouping and alternate variable names without making height assumptions; next step is to inspect Stage27 and, if necessary, source separately documented AmeriFlux measurement-height/site metadata.
+
 ### Data version policy
 
 Never edit official release CSVs, the original shared QC-v5 engine, or previously generated numerical candidates in place. All site-specific remedies must create new versioned site-limited trial folders and replacement ledgers. The separate Stage20 US-Bar sensitivity is **not** a global change to QCv5 humidity thresholds. ERA5_HH used by the official FLUXNET release is **not** verified independent ERA5-Land; do not claim ERA5-Land replacement occurred. Do not delete or change the Stage18 incomplete marker to imply unified approval.
