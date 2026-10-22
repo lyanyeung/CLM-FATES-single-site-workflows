@@ -2,6 +2,10 @@
 
 **Scientific purpose:** distinguish incomplete spin-up from climate-cycle-aligned demographic variability in single-site CTSM/CLM–FATES simulations, with the end use of eddy-covariance GPP and NEE comparisons. **Status:** exploratory diagnostics calibrated only on the 15 worked examples; **not** an official CTSM/FATES stopping criterion.
 
+## Prerequisite — Site PFT realism (Stage 0)
+
+Before extending or retaining any simulation for EC flux science, check actual FATES PFT vegetation-carbon dominance against the observed tower stand and land cover. A converged but ecologically incorrect vegetation composition is not an adequate outcome. Confirmed dynamic mismatches in the six-site experiment: RU-Fyo, DE-Tha, NL-Loo and IL-Yat. For these sites, prioritize a separate fixed-PFT / noncompeting sensitivity setup rather than assuming longer dynamic spin-up will correct the ecological mismatch. For the nine remaining cases the modeled final PFT composition has not been verified yet, so all flux decisions are conditional. Details: [PFT_REALISM_AND_FIXED_PFT.md](PFT_REALISM_AND_FIXED_PFT.md). No active case or Slurm job is changed by this documentation.
+
 ## Stage 0 — data-quality and chronology gate
 
 For each case, verify `RUN_STARTDATE`, repeated DATM `year_first`/`year_last`, `taxmode=cycle`, noleap calendar, `FATES_VEGC` units, and a continuous annual source history (using the frozen analysis archive). Let `L = year_last - year_first + 1`; for `n` archived annual model years, use only `N = floor(n/L)*L` complete years and record `n-N` as an excluded partial tail. Note the meteorological forcing repeats at fixed phase; do not mix phases when comparing model cycles.
