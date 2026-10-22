@@ -124,6 +124,12 @@ def main():
     if len(selected)!=1:
         p.error("Site/year is not among the 32 Stage09a approved-for-planning requests")
     row=selected[0]
+    # The CDS time-series API requires a single date-range expression.
+    # Reject stale Stage09a endpoint-only plans: no downloads with two dates.
+    date = row["request"].get("date")
+    expected_date = [f"{a.year-1}-12-29/{a.year+1}-01-03"]
+    if date != expected_date:
+        raise ValueError("Unsafe CDS date range in Stage09a plan: regenerate it with the updated Stage09a script (expected "+str(expected_date)+")")
     clock=next(x for x in clocks if x["site"]==a.site)
     dest=EXTERNAL_ROOT/a.site/str(a.year)
     name=f"ERA5Land_{a.site}_{a.year}_t2m_d2m_sp"
