@@ -1,3 +1,26 @@
+# 2026-10-23 SCIENTIFIC CORRECTION — controlled two-arm design
+
+**Use this section as the active mode specification; older FULL-vs-FIXNC text below is retained as dated history only.**
+
+If the scientific goal is *hold observed-biogeography eligibility constant and change competition*, the two proposed experiments are:
+
+| Arm | `use_fates` | `use_fates_sp` | `use_fates_fixed_biogeog` | `use_fates_nocomp` | Interpretation |
+|---|---|---|---|---|---|
+| `COMP` | .true. | .false. | .true. | .false. | Competing FATES PFTs subject to permitted biogeography |
+| `FIXNC` | .true. | .false. | .true. | .true. | PFT land-area assignment fixed, without inter-PFT area competition |
+
+The existing **unrestricted FULL** experiment is an optional third observational baseline, but **not** equivalent to `COMP`.
+
+**Neither arm can be initialized from arbitrary stand-percent figures without confirming the actual source/denominator and FATES PFT coverage controls.** Do not infer that choosing fixed biogeography automatically enforces measured abundance percentages in competition mode. An approved `fates_hlm_pft_map` and valid surface mapping must be demonstrated by generated namelists and 1–5 year tests; inspect `FATES_CROWNAREA_PF` or another appropriate area-resolved diagnostic instead of mistaking `FATES_VEGC_PF` for area. PFT mapping may allow a type without matching its initial fractional abundance.
+
+CTSM compset is a high-level system choice. **Keep the same original compset if compatible**; determine whether changing these FATES flags is supported as runtime namelist settings by the checked-out revision. Check `COMPSET`, `COMP_INTERFACE`, active CIME/CTSM/FATES SHAs, `CaseDocs/lnd_in`, executable build provenance and required `fates_hlm_pft_map`. If a mode requires a build-time difference, create independent executable/build; never blindly reuse `--keepexe`.
+
+**Current cohort counts:** 38 total; 22 published quantitative evidence leads in the master table; 6 additional quantitative leads in an **unverified** follow-up file; 10 other sites with qualitative vegetation descriptions. Counts of research leads do not measure readiness for direct fixed-area setup. All 44 prospective COMP/FIXNC cases remain on HOLD pending preflight and primary-source verification.
+
+**Plan script**: `scripts/02_make_dual_mode_plan.py` now emits `COMP` and `FIXNC` for each of 22 sites, and both arms have `submission_authorized=NO`.
+
+---
+
 # Dual-mode FATES vegetation experiment design (draft; NOT submitted)
 
 Date: 2026-10-23. Scope: four existing FLUXNET multi-site batches; 22 sites having numerical literature leads in `38_site_PFT_evidence.csv`, and remaining 16 investigated separately.
