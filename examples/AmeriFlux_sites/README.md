@@ -21,3 +21,7 @@ Use the versioned, **complete** user-supplied [2026-09-08 BASE Measurement Heigh
 The older Batch01 Stage26/27 BIF-height scripts were retired and deleted; they assumed FLUXNET BIF `VAR_INFO_*` fields that the ten AmeriFlux BIF files do not contain. **BIF coordinates remain valid as a separate workflow.**
 
 For any batch, supply that batch's `sites.tsv` via `--sites-tsv`. All candidate TA/WS heights retain their original variable names, missing/partial dates, instruments and comments. Do not automatically map an indexed TA level, wind height or EC measurement height to model `ZBOT`. Create a new separately versioned snapshot when the monthly BASE metadata changes; do not overwrite this source file. The numerical QC and meteorological science gates are also separate from the height source audit.
+
+## Stage30 — open height-science decisions
+
+[Stage30 read-only mapping/date audit](scripts/30_audit_BASE_height_mapping_gaps_and_date_windows.py) follows Stage29. Batch01 has 5 unapproved static candidates, 3 dynamic candidates with partial dates, and 2 unresolved multi-layer TA arrays (CA-Cbo, CA-Man). Stage30 writes only candidate evidence, blocked sensor alternatives, uncertain date windows, and blank approval decisions. It does not equate `TA_PI_F` with FLUXNET `TA_F` or create ZBOT/DATM. Scientific approval remains pending.
