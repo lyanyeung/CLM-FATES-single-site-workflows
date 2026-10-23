@@ -759,6 +759,41 @@ After preflight `--run` creates an isolated
 report, not a revised forcing. **Do not** remove existing
 `INCOMPLETE` markers, edit sources, or start DATM/Spin-up.
 
+## Stage09f: checkpointed, capped external dewpoint downloads
+
+Following Stage09e's 295 US-NR3 2022 comparisons, preserve both
+humidity-transfer sensitivities as evidence only: absolute vapor pressure
+passed 278/295, RH transfer passed 295/295. Neither passes independent
+scientific validation or authorizes forcing edits.
+
+[Stage09f](scripts/stage09/09f_incremental_dewpoint_queue.py) audits
+all existing ERA5-Land receipts, ZIP CRCs, full hourly UTC time axes,
+units, gridded coordinates and T2m/D2m/SP numeric coverage before
+choosing at most **three new site-years per invocation**. US-NR3 2022
+is reused and not redownloaded. `--check` is strictly read-only;
+`--run --max-new 1` downloads just one selected year, with a second
+validation afterward. Keep the Stage09b file beside Stage09f.
+Missing credentials or absent CDS resources stop execution rather
+than bypassing the strict checks.
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  BASE="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Batch03"
+  mkdir -p "$BASE/scripts/stage09"
+  for name in 09b_download_era5land_pilot.py 09f_incremental_dewpoint_queue.py; do
+    curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage09/$name" -o "$BASE/scripts/stage09/$name"
+  done
+  "$CONDA_PREFIX/bin/python" -B "$BASE/scripts/stage09/09f_incremental_dewpoint_queue.py" --check --max-new 1
+)
+```
+
+The next optional command is `--run --max-new 1` (not automatic).
+This does not approve UTC conversion, site-elevation adjustments,
+RH or VPD replacement, DATM, or spin-up.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
