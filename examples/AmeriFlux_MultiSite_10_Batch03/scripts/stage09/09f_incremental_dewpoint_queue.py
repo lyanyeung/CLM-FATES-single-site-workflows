@@ -208,9 +208,9 @@ def main():
         if status!="VERIFIED":
             raise RuntimeError("New CDS retrieval did not pass physical/time/receipt verification")
         print("STAGE09F VERIFIED NEW:",r["site"],r["year"],meta,flush=True)
-    print("STAGE09F SUMMARY: validated_new=",len(selected),
-          "previously_validated=",len(verified),
-          "all_inputs_unchanged=True; no DATM or forcing writes",sep="")
+    print(f"STAGE09F SUMMARY: validated_new={len(selected)} "
+          f"previously_validated={len(verified)} "
+          "all_inputs_unchanged=True; no DATM or forcing writes")
 
 
 if __name__=="__main__":
