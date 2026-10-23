@@ -655,7 +655,7 @@ require provenance validation; US-Me2 has no release BIF. The
 [Stage09b pilot](scripts/stage09/09b_download_era5land_pilot.py) validates
 the pinned Stage09a request receipt and offers one explicit CDS retrieval
 (default **US-NR3 2022**) rather than automatically submitting all 32.
-The current CDS product for point hourly ERA5-Land is
+The US-NR3 2022 pilot returned 8,904 consecutive hourly observations per variable (2021-12-29 through 2023-01-03) using two date endpoints, so earlier concerns about two isolated dates were disproved. The verified CDS product for point hourly ERA5-Land is
 `reanalysis-era5-land-timeseries`. Returned payload can be a NetCDF
 or ZIP of NetCDF groups. The pilot preserves the raw response in isolated
 `external_evidence/` storage, and SHA256-receipts both request and
@@ -688,6 +688,41 @@ returned raw NetCDF/ZIP and UTC coverage before any expansion to the
 remaining 31 requests. Six BIF clock offsets and the US-Me2 fallback
 still need verified local-standard-time alignment before joining
 downloaded evidence with the site series.
+
+## Stage09c–d: verified US-NR3 2022 pilot and dewpoint evidence
+
+Stage09c confirmed that the downloaded two-member ZIP contains exactly
+8,904 hourly UTC values **per variable**, with `t2m`, `d2m`, `sp`,
+each covering 2021-12-29 00:00 through 2023-01-03 23:00. The total
+17,808 reported across two NetCDF time axes is **not** a count of
+independent timestamps. Requested tower coordinates (40.052, −105.5864)
+mapped to ERA5-Land grid (40.1, −105.6). The 2022 pilot does **not**
+need redownloading. Date endpoints in Stage09a/09b were restored
+to the empirically validated `["2021-12-29","2023-01-03"]` form.
+
+The [Stage09d read-only comparison](scripts/stage09/09d_validate_nr3_2022_dewpoint.py)
+confirms full unique UTC axes, grid coordinates, units and temperature/
+dewpoint/pressure physical ranges and produces a **provisional** comparison
+at the US-NR3 2022 blocked native timestamps, using the BIF local
+standard UTC−7 offset only as a pending-verification assumption. This
+does not authorize any source substitution.
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  BASE="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Batch03"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  mkdir -p "$BASE/scripts/stage09"
+  SCRIPT="$BASE/scripts/stage09/09d_validate_nr3_2022_dewpoint.py"
+  curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage09/09d_validate_nr3_2022_dewpoint.py" -o "$SCRIPT"
+  "$CONDA_PREFIX/bin/python" -B "$SCRIPT" --check
+)
+```
+
+After preflight, `--run` creates isolated diagnostic CSV/JSON
+under `reports/stage09d_nr3_2022_dewpoint_...`, leaving the
+original ZIP, tower data, candidate forcing, and model cases unchanged.
 
 ## Next stages and scientific review
 
