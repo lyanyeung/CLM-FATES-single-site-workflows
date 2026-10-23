@@ -61,13 +61,22 @@ def read_source(root,rehash):
                     scientific_status="NUMERICAL_SENSITIVITY_ONLY_ALL_ROWS_HOLD").items():
         if m.get(k)!=v:raise ValueError("Unexpected Stage19 contract: "+k)
     if rehash:
-        for field,expected in [("original_source_sha256",5),
-                               ("cds_receipt_sha256",39),
-                               ("verified_netcdf_sha256",39)]:
+        raw_map=m["original_source_sha256"]
+        assert set(raw_map)==set(EXPECTED), "Unexpected raw site set"
+        base=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch02")
+        m11=json.loads((base/"stage11_cold_humidity_review_20261022T020911Z_2ad6f27b"/"manifest.json").read_text())
+        m08=json.loads((Path(m11["source_stage08"])/"exact_input_manifest.json").read_text())
+        sources={item["site"]:Path(item["primary"]).resolve() for item in m08["sites"]}
+        for site,expected_hash in raw_map.items():
+            f=sources[site]
+            if digest(f)!=expected_hash or m11["input_hashes"].get(str(f))!=expected_hash:
+                raise ValueError("Raw source mismatch: "+site)
+        for field in ("cds_receipt_sha256","verified_netcdf_sha256"):
             hashes=m[field]
-            if len(hashes)!=expected:raise ValueError("Hash scope differs: "+field)
-            for p,d in hashes.items():
-                if digest(p)!=d:raise ValueError("Original/ERA file changed: "+p)
+            if len(hashes)!=39: raise ValueError("Wrong number of CDS hashes")
+            for f,expected_hash in hashes.items():
+                if digest(f)!=expected_hash:
+                    raise ValueError("CDS lineage checksum mismatch: "+f)
     file=root/CSV
     a=pd.read_csv(file,parse_dates=["local"])
     if len(a)!=4884 or a.duplicated(["site","local"]).any() or \
