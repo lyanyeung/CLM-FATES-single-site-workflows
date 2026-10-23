@@ -794,6 +794,32 @@ The next optional command is `--run --max-new 1` (not automatic).
 This does not approve UTC conversion, site-elevation adjustments,
 RH or VPD replacement, DATM, or spin-up.
 
+## Stage09g: one-command finish of remaining ERA5-Land evidence
+
+After Stage09f successfully verified **20/32** site-years (1,868/1,924
+blocked native timestamps covered by external evidence), the
+[Stage09g runner](scripts/stage09/09g_download_all_remaining.py)
+can finish **all 12 remaining** without repeated manual submissions.
+It invokes the existing pinned Stage09f and Stage09b scripts in
+**serial, ≤3-request batches**, re-checks all existing SHA256 receipts,
+hourly UTC axes, NetCDF variables and grids before and after each
+batch, refuses overwrites, and stops on the first failed download.
+It does NOT modify QCv5, DATM, cases, or submit Slurm jobs.
+
+On IRIDIS6, download the three versioned scripts to the established
+Stage09 folder (do not `git pull` into a conflicted checkout).
+First run `09g_download_all_remaining.py --check` for a
+read-only audit, then explicitly run `--run` to finish the
+queue. A persistent advisory lock prevents two Stage09g instances
+from draining the same queue simultaneously. A failed or interrupted
+CDS retrieval may retain a `.download.partial` file, which requires
+manual inspection before retry; existing verified ZIP/receipt pairs
+are never changed. Successful completion is `VERIFIED=32/32`.
+
+This is **external evidence coverage only**, not scientific acceptance
+of replacement RH, QBOT, or forcing. UTC offset and grid/site elevation
+checks remain required before Post-v5 and spin-up.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
