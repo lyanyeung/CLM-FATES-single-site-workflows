@@ -724,6 +724,41 @@ After preflight, `--run` creates isolated diagnostic CSV/JSON
 under `reports/stage09d_nr3_2022_dewpoint_...`, leaving the
 original ZIP, tower data, candidate forcing, and model cases unchanged.
 
+## Stage09e: external dewpoint at retained tower TA (evidence only)
+
+Stage09d confirmed all **8,904 hourly UTC samples per variable** for
+the US-NR3 2022 ERA5-Land pilot. The 295 blocked native records in 2022
+have externally derived grid RH **47.10–84.60%** under provisional
+UTC−7 alignment. This establishes usable comparison evidence, **not a
+validated forcing replacement**.
+
+[Stage09e](scripts/stage09/09e_nr3_dewpoint_tower_consistency.py)
+compares two explicitly separate **sensitivities**: (A) external
+dewpoint-derived vapor pressure combined with retained tower TA and
+pressure; (B) transfer of the external grid RH to tower TA/pressure.
+It evaluates relative tower/grid temperatures and pressures, includes
+native-interval midpoint timing and ±1-hour time-offset sensitivity,
+and reports previously screened MDS alternatives. UTC offset approval
+and site/grid elevation differences remain open scientific checks.
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  BASE="$HOME/CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Batch03"
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  SCRIPT="$BASE/scripts/stage09/09e_nr3_dewpoint_tower_consistency.py"
+  mkdir -p "$BASE/scripts/stage09"
+  curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage09/09e_nr3_dewpoint_tower_consistency.py" -o "$SCRIPT"
+  "$CONDA_PREFIX/bin/python" -B "$SCRIPT" --check
+)
+```
+
+After preflight `--run` creates an isolated
+`reports/stage09e_nr3_2022_tower_dewpoint_...` science-evidence
+report, not a revised forcing. **Do not** remove existing
+`INCOMPLETE` markers, edit sources, or start DATM/Spin-up.
+
 ## Next stages and scientific review
 
 Continue from the actual Stage01 inventory, using Batch03-specific manifests
