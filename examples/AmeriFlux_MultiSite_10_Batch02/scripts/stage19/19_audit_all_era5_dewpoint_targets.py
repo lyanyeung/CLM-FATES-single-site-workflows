@@ -342,8 +342,8 @@ def main():
         checked_nc_sha[str(nc)]=receipt["netcdf_sha256"]
         receipt_map[(site,yr)]=(nc,grid)
     if len({grid for _,grid in receipt_map.values()})!=38 or \
-       len(checked_nc_sha)!=38:
-        raise ValueError("Expected exactly 38 unique verified ERA5 grid-year NetCDFs")
+       len(checked_nc_sha)!=39:
+        raise ValueError("Expected 38 distinct grids stored as 39 files (ICh/ICt Stage15 duplicates)")
     original={}; offset_evidence={}
     for site in OFFSETS:
         path=Path(source[site]["primary"]).resolve(strict=True)
@@ -354,7 +354,7 @@ def main():
         print("SOURCE VERIFIED:",site,"time rows=",len(original[site]),
               "UTC offset evidence=",offset_evidence[site],flush=True)
     print("STAGE19 PREFLIGHT: 5 Stage15 + 34 Stage18 receipts, 38 distinct "
-          "ERA5 grid-year files; original raw site files SHA256 verified.",flush=True)
+          "ERA5 grid-years in 39 physical files; source files SHA256 verified.",flush=True)
     details=[];summaries=[];cache={}
     for row in sorted(planned,key=lambda x:(x["site"],x["year"])):
         site=row["site"];yr=int(row["year"])
