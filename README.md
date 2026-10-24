@@ -1,6 +1,10 @@
 # CLM-FATES single-site workflows
 
 
+## Stage82 — DATM case integration preflight (read-only)
+
+After the operator-confirmed successful Stage81 **213 annual NC / 10-site** technical build, next run the [Stage82 read-only case-integration and NetCDF integrity check](examples/AmeriFlux_MultiSite_10/scripts/stage82/README.md). It SHA-verifies the Stage80/81 source receipts and annual files, validates sample NOLEAP NetCDF, and optionally inventories an actual existing CIME case (`--reference-case`) without changing it. Further tasks: verify DATM/CDEPS stream format, model domain, native station timestamp centering, and site-specific ZBOT sensor height (notably CA-Cbo/CA-Man) before an isolated 1–5-day smoke test. **Do not submit production spin-up or activate Stage81 placeholder stream templates yet.**
+
 ## Stage81 FINISHED on IRIDIS6 — 213 annual DATM NetCDF + 10 unactivated stream templates (24 October 2026)
 
 **User-provided actual completed Stage81 output (not independently inspected from GitHub):** Stage81 `--self-test`, `--check` and `--build` all succeeded using the immutable Stage80 selection (18 original RH<1% native-ERA5 joint replacements, 1,091 original RH1–5% rows preserved). The script reports **10/10 sites; 213/213 yearly 30-minute NOLEAP NetCDF files** passing its annual readback check, and **10/10 DATM stream TEMPLATE files generated, NOT ACTIVATED**. Output and per-file SHA source-provenance manifest: `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage81_DATM_technical_20261024T162235Z/` (`manifest.json`).
