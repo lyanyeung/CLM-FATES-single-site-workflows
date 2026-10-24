@@ -988,7 +988,7 @@ variable replacements at US-NC2**. The minimum water-relative RH was 2.2064%,
 includes exact IRIDIS report locations and outstanding Post-v5 holds.
 
 The next source-event [Stage11c audit script](scripts/stage11/11c_qc0_manual_era_change_review.py)
-has been committed but **not yet verified by running on IRIDIS6**. It
+has now **passed the IRIDIS6 self-test, check and report run**. It
 reconciles all 105 source QC/ERA/processed-v5 changes by native source key,
 extracts 6 measured-QC0 changes, preserves 18 manual review entries, and
 audits RH<1% records. The script is evidence-only, not a repair generator.
@@ -996,3 +996,27 @@ audits RH<1% records. The script is evidence-only, not a repair generator.
 **All humidity, clock, PFT/CO2 protocol, Post-v5, DATM and spinup gates remain
 unapproved.** No original forcing, processed_v5 data, Stage07 incomplete marker,
 CIME case or Slurm job may be changed based on these audit results.
+
+
+### Stage11c verified and Stage11d evidence packet (2026-10-24)
+
+[Stage11c](scripts/stage11/11c_qc0_manual_era_change_review.py) **passed**
+on IRIDIS6 with 105 exact source-to-v5 variable changes, 6 originally
+QC0-coded measured air-temperature modifications, 18 manual-review entries
+(including 4 without final variable changes), 38 US-NC2
+`secondary_era_replacement` variables and 5 preserved RH values
+between 0 and 1%. Stage11c reported no originally missing values among
+the 105 modified source records; the 38 later ERA-source replacements
+therefore require an explicit `event_reason` analysis, not a claim of
+original input missingness.
+
+The six modified QC0 values all have
+`isolated_spike_ERA_confirmed|short_gap_interpolated` event reason.
+[Verified Stage11c data interpretation and event list](docs/STAGE11C_VERIFIED_QC0_MANUAL_REVIEW_2026-10-24.md).
+
+[Stage11d](scripts/stage11/11d_priority_change_context_review.py) is now
+committed **but not yet executed on IRIDIS6**. It creates a read-only review
+packet of original, companion ERA and processed_v5 values for native +/-2h
+around the specific QC0, ERA replacement, manual-review and low-RH events.
+This is meant to support manual science signoff, not automatic data editing.
+All Post-v5/DATM/CIME/Slurm permissions remain zero.
