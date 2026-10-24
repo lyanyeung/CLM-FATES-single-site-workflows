@@ -116,7 +116,11 @@ def main():
  p.add_argument('--events-csv',type=Path)
  p.add_argument('--outdir',type=Path)
  args=p.parse_args()
- if args.self_test:self_test();return
+ if args.self_test:
+  self_test()
+  print('SUPERSEDED: download ALL 1109 RH<5 events via Stage77')
+  return
+ raise RuntimeError('Stage76B SUPERSEDED: 17-only native ERA5 download is incomplete; use scripts/stage77 for all 1109 RH<5 events')
  if not args.events_csv:p.error('--events-csv required')
  cases=events(args.events_csv)
  req=make_requests(cases)
