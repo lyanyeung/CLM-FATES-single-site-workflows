@@ -25,6 +25,14 @@ At half-hour times, interpolate **temperature (K)**, **actual vapour pressure** 
 
 The script uses a **water-saturation formulation** and requires a follow-up ice/water convention check in winter, and flags meteorological discontinuities after replacement. **Do not retain original QBOT/PSRF/VPD_USE** when substituting ERA T. There is no FLUXNET fallback.
 
+## 24 October 2026 actual IRIDIS6 execution and bug fix
+
+**Confirmed user log:** all **45** CDS native ERA5 downloads finished and the merged native T2m/D2m/SP CSV and checksum manifest were saved under `reports/stage77_ERA5_native_20261024T100640Z/`. The `--check` recomputed exactly **1,109/1,109** targets with same-source thermodynamics (no selected forcing edits). The first `--trial` generated full-file, numerically validated CA-Ca3 (41 edits, RH<1: 7→0) and CA-Cbo (28 edits, RH<1: 2→0), then crashed on CA-Man at `int(src.stem.rsplit('_',2)[-2])`, because its Stage74 source filename is `...TRIAL_NOT_PRODUCTION.csv` and its second-to-last token is `NOT` (not a year). This is **a script filename-parser bug**, not a CDS/download or ERA5 physical-calculation failure.
+
+**Fixed script:** derive `(first_year,last_year)` from the canonical Stage58 `SITES` metadata keyed by site, rather than parsing the filename. To finish the remaining six-site trial, **reuse the already downloaded `native_ERA5_all_1109_RH_lt5_hourly_T2m_D2m_SP.csv` and its manifest**, redownload the patched Stage77 script, and rerun `--check` then `--trial --outdir NEW_UNIQUE_DIRECTORY`. **Do not redownload the 45 ERA5 requests.** Keep the first partially populated trial folder for audit or manual cleanup, and do not reuse it as the fresh output directory.
+
+**Science note:** the native ERA5 `--check` reported many large original-to-ERA RH boundary differences (e.g., 96/121 CA-Man targets and 35/41 CA-Ca3 targets), even though all substitutions are thermodynamically consistent. These changes need review before approving model use. The source clock offsets in this script remain provisional.
+
 ## Modes
 
 `77_native_ERA5_all_RH_below5.py`:
