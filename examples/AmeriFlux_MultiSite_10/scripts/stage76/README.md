@@ -1,5 +1,7 @@
 # Stage76 — 17 extreme RH cases and all 1–5% RH: ERA temperature/dewpoint and human review
 
+> **SUPERSEDED BY THE LATEST HUMAN DECISION — 24 OCTOBER 2026.** The operator now explicitly directs **all 1,109 RH <5% records** (18 below 1%, including CA-Man, and 1,091 between 1% and 5%) to be recalculated using *actual native ERA5 T2m + 2m dewpoint + surface pressure*. The earlier Stage76 partial review and 'accept 1–5% as-is' classification are historical only. **Do not use Stage76 as the current release pipeline.** Use [Stage77](../stage77/README.md) instead. No actual native ERA5 recomputation has been reported complete yet.
+
 **Scientific status: science review only, 0 meteorological replacements approved.** This stage follows the successful Stage75 ten-site numerical inventory and the CA-Man Stage74 operator-selected 18-row joint trial.
 
 ## Scope
