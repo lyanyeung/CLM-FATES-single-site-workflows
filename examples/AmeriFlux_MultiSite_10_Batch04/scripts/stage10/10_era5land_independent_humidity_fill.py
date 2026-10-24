@@ -244,38 +244,91 @@ def grid_read(path,year,point):
             "grid_latitude":locations[0][0],"grid_longitude":locations[0][1],
             "hours":len(wanted)}
 
+def finish_external(site, year, point, candidate):
+    """Verify complete existing/new CDS response; record one immutable receipt."""
+    folder, stem = response_path(site, year)
+    suffix = classify(candidate)
+    proof = grid_read(candidate, year, point)
+    dest = folder/(stem+suffix)
+    if candidate != dest:
+        if dest.exists():
+            raise FileExistsError("Valid CDS payload destination already exists: "+str(dest))
+        candidate.rename(dest)
+    receipt_path = folder/(stem+".receipt.json")
+    if receipt_path.exists():
+        raise FileExistsError("CDS receipt already exists; verify before reuse")
+    receipt = {"site":site,"year":year,"dataset":DATASET,
+               "request":request(point["latitude"],point["longitude"],year),
+               "file":str(dest),"sha256":sha(dest),
+               "bytes":dest.stat().st_size,"BIF_sha256":point["BIF_sha256"],
+               "grid_latitude":proof["grid_latitude"],
+               "grid_longitude":proof["grid_longitude"],
+               "hours":proof["hours"],
+               "status":"INDEPENDENT_CDS_DOWNLOADED_HOUR_GRID_VALID_NOT_MODEL_APPROVED",
+               "created_utc":datetime.now(timezone.utc).isoformat()}
+    with receipt_path.open("x",encoding="utf-8") as output:
+        json.dump(receipt,output,indent=2)
+        output.write("\n")
+    print("CDS VERIFIED/RECOVERED",site,year,receipt["sha256"],flush=True)
+    return dest
+
+
+def recover_unreceipted(site, year, point):
+    """Reuse a valid previous partial response, never overwrite a good file."""
+    folder, stem = response_path(site,year)
+    rec = response_receipt(site,year)
+    if rec is not None:
+        return rec
+    p = folder/(stem+".download.partial")
+    complete = [folder/(stem+e) for e in (".nc",".zip") if (folder/(stem+e)).exists()]
+    if len(complete)>1 or (complete and p.exists()):
+        raise FileExistsError("Multiple unreceipted CDS payloads; operator review required: "+str(folder))
+    if complete:
+        print("CDS UNRECEIPTED COMPLETE CANDIDATE:",complete[0],flush=True)
+        return finish_external(site,year,point,complete[0])
+    if not p.exists():
+        return None
+    regular(p)
+    print("CDS RECOVER PREVIOUS PARTIAL:",p,"bytes",p.stat().st_size,flush=True)
+    try:
+        return finish_external(site,year,point,p)
+    except (ValueError, OSError, zipfile.BadZipFile) as exc:
+        # Protect bytes from an interrupted CDS request, rather than delete.
+        if not p.exists():
+            raise
+        digest=sha(p)
+        quarantine=p.with_name(stem+".unusable_"+datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")+
+                               "_"+digest[:12]+".download.partial")
+        if quarantine.exists():
+            raise FileExistsError("Cannot safely isolate invalid partial: "+str(quarantine))
+        p.rename(quarantine)
+        print("CDS PARTIAL INCOMPLETE: quarantined, source retained:",quarantine,
+              "SHA256",digest,"reason",str(exc)[:300],flush=True)
+        return None
+
+
 def download_one(site,year,point):
+    if GRID_ROOT.is_symlink():raise ValueError("Grid root symlink not permitted")
+    folder,stem=response_path(site,year)
+    if folder.is_symlink():raise ValueError("Output folder symlink not permitted")
+    if not folder.exists(): folder.mkdir(parents=True,exist_ok=False)
+    existing=recover_unreceipted(site,year,point)
+    if existing is not None:
+        print("CDS REUSED PREVIOUS VERIFIED ARTIFACT",site,year,flush=True)
+        return existing
     if importlib.util.find_spec("cdsapi") is None:
         raise ValueError("cdsapi not installed; stop before requesting")
     if not (Path.home()/".cdsapirc").is_file() and not os.getenv("CDSAPI_KEY"):
         raise ValueError("Missing CDSAPI credentials; stop before requesting")
-    if GRID_ROOT.is_symlink():raise ValueError("Grid root symlink not permitted")
-    folder,stem=response_path(site,year)
-    if folder.is_symlink():raise ValueError("Output folder symlink not permitted")
     for suffix in (".zip",".nc",".receipt.json",".download.partial"):
         if (folder/(stem+suffix)).exists():
             raise FileExistsError("Ambiguous/reused CDS artifact "+str(folder/(stem+suffix)))
-    folder.mkdir(parents=True,exist_ok=True)
     request_data=request(point["latitude"],point["longitude"],year)
     print("CDS REQUEST START",site,year,request_data,flush=True)
     import cdsapi
     partial=folder/(stem+".download.partial")
     cdsapi.Client().retrieve(DATASET,request_data).download(str(partial))
-    suffix=classify(partial)
-    proof=grid_read(partial,year,point)
-    dest=folder/(stem+suffix)
-    partial.rename(dest)
-    receipt={"site":site,"year":year,"dataset":DATASET,
-             "request":request_data,"file":str(dest),"sha256":sha(dest),
-             "bytes":dest.stat().st_size,"BIF_sha256":point["BIF_sha256"],
-             "grid_latitude":proof["grid_latitude"],
-             "grid_longitude":proof["grid_longitude"],
-             "hours":proof["hours"],
-             "status":"INDEPENDENT_CDS_DOWNLOADED_HOUR_GRID_VALID_NOT_MODEL_APPROVED",
-             "created_utc":datetime.now(timezone.utc).isoformat()}
-    (folder/(stem+".receipt.json")).write_text(json.dumps(receipt,indent=2)+"\n")
-    print("CDS VERIFIED",site,year,receipt["sha256"],flush=True)
-    return dest
+    return finish_external(site,year,point,partial)
 
 def rh_hour(grid,utc):
     start=grid["start_utc"]
@@ -380,7 +433,8 @@ def self_test():
                     "values":{"t2m":[283.15,283.15],"d2m":[278.15,278.15],
                               "sp":[100000,100000]}},
                    datetime(2025,1,1,0,30,tzinfo=timezone.utc)) is not None
-    print("STAGE10 SELF-TEST PASS: FLUXNET standard clock, leap-year windows, T/D2M humidity interpolation")
+    assert (GRID_ROOT/"US-Rpf"/"2022"/"ERA5Land_US-Rpf_2022_T2M_D2M_SP_Stage10.download.partial").name.endswith(".download.partial")
+    print("STAGE10 SELF-TEST PASS: local clock, T/D2M humidity, safe CDS interrupted-file recovery")
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
