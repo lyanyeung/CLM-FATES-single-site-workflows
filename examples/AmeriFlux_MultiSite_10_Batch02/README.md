@@ -1470,3 +1470,39 @@ forcing-ready science policy and no forcing is modified.
 
 [Stage60 PASS and complete Stage61 pinned IRIDIS6 instructions](docs/stage60_operator_PASS_and_stage61_full_original_hard_coverage_20261024.md).
 Stage61 published on GitHub; **not yet run on IRIDIS6**.
+
+
+### Stage61 IRIDIS6 AUDIT PASS: 21,921 original hard humidity events remain after Stage60; Stage62 automatic non-Ho1 data completion (24 October 2026)
+
+Operator Stage61 fixed Git blob `9d67aafa960c4c5e6e41d9c67f7f2eaf60f25d1d`
+passed self-test, source check, and full isolated audit. The exact
+Stage49 review census contained 26,332 original hard-physics events
+plus 100 additional positive-RH-under-1%-only events, and **all
+4,411** Stage60 selected independent ERA5 water-humidity patch
+times coincide with the Stage49 hard set. Exact same-site/native
+timestamp source join identifies **21,921 hard original events not
+yet covered by Stage60**. Of those, **16,788** are US-Ho1 source
+hard events, including **all 917** earlier Stage58 provisional-UTC
+HOLD target records. **5,133** are spread over nine other sites:
+BZS 86, CMW 42, EML 2,984, GLE 830, Ha1 23, Ho2 717,
+Ho3 39, ICh 48, ICt 364. No forcing was changed.
+
+New [Stage62 fast source-verified independent CDS ERA5 reuse,
+bounded retrieval and original-TA/PA humidity correction script](scripts/stage62/62_reuse_or_fetch_CDS_ERA5_for_5133_nonHo1_hard_humidity.py)
+continues the nine-site 5,133 exactly from Stage61, using only
+checksum-pinned Stage50 t2m/d2m/sp CDS ERA5 receipt methodology.
+It automatically reuses Stage15/18/Stage50 verified independent
+ERA5 grid-years and explicitly reports missing grid-years and
+missing original-release BIF metadata. With `--fetch`
+it downloads a bounded subset of missing authenticated grid-years
+into a new isolated Stage62 cache; with `--stage` it
+creates separate candidate/hold rows where CDS is available and
+original tower T vs ERA5 agrees to <=8 C. No guessing original
+Ho1 UTC_OFFSET, no automatic changing of original tower T if
+>8 C, no use of in-package companion *_ERA, and no source/DATM
+writes. The distinct 102 positive original RH<1% cases remain a
+separate scientific review, not compulsory ERA repair.
+
+[Stage61 verified live stdout and Stage62 complete IRIDIS6
+instructions](docs/stage61_PASS_stage62_5133_CDSEra_auto_reuse_fetch_20261024.md).
+Stage62 committed but not yet run on IRIDIS6.
