@@ -1,5 +1,11 @@
 # CLM-FATES single-site workflows
 
+## CURRENT OPERATOR-OVERRIDE: all RH <5% to native ERA5 (24 October 2026)
+
+**This is the latest instruction and takes precedence over earlier RH handling decisions elsewhere in this README.** For **AmeriFlux Batch01**, the operator explicitly directs that **EVERY original half-hour with RH <5% be recomputed from the same native ERA5 source's 2 m air temperature, 2 m dewpoint and surface pressure**, replacing **all five coupled forcing fields together**: `TBOT`, `TA_USE`, `QBOT`, `PSRF` and `VPD_USE`. No temperature-only or original-QBOT shortcuts. Scope from checksum-pinned Stage75 candidate forcings: **1,109 records** = 18 RH<1% (including the previously accepted CA-Man case) + 1,091 RH 1–5%: CA-Ca3 **41**, CA-Cbo **28**, CA-Man **121**, CA-TP4 **6**, US-Aud **874**, US-Bar **39**. Older Stage76 acceptance of 1–5% unchanged and older CA-Man accepted RH<1% are **SUPERSEDED for the respective low-RH timestamps**; the separate CA-Man Stage74 18/17 temperature-QC decision remains the input baseline.
+
+**Implementation:** [Stage77 native ERA5 all-RH<5 source-coupled pipeline](examples/AmeriFlux_MultiSite_10/scripts/stage77/README.md) and [code](examples/AmeriFlux_MultiSite_10/scripts/stage77/77_native_ERA5_all_RH_below5.py), with site/year CDS downloads, same-source thermodynamics, row-exact 1,109-target verification, six new trial forcings, 10+/15-year physical/full-file audit, manifests and human-readable decision ledgers. Historic Stage76 and Stage74 reports are kept unchanged as reproducibility records and **must not override this new operator choice**. Native ERA5 must be **actually downloaded** before claiming recomputation; any proposed LST→UTC site offsets require independent metadata verification and must remain flagged PROVISIONAL. No original forcing overwrite, active CIME/DATM case edit, or Slurm submission is authorized by creating a trial.
+
 
 ## Mandatory meteorological source consistency (all ICOS, AmeriFlux and OzFlux workflows)
 
