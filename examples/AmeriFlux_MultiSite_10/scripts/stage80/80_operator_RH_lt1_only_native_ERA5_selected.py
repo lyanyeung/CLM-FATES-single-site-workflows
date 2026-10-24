@@ -220,6 +220,10 @@ def audit_site(site,baseline,trial,targets,dest=None):
    raise RuntimeError('Incomplete Stage80 exact original RH<1 coverage '+site)
   if flags['original_lt1']!=RH_LT1[site] or flags['original_1to5']!=RH_1TO5[site]:
    raise RuntimeError('Stage80 source RH census drift '+site)
+  # Counter returns 0 for an absent key, but dict(Counter) drops absent
+  # keys. Ensure a successful zero-residual site returns explicit zeros.
+  for key in ('rows','edited','original_lt1','original_1to5','selected_lt1'):
+   flags.setdefault(key,0)
   if flags['selected_lt1']!=0:raise RuntimeError('Stage80 selected RH<1 remains '+site)
   return dict(flags),edits,risks
  finally:
@@ -281,6 +285,33 @@ def selftest():
                'original_RH_pct':'1.0',
                'operator_decision':'RECOMPUTE_ALL_RH_BELOW_5_NATIVE_ERA5_T_D2M_SP'})
   assert '2010-01-01 12:00:00' in parse_targets(ledger,'CA-Man',base,expected_lt1=1,expected_1to5=0)
+ # Regression for actual IRIDIS6 CA-Ca3 bug: a *successful* source site
+ # with zero residual RH<1 must return an explicit selected_lt1=0, even
+ # after conversion from Counter to ordinary dict.
+ with tempfile.TemporaryDirectory() as folder:
+  p=Path(folder);a=p/'original.csv';b=p/'stage77_trial.csv'
+  def build_row(index,humidity_percent):
+   T=25.0;pressure=100000.0
+   es=6.112*math.exp(17.67*T/(T+243.5))
+   e=es*humidity_percent/100.0
+   q=.622*e/(pressure/100.0-.378*e)
+   return {'time':(datetime(2010,1,1)+timedelta(minutes=30*index)).strftime('%Y-%m-%d %H:%M:%S'),
+           'TBOT':str(T+273.15),'TA_USE':str(T),
+           'QBOT':repr(q),'PSRF':str(pressure),
+           'VPD_USE':repr(es-e),'FSDS':'400'}
+  originals=[build_row(i,0.5 if i<7 else 2.0) for i in range(41)]
+  corrected=[build_row(i,40.0) if i<7 else dict(originals[i]) for i in range(41)]
+  fields=list(originals[0])
+  # All source rows must share identical time coordinates.
+  for x,y in zip(originals,corrected):y['time']=x['time']
+  for path,rows in ((a,originals),(b,corrected)):
+   with path.open('w',newline='',encoding='utf-8') as f:
+    w=csv.DictWriter(f,fieldnames=fields)
+    w.writeheader();w.writerows(rows)
+  sample_targets={row['time'] for row in originals[:7]}
+  stats,edits,warnings=audit_site('CA-Ca3',a,b,sample_targets)
+  assert stats['edited']==7 and stats['selected_lt1']==0
+  assert stats['original_1to5']==34 and len(edits)==7
  print('SELF-TEST PASS: exactly 18 original RH<1 ERA coupled replacements; 1091 RH1-5 retained; unrelated fields preserved')
 
 def main():
@@ -325,7 +356,7 @@ def main():
     dest=location/f'{site}_CLM_forcing_{first}_{last}.csv'
    else:dest=None
    counts,edits,risks=audit_site(site,source,changed[site]['after'],targets,dest)
-   if counts['edited']!=ny or counts['selected_lt1']!=0:
+   if counts.get('edited',0)!=ny or counts.get('selected_lt1',0)!=0:
     raise RuntimeError('Stage80 operator replacement failed '+site)
    if dest is not None:
     total,modified=verify_output(site,source,dest,targets)
