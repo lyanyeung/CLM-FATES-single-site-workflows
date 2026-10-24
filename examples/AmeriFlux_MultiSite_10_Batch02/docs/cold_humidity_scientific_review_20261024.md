@@ -62,3 +62,24 @@ Both script modes are read-only; they verify source SHA256 and scientific HOLD b
 
 ## 5. Existing candidate protection
 The five Stage07 numeric-only candidates US-BZS, US-CMW, US-Ha1, US-Ho2, US-Ho3 remain preserved; they are not approved. The Stage08 incomplete marker, 4,884 HOLD rows and CDS source receipts remain protected. OSH-site eligibility and reference land cover/PFT, ZBOT, and flux-footprint representation are separate pre-model scientific reviews.
+
+## Stage31 measured output and Stage32 continuation — 24 October 2026
+
+IRIDIS6 operator ran the published Stage31 wrapper with `--check` and `--audit`, both successfully. All 4,884 Stage08 held timestamps were retained; source groups were QC0 measured temperature **938**, QC2 ERA-origin temperature **3,945**, and one other QC1. The RH-transfer variant passed its constructed numerical water-saturation screen for all 4,884, **which is not independent humidity validation**. Dewpoint actual-vapour-pressure transfer to retained site T produced **431 negative VPD values** (US-Ho1 425 in QC2 group, US-GLE 6: 4 QC0 and 2 QC2). ERA5 ice supersaturation cautions: **2,782** (EML 815, GLE 194, Ho1 29, ICh 141, ICt 1,603). All zero science approvals.
+
+**Stage32** (`scripts/stage32/32_review_humidity_source_phase_risks.py`) checks the mathematical A/B/C alternatives **without creating a repaired forcing**: (A) transfer ERA5 water RH to retained site T; (B) transfer ERA5 dewpoint-derived vapour pressure to retained site T; and (C) use ERA5 T + ERA5 RH as a numerically paired *reference only*. It separates recorded source QC0/QC2, subzero water/ice physical constraints, phase warnings, temperature differences, and a hierarchical HOLD review priority. US-Ho1 clock remains an overriding hold. Stage32 is a new executable script: live IRIDIS output pending and should be reported separately from Stage31 operator evidence.
+
+Download and run Stage32 on IRIDIS6 using a specific GitHub commit hash instead of `git pull` into an unresolved working tree:
+
+```bash
+set -euo pipefail
+RAW=https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/examples/AmeriFlux_MultiSite_10_Batch02
+DIR="$HOME/Batch02_science_audits/stage32"
+mkdir -p "$DIR"
+curl -fLsS "$RAW/scripts/stage32/32_review_humidity_source_phase_risks.py" -o "$DIR/32_review_humidity_source_phase_risks.py"
+PY=/home/ly3n24/.conda/envs/clm_fates_env/bin/python
+"$PY" "$DIR/32_review_humidity_source_phase_risks.py" --check
+"$PY" "$DIR/32_review_humidity_source_phase_risks.py" --audit
+```
+
+The `curl` command writes only the local downloaded script copy to HOME; the script itself does not write output files or change original data, forcing, DATM, CIME, or jobs. Old Stage11–22 data retrievals must not be rerun without need.

@@ -1036,3 +1036,7 @@ ten already-extracted sites; no upload or extraction is required.
 The original Stage11–22 scripts were restored from the historical Stage22 commit. Stage23–30 inline analyses are archived as reproducible read-only entry points (not byte-identical copies); Stage31 is the next source-aware sensitivity gate. See [scientific audit report and IRIDIS6 instructions](docs/cold_humidity_scientific_review_20261024.md).
 
 **SCIENCE HOLD:** 4,884 unresolved Stage08 records, 0 DATM-approved replacements; US-Ho1 time offset is still provisional. Avoid rerunning completed CDS downloads or overwriting preserved Stage07/08 candidates.
+
+### Stage31 result and Stage32 source/phase audit (24 October 2026)
+
+Stage31 passed on IRIDIS6 and classified all 4,884 held targets by original temperature provenance (QC0 **938**, QC2 **3,945**, other **1**). All RH-transfer candidates were numerically within water-phase bounds, but 431 dewpoint-transferred variants were negative (Ho1 425, GLE 6) and 2,782 ice-supersaturation cautions were flagged. **No approval.** Stage32 is a new read-only script comparing the source-stratified RH-transfer, dewpoint-transfer, and paired CDS-T/RH *numerical reference* with ice/temperature/timezone review flags. [See science report and GitHub-to-IRIDIS instructions](docs/cold_humidity_scientific_review_20261024.md).
