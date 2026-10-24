@@ -275,6 +275,14 @@ On IRIDIS6 first run `--check`, and then optionally `--run` for **new reports on
 
 Stage06 reports go into a new `reports/stage06_qcv5_candidate_effects_*` folder with SHA receipts and a boundary review list, without editing original or Stage05 files. **No production sparse-patch merge before the 754 HOLDs and boundary/physical QC have been resolved and seven remaining Batch04 sites have completed appropriate scientific screening.**
 
+## Stage10 BIF verified; three external site-years present; safely resume missing two (2026-10-24)
+
+Stage10 reached its first CDS download after a successful self-test. Original BIF readings are unambiguous: US-Rpf **65.1198°N, -147.429°, UTC_OFFSET -9** and US-SRM **31.8214°N, -110.8661°, UTC_OFFSET -7**. The operator's 689 exact target HH timestamps fall into only **five site-years**: US-Rpf 2024 (390), 2008 (218), 2021 (69), 2022 (11), US-SRM 2023 (1). The first **three have existing SHA receipts**; US-Rpf 2022 has a saved `.download.partial`, and US-SRM 2023 needs a new retrieval.
+
+The old `FileExistsError` is a safety guard that stopped a potential overwrite of US-Rpf 2022's earlier partial response. **No Stage10 derived repairs are confirmed yet.** [Fixed Stage10](scripts/stage10/10_era5land_independent_humidity_fill.py) first verifies and reuses a complete previous partial (or isolatedly preserves a failed one and retries); it never deletes original data, and only then obtains missing years and creates new **full native-length** source-derived CSVs.
+
+Read the [Stage10 interrupted partial provenance and fix](docs/STAGE10_INTERRUPTED_CDS_PARTIAL_RESUME_2026-10-24.md). On IRIDIS6, re-download the pinned source from commit `b8ff0c2aaf41683d70bb94e9d70715c25c5eea45` and run `--run --max-downloads 2`. Existing 3 year receipts are preserved, and at most 2 new CDS requests are needed (or 1 if the pre-existing 2022 partial verifies).
+
 ## Stage09 VERIFIED (zero source repairs) / Stage10 independent ERA5-Land next
 
 The operator completed Stage09 (`--self-test` and `--apply`) on IRIDIS6, generated two complete source-length derived CSVs, **0 new patches**, and preserved all **696 Stage08 HOLDs**. **US-Rpf 688/688** and **US-SRM 1/1** source-native VPD samples in the ERA-physics HOLDs are themselves physically invalid and cannot be safely rescued by max-four-HH original-tower interpolation. The repeated Stage09 source-CSV SHA256 matches Stage08 unchanged files.
@@ -288,7 +296,7 @@ Run after CDS credentials `~/.cdsapirc` and `cdsapi,numpy,netCDF4` are configure
 ```bash
 (
   set -euo pipefail
-  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/3d1d15e5a8d0c3403446fa67f0a9e32c4e2ea15d"
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/b8ff0c2aaf41683d70bb94e9d70715c25c5eea45"
   REL="examples/AmeriFlux_MultiSite_10_Batch04"
   BASE="$HOME/ameriflux_batch04_stage10"
   SCRIPT="$BASE/scripts/stage10/10_era5land_independent_humidity_fill.py"
