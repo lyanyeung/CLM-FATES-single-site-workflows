@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 04
 
-> **Operational status (2026-10-24): STAGE00 VERIFIED — 10/10 original ZIPs transferred to IRIDIS6 and local/remote SHA256 matched.** Operator-supplied output includes the explicit 10/10 success marker. Full checksums and package sizes are preserved in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md). **Stage01 extraction is pending.** No forcing modification, QC repair, DATM input, surface modification, CIME case or spin-up is approved.
+> **Operational status (2026-10-24): STAGE00 + STAGE01 VERIFIED (10/10 sites each) from operator logs.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 metadata audit code is now prepared but not yet run.** No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
 
 Fourth independent ten-site AmeriFlux campaign following [Batch03](../AmeriFlux_MultiSite_10_Batch03/), [Batch02](../AmeriFlux_MultiSite_10_Batch02/) and [Batch01](../AmeriFlux_MultiSite_10/). This directory contains the exact release manifest and reproducible scripts. Never commit raw tower ZIPs or derived large files to GitHub.
 
@@ -81,6 +81,29 @@ To run only after a verified 10/10 upload, execute **on IRIDIS6**:
 ```
 
 The Stage01 CLI also supports `--audit-only`, `--sites US-Rpf`, `--sites-root` and `--reports-dir`. Stage01 runs no Slurm jobs. Default output inventory location: `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch04/reports/`.
+
+## Stage02 — READ-ONLY BIF metadata and native time-step check (pending execution)
+
+Batch04 Stage02 follows the established Batch03 metadata-preflight design, **without** Batch03's site-specific coordinate decision or FULLSET fallback files. All 10 Stage01 products have BIF; each release must have exactly one original BIF file. Ambiguous or missing BIF coordinates are reported as review failures. There is **no automatic selection** of alternative coordinates, vegetation percentages, FATES PFTs or measurement-height/ZBOT values.
+
+On the **IRIDIS6 login terminal**, run:
+
+```bash
+(
+  set -euo pipefail
+  RAW='https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main'
+  REL='examples/AmeriFlux_MultiSite_10_Batch04'
+  BASE="$HOME/ameriflux_batch04_stage02"
+  mkdir -p "$BASE/scripts/stage02"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  SCRIPT="$BASE/scripts/stage02/02_check_batch04_metadata.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage02/02_check_batch04_metadata.py" -o "$SCRIPT"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" 2>&1 | tee "$BASE/stage02_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+This script **does not write any output** itself. The shell `tee` saves an external operator log. A successful output ends with `STAGE02 SUMMARY: 10/10 coordinate + first-interval checks PASS; failures: none`; that PASS still does not establish full timestamp/coverage/QC science. Coordinate conflicts, missing metadata or ambiguous IGBP must be reviewed rather than filled automatically. Investigate exclusions (WET/CRO/WAT), non-forest PFT applicability, sensor-to-TA mapping and time continuity in later independent scientific stages.
 
 ## Scientific gates after extraction (not yet executed)
 
