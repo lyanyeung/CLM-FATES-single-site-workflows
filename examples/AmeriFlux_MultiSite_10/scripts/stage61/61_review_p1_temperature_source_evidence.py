@@ -336,8 +336,8 @@ def main():
     mode.add_argument('--check',action='store_true')
     mode.add_argument('--audit',action='store_true')
     mode.add_argument('--self-test',action='store_true')
-    p.add_argument('--stage59-dir',type=Path,required=True)
-    p.add_argument('--stage60-dir',type=Path,required=True)
+    p.add_argument('--stage59-dir',type=Path)
+    p.add_argument('--stage60-dir',type=Path)
     p.add_argument('--sites-tsv',type=Path,default=Path(__file__).resolve().parents[2]/'sites.tsv')
     p.add_argument('--raw-root',type=Path,default=DEFAULT_RAW)
     p.add_argument('--experiment-root',type=Path,default=DEFAULT_EXP)
@@ -345,6 +345,8 @@ def main():
     if a.self_test:
         self_test()
         return
+    if a.stage59_dir is None or a.stage60_dir is None:
+        p.error('--stage59-dir and --stage60-dir are required for --check/--audit')
     root=a.experiment_root.resolve(strict=True)
     s59,s60,p1,steps,ctx,packages,m59,m60=read_inputs(a)
     print('STAGE61 P1 EVIDENCE | READ-ONLY INPUTS')
