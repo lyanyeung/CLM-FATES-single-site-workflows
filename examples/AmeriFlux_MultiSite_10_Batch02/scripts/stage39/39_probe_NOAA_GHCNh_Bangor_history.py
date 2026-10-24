@@ -118,8 +118,8 @@ def gate(args):
               on="local",how="left",validate="one_to_one",
               suffixes=("","_raw"),indicator=True)
     if not x._merge.eq("both").all():raise ValueError("Original Ho1 times absent")
-    if not np.allclose(x.retained_TA_C,x.TA_F,atol=1e-6,rtol=0,equal_nan=True).all() or \
-       not np.allclose(x.TA_F_QC,x.TA_F_QC_raw,atol=0,rtol=0,equal_nan=True).all():
+    if not np.allclose(x.retained_TA_C,x.TA_F,atol=1e-6,rtol=0,equal_nan=True) or \
+       not np.allclose(x.TA_F_QC,x.TA_F_QC_raw,atol=0,rtol=0,equal_nan=True):
         raise ValueError("Stage20 original Ho1 TA/QC mismatch")
     calc=esw(x.retained_TA_C)-esw(x.ERA5_Td2M_C)
     if not np.allclose(calc,x.Td_transfer_water_VPD_hPa,rtol=1e-8,atol=1e-7):
@@ -234,7 +234,13 @@ def test():
     a,b,c,times,n,sm=parse_psv(synthetic,1999)
     assert n==2 and len(times)==2 and b==["temperature_Quality_Code"]
     assert nearest(times,datetime(1999,2,13,4,30))==30
-    print("STAGE39 SELF-TEST PASS | schema, UTC and station-month coverage")
+    # Regression: np.allclose produces a scalar bool, not an array with .all().
+    measured=np.array([2.5,np.nan,3.0])
+    same=np.array([2.5,np.nan,3.0])
+    altered=np.array([2.5,np.nan,4.0])
+    assert np.allclose(measured,same,atol=1e-6,rtol=0,equal_nan=True)
+    assert not np.allclose(measured,altered,atol=1e-6,rtol=0,equal_nan=True)
+    print("STAGE39 SELF-TEST PASS | schema, UTC, and scalar np.allclose preflight guard")
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

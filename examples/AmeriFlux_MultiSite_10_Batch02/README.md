@@ -1073,3 +1073,8 @@ Stage37 successfully traced Ho1's 319 negative-Td-VPD records with no neighbouri
 ### Stage38 verified; Stage39 memory-only NOAA GHCNh source probe
 
 Stage38 identified the 319 Ho1 cases without neighbouring QC0 as 1998 64 (4 episodes), 1999 25 (3), 2001 230 (9) and found only the original FLUXNET FULLSET ZIP in its bounded local search (not proof BASE/BADM is unavailable elsewhere). Stage39 adds a standalone read-only NOAA GHCNh station-year availability script with --self-test, offline --check, and explicit optional network --probe. It does not write external data or declare NOAA station quality accepted. [See detailed science record](docs/cold_humidity_scientific_review_20261024.md). 4,884 HOLD / 0 approved forcing replacements.
+
+
+### Stage39 v2 preflight bug fix (24 October 2026)
+
+Initial Stage39 --self-test passed, and three original source checksums passed, but --check failed before NOAA network access due to invalid `.all()` calls on the scalar bool returned by `np.allclose()`. Stage39 v2 corrects both checks, retains SHA256 and strict numerical comparisons, and adds a synthetic regression case. **No NOAA probe was launched, no original data were changed, and no repair was approved.** See [scientific audit record](docs/cold_humidity_scientific_review_20261024.md).

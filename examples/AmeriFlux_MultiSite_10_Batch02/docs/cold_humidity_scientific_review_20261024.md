@@ -176,3 +176,9 @@ Within a bounded local US-Ho1 forcing/source folder inspection, Stage38 found th
 NOAA GHCNh official documentation confirms per-station/per-year PSV structure and raw observation source/QC fields: https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/doc/ghcnh_DOCUMENTATION.pdf and https://www.ncei.noaa.gov/products/global-historical-climatology-network-hourly . This does **not** independently confirm specific Bangor station/year PSV availability. Bangor airport is geographically separated from Howland and may reflect airport rather than forest microclimate; station metadata, elevation, UTC, and QC/source-code interpretation are separate science gates. AmeriFlux BASE acquisition remains a parallel source review: https://ameriflux.lbl.gov/sites/siteinfo/US-Ho1 .
 
 **Science status:** Stage08 4,884 HOLD, 0 approved replacements; no DATM, CIME, forcing, NetCDF, model run, or source file modification.
+
+## Stage39 v2 NumPy scalar-allclose preflight hotfix (24 October 2026)
+
+First IRIDIS6 execution passed the Stage39 synthetic `--self-test` and verified original SHA256 for US-Ho1/Ho2/Ho3 (490,896 / 473,376 / 333,120 raw records). It **stopped before NOAA access** during the offline `--check`: `AttributeError: 'bool' object has no attribute 'all'` at original line 121. Root cause: `np.allclose()` itself returns a scalar bool, but two Stage39 preflight comparisons erroneously appended `.all()`. This is a script programming error **not evidence of changed source files or NOAA failure**.
+
+Stage39 v2 removes both invalid `.all()` calls while retaining the original strict numerical equality/tolerance and SHA256 checks, and adds a synthetic NumPy regression check to `--self-test` for equal/mismatched arrays with NaNs. No source, forcing, ERA5, DATM, CIME or Slurm modification. Live `--check` and `--probe` are **pending** after this source change; NOAA file availability remains unverified.
