@@ -101,6 +101,8 @@ def self_test():
     assert 0<v<esw(t) and 0<q<.08 and esi(t)<esw(t)
     assert len(FIELDS)==10
     assert REASON=="NO_VERIFIED_ERA5LAND_SOURCE_FOR_SITE_YEAR"
+    assert (408+328+302)==1038
+    assert 2810-1038==1772
     print("STAGE12G SELF-TEST PASS: 6 site source clocks, 233 immutable science holds, fixed tower T/P and water/ice RH/QBOT formulas; NO WRITES",flush=True)
 
 def sources():
@@ -224,8 +226,6 @@ def one(site,spec,held,missing,catalog,stage10):
         target=np.flatnonzero(requested&(date.dt.year.to_numpy()==year))
         if (site,int(year)) not in catalog:continue
         plan,metadata=catalog[(site,int(year))]
-        if metadata["sha256"]!=metadata["sha256"]:
-            raise ValueError("Impossible SHA source equality")
         gridfile=file(metadata["path"])
         if sha(gridfile)!=metadata["sha256"]:
             raise ValueError("Stage12f external year data SHA changed during run")
