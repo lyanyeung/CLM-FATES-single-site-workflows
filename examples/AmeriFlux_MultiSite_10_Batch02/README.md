@@ -1506,3 +1506,29 @@ separate scientific review, not compulsory ERA repair.
 [Stage61 verified live stdout and Stage62 complete IRIDIS6
 instructions](docs/stage61_PASS_stage62_5133_CDSEra_auto_reuse_fetch_20261024.md).
 Stage62 committed but not yet run on IRIDIS6.
+
+
+### Stage62 IRIDIS6 STAGING PASS; new automatic verified-CDS continuation for 22 missing grid-years (24 October 2026)
+
+The original Stage62 exact-source audit and isolated staging **PASSED**,
+producing `reports/stage62_nonHo1_5133_verified_CDS_stage_20261024T120055Z_3489543f`.
+Of the 5,133 previously uncovered **non-Ho1** original VPD/RH hard
+events: **2,911** have valid independent ERA5 water-humidity corrections
+at original tower T/PA; **1,970** still need 22 independent CDS ERA5
+grid-years; **166** have original tower vs ERA5 T2m discrepancy >8 C
+and retain temperature science HOLD; **86 US-BZS** lack verified
+same-release BIF UTC_OFFSET and stay provenance HOLD.
+The 16,788 separate US-Ho1 original source hard cases remain held.
+No original, Stage60, forcing or model files were touched.
+
+An updated [Stage62 automatic batch completion script](scripts/stage62/62_reuse_or_fetch_CDS_ERA5_for_5133_nonHo1_hard_humidity.py)
+has `--auto --max-new 8` to fetch all 22 missing exact
+independent CDS grid-years in validated, resumable batches,
+then automatically rebuild the full 5,133 event status ledger.
+It preserves original EC TA/PA, never guesses station UTC_OFFSET,
+never implicitly approves >8 C tower temperature deviations,
+and never overwrites original inputs/NetCDF/DATM.
+[Verified Stage62 output, precise BIF/T blockers and pinned one-shot
+IRIDIS6 Stage62 --auto command](docs/stage62_operator_pass_next_auto_CDS_20261024.md).
+Stage62 `--auto` published on GitHub but not yet
+executed on IRIDIS6.
