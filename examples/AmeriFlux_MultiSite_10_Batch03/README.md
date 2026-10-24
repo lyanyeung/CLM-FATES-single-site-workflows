@@ -1282,3 +1282,10 @@ On the IRIDIS6 login node:
 ```
 
 A CDS credential and installed `cdsapi`, `numpy` and `netCDF4` are needed for actual download/audit. The command makes exactly **one** CDS query (the `--check` mode makes none). Do not run `--download` again after successful download; non-overwrite protection intentionally blocks it. If the CDS request fails and leaves a `.download.partial`, inspect it rather than deleting an original or bypassing checks. Report remains **scientific evidence only**: UTC-5 is a published offset but not an automatically approved tower clock shift, and this ERA5-derived data cannot independently prove tower RH truth. A separate future time-offset sensitivity comparison of the four Stage11M VPD discontinuities is required before any new change or Post-v5/DATM/CLM-FATES model approval.
+
+
+### Stage11m verified and Stage11n sensitivity only (2026-10-24)
+
+Stage11m on IRIDIS6 passed syntax, self-test, check and run. It SHA-verified four residual US-NC2 VPD transitions and 40 original source/companion ERA/Stage07/Stage11h/Stage11l native context rows. Remaining jumps in Stage11l: March 18 18:00-18:30 4.997141 hPa; March 23 08:30-09:00 9.467392 hPa; March 23 15:00-15:30 4.812737 hPa; March 25 10:00-10:30 5.859252 hPa.
+
+[Stage11n](scripts/stage11/11n_seven_candidate_four_boundary_RH_sensitivity_READONLY.py) is committed but **has not been run on IRIDIS6**. This is read-only source-companion ERA-RH WHAT-IF for seven possible additional US-NC2 native source timestamps (202503181800, 202503230730, 202503230800, 202503230830, 202503231530, 202503231600, 202503251030), including three already modified by Stage07. It compares four existing boundaries and newly introduced adjacent jumps, retaining EC tower TA/TBOT. None of the seven is an approved addition to the existing 64 humidity target mask. Stage07/11h/11l remain protected, with Post-v5/DATM/spinup approvals zero.
