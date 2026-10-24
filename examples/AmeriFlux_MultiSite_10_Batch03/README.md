@@ -908,3 +908,22 @@ The [Stage10i source ERA VPD saturation audit](scripts/stage10/10i_source_ERA_vp
 is committed as the next **unrun** read-only diagnosis. No humidity repairs,
 time-offset approvals, Post-v5 acceptance or spinups are authorized. No humidity replacements, time offset or spinup
 has been approved.
+
+
+### Stage10i verified and Stage10j next (2026-10-24)
+
+[Stage10i](scripts/stage10/10i_source_ERA_vpd_saturation_audit.py) passed IRIDIS6
+self-test/check/run: 1,924/1,924 event rows had original paired
+`VPD_ERA > es_water(TA_ERA)`, corresponding to negative *implied* liquid-water
+vapour pressure within the exact-release paired ERA source fields. The largest
+site median overage was US-MtB (0.257 hPa); US-NR3 covered 1,484 records.
+This **does not** establish that actual atmospheric water vapour pressure
+was negative, or identify which upstream ERA/downscaling step is at fault.
+
+[Stage10j (code only; not yet run on IRIDIS)](scripts/stage10/10j_source_vs_grid_humidity_counterfactuals.py)
+will compare the original source `TA_ERA` and `VPD_ERA` against the previously
+obtained, SHA-pinned ERA5-Land temperature/dewpoint evidence, using only exact
+same source-row IDs and arithmetic sensitivities. It is not a humidity
+correction method. Full results and strict scientific caveats are in the
+[Stage10e–10i evidence ledger](docs/STAGE10E_TO_10G_QC_EVIDENCE_2026-10-24.md).
+**All repairs and spinups remain unapproved.**
