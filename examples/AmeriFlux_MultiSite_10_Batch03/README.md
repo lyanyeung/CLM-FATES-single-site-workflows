@@ -1024,8 +1024,10 @@ ERA replacement. Six source QC0 air-temperature spikes, five RH<1% cases,
 and four unchanged manual-review rows remain on science hold. See
 [Stage11d verified source evidence](docs/STAGE11D_VERIFIED_PRIORITY_SOURCE_REVIEW_2026-10-24.md).
 
-[Stage11e final source-physics triage](scripts/stage11/11e_priority_scientific_triage.py)
-is **committed but not yet run on IRIDIS6**. It will use the sealed 62-target
+[Stage11e-v1](scripts/stage11/11e_priority_scientific_triage.py) **failed synthetic self-test before IRIDIS file checks**: a one-event simulation encountered an erroneously hardcoded 62-event join requirement. The historical v1 is preserved for auditing.
+
+[Stage11e-v2 repaired source-physics triage](scripts/stage11/11e_v2_priority_scientific_triage.py)
+is **committed but not yet run on IRIDIS6**. Synthetic tests now explicitly request one event and verify that production still requires 62 unique joined records; an unmatched event identity also fails. It will use the sealed 62-target
 Stage11d report to independently classify original VPD/T water thermodynamics,
 check six QC0 edits against native neighbours and report 38 QC1 VPD
 inconsistencies. The output is a scientific review queue, not permission to
