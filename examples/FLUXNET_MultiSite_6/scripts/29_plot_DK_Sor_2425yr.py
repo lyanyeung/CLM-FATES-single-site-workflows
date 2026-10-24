@@ -17,6 +17,7 @@ import importlib.util
 import json
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -171,19 +172,24 @@ def main():
                         help="Inspect NetCDF archive/checkpoint only. Do not generate outputs.")
     args = parser.parse_args()
     repo = args.repo.resolve()
-    stage = repo / "examples/FLUXNET_MultiSite_6/scripts/27_plot_six_site_latest_archived_convergence_to_RFS.py"
-    if not stage.is_file():
-        raise FileNotFoundError(f"Original stage-27 method not found: {stage}")
-    checkpoint = preflight(repo, stage)
-    if args.check_only:
-        return 0
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    dest = RFS_PARENT / (stamp + "_DK_Sor_2425_archive_snapshot")
-    cmd = [sys.executable, "-B", str(stage), "--repo", str(repo),
-           "--sites", SITE, "--output-root", str(dest)]
-    print("Executing the original stage-27 science pipeline (DK-Sor only)", flush=True)
-    subprocess.run(cmd, check=True)
-    create_report(dest, checkpoint)
+    # Load the exact fetched GitHub stage-27 file without touching a potentially
+    # conflicted local repository worktree. Stage 27 itself pins its helpers.
+    rel = "examples/FLUXNET_MultiSite_6/scripts/27_plot_six_site_latest_archived_convergence_to_RFS.py"
+    with tempfile.TemporaryDirectory(prefix="dk_sor_stage27_") as temp:
+        stage = Path(temp) / "27_plot_six_site_latest_archived_convergence_to_RFS.py"
+        with stage.open("w", encoding="utf-8") as output:
+            subprocess.run(["git", "-C", str(repo), "show", "origin/main:" + rel],
+                           check=True, stdout=output)
+        checkpoint = preflight(repo, stage)
+        if args.check_only:
+            return 0
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        dest = RFS_PARENT / (stamp + "_DK_Sor_2425_archive_snapshot")
+        cmd = [sys.executable, "-B", str(stage), "--repo", str(repo),
+               "--sites", SITE, "--output-root", str(dest)]
+        print("Executing the original stage-27 science pipeline (DK-Sor only)", flush=True)
+        subprocess.run(cmd, check=True)
+        create_report(dest, checkpoint)
     return 0
 
 
