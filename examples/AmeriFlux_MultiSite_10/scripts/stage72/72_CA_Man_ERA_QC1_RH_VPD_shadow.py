@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import importlib.util
 import json
 import math
 from collections import Counter, defaultdict
@@ -301,6 +302,34 @@ def verify_shadow(original,trial,patches):
     if n!=262800 or seen!=set(patches):raise RuntimeError('Shadow full row-level check failure')
     return n
 
+def full_science_file_gate(original,trial):
+    """Re-use Stage58 across all 262800 NOLEAP half-hours, not event-only."""
+    script=Path(__file__).resolve().parents[1]/'stage58'/'58_audit_selected_forcing_candidates.py'
+    if not script.is_file():
+        raise RuntimeError('Stage58 full-file scanner dependency missing '+str(script))
+    spec=importlib.util.spec_from_file_location('stage58_gate_for_stage72',str(script))
+    if spec is None or spec.loader is None:
+        raise RuntimeError('Cannot import Stage58 full forcing gate')
+    mod=importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    baseline=mod.scan(original,1994,2008)
+    candidate=mod.scan(trial,1994,2008)
+    if baseline['rows']!=262800 or candidate['rows']!=262800:
+        raise RuntimeError('Expected 262800 rows in original and trial')
+    if baseline['structural_gate']!='PASS_REVIEW_ONLY' or candidate['structural_gate']!='PASS_REVIEW_ONLY':
+        raise RuntimeError('Stage58 original or shadow full-file physical/structural gate failed')
+    prev=baseline['flags'];new=candidate['flags']
+    if prev.get('ta_step_over10C',0)!=185 or new.get('ta_step_over10C',0)>prev.get('ta_step_over10C',0):
+        raise RuntimeError('Shadow 10C jump count unexpectedly increased or original baseline changed')
+    for flag in ('rh_below1','rh_above100','invalid_humidity','rh_nonpositive',
+                 'vpd_closure_warning','nonfinite_rows','bad_calendar'):
+        if new.get(flag,0)>prev.get(flag,0):
+            raise RuntimeError('Shadow introduced full-file '+flag)
+    return {'original_step_gt10':prev.get('ta_step_over10C',0),
+            'shadow_step_gt10':new.get('ta_step_over10C',0),
+            'original_structural_gate':baseline['structural_gate'],
+            'shadow_structural_gate':candidate['structural_gate']}
+
 def show(result):
     print('STAGE72 | 35 CA-Man isolated QC1 ERA temperature hypotheses | FIXED QBOT')
     print('35 of 36 events screen as temperature boundary continuous; 2007-03-10 remains HOLD.')
@@ -370,9 +399,11 @@ def main():
         trial=dest/'CA-Man_ERA_QC1_FIXEDQ_SHADOW_NOT_PRODUCTION.csv'
         write_shadow(original,trial,patches)
         verify_shadow(original,trial,patches)
+        full_gates=full_science_file_gate(original,trial)
+        print('Full 15-year Stage58 gate:',full_gates)
         trial_digest=sha(trial)
     else:
-        trial=None;trial_digest=None
+        trial=None;trial_digest=None;full_gates=None
     if sha(original)!=ORIGINAL_SHA:raise RuntimeError('Original CA-Man forcing changed unexpectedly')
     (dest/'manifest.json').write_text(json.dumps({
         'stage':72,'site':'CA-Man','candidate_events':35,'special_hold_event':'2007-03-10 11:30:00',
@@ -381,6 +412,7 @@ def main():
         'original_forcing_path':str(original),'original_forcing_sha256':ORIGINAL_SHA,
         'shadow_path':str(trial) if trial else None,'shadow_sha256':trial_digest,
         'shadow_modified_rows':len(patches),'candidate_physics':dict(Counter(x['physics_gate'] for x in results)),
+        'full_15_year_stage58_gate':full_gates,
         'changed_columns':sorted(CHANGED),'unchanged_fields':['QBOT','PSRF','FSDS','FLDS','WIND','PRECTmms'],
         'source_clock_verified':False,'source_independent':False,'science_approved':False,
         'production_approved':False,'original_forcing_modified':False,'jobs_submitted':False,
