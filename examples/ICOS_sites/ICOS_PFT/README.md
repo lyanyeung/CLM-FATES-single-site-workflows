@@ -1,5 +1,20 @@
 # ICOS_PFT: observed vegetation evidence for four FLUXNET multisite campaigns
 
+## New cross-batch modeled PFT realism report — 24 October 2026
+
+**[Four-batch tower vegetation vs FATES PFT report](comparison_20261024/FOUR_BATCH_EC_PFT_VS_FATES_REPORT_20261024.md)** joins the previously curated 38-site vegetation-evidence inventory, published model-end FATES vegetation carbon shares, and the existing 15-site CLM input surface audit.
+
+- 34/38 station final-model PFT distributions were published (36 runs have reached at least 1000 model years per user-provided Slurm status).
+- Dominant-functional-type screening: **6 broad matches**, **2 partial mixed-forest matches**, **26 mismatches**.
+- **All 34 published FATES PFT vectors show 0% final needleleaf evergreen or deciduous vegetation carbon**, including spruce/pine tower stations.
+- DE-Lnf / ES-Agu have 1000-year models but published PFT is missing because the EC half-hourly source discovery failed. IT-Noe / CH-Aws remained unfinished at the last cited monitoring checkpoint.
+- [Detailed 38-site numerical comparison](comparison_20261024/four_batch_EC_original_versus_FATES_PFT_38sites.csv); [full 14-PFT terminal vectors for 6 / 8 / 11 / 13 cohorts](comparison_20261024/).
+
+This is a functional-group *screen*, **not** proof of matching observed area percentages. Original percentages have differing denominators (basal area, stand species share, cover, carbon stocks); modeled `FATES_VEGC_PF` is plant carbon share. No original forcing, active model case, or surface was changed.
+
+---
+
+
 **Research inventory; not a FATES surface modification. Updated 22 October 2026.**
 
 ## Scope
