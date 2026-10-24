@@ -1,0 +1,2 @@
+Site,Status,ArchivedYears,LastModelYear,LastCheckpointElapsedYears,MissingHistYears,BIF_IGBP,DominantFATESPFT,DominantFATESVEGC_pct,ConvergenceFocusVariable,Last100yrTrend_pct,AlignedCycleAbsChange_pct,ECFluxProblem,ResultsDirectory
+DK-Sor,OK,2425,4420,2425,0,DBF,broadleaf_colddecid_extratrop_tree,99.68274524072355,TOTECOSYSC,1.1538236859806517,0.3650774300082672,,/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/convergence_snapshots/20261024T100510Z_DK_Sor_2425_archive_snapshot/DK-Sor

@@ -1,0 +1,27 @@
+{
+  "repository_sha": "c4945ef609fa3bce28c2a6179a7b24b892a47512",
+  "created_utc": "20261024T100511Z",
+  "requested_sites": [
+    "DK-Sor"
+  ],
+  "Research_Filestore_root": "/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/convergence_snapshots/20261024T100510Z_DK_Sor_2425_archive_snapshot",
+  "interpretation": "Interim exploratory convergence diagnostics of archived histories; not proof of equilibrium or observed IGBP consistency.",
+  "results": [
+    {
+      "Site": "DK-Sor",
+      "Status": "OK",
+      "ArchivedYears": 2425,
+      "LastModelYear": 4420,
+      "LastCheckpointElapsedYears": 2425,
+      "MissingHistYears": 0,
+      "BIF_IGBP": "DBF",
+      "DominantFATESPFT": "broadleaf_colddecid_extratrop_tree",
+      "DominantFATESVEGC_pct": 99.68274524072355,
+      "ConvergenceFocusVariable": "TOTECOSYSC",
+      "Last100yrTrend_pct": 1.1538236859806517,
+      "AlignedCycleAbsChange_pct": 0.3650774300082672,
+      "ECFluxProblem": "",
+      "ResultsDirectory": "/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/convergence_snapshots/20261024T100510Z_DK_Sor_2425_archive_snapshot/DK-Sor"
+    }
+  ]
+}
