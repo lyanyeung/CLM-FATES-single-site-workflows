@@ -370,7 +370,12 @@ def self_test():
     assert local_to_utc("202501010000",p["offset_hours"]).isoformat()=="2025-01-01T08:00:00+00:00"
     assert dates(2020)==["2019-12-29","2021-01-03"]
     assert len(expected_hours(2020))==372*24
-    assert 80<100*sat_c(5)/sat_c(10)<100
+    # Same-water saturation ratio e_s(5 C)/e_s(10 C) is ~71.1%, not >80%.
+    ratio = 100 * sat_c(5) / sat_c(10)
+    assert 70 < ratio < 73, "water saturation-pressure regression: {}".format(ratio)
+    assert abs(sat_c(0)-6.112) < 1e-9
+    assert sat_c(5) < sat_c(10)
+    assert len(expected_hours(2021)) == 371 * 24
     assert rh_hour({"start_utc":datetime(2025,1,1,tzinfo=timezone.utc),
                     "values":{"t2m":[283.15,283.15],"d2m":[278.15,278.15],
                               "sp":[100000,100000]}},
