@@ -1,5 +1,8 @@
 # Stage77 — operator decision: recompute **ALL RH <5%** using native ERA5 T2m + dewpoint2m + pressure
 
+> **SUPERSEDED AS THE CURRENT OPERATOR RULE BY STAGE80 (24 October 2026).** This Stage77 document remains an archival reproducibility record only. The user now explicitly requests **only 18 original RH<1% half-hours replaced by the already-computed native ERA5 T/D2m/P joint state; all 1,091 original RH 1–5% and every other Stage75 record remain unchanged**. Do not select the former Stage77 1,109-row trial as current forcing. See [Stage80](../stage80/README.md). Existing outputs and evidence are retained; no new ERA5 downloads required.
+
+
 **Latest operator decision on 24 October 2026 OVERRIDES both the earlier Stage76 "accept RH 1–5% unchanged" decision and the earlier CA-Man accepted RH<1% risk for the specific low-RH records.** The scope is **1,109 half-hour records** across six sites in AmeriFlux Batch01, counted from the *Stage75 reviewed forcing versions*, **including the existing Stage74 CA-Man 18-event trial**. All sites not listed below are untouched.
 
 | Site | Original RH<1% | RH 1–5% | Native ERA5 joint-recompute targets | Site coord (AmeriFlux) | Provisional UTC = local standard time + |
