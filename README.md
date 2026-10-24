@@ -1,5 +1,13 @@
 # CLM-FATES single-site workflows
 
+
+## ACTIVE Batch01 operator rule — only original RH <1% replaced (24 October 2026)
+
+**LATEST USER DECISION, superseding Stages77–79's broader low-RH replacement and edge-review instructions.** For the ten Stage75 Batch01 selected forcings: replace **only the 18 ORIGINAL half-hour records with RH<1%**, always using the already-computed same-source **native ERA5 T2m + 2m dewpoint + surface pressure** joint meteorological state (`TBOT`, `TA_USE`, `QBOT`, `PSRF`, `VPD_USE`). Counts: **CA-Ca3 7, CA-Cbo 2, CA-Man 1, US-Bar 8**. Keep **every other row unchanged**, including **all 1,091 original RH 1–5% records** (CA-Ca3 34; CA-Cbo 26; CA-Man 120; CA-TP4 6; US-Aud 874; US-Bar 31), and preserve the Stage75 CA-Man prior Stage74 approved edits as baseline. The older **all-1,109 RH<5% Stage77 trials are historical alternatives, NOT the current selected forcing version**.
+
+[**Stage80 final operator scope and 10-site selected version workflow**](examples/AmeriFlux_MultiSite_10/scripts/stage80/README.md) builds **four complete SHA-pinned candidate forcing CSVs (18 ERA5 replacements only)** and a ten-site manifest (four new candidates + six unchanged Stage75 paths), with exact every-row diff verification, full NOLEAP/physics checks and a change ledger. The 89 Stage78 new/worsened RH/T edges and Stage79 source-switch findings relate to the **superseded 1,109-row trial**; they do not block implementing the user's narrower replacement decision. Any substantial boundary steps caused by the **18 retained ERA5 corrections** are logged as **explicitly operator-accepted risk**, not automatically repaired by changing neighbors. ERA5 LST/UTC/half-hour averaging remains a documented source-provenance caveat; no existing active CIME/DATM case or Slurm job is modified.
+
+
 ### Stage79 transition-specific native ERA5 diagnosis (24 October 2026)
 
 **Observed Stage78 89-edge classification from IRIDIS6:** CA-Ca3 13, CA-Cbo 18, CA-Man 42, CA-TP4 5, US-Aud 0, US-Bar 11. Site-specific examples reveal *new* half-hour RH steps of **84.37 pp (CA-Man), 69.85 pp (US-Bar), 67.02 pp (CA-Cbo), 56.29 pp (CA-TP4) and 44.91 pp (CA-Ca3)** where the previous source had much smaller steps. These are actual before/after boundary risks, not just Stage77's 179 provisional old-neighbor flags. **Do not mark production MET ready solely based on thermodynamic closure or elimination of RH<1**.
