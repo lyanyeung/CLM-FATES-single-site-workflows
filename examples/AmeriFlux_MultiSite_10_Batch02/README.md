@@ -1615,3 +1615,33 @@ primary exactly. No original/model input writes.
 [Stage62 final operator PASS and Stage63 pinned one-paste
 IRIDIS6 procedure](docs/stage62_operator_PASS_and_stage63_246_auto_T_neighbour_20261024.md).
 Stage63 is committed, not yet run on IRIDIS6.
+
+
+### Stage63 IRIDIS6 full PASS; 177 automatic original cold-T acceptances and Stage64 full source accounting (24 October 2026)
+
+The user ran pinned Stage63, which passed syntax, self-test,
+source check and AUDIT. Report:
+`reports/stage63_246_temperature_auto_neighbor_QC_20261024T231206Z_b5fac2db`.
+Of the 246 original EC tower temperatures >8°C from independently
+verified ERA5 T2m, the exact original-source neighboring-T and QA
+audit **automatically accepted 177 cold records** and
+held **69**: 48 at/above freezing outside the conservative cold-only
+automatic policy, 12 native tower temporal jump/nonstationarity,
+9 lacking verified neighboring QC. No original T or forcing was
+changed. Stage63 searched source-adjacent US-BZS and US-Ho1 ZIP
+directories and found no matching same-release BIF.
+
+[Stage64 source-pinned automatic candidate merger](scripts/stage64/64_merge_9389_verified_ERA5_humidity_candidates.py)
+now reconciles **4,411 Stage60 + 4,801 Stage62 + 177 Stage63 =
+9,389** unique (site, original tower timestamp) independent CDS
+ERA5 water-humidity candidate replacements, with original accepted
+EC air T and PA retained. All exact source identities, Stage61
+original **26,332** hard-physics RH/VPD records, SHA256 and water
+VPD/QBOT formulas must match. The residual source holds are
+**16,788 US-Ho1 original metadata/time**, **86 US-BZS original
+BIF/time**, and **69 Stage63 tower T** (16,943 total).
+The additional 100 unique positive RH<1% original review-only
+events stay separate. This is an isolated science-ledger integration,
+not approval to overwrite DATM or run models.
+[Stage63 IRIDIS6 results and Stage64 pinned command](docs/stage63_PASS_stage64_9389_consolidated_source_hard_20261024.md).
+Stage64 GitHub-published but not yet executed on IRIDIS6.
