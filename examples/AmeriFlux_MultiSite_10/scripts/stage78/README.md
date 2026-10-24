@@ -1,5 +1,8 @@
 # Stage78 — finalize **completed** 1,109-row native ERA5 candidate set and audit actual RH/T edges
 
+> **SUPERSEDED AS THE CURRENT OPERATOR RULE BY STAGE80 (24 October 2026).** This Stage78 document remains an archival reproducibility record only. The user now explicitly requests **only 18 original RH<1% half-hours replaced by the already-computed native ERA5 T/D2m/P joint state; all 1,091 original RH 1–5% and every other Stage75 record remain unchanged**. Do not select the former Stage77 1,109-row trial as current forcing. See [Stage80](../stage80/README.md). Existing outputs and evidence are retained; no new ERA5 downloads required.
+
+
 ## Actual Stage77 result (24 October 2026)
 
 **User-supplied successful IRIDIS6 output:** all 45 native ERA5 downloads completed, `--check` passed **1,109/1,109**, and `--trial` generated and physically validated **all six complete forcing files** in:
