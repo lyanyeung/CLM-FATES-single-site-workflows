@@ -13,6 +13,16 @@ This page is the **ICOS sites** collection for the European FLUXNET / ICOS multi
 
 **Total: 38 case slots** across the four research campaigns. The same observation network label is not a claim of uniform licensed data source or independently validated land-surface forcing. Consult the individual README files and data-source manifests for each site's true provenance, quality-control decisions and PFT/meteorological caveats.
 
+## Four-batch EC tower vegetation and PFT realism — 24 October 2026
+
+[**ICOS_PFT: central report and all result tables**](ICOS_PFT/) brings together the observations and finished simulation outputs for all **38 sites**.
+
+- [**38-site master observed-vs-FATES table**](ICOS_PFT/MASTER_38_SITE_OBSERVED_VS_FATES_PFT_20261024.csv): original species/PFT percentage evidence with denominators and source URLs, and final simulated PFT percentages where GitHub data exist.
+- [**38-site observed PFT percentage report**](ICOS_PFT/38_SITE_OBSERVED_PFT_PERCENT_REPORT_20261024.md): 28 numeric observation leads, 10 sites with qualitative-only evidence. Most numerical leads are *not* actual area percentages.
+- [**Four-batch model PFT comparison report**](ICOS_PFT/comparison_20261024/FOUR_BATCH_EC_PFT_VS_FATES_REPORT_20261024.md): 34 published model end-state PFT vectors (6 broad-type matches, 2 partial mixed-forest matches, 26 mismatches). Four sites remain without published completed PFT comparisons.
+
+The latest plot/statistical snapshot here is dated 24 October 2026; do not equate simulation completion with full PFT/ecosystem realism. Original tower species shares, CLM `PCT_NAT_PFT`, and FATES `FATES_VEGC_PF` use different denominators.
+
 ## Operational status
 
 See the [repository home page](../../README.md) for the most recent documented, **dated** IRIDIS6 status snapshot. GitHub does not automatically query live Slurm queues, and archived model years are not proof of FATES/carbon-pool convergence.
