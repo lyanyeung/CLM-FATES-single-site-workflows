@@ -28,3 +28,10 @@ The **2,810** no-year-source native half-hours by site: US-MtB **2,363**, US-Kon
 - Published source UTC offsets remain **unapproved time hypotheses**; Stage12f does not align downloaded hourly ERA5-Land to tower native time, regenerate VPD/QBOT, or write any forcing. No DATM/CIME/Slurm changes or scientific release.
 
 **After** targeted missing-source years are retrieved and verified, the next step is a separate six-site science-gated successor using those new year data at unchanged source EC TA/PSRF plus the full already-performed Stage12b/c/d/e physical and boundary rules; exclude all 233 original holds and all previously valid humidity. The scientific gate cannot be skipped.
+
+
+## Stage12f v2 regression fix, 2026-10-24
+
+The first Stage12f IRIDIS6 syntax and self-test passed, but `--check` stopped before download with `Stage09f 32 earlier verified yearly sources changed`. This was a **script assertion bug, not evidence of altered source data**: the original SHA-verified Stage09a source plan contains 32 site-years across all **seven** blocked sites including US-Me2; the Stage12e `verify()` function intentionally returns an existing-source `catalog` filtered to the **six** sites under Stage12e/12f repair. The erroneous check compared the filtered catalog length to 32.
+
+The new [Stage12f script](../scripts/stage12/12f_missing_year_ERA5Land_download_queue.py) validates the full original 32-entry seven-site plan, verifies all original source SHAs through Stage12e/Stage10b, and requires exact set-equality between the six-site filtered year catalog and the six-site subset of the full 32-entry plan. A dedicated self-test reproduces a 32-entry source inventory with 31 eligible plus one excluded US-Me2 source-year and rejects a missing six-site catalog. The initial failure occurred before listing/downloading site-years; no CDS request or forcing/source modification occurred. The exact actual six-site catalog count is intentionally derived from the stored 32-entry manifest on IRIDIS6 rather than assumed to be 31.
