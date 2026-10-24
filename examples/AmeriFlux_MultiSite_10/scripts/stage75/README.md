@@ -2,6 +2,8 @@
 
 Stage74 **actually ran** on IRIDIS6 and produced a protected CA-Man operator-selected trial: **18 same-source ERA5_HH T/Q/P/VPD half-hours changed, 17 RH/VPD-boundary-risk events left exactly unchanged, one March 2007 QC0-anchor retained**. The 15-year original/trial full-file scan passed; CA-Man's >10°C/30-min step flags decreased **185→152**, with RH<1 remaining **1→1**. This is a **trial**, not source-clock or production approval.
 
+**Stage75 correction (24 October 2026):** The initial audit incorrectly asserted `CA-Man P1 = 36`. Stage70A actually defines **36 reviewed CA-Man QC0→QC1 events as a subset of the 96 total P1 events across all ten sites**; CA-Man can have additional P1 event classes. The updated script now verifies the exact 36 subset via `36_CA-Man_QC0_to_QC1_review.csv`, checks its `19+15+2` classification and P1 membership, and reports the actual CA-Man P1 total without inventing a fixed number. It also permits a reduction (but not an increase) in critical MET flags for the CA-Man trial. The first `--audit` failure was a script census assumption, **not new evidence of a forcing/model error**; no audit outputs were produced by that failed invocation.
+
 Stage75 is an **audit**, not a proposed new correction. It combines the original Stage59/60/70A review and Stage74 operator decision:
 
 - Verify the **10 Stage58-selected original site forcings**, using exact source SHA-256 values from Stage59. For **CA-Man alone**, use the exact Stage74 trial as the *reviewed candidate*, and verify the Stage74 original/trial manifest and decision ledger checksums.
