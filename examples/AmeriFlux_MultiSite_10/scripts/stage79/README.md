@@ -1,5 +1,8 @@
 # Stage79 — 89 *actual* newly/worsened RH/T edges: source-switch science triage
 
+> **SUPERSEDED AS THE CURRENT OPERATOR RULE BY STAGE80 (24 October 2026).** This Stage79 document remains an archival reproducibility record only. The user now explicitly requests **only 18 original RH<1% half-hours replaced by the already-computed native ERA5 T/D2m/P joint state; all 1,091 original RH 1–5% and every other Stage75 record remain unchanged**. Do not select the former Stage77 1,109-row trial as current forcing. See [Stage80](../stage80/README.md). Existing outputs and evidence are retained; no new ERA5 downloads required.
+
+
 ## Why this step exists
 
 Stage77 **successfully recomputed 1,109 original RH<5% half-hours** (six independent candidate forcings, same-source native ERA5 2 m T + 2 m dewpoint + surface pressure, five coupled variables, no original edits). Stage78 compared the final-to-final candidate against original-to-original RH/T across affected consecutive 30-minute edges. **89 edges** meet its new/worsened high-risk rule:
