@@ -1040,3 +1040,7 @@ The original Stage11–22 scripts were restored from the historical Stage22 comm
 ### Stage31 result and Stage32 source/phase audit (24 October 2026)
 
 Stage31 passed on IRIDIS6 and classified all 4,884 held targets by original temperature provenance (QC0 **938**, QC2 **3,945**, other **1**). All RH-transfer candidates were numerically within water-phase bounds, but 431 dewpoint-transferred variants were negative (Ho1 425, GLE 6) and 2,782 ice-supersaturation cautions were flagged. **No approval.** Stage32 is a new read-only script comparing the source-stratified RH-transfer, dewpoint-transfer, and paired CDS-T/RH *numerical reference* with ice/temperature/timezone review flags. [See science report and GitHub-to-IRIDIS instructions](docs/cold_humidity_scientific_review_20261024.md).
+
+### Stage32 result, Stage33 US-Ho1 clock alignment sensitivity
+
+Stage32 completed on IRIDIS6: all 4,884 held records re-verified, 431 Td-transfer negative-water-VPD conflicts (Ho1 425, GLE 6), and 2,782 ERA5 ice-RH warnings. All remain SCIENTIFIC HOLD, no repairs approved. Stage33 uses already downloaded SHA-pinned ERA5 NetCDF grid-years to compare hypothetical local-minus-UTC offsets -7 to -3 against original observed QC0 temperature, separately for all covered years, winter and held targets. This is not independent timezone certification. See [science provenance and stage details](docs/cold_humidity_scientific_review_20261024.md).

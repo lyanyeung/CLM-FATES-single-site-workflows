@@ -83,3 +83,17 @@ PY=/home/ly3n24/.conda/envs/clm_fates_env/bin/python
 ```
 
 The `curl` command writes only the local downloaded script copy to HOME; the script itself does not write output files or change original data, forcing, DATM, CIME, or jobs. Old Stage11–22 data retrievals must not be rerun without need.
+
+## Stage32 completed and Stage33 next (24 October 2026)
+
+Stage32 was executed successfully on IRIDIS6 (both --check and --audit). All 4,884 Stage19–21 source records matched their pinned SHA256 lineage and remain SCIENTIFIC HOLD, with 0 approved repairs.
+
+**Stage32 summary:** 4,884 RH-transferred water-VPD numerical candidates are physically bounded by construction (not independently humidity-validated). Td-transfer water-negative VPD occurs 431 times: US-Ho1 425 (all source QC2 temperature), US-GLE 6 (4 QC0, 2 QC2). 2,782 grid-ERA5 ice-RH warnings were recorded. At the *retained site temperature*, RH-transfer ice saturation is exceeded 1,616 times (EML 540, GLE 171, Ho1 160, ICh 30, ICt 715); Td-transfer ice saturation is exceeded 529 times (EML 13, GLE 47, Ho1 469, ICh 0, ICt 0). Counts overlap and should not be summed as unique events.
+
+**Mutually exclusive review routes:** P0_HO1_CLOCK_HOLD 917; P1_TD_WATER_SUPERSAT_HOLD 6; P2_ICE_PHASE_HOLD 2,773; P3_TEMPERATURE_REPRESENTATIVENESS_HOLD 818; P4_UNVALIDATED_HUMIDITY_HOLD 370. All are HOLD, including P4.
+
+Strong Ho1 temperature inconsistency: 1999-02-13 01:00 retained TA -12.561 C, CDS ERA5 TA +9.2454 C, dewpoint +8.7993 C, hence Td-transfer water VPD -8.9817 hPa. Do not blindly substitute dewpoint or alter tower observations.
+
+**Stage33** script: scripts/stage33/33_audit_US_Ho1_clock_alignment.py. It reuses the existing receipt- and SHA256-verified Stage15/18 NetCDF site-years, verifies Stage19 nominal local-UTC=-5 interpolation and the 425 negative water-VPD count, and tests offsets -7..-3h against all original tower QC0 observations in covered years, winter QC0, and the held QC0 subset. Offset sensitivity is NOT independent UTC/BADM certification, and full site grid orography remains unknown. Original US-Ho1 FULLSET 3-6 has no BIF. AmeriFlux official site https://ameriflux.lbl.gov/sites/siteinfo/US-Ho1 reports 45.2040 N, -68.7402 longitude and 60m elevation but does not alone establish the release UTC offset. No additional CDS download is needed. Stage33 live IRIDIS results are not yet verified.
+
+Stage33 usage: download the single Python source to HOME from a pinned GitHub commit, then run --check followed by --audit. Both operations read only scientific/source data and never modify forcing, CIME, DATM or Slurm.
