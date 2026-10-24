@@ -121,8 +121,11 @@ def load_targets(stage49,inventory):
     selected["RH_raw_pct"]=pd.to_numeric(selected.RH_raw_pct,errors="coerce")
     selected=selected[(selected.RH_raw_pct==0)|(selected.RH_raw_pct>100)].copy()
     counts=selected.groupby("site").size().to_dict()
-    if counts!=EXPECTED or len(selected)!=444:
-        raise ValueError("Expected EXACT Stage48 444 RH targets, got "+str(counts))
+    raw_zero=int((selected.RH_raw_pct==0).sum())
+    raw_over=int((selected.RH_raw_pct>100).sum())
+    if counts!=EXPECTED or len(selected)!=444 or (raw_zero,raw_over)!=(39,405):
+        raise ValueError("Expected 444 original RH targets (39 zero, 405 >100): "+
+                         str((counts,raw_zero,raw_over)))
     if selected.duplicated(["site","timestamp_start"]).any():
         raise ValueError("Duplicate original site/time target")
     for site,part in selected.groupby("site"):
