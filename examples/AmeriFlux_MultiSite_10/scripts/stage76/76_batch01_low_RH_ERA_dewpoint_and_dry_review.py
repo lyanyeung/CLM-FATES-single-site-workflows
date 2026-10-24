@@ -37,7 +37,9 @@ def sha(p):
 def read(p,need):
  if not p.is_file():raise RuntimeError('Missing '+str(p))
  with p.open(newline='',encoding='utf-8-sig') as f:
-  r=csv.DictReader(f);fields=r.fieldnames or []
+  # sites.tsv is TAB separated; Stage76 v1 mistakenly read it as comma CSV.
+  r=csv.DictReader(f,delimiter='\t' if p.suffix.lower()=='.tsv' else ',')
+  fields=r.fieldnames or []
   if len(fields)!=len(set(fields)) or not set(need).issubset(fields):
    raise RuntimeError('Unexpected input schema '+str(p)+' missing '+str(set(need)-set(fields)))
   return list(r)
@@ -127,8 +129,8 @@ def load_native(path):
  if path is None:return {}
  result={}
  for r in read(path,NATIVE_COLUMNS):
-  if r['source_dataset']!='reanalysis-era5-single-levels':
-   raise RuntimeError('Native input must be raw ERA5 single-levels, not FLUXNET ERA regression')
+  if r['source_dataset']!='reanalysis-era5-single-levels-timeseries':
+   raise RuntimeError('Native input must be ERA5 hourly single-levels timeseries, not FLUXNET regression')
   t=datetime.fromisoformat(r['valid_time_utc'].replace('Z','+00:00'))
   if t.tzinfo is None or t.utcoffset()!=timedelta(0) or t.minute or t.second:
    raise RuntimeError('Native ERA5 timestamps must be UTC whole hours')
@@ -182,7 +184,9 @@ def build_groups(all_events):
     'max_RH_boundary_jump_pp':round(step,4),
     'n_RH_below2':sum(z<2 for z in rhs),
     'n_same_row_ERA':sum(e.get('era') is not None for e in g),
-    'review_priority':status,'human_decision':'','human_notes':''})
+    'review_priority':status,
+    'human_decision':'OPERATOR_ACCEPT_ORIGINAL_RH_1_TO_5_NO_CHANGE',
+    'human_notes':'2026-10-24 operator accepted all RH 1-5%; no automatic replacement.'})
   for e in g:e.update(group=name,group_length=len(g),priority=status)
  return results
 
@@ -232,10 +236,17 @@ def dry_line(e):
   ERA5_HH_RH_pct=f(era['rh'] if era else None),
   ERA5_HH_RH_minus_original_pp=f(era['rh']-s['rh'] if era else None),
   episode_id=e['group'],episode_n_halfhours=e['group_length'],
-  review_priority=e['priority'],human_decision='',human_notes='')
+  review_priority=e['priority'],
+  human_decision='OPERATOR_ACCEPT_ORIGINAL_RH_1_TO_5_NO_CHANGE',
+  human_notes='2026-10-24 explicit operator acceptance: leave entire original MET record unchanged; not independent validation of RH.')
 
 def selftest():
  assert sum(LOW.values())==17 and sum(DRY.values())==1091
+ import tempfile
+ with tempfile.TemporaryDirectory() as temp:
+  testfile=Path(temp)/'sites.tsv'
+  testfile.write_text('site\tpackage\tfirst_year\tlast_year\nCA-Ca3\tAMF_example\t2001\t2024\n',encoding='utf-8')
+  assert read(testfile,{'site','package'})[0]['package']=='AMF_example'
  a,gate=source_era(dict(TA_ERA='25',VPD_ERA='10',PA_ERA='101'))
  assert a and gate.endswith('NOT_NATIVE') and abs(a['vpd']-10)<1e-6
  assert source_era(dict(TA_ERA='-20',VPD_ERA='400',PA_ERA='100'))[0] is None
@@ -323,10 +334,11 @@ def main():
     RH1to5_source_ERA_available=sum(bool(e['era']) for e in entries),
     unresolved_RH_lt1=LOW.get(site,0),
     native_ERA5_events_available=sum(bool(e['native']) for e in low_site),
-    review_status='RH_LT1_REQUIRES_HUMAN_REVIEW' if low_site else
-      'RH1TO5_REQUIRES_SOURCE_CONTEXT_REVIEW' if entries else
+    review_status='RH_LT1_NATIVE_ERA_RECOMPUTATION_REQUIRED;RH1TO5_ACCEPTED_AS_IS' if low_site else
+      'RH1TO5_OPERATOR_ACCEPTED_AS_IS' if entries else
       'NO_RH_LT5_FLAGS_NOT_A_FULL_SCIENCE_APPROVAL'))
- print('STAGE76 | 17 UNRESOLVED RH<1 + 1091 RH 1-5% | ZERO AUTO REPAIR')
+ print('STAGE76 | 17 RH<1 REQUIRE NATIVE ERA5 T+D2M+SP | ALL 1091 RH1-5 OPERATOR ACCEPTED AS-IS')
+ print('OPERATOR DECISION (2026-10-24): RH >=1 and <5% all 1091 retain ORIGINAL MET; risk accepted, no replacements.')
  print('FLUXNET ERA dewpoint columns are INFERRED using TA_ERA+VPD_ERA, NOT original native ERA5 dewpoint.')
  print(f"{'site':8} {'RH<1':>5} {'RH1-5':>7} {'episodes':>8} {'max_run':>7} {'ERA_source':>10}")
  for z in summaries:
@@ -356,9 +368,16 @@ def main():
   'FLUXNET_ERA_dewpoint':'INFERRED_FROM_SAME_ROW_TA_ERA_VPD_ERA_NOT_NATIVE',
   'raw_products':source_paths,'native_ERA5_input':str(a.native_era5_csv) if a.native_era5_csv else None,
   'native_ERA5_SHA256':mod75.sha(a.native_era5_csv) if a.native_era5_csv else None,
-  'clock_verified':False,'scientific_approval':False,'forcing_changed':False,
+  'clock_verified':False,
+  'RH_1to5_operator_decision':'ACCEPT_ORIGINAL_1091_RECORDS_AS_IS',
+  'RH_1to5_operator_decision_date':'2026-10-24',
+  'RH_1to5_operator_accepted_rows':1091,
+  'RH_lt1_native_ERA5_recalculation_requested':17,
+  'RH_lt1_native_ERA5_recalculation_completed':sum(bool(e['native']) for e in unresolved),
+  'scientific_approval':False,'forcing_changed':False,
   'model_jobs_submitted':False,'no_automatic_substitution':True,
-  'notes':['FLUXNET site timestamps use local standard time; do not silently equate them with ERA5 UTC.',
+  'notes':['Operator has accepted and frozen original RH1-5 records, no independent truth claim.',
+           'FLUXNET site timestamps use local standard time; do not silently equate them with ERA5 UTC.',
            'Actual native ERA5 T2m+D2m pairs require native CDS extract and explicit site LST-to-UTC offsets.',
            'Low RH may reflect true dry episodes; no automatic RH1-5 replacement.',
            'Same-source T/VPD/PA implied dew point is NOT a separately retrieved ERA5 dewpoint.']
