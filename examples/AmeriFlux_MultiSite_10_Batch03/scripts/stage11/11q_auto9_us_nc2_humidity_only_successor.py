@@ -249,10 +249,10 @@ def compute(extras,prior,land_27,overview,old_edges):
         trial.at[i,"QBOT"]=q
         decisions.append({
             "site":"US-NC2","native_key":key,
-            "source_QC":int(old_what_if!=v) if False else
+            "source_QC":(
                 int(prior.loc[prior.native_key.eq(key),"original_source_QC"].iloc[0])
                 if key in set(prior.native_key)
-                else int(extras.loc[extras.native_key.eq(key),"source_original_VPD_QC"].iloc[0]),
+                else int(extras.loc[extras.native_key.eq(key),"source_original_VPD_QC"].iloc[0])),
             "previously_amended_by_Stage07":stage07_altered,
             "prior_Stage11l_tower_TA_C":tsite,
             "companion_ERA_source_RH_pct":source_rh,
