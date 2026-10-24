@@ -79,8 +79,28 @@ def raw_review(s59,s70a,s74):
  p2=read(s70a/'184_P2_pending_review.csv',{'site','episode_id','priority'})
  if len(p1)!=96 or len(p2)!=184 or len({(r['site'],r['episode_id']) for r in p1+p2})!=280:
   raise RuntimeError('Stage70A initial event census unexpected')
- if sum(r['site']=='CA-Man' for r in p1)!=36:
-  raise RuntimeError('CA-Man P1=36 expected')
+ # The 36 manually investigated CA-Man QC0->QC1 events are a SUBSET of
+ # all CA-Man P1 episodes, not the full CA-Man P1 census.
+ ca36=read(s70a/'36_CA-Man_QC0_to_QC1_review.csv',
+           {'site','episode_id','manual_review_group','priority','QC_direction'})
+ if len(ca36)!=36 or len({r['episode_id'] for r in ca36})!=36:
+  raise RuntimeError('Stage70A CA-Man QC0->QC1 subset must have exactly 36 unique events')
+ if any(r['site']!='CA-Man' or r['priority']!='P1_BATCH_REVIEW'
+        or r['QC_direction']!='0->1' or not r['manual_review_group'].startswith('CA_MAN_')
+        for r in ca36):
+  raise RuntimeError('CA-Man 36 subset is not the expected P1 QC0->QC1 set')
+ p1_by_id={(r['site'],r['episode_id']):r for r in p1}
+ if any((r['site'],r['episode_id']) not in p1_by_id or
+        p1_by_id[(r['site'],r['episode_id'])]['manual_review_group']!=r['manual_review_group']
+        for r in ca36):
+  raise RuntimeError('Stage70A CA-Man 36 is not a true subset of all 96 P1 events')
+ if Counter(r['manual_review_group'] for r in ca36)!={
+    'CA_MAN_19_SHADOW_ONLY_MOISTURE_HOLD':19,
+    'CA_MAN_15_FIXED_Q_PHYSICS_REJECTED':15,
+    'CA_MAN_2_ANCHOR_DISAGREEMENT':2}:
+  raise RuntimeError('Stage70A CA-Man 19+15+2 group allocation changed')
+ print('Stage70A reconciliation: 36 QC0->QC1 cases verified as subset of',
+       sum(r['site']=='CA-Man' for r in p1),'total CA-Man P1 episodes')
  manifest=json.loads((s74/'manifest.json').read_text(encoding='utf-8'))
  if (manifest.get('stage'),manifest.get('operator_selected_for_trial'),
      manifest.get('keep_original_for_humidity_boundary'),manifest.get('keep_special_anchor'),
@@ -134,8 +154,13 @@ def audit_all(selections,stage58,p1,p2,candidate):
   reviewed=stage58.scan(current,first,last)
   b=basic['flags'];f=reviewed['flags']
   add=humidity_extra(current)
-  if any(b.get(k,0)!=f.get(k,0) for k in FLAGS_CRITICAL):
-   raise RuntimeError('Stage74 changed a critical MET gate for '+site)
+  if site=='CA-Man':
+   # Reductions can be genuine improvements. Reject NEW critical violations,
+   # but do not reject a fixed anomaly merely because the counts decrease.
+   if any(f.get(k,0)>b.get(k,0) for k in FLAGS_CRITICAL):
+    raise RuntimeError('Stage74 introduced a critical MET flag for '+site)
+  elif any(b.get(k,0)!=f.get(k,0) for k in FLAGS_CRITICAL):
+   raise RuntimeError('Unexpected critical MET flag changed outside CA-Man: '+site)
   if basic['structural_gate']!='PASS_REVIEW_ONLY' or reviewed['structural_gate']!='PASS_REVIEW_ONLY':
    print('WARNING: structural gate FAIL '+site)
   if site=='CA-Man' and (b.get('ta_step_over10C')!=185 or f.get('ta_step_over10C')!=152
@@ -202,7 +227,10 @@ def show(rows):
  print('NO production release, no new forcing, no DATM/CIME/Slurm, even where numerical scan passes.')
 
 def selftest():
- assert sum([5,31,37,185,11,11,14,22,106,0])==422
+ assert sum([0,5,31,37,185,11,11,14,22,106])==422
+ assert 19+15+2==36
+ # Important: 36 CA-Man QC0->QC1 source events are only a P1 subset;
+ # no assumption about the total number of CA-Man P1 groups is valid.
  assert 422-(185-152)==389
  assert sum(PENDING_RH.values())==17 and 18+17+1==36
  print('SELF-TEST PASS: ten-site 422 ->389 reviewed jump arithmetic, RH17, CA-Man 18/17/1')
