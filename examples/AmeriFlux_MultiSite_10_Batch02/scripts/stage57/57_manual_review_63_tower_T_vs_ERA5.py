@@ -261,7 +261,7 @@ def main():
         print("STAGE57 CHECK PASS | no writes")
         return
     root=a.output_root.resolve()
-    if root==S56 or root in S56.parents or S56 in root.parents:
+    if root==S56 or S56 in root.parents:
         raise ValueError("Output root overlaps Stage56")
     dest=root/("stage57_manual_63_T_gt8C_original_tower_review_"+
          datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")+"_"+uuid4().hex[:8])
