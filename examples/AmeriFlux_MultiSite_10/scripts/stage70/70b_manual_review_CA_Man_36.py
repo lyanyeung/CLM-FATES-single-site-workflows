@@ -27,6 +27,7 @@ FIELDS=[
  "site","episode_id","event_time","review_group","original_step_C",
  "original_T_before_C","original_T_at_C","FLUXMET_T_before_C",
  "FLUXMET_T_at_C","ERA5_T_before_C","ERA5_T_at_C",
+ "ERA5_step_C","original_minus_ERA5_C","shadow_minus_ERA5_C",
  "FLUXMET_QC_transition","BASE_native_T_before_JSON",
  "BASE_native_T_at_JSON","BASE_sensor_match_count_before",
  "Stage68_shadow_T_C","original_RH_pct","shadow_RH_pct",
@@ -111,6 +112,9 @@ def build(reports):
             raise RuntimeError("Shadow row vs review category mismatch "+str(key))
         previous=maybe(s["candidate_T_before_C"])
         at=maybe(s["candidate_T_current_C"])
+        era_prev=maybe(s["ERA5_T_before_C"])
+        era_at=maybe(s["ERA5_T_current_C"])
+        shadow=maybe(h.get("shadow_T_C",""))
         rows.append(dict(
             site="CA-Man",episode_id=a["episode_id"],event_time=when,
             review_group=group,original_step_C=round(at-previous,4)
@@ -121,6 +125,9 @@ def build(reports):
             FLUXMET_T_at_C=s["FLUXMET_T_current_C"],
             ERA5_T_before_C=s["ERA5_T_before_C"],
             ERA5_T_at_C=s["ERA5_T_current_C"],
+            ERA5_step_C=round(era_at-era_prev,4) if era_at is not None and era_prev is not None else "",
+            original_minus_ERA5_C=round(at-era_at,4) if at is not None and era_at is not None else "",
+            shadow_minus_ERA5_C=round(shadow-era_at,4) if shadow is not None and era_at is not None else "",
             FLUXMET_QC_transition="0->1",
             BASE_native_T_before_JSON=native(b["BASE_TA_30min_before_JSON"]),
             BASE_native_T_at_JSON=native(b["BASE_TA_at_event_JSON"]),
@@ -154,16 +161,25 @@ def printed_summary(events,low):
     print("STAGE70B | HUMAN REVIEW OF 36 CA-MAN EVENTS | NO REPAIRS")
     print("Review categories:",dict(Counter(r["review_group"] for r in events)))
     print("Number of independent humidity observations verified: 0")
-    print("All 36 events (T in deg C, humidity shifts are percentage points):")
-    print(f"{'N':>2} {'time':19} {'group':9} {'step':>7} {'TA_before':>9} "
-          f"{'TA_at':>7} {'shadow_T':>9} {'dRH':>7} {'dVPD':>8}")
+    print("ALL 36 events: Original, FLUXMET and ERA5 TA [C] side by side.")
+    print("ERA5 values are from provisional FLUXNET ERA5_HH timestamp matching; NOT independent truth.")
+    print(f"{'N':>2} {'time':19} {'group':9} {'orig_T':>7} "
+          f"{'flux_T':>7} {'ERA5_T':>7} {'ERA_dT':>7} "
+          f"{'orig-ERA':>9} {'shadow_T':>9} {'shdw-ERA':>9}")
     for i,r in enumerate(events,1):
         label=("SHADOW" if "19_SHADOW" in r["review_group"] else
                "PHYS_FAIL" if "15_FIXED" in r["review_group"] else "ANCHOR")
-        print(f"{i:2d} {r['event_time']:19} {label:9} {fmt(r['original_step_C']):>7} "
-              f"{fmt(r['original_T_before_C']):>9} {fmt(r['original_T_at_C']):>7} "
-              f"{fmt(r['Stage68_shadow_T_C']):>9} {fmt(r['delta_RH_pp']):>7} "
-              f"{fmt(r['delta_VPD_hPa']):>8}")
+        print(f"{i:2d} {r['event_time']:19} {label:9} "
+              f"{fmt(r['original_T_at_C']):>7} "
+              f"{fmt(r['FLUXMET_T_at_C']):>7} "
+              f"{fmt(r['ERA5_T_at_C']):>7} "
+              f"{fmt(r['ERA5_step_C']):>7} "
+              f"{fmt(r['original_minus_ERA5_C']):>9} "
+              f"{fmt(r['Stage68_shadow_T_C']):>9} "
+              f"{fmt(r['shadow_minus_ERA5_C']):>9}")
+    print("ERA5 available at event:",
+          sum(maybe(r['ERA5_T_at_C']) is not None for r in events),"/",len(events))
+    print("Original vs ERA5 and shadow vs ERA5 are clock-UNVERIFIED diagnostic comparisons.")
     print("Unresolved low-RH records:",len(low),
           "by site:",dict(Counter(r["site"] for r in low)))
     print("To inspect one event: use --episode <FULL_EPISODE_ID> or --episode <NUMBER 1..36>.")
