@@ -1154,14 +1154,24 @@ points, **plus three original source rows already corrected in Stage07**.
 These are science-review candidates, NOT a user-approved expanded ERA
 replacement mask. [Verified Stage11j four-event context](docs/STAGE11J_VERIFIED_FOUR_EVENT_CONTEXT_AND_UNREPAIRED_NEIGHBOURS_2026-10-24.md).
 
-[Stage11k source-neighbour RH screening](scripts/stage11/11k_four_event_unrepaired_neighbour_RH_review.py)
-is **committed but not yet run on IRIDIS6**. It checks the Stage11j
-read-only report SHA, independently recomputes original versus companion
-water RH for all 52 native intervals and distinguishes 11 never repaired
-source neighbour events, three already Stage07-corrected neighbours and
-four previously Stage11h-corrected central events. It never automatically
-extends the existing 53-row human-approved trial, changes forcing, or
-grants Post-v5/DATM/spinup approval.
+[Stage11k v1 read-only source-neighbour RH screening](scripts/stage11/11k_four_event_unrepaired_neighbour_RH_review.py)
+passed Python syntax and self-test on IRIDIS6, but **STOPPED safely during
+--check** on 2026-10-24: v1 incorrectly assumed 18 source-discrepancy
+records instead of **25**. No --run, forcing write or model job occurred.
+In fact the source-native ±3h contexts identify **11** original-VPD
+neighbours still unchanged in Stage07/Stage11h, **3** already Stage07-only
+corrected neighbours, and **11** Stage11h-changed context records, of
+which **4** are the hotspot centres and **7** are additional already
+modified source records. The 11 proposed new review targets remain
+unchanged as per the verified Stage11j screen. This is only a science
+review flag and not an automatic permission to replace RH.
+
+The corrected [Stage11k v2 SHA-protected read-only reconciliation](scripts/stage11/11k_v2_four_event_unrepaired_neighbour_RH_review.py)
+has been committed as a **new file** and is **NOT YET RUN on IRIDIS6**.
+[Precise v1 failure explanation and v2 audit gate]
+(docs/STAGE11K_V1_FAILURE_RECONCILED_AND_V2_REVIEW_GATE_2026-10-24.md).
+The immutable Stage11j, Stage11h and Stage07 inputs remain untouched.
+Post-v5, DATM and spinup approvals remain at zero.
 
 The existing IRIDIS `62_human_review_WORKING_COPY.csv` and SHA-sealed
 original Stage11f report have NOT been updated by GitHub commits.
