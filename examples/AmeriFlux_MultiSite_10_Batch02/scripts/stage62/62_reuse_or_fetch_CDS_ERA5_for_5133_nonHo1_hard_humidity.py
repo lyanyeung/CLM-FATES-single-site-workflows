@@ -9,6 +9,9 @@ using Stage50's validated CDS logic. With --auto, retrieve all remaining missing
 batches, validating each and then build the candidate ledger in one invocation.
 Exclusive flock and race-safe create-only receipts allow safe retries after
 an interrupted or overlapping download without overwriting valid receipts.
+If an existing Stage62 original_CDS_payload fails its pinned receipt SHA256,
+only that exact grid/year is re-downloaded into an isolated rescue cache;
+neither the old receipt nor old source payload/NetCDF is overwritten.
 With --stage, create an isolated partial/full humidity patch ledger, keeping
 original EC TA/PA if and only if TA valid and |TA-ERA5 T2m| <= 8 C.
 Original T anomalies exceeding 8 C stay HOLD, as in previous policy.
@@ -34,6 +37,9 @@ STAGE61=REPORTS/"stage61_stage49_vs_stage60_full_hard_coverage_20261024T114810Z_
 STAGE50_SCRIPT=Path.home()/"CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Batch02/scripts/stage50/50_prepare_unified_CDS_ERA5_RH_zero_gt100.py"
 STAGE50_BLOB="757452798582dc0aaf6d2c78f23999e653247469"
 CACHE=Path.home()/"AmeriFlux_Batch02_Stage62_external_CDS_ERA5"
+# A separate append-only cache for sources whose original bytes no longer
+# match an existing immutable receipt. NEVER repair by overwriting source.
+RESCUE_CACHE=CACHE/"isolated_original_payload_SHA256_conflict_recovery_v1"
 INPUT="original_hard_events_not_in_Stage60_patch.csv"
 SITES={"US-BZS":86,"US-CMW":42,"US-EML":2984,"US-GLE":830,
        "US-Ha1":23,"US-Ho2":717,"US-Ho3":39,"US-ICh":48,"US-ICt":364}
@@ -164,10 +170,39 @@ def reset_receipt_plan_after_fetch(plan):
     plan.loc[eligible,"verified_receipt"]=""
     return plan
 
+def is_known_local_payload_sha_conflict(mod,key,error):
+    """Allow only an exact original Stage62 payload SHA mismatch to be isolated.
+
+    Any other verified source problem (NetCDF SHA, calendar, grid, receipt
+    schema, source file missing, permissions) still fails closed.
+    """
+    expected=(CACHE/mod.grid_name(key)/"original_CDS_payload").resolve()
+    return str(error)=="CDS source SHA256 mismatch "+str(expected)
+
+def resolve_verified_with_isolated_recovery(mod,key,jobs):
+    """Prefer an independently verified immutable rescue receipt when present."""
+    rescue=RESCUE_CACHE/mod.grid_name(key)/"verified_receipt.json"
+    if rescue.exists():
+        if rescue.is_symlink():
+            raise ValueError("Refuse symlinked recovery receipt "+str(rescue))
+        r=mod.read_receipt(rescue,key,jobs[key]["sites"])
+        if r is None:
+            raise ValueError("Recovery receipt exists but failed validation "+str(rescue))
+        return r,str(rescue)
+    try:
+        return mod.resolve_receipt(key,jobs,CACHE)
+    except ValueError as exc:
+        if not is_known_local_payload_sha_conflict(mod,key,exc):
+            raise
+        print("STAGE62 ORIGINAL CDS SHA CONFLICT ISOLATED",
+              mod.grid_name(key),"original receipt and payload PRESERVED",
+              "recovery required",flush=True)
+        return None,None
+
 def locate_receipts(mod,plan,jobs):
     found={};missing=[]
     for key in sorted(jobs,key=lambda x:(x[2],x[0],x[1])):
-        r,p=mod.resolve_receipt(key,jobs,CACHE)
+        r,p=resolve_verified_with_isolated_recovery(mod,key,jobs)
         if r is None:
             missing.append(key)
         else:
@@ -207,7 +242,26 @@ def fetch_new(mod,jobs,missing,limit):
 def _fetch_new_locked(mod,jobs,missing,limit):
     verified=0
     for key in missing[:limit]:
-        folder=CACHE/mod.grid_name(key)
+        original_folder=CACHE/mod.grid_name(key)
+        original_receipt=original_folder/"verified_receipt.json"
+        # Only a specifically identified old payload checksum conflict may
+        # change the destination to a NEW, isolated download directory.
+        # The conflicting original receipt, payload and NetCDF are preserved.
+        rescued=False
+        if original_receipt.exists():
+            try:
+                original_valid=mod.read_receipt(
+                    original_receipt,key,jobs[key]["sites"])
+                if original_valid is None:
+                    raise ValueError("Original CDS receipt unexpectedly unreadable")
+            except ValueError as exc:
+                if not is_known_local_payload_sha_conflict(mod,key,exc):
+                    raise
+                rescued=True
+                print("STAGE62 ISOLATED REDOWNLOAD OF CONFLICTING CDS SOURCE",
+                      mod.grid_name(key),"NO ORIGINAL FILE MODIFICATIONS",
+                      flush=True)
+        folder=(RESCUE_CACHE if rescued else CACHE)/mod.grid_name(key)
         folder.mkdir(parents=True,exist_ok=True)
         marker=folder/"INCOMPLETE_DO_NOT_USE"
         receipt_file=folder/"verified_receipt.json"
@@ -348,6 +402,19 @@ def self_test():
     assert demo.verified_receipt.tolist()==["","",""]
     assert 4411+21921==26332
     assert callable(_fetch_new_locked) and callable(fetch_new)
+    class _MockGrid:
+        @staticmethod
+        def grid_name(k):
+            return "ERA5_2014_lat+031.75_lon-0110.25"
+    grid=(31.75,-110.25,2014)
+    expected=str((CACHE/_MockGrid.grid_name(grid)/"original_CDS_payload").resolve())
+    assert is_known_local_payload_sha_conflict(
+        _MockGrid,grid,ValueError("CDS source SHA256 mismatch "+expected))
+    assert not is_known_local_payload_sha_conflict(
+        _MockGrid,grid,ValueError("CDS source SHA256 mismatch /unrelated.nc"))
+    assert not is_known_local_payload_sha_conflict(
+        _MockGrid,grid,ValueError("CDS field units/dims mismatch"))
+    assert RESCUE_CACHE!=CACHE
     # An existing relative-humidity reference cannot be used as ice VPD.
     tw=np.array([-30.,20.])
     assert np.isfinite(6.112*np.exp(17.67*tw/(tw+243.5))).all()
