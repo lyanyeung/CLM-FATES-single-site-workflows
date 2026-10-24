@@ -75,9 +75,9 @@ def route(site, flags, i, tq, rh):
         return "HOLD_HO1_TEMPERATURE_AND_HUMIDITY_PROVENANCE"
     if not np.isfinite(tq):
         return "HOLD_TEMPERATURE_QC_UNAVAILABLE"
-    if int(tq) == 2:
+    if tq == 2:
         return "MANUAL_JOINT_T_AND_HUMIDITY_QC2"
-    if int(tq) != 0:
+    if tq != 0:
         return "MANUAL_T_AND_HUMIDITY_QC_NOT_ZERO"
     return "EXTERNAL_CDS_AND_SOURCE_VERIFICATION_REQUIRED_NOT_APPROVED"
 
@@ -219,6 +219,7 @@ def main():
     if opt.chunksize < 1000:
         ap.error("--chunksize must be >=1000")
     specs = mod.load_inventory(opt.inventory)
+    inventory_sha_at_start = mod.sha256(opt.inventory)
     if opt.check:
         print("STAGE49 CHECK PASS | Stage48 blob and 10 Stage04b primary entries")
         for x in specs:
@@ -235,7 +236,6 @@ def main():
     marker = dest / "INCOMPLETE_DO_NOT_USE"
     marker.write_text("Unfinished Stage49; not scientific approval.\n")
     site_counts = {s: Counter() for s in mod.SITES}
-    year_counts = {}
     from collections import defaultdict
     year_counts = defaultdict(Counter)
     checksums = {}
@@ -265,11 +265,13 @@ def main():
         totals.update(c)
     if totals["ORIGINAL_ROWS"] <= 0 or totals["ROW_LEVEL_REVIEW"] < totals["HARD_PHYSICS_UNION"]:
         raise ValueError("Invalid review accounting")
+    if mod.sha256(opt.inventory) != inventory_sha_at_start:
+        raise ValueError("Stage04b inventory changed during audit")
     provenance = {
         "status": "REVIEW_ONLY_NO_DATM_APPROVAL",
         "stage48_blob_sha1": STAGE48_BLOB,
         "inventory": str(opt.inventory),
-        "inventory_sha256": mod.sha256(opt.inventory),
+        "inventory_sha256": inventory_sha_at_start,
         "primary_sha256_by_site": checksums,
         "totals": dict(totals),
         "stage08_hold_cohort_not_joined": 4884,
