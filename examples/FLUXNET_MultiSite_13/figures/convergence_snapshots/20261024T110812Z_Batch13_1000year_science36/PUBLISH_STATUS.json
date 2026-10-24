@@ -1,0 +1,40 @@
+{
+  "schema": "fluxnet_crossbatch_publication_v1",
+  "batch": "13",
+  "analysis_snapshot": "20261024T110812Z_Batch13_1000year_science36",
+  "source_dataset": "archived annual h0a and original FLUXNET EC",
+  "scope": "PARTIAL_VERIFIED",
+  "expected_count": 13,
+  "published_success_count": 11,
+  "published_success_sites": [
+    "DE-Gri",
+    "DE-Obe",
+    "DE-RuR",
+    "ES-LJu",
+    "FI-Hyy",
+    "FI-Let",
+    "FR-Pue",
+    "GF-Guy",
+    "IT-Col",
+    "IT-MBo",
+    "IT-Tor"
+  ],
+  "not_published_count": 2,
+  "not_published_sites": [
+    {
+      "Site": "DE-Lnf",
+      "Status": "FAILED",
+      "Problem": "No HH tower carbon flux CSV with NEE_VUT_REF and GPP DT/NT under raw* directories of /iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/DE-Lnf/forcing; checked 1 raw dirs"
+    },
+    {
+      "Site": "ES-Agu",
+      "Status": "FAILED",
+      "Problem": "No HH tower carbon flux CSV with NEE_VUT_REF and GPP DT/NT under raw* directories of /iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/ES-Agu/forcing; checked 1 raw dirs"
+    }
+  ],
+  "other_incomplete_sites_excluded": [
+    "IT-Noe",
+    "CH-Aws"
+  ],
+  "note": "Only complete 4-PNG + CSV + JSON per-station products are published. A model reaching 1000 years does not prove convergence."
+}
