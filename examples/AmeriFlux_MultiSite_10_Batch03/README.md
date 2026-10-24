@@ -1117,14 +1117,30 @@ Stage11h's new files and SHA receipt are under
 `science_trials/stage11h_companion_ERA_RH_shadow_20261024T084110Z_78d963bd/`
 on IRIDIS6, with its own INCOMPLETE marker retained.
 
-[Verified Stage11h report and next Stage11i QA](docs/STAGE11H_VERIFIED_SHADOW_TRIAL_AND_STAGE11I_QA_2026-10-24.md)
-are now documented. [Stage11i](scripts/stage11/11i_three_site_shadow_impact_audit.py)
-is **committed but not yet run on IRIDIS6**. It independently verifies the
-three full-site shadow CSVs and the Stage07 inputs by SHA, checks that
-only selected VPD/QBOT values differ, compares *newly introduced* adjacent
-VPD jumps against the pre-existing Stage07 jumps, and calculates annual
-VPD/RH/QBOT effects. Independent source/ERA5-Land, clock, PFT/CO2, Post-v5,
-DATM and spinup scientific approval remains outstanding.
+[Stage11i independent 998,640-row shadow impact audit](scripts/stage11/11i_three_site_shadow_impact_audit.py)
+**PASSED IRIDIS6 --self-test, --check and --run** on 2026-10-24.
+It independently verified 6/53/3 user decisions, the 43 actual VPD/QBOT
+changes (US-MOz 0, US-Mpj 2, US-NC2 41), 998,640 NO_LEAP forcing
+half-hours, identical non-selected variables/timestamps and physically
+consistent humidity/QBOT. Annual mean VPD change was -0.000244 hPa in
+US-Mpj 2018 and -0.001140 hPa in US-NC2 2025, but annual metrics alone
+cannot validate short-lived source anomalies.
+
+Exactly **four event IDs introduced a >2 hPa adjacent VPD jump relative
+to Stage07**, of which **two were >5 hPa**: US-NC2 native
+202503231230 (+9.761132 hPa), 202503250900 (+8.227839 hPa),
+202503181900 (+3.706716 hPa), and US-Mpj 201802021730 (+2.286140 hPa).
+These are science review flags, not automatic proof the new humidity
+is false. [Verified Stage11i analysis and four-event hold]
+(docs/STAGE11I_VERIFIED_FOUR_HUMIDITY_JUMPS_2026-10-24.md).
+
+[Stage11j targeted +/-3h source-context review](scripts/stage11/11j_four_jump_source_context_review.py)
+is **committed but not yet run on IRIDIS6**. It compares exact-time
+original source FLUXMET QC, companion ERA5 site-downscaled RH, Stage07
+and the sealed Stage11h research shadow at the four high-jump events
+(52 native half-hour context rows). It produces only read-only reviews,
+never forcing writes. Independent source/ERA5-Land, clock, PFT/CO2,
+Post-v5, DATM and spinup science approval remains ZERO.
 
 The existing IRIDIS `62_human_review_WORKING_COPY.csv` and SHA-sealed
 original Stage11f report have NOT been updated by GitHub commits.
