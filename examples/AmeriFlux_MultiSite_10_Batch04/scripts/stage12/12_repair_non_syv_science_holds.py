@@ -179,8 +179,9 @@ def point_for(site,native):
         if not records:
             raise ValueError("Approved US-Seg BIF GROUP_ID 1495 absent")
         lat,long=SEG_LOCATION["latitude"],SEG_LOCATION["longitude"]
-        if lat not in records["LOCATION_LAT"] or long not in records["LOCATION_LONG"]:
-            raise ValueError("Approved US-Seg coordinates not present in original 1495 BIF")
+        if (not any(x is not None and abs(x-lat)<=0.0001 for x in records["LOCATION_LAT"]) or
+            not any(x is not None and abs(x-long)<=0.0001 for x in records["LOCATION_LONG"])):
+            raise ValueError("Approved US-Seg group1495 coordinates not in original BIF within 0.0001 degrees")
         off=set(x for x in records["UTC_OFFSET"] if x is not None)
         if len(off)!=1:
             alloff={v for r in grouped.values() for v in r.get("UTC_OFFSET",[]) if v is not None}
