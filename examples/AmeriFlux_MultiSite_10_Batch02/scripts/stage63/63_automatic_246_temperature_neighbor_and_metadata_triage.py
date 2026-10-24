@@ -81,8 +81,7 @@ def read_source():
         int(ds.candidate_status.str.startswith("HOLD_VERIFIED_EXTERNAL_CDS_GRIDYEAR_MISSING").sum())!=0):
         raise ValueError("Stage62 status science counts mismatch")
     target=ds.loc[ds.candidate_status.eq(T_ROUTE)].copy()
-    m61_path=Path(m["source_SHA256"].get("Stage61_manifest_sha256",""))
-    if not m61_path:
+    if not m.get("source_SHA256",{}).get("Stage61_manifest_sha256"):
         raise ValueError("Missing Stage61 original source SHA reference")
     stage61=REPORT/"stage61_stage49_vs_stage60_full_hard_coverage_20261024T114810Z_fc209bf8"
     if digest(stage61/"coverage_manifest.json")!=m["source_SHA256"]["Stage61_manifest_sha256"]:
@@ -236,7 +235,8 @@ def zip_bif_discovery(spec):
     out=[]
     for site in BIF_SITES:
         primary=Path(spec[site]["file"]).resolve(strict=True)
-        dirs=[primary.parent,primary.parent.parent]
+        dirs=[primary.parent,primary.parent.parent,
+              primary.parent.parent.parent]
         candidates={}
         for parent in dirs:
             if not parent.is_dir():continue
@@ -252,8 +252,18 @@ def zip_bif_discovery(spec):
             try:
                 with zipfile.ZipFile(p) as z:
                     names=z.namelist()
-                    record["matching_original_primary_name_in_zip"]=any(
-                         Path(n).name==primary.name for n in names)
+                    originals=[x for x in z.infolist() if
+                        not x.is_dir() and Path(x.filename).name==primary.name
+                        and x.file_size==primary.stat().st_size]
+                    record["matching_original_primary_name_in_zip"]=bool(originals)
+                    source_exact=False
+                    if len(originals)==1:
+                        h=hashlib.sha256()
+                        with z.open(originals[0]) as stream:
+                            for block in iter(lambda:stream.read(1<<20),b""):
+                                h.update(block)
+                        source_exact=(h.hexdigest()==spec[site]["sha256"])
+                    record["original_primary_SHA256_same_release"]=source_exact
                     bif=[x for x in z.infolist() if (not x.is_dir() and
                          site in Path(x.filename).name and
                          "_BIF_" in Path(x.filename).name and
@@ -272,9 +282,24 @@ def zip_bif_discovery(spec):
                                         value=item.get("DATAVALUE","").strip()
                                         if value and value!="-9999":
                                             values.setdefault(key,set()).add(value)
+                                unique={k:list(v)[0] for k,v in values.items()
+                                        if len(v)==1}
+                                valid=(source_exact and
+                                   all(k in unique for k in
+                                       ("LOCATION_LAT","LOCATION_LONG","UTC_OFFSET")))
+                                if valid:
+                                    lat=float(unique["LOCATION_LAT"])
+                                    lon=float(unique["LOCATION_LONG"])
+                                    utc=float(unique["UTC_OFFSET"])
+                                    valid=(-90<=lat<=90 and -180<=lon<=180
+                                           and -12<=utc<=14
+                                           and utc*2==int(utc*2))
                                 record["BIF_candidates"].append({
                                     "member":member.filename,
-                                    "values":{k:sorted(v) for k,v in values.items()}})
+                                    "values":{k:sorted(v) for k,v in values.items()},
+                                    "BIF_same_archive_original_primary_SHA256_verified":
+                                        bool(valid)})
+                                record["source_release_verified"]=bool(valid) or record["source_release_verified"]
                         except (OSError,UnicodeError,ValueError,csv.Error) as e:
                             record["BIF_candidates"].append({"member":member.filename,
                                 "parse_error":str(e)})
