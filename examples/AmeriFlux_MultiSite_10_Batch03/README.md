@@ -1103,13 +1103,28 @@ verified. **Independent ERA5-Land data were not evaluated**.
 
 The [Stage11g verified interpretation and Stage11h shadow trial protocol](docs/STAGE11G_VERIFIED_AND_STAGE11H_SHADOW_TRIAL_2026-10-24.md)
 is now documented. [Stage11h](scripts/stage11/11h_isolated_ERA_RH_three_site_science_trial.py)
-is **committed but not yet executed on IRIDIS6**. It has an initial
-fully read-only `--check` and a separate `--run` which will build new
-isolated three-site research-only shadow forcing CSVs, retaining 6 Stage07
-TA and 3 Stage07 VPD choices and recomputing only the other 53 selected
-VPD/QBOT. This trial carries its own permanent INCOMPLETE marker and
-cannot be used for model production.
-Physical feasibility is not independent tower validation.
+**PASSED IRIDIS6 --self-test, --check and --run** on 2026-10-24.
+Its *separate unapproved* shadow research forcing for US-MOz (315,360
+half-hours), US-Mpj (315,360) and US-NC2 (367,920) retained 6 Stage07
+TA and 3 Stage07 VPD decisions, and reconstructed paired-source ERA5 RH
+at 53 selected VPD/QBOT event timestamps. Exactly **43 VPD values
+actually differed** from Stage07 (US-MOz 0, US-Mpj 2, US-NC2 41).
+Maximum original-to-shadow VPD changes were 0, 2.286140 and 9.761132
+hPa. Minimum shadow RH was 2.206422%, 1.168592% and 1.439602%.
+This is a science shadow trial, **not** a Post-v5 approved forcing.
+
+Stage11h's new files and SHA receipt are under
+`science_trials/stage11h_companion_ERA_RH_shadow_20261024T084110Z_78d963bd/`
+on IRIDIS6, with its own INCOMPLETE marker retained.
+
+[Verified Stage11h report and next Stage11i QA](docs/STAGE11H_VERIFIED_SHADOW_TRIAL_AND_STAGE11I_QA_2026-10-24.md)
+are now documented. [Stage11i](scripts/stage11/11i_three_site_shadow_impact_audit.py)
+is **committed but not yet run on IRIDIS6**. It independently verifies the
+three full-site shadow CSVs and the Stage07 inputs by SHA, checks that
+only selected VPD/QBOT values differ, compares *newly introduced* adjacent
+VPD jumps against the pre-existing Stage07 jumps, and calculates annual
+VPD/RH/QBOT effects. Independent source/ERA5-Land, clock, PFT/CO2, Post-v5,
+DATM and spinup scientific approval remains outstanding.
 
 The existing IRIDIS `62_human_review_WORKING_COPY.csv` and SHA-sealed
 original Stage11f report have NOT been updated by GitHub commits.
