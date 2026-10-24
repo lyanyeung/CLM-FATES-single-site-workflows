@@ -1027,8 +1027,20 @@ and four unchanged manual-review rows remain on science hold. See
 [Stage11e-v1](scripts/stage11/11e_priority_scientific_triage.py) **failed synthetic self-test before IRIDIS file checks**: a one-event simulation encountered an erroneously hardcoded 62-event join requirement. The historical v1 is preserved for auditing.
 
 [Stage11e-v2 repaired source-physics triage](scripts/stage11/11e_v2_priority_scientific_triage.py)
-is **committed but not yet run on IRIDIS6**. Synthetic tests now explicitly request one event and verify that production still requires 62 unique joined records; an unmatched event identity also fails. It will use the sealed 62-target
-Stage11d report to independently classify original VPD/T water thermodynamics,
-check six QC0 edits against native neighbours and report 38 QC1 VPD
-inconsistencies. The output is a scientific review queue, not permission to
-write new forcing. All Post-v5/DATM/CIME/Slurm approvals remain zero.
+has **PASSED IRIDIS6 syntax, self-test, read-only check and full audit**
+on 2026-10-24, retaining the unchanged production 62-record/source SHA
+guard. It confirmed **38/38 original US-NC2 `VPD_F_QC=1` values have
+nonpositive paired-source implied vapour pressure** before Stage07's ERA
+replacement; six QC0 temperature edits are exactly the average of immediate
+30-minute source neighbours, but only US-MOz has both neighbour source QC0.
+Five preserved extremely low positive RH records occur at positive air T.
+No humidity changes or scientific approvals were made.
+
+The [verified Stage11e outcome and provenance](docs/STAGE11E_VERIFIED_AND_STAGE11F_HUMAN_GATE_2026-10-24.md)
+contains station statistics, native timestamps and report location.
+
+[Stage11f unsigned human science review queue](scripts/stage11/11f_human_review_signoff_queue.py)
+has been **committed but not yet run on IRIDIS6**. It will use sealed
+Stage11e-v2 and Stage11d evidence to generate an event-level review queue
+and four contiguous March 2025 QC1 VPD episode summaries. All decisions,
+Post-v5/DATM/CIME/Slurm permissions and spinup authorizations remain ZERO.
