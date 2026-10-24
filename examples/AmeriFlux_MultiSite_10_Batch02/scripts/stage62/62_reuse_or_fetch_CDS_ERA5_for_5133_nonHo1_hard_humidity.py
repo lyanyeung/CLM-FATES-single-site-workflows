@@ -4,8 +4,10 @@
 SOURCE: Stage61 exact (site, original local timestamp) residuals, after
 the 4,411 Stage60 user-approved scientific water-humidity selections.
 Auto-reuse only checksum-and-calendar-verified independent CDS ERA5
-t2m/d2m/sp grid-year receipts. With --fetch, retrieve a controlled batch
-of missing exact grid-years using Stage50's already validated CDS logic.
+t2m/d2m/sp grid-year receipts. With --fetch, retrieve a controlled batch of missing exact grid-years
+using Stage50's validated CDS logic. With --auto, retrieve all remaining
+missing grid-years in sequential bounded batches, validating each and
+then build the candidate ledger in one invocation.
 With --stage, create an isolated partial/full humidity patch ledger, keeping
 original EC TA/PA if and only if TA valid and |TA-ERA5 T2m| <= 8 C.
 Original T anomalies exceeding 8 C stay HOLD, as in previous policy.
@@ -293,7 +295,7 @@ def self_test():
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
     acts=ap.add_mutually_exclusive_group(required=True)
-    for name in ("self-test","check","fetch","stage"):
+    for name in ("self-test","check","fetch","stage","auto"):
         acts.add_argument("--"+name,action="store_true")
     ap.add_argument("--max-new",type=int,default=8)
     args=ap.parse_args()
@@ -319,6 +321,25 @@ def main():
     if args.fetch:
         fetch_new(mod,jobs,missing,args.max_new)
         return
+    if args.auto:
+        # User authorized physical-rule-based auto-completion. Only verified
+        # same-product CDS files, never in-package ERA companions or source edits.
+        original_missing=len(missing)
+        completed=0
+        while missing:
+            before_count=len(missing)
+            fetch_new(mod,jobs,missing,min(args.max_new,before_count))
+            found,missing=locate_receipts(mod,plan,jobs)
+            completed+=before_count-len(missing)
+            print("STAGE62 AUTO CDS VERIFIED",completed,"/",original_missing,
+                  "MISSING",len(missing),flush=True)
+            if len(missing)>=before_count:
+                raise RuntimeError("Stage62 auto retrieval made no verified progress")
+        if not all(r["retrieval_status"] != "CDS_DOWNLOAD_REQUIRED"
+                   for r in plan.to_dict("records")):
+            raise ValueError("Stage62 stale missing-gridyear plan after auto mode")
+        print("STAGE62 AUTO CDS COMPLETE | all",len(jobs),
+              "verifiable exact grid-years receipt-checked",flush=True)
     patch=physics(mod,events,info,found,holds)
     counts=dict(Counter(patch.candidate_status))
     print("STAGE62 WATER_HUMIDITY_CANDIDATE_STATUS",counts)
@@ -363,6 +384,8 @@ def main():
         json.dumps(report,sort_keys=True,indent=2)+"\n")
     marker.unlink()
     print("STAGE62 STAGING PASS | distinct non-Ho1 original 5133 all accounted for")
+    if args.auto:
+        print("STAGE62 AUTO PASS | verified all accessible CDS grid-years; full 5133 candidate/hold census generated")
     print("REPORT",dest)
     print("NO ORIGINAL, Stage60, NETCDF FORCING, DATM, CIME OR SLURM CHANGES")
 if __name__=="__main__":
