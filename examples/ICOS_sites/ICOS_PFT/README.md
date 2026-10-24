@@ -7,6 +7,7 @@
 - 34/38 station final-model PFT distributions were published (36 runs have reached at least 1000 model years per user-provided Slurm status).
 - Dominant-functional-type screening: **6 broad matches**, **2 partial mixed-forest matches**, **26 mismatches**.
 - **All 34 published FATES PFT vectors show 0% final needleleaf evergreen or deciduous vegetation carbon**, including spruce/pine tower stations.
+- Their first archived model year actually contains **21.59–40.66%** needleleaf VegC (median **35.40%**): needleleaf is present initially and disappears during spin-up, falling below 0.01% by year 50 in **28/34 stations**. [34-site onset-to-extinction analysis](comparison_20261024/four_batch_initial_to_final_needleleaf_extinction_34sites.csv).
 - DE-Lnf / ES-Agu have 1000-year models but published PFT is missing because the EC half-hourly source discovery failed. IT-Noe / CH-Aws remained unfinished at the last cited monitoring checkpoint.
 - [Detailed 38-site numerical comparison](comparison_20261024/four_batch_EC_original_versus_FATES_PFT_38sites.csv); [full 14-PFT terminal vectors for 6 / 8 / 11 / 13 cohorts](comparison_20261024/).
 
