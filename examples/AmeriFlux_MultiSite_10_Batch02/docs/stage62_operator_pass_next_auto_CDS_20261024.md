@@ -170,3 +170,81 @@ Expected terminal result:
 `STAGE62 AUTO PASS | verified all accessible CDS grid-years; full 5133 candidate/hold census generated`.
 This new script has been GitHub-published and exact blob verified
 by the assistant but not yet run against the operator's IRIDIS6 filesystem.
+
+
+## 24 October 2026 — Confirmed original payload SHA256 mismatch, isolated rescue
+
+The operator reran Git blob
+`4438a236ac8b0a9f4d8562ea0fae9612f979ffed` of Stage62 and
+passed the self-test. Preflight halted *before further CDS downloads*
+with this error from the pinned Stage50 independent source verifier:
+
+```text
+ValueError: CDS source SHA256 mismatch /iridisfs/home/ly3n24/AmeriFlux_Batch02_Stage62_external_CDS_ERA5/ERA5_2014_lat+031.75_lon-0110.25/original_CDS_payload
+```
+
+This conclusively establishes that the existing **2014 US-CMW
+original_CDS_payload bytes differ from the previously recorded
+verified_receipt.json SHA256**. It does **not** establish which process
+changed them, whether the data are scientifically wrong, or the integrity
+of the associated NetCDF beyond the stage at which validation stopped.
+Neither the user nor ChatGPT should edit, delete, overwrite or silently
+recompute the existing receipt to match changed bytes.
+
+The updated Stage62 script has:
+- new isolated rescue root:
+  `~/AmeriFlux_Batch02_Stage62_external_CDS_ERA5/isolated_original_payload_SHA256_conflict_recovery_v1/`
+- an **exact error-path gate**, accepting only
+  `CDS source SHA256 mismatch` for the original Stage62
+  `ERA5_2014_lat+031.75_lon-0110.25/original_CDS_payload`;
+  all other errors remain hard STOP, including NetCDF/checksum/calendar
+  mismatches, unverified BIF and misleading ERA companion data
+- independent CDS re-download of only the conflicted grid-year into
+  the new rescue directory (all other verified receipts are reused)
+- immutable SHA256-verified rescue receipt with full source payload,
+  NetCDF times/dimensions/units and exact grid/year checks
+- automatic preference for the new verified rescue receipt once it
+  exists, preserving the conflicting original receipt/payload/NetCDF
+  and retaining all source/model forcing HOLD boundaries
+- a synthetic self-test for the exact conflict-match and failure
+  of unrelated errors
+
+Git commit pinned for isolated recovery:
+`2ec159f7459062abc51d9c889438fdc0ec2adf51`
+
+Git blob SHA:
+`0b68fa14a7e008bd7fb1b19153024e215f67c2bf`
+
+### Exact IRIDIS6 restart
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PY="$CONDA_PREFIX/bin/python"
+  REL="examples/AmeriFlux_MultiSite_10_Batch02"
+  SCRIPT="$HOME/CLM-FATES-single-site-workflows/$REL/scripts/stage62/62_reuse_or_fetch_CDS_ERA5_for_5133_nonHo1_hard_humidity.py"
+  COMMIT="2ec159f7459062abc51d9c889438fdc0ec2adf51"
+  EXPECTED="0b68fa14a7e008bd7fb1b19153024e215f67c2bf"
+  TMP="$(mktemp)"
+  trap 'rm -f "$TMP"' EXIT
+  curl -fLsS --retry 3 \
+    "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL/scripts/stage62/62_reuse_or_fetch_CDS_ERA5_for_5133_nonHo1_hard_humidity.py" \
+    -o "$TMP"
+  echo "EXPECTED: $EXPECTED"
+  echo "ACTUAL: $(git hash-object "$TMP")"
+  test "$(git hash-object "$TMP")" = "$EXPECTED"
+  cp "$TMP" "$SCRIPT"
+  "$PY" -m py_compile "$SCRIPT"
+  "$PY" -B "$SCRIPT" --self-test
+  "$PY" -B "$SCRIPT" --auto --max-new 8 \
+    2>&1 | tee "$HOME/Batch02_Stage62_isolated_SHA_recovery_$(date -u +%Y%m%dT%H%M%SZ).log"
+)
+```
+
+Stage62 AUTO success means all **source-verifiable** non-Ho1 grid-years
+have independent validated CDS records, and the new 5,133-row
+candidate/HOLD ledger is staged. It does **not** release the 16,788
+US-Ho1 original source physics flags, the 86 BZS BIF issues or
+site-TA discrepancies without their specific checks; does not modify
+any original EC tower files or model forcing.
