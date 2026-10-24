@@ -1030,3 +1030,9 @@ read-only inventory with no raw writes, and rejection of an hourly release
 missing BIF. The extraction code and original source data are unchanged.
 After downloading the corrected script, run `--audit-only` to recheck all
 ten already-extracted sites; no upload or extraction is required.
+
+## Stage11–31 cold-humidity scientific audit archive (24 October 2026)
+
+The original Stage11–22 scripts were restored from the historical Stage22 commit. Stage23–30 inline analyses are archived as reproducible read-only entry points (not byte-identical copies); Stage31 is the next source-aware sensitivity gate. See [scientific audit report and IRIDIS6 instructions](docs/cold_humidity_scientific_review_20261024.md).
+
+**SCIENCE HOLD:** 4,884 unresolved Stage08 records, 0 DATM-approved replacements; US-Ho1 time offset is still provisional. Avoid rerunning completed CDS downloads or overwriting preserved Stage07/08 candidates.
