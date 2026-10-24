@@ -142,7 +142,6 @@ def read_inputs(args):
     pinned=m59.get('selected_candidates',{})
     if set(pinned)!=set(EXPECTED_SITES):
         raise RuntimeError('Ten-site candidate provenance missing')
-    path=args.stage59_dir/'../../' # NOT used; source paths read from actual manifest below
     meta=data_csv(args.sites_tsv,['site','package'])
     sites={row['site']:row for row in meta}
     if set(sites)!=set(EXPECTED_SITES):
@@ -163,7 +162,7 @@ def lag_metrics(site,contexts,source):
                 residuals.append(abs(value-obs))
         residuals.sort()
         med=statistics.median(residuals) if residuals else None
-        p90=residuals[min(len(residuals)-1,int(math.ceil(len(residuals)*0.9))-1)] if residuals else None
+        p90=residuals[max(0,math.ceil(len(residuals)*0.9)-1)] if residuals else None
         candidates.append({'site':site,'offset_minutes':offset,
                            'reference_context_rows':len(reference),
                            'matched_rows':len(residuals),
