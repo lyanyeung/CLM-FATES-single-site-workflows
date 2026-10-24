@@ -5,9 +5,10 @@ SOURCE: Stage61 exact (site, original local timestamp) residuals, after
 the 4,411 Stage60 user-approved scientific water-humidity selections.
 Auto-reuse only checksum-and-calendar-verified independent CDS ERA5
 t2m/d2m/sp grid-year receipts. With --fetch, retrieve a controlled batch of missing exact grid-years
-using Stage50's validated CDS logic. With --auto, retrieve all remaining
-missing grid-years in sequential bounded batches, validating each and
-then build the candidate ledger in one invocation.
+using Stage50's validated CDS logic. With --auto, retrieve all remaining missing grid-years in sequential bounded
+batches, validating each and then build the candidate ledger in one invocation.
+Exclusive flock and race-safe create-only receipts allow safe retries after
+an interrupted or overlapping download without overwriting valid receipts.
 With --stage, create an isolated partial/full humidity patch ledger, keeping
 original EC TA/PA if and only if TA valid and |TA-ERA5 T2m| <= 8 C.
 Original T anomalies exceeding 8 C stay HOLD, as in previous policy.
@@ -185,14 +186,44 @@ def fetch_new(mod,jobs,missing,limit):
     if not missing:
         print("STAGE62 FETCH NOT NEEDED | all verifiable grid-years available")
         return
+    # A single lock for Stage62's separate cache avoids two --auto
+    # invocations creating the same CDS payload/receipt simultaneously.
+    # Legacy/Stage50 writers may not honor this lock, so the
+    # receipt-file creation below also handles an atomic race safely.
+    import fcntl
     CACHE.mkdir(parents=True,exist_ok=True)
+    lockpath=CACHE/".stage62_verified_CDS_fetch.lock"
+    with lockpath.open("a+") as lock:
+        try:
+            fcntl.flock(lock.fileno(),fcntl.LOCK_EX|fcntl.LOCK_NB)
+        except BlockingIOError as exc:
+            raise RuntimeError("Another Stage62 CDS fetch may be active. "
+              "Refusing concurrent writes; use one process only.") from exc
+        try:
+            return _fetch_new_locked(mod,jobs,missing,limit)
+        finally:
+            fcntl.flock(lock.fileno(),fcntl.LOCK_UN)
+
+def _fetch_new_locked(mod,jobs,missing,limit):
+    verified=0
     for key in missing[:limit]:
         folder=CACHE/mod.grid_name(key)
         folder.mkdir(parents=True,exist_ok=True)
         marker=folder/"INCOMPLETE_DO_NOT_USE"
         receipt_file=folder/"verified_receipt.json"
         if receipt_file.exists():
-            raise ValueError("Existing unaccepted receipt: "+str(receipt_file))
+            # Previous interrupted run may have completed this receipt,
+            # or a different process may have finished after preflight.
+            # Never delete or overwrite an existing receipt.
+            already=mod.read_receipt(receipt_file,key,jobs[key]["sites"])
+            if already is None:
+                raise ValueError("Existing CDS receipt unverified: "+str(receipt_file))
+            if marker.exists():
+                marker.unlink()  # only after full hash/calendar verification
+            verified+=1
+            print("STAGE62 VERIFIED REUSE EXISTING RECEIPT",
+                  mod.grid_name(key),"NC_SHA",already["netcdf_sha256"],flush=True)
+            continue
         if not marker.exists():
             if any(folder.iterdir()):
                 raise ValueError("Unknown existing unverified CDS folder: "+str(folder))
@@ -220,13 +251,27 @@ def fetch_new(mod,jobs,missing,limit):
              "original_payload_sha256":sha(payload),
              "netcdf_path":str(nc.resolve()),"netcdf_sha256":sha(nc),
              "no_model_approval":True}
-        with receipt_file.open("x") as f:
-            json.dump(rec,f,indent=2);f.write("\n")
+        try:
+            with receipt_file.open("x") as f:
+                json.dump(rec,f,indent=2);f.write("\n")
+            outcome="NEW CDS GRID-YEAR"
+        except FileExistsError:
+            # Fail-closed optimistic concurrency: never unlink or overwrite
+            # this receipt; accept only if its checksummed source is exactly
+            # the independent CDS payload/NetCDF just validated.
+            already=mod.read_receipt(receipt_file,key,jobs[key]["sites"])
+            if (already is None or
+                already.get("netcdf_sha256")!=rec["netcdf_sha256"] or
+                already.get("original_payload_sha256")!=rec["original_payload_sha256"]):
+                raise ValueError("Conflicting verified CDS receipt; neither "
+                    "receipt nor source files overwritten: "+str(receipt_file))
+            outcome="RACE-SAFE VERIFIED EXISTING RECEIPT"
         marker.unlink()
-        print("STAGE62 VERIFIED NEW CDS GRID-YEAR",mod.grid_name(key),
+        verified+=1
+        print("STAGE62 VERIFIED",outcome,mod.grid_name(key),
               "NC_SHA",rec["netcdf_sha256"],flush=True)
-    print("STAGE62 FETCH PASS | downloaded",min(limit,len(missing)),
-          "of",len(missing),"missing verified grid-years")
+    print("STAGE62 FETCH PASS | checked",verified,
+          "of",len(missing),"needed verified grid-years")
     print("RERUN Stage62 --stage for the expanded candidate coverage")
 
 def physics(mod,events,info,found,holds):
@@ -302,6 +347,7 @@ def self_test():
         "PENDING_RECEIPT_CHECK"]
     assert demo.verified_receipt.tolist()==["","",""]
     assert 4411+21921==26332
+    assert callable(_fetch_new_locked) and callable(fetch_new)
     # An existing relative-humidity reference cannot be used as ice VPD.
     tw=np.array([-30.,20.])
     assert np.isfinite(6.112*np.exp(17.67*tw/(tw+243.5))).all()
