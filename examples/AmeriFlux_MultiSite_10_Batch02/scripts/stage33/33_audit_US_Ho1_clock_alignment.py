@@ -31,6 +31,41 @@ def sha(path):
         for b in iter(lambda:f.read(1048576),b""):h.update(b)
     return h.hexdigest()
 
+def verify_ledger_file(path, ledger, label):
+    """Verify the SAME file by its SHA256, even when /home and realpath differ.
+
+    Stage19 stored receipt dictionary keys with Path.home() spelling *before*
+    resolving symlinks, whereas Stage33 originally resolved before lookup.
+    Identity aliases are permitted; mismatched hashes NEVER are.
+    """
+    actual_path=Path(path).resolve(strict=True)
+    candidates=[]
+    for name,expected in ledger.items():
+        try:
+            is_same=(Path(name).resolve(strict=True)==actual_path)
+        except (FileNotFoundError,NotADirectoryError):
+            is_same=False
+        if is_same:
+            candidates.append((name,expected))
+    if not candidates:
+        raise ValueError(label+" not found in Stage19 checksum ledger: "+
+                         str(actual_path)+" (original spelling: "+str(path)+")")
+    hashes={expected for _,expected in candidates}
+    if len(hashes)!=1:
+        raise ValueError(label+" has conflicting SHA256 for aliases: "+
+                         str([name for name,_ in candidates]))
+    expected=next(iter(hashes))
+    actual=sha(actual_path)
+    if actual!=expected:
+        raise ValueError(label+" real SHA256 mismatch: "+str(actual_path)+
+                         " expected="+expected+" actual="+actual)
+    chosen=next((name for name,_ in candidates if name==str(path)),
+                candidates[0][0])
+    if chosen!=str(actual_path):
+        print("LEDGER PATH ALIAS VERIFIED:",label,
+              "manifest="+chosen,"resolved="+str(actual_path),flush=True)
+    return actual_path
+
 def epoch(times):
     return pd.DatetimeIndex(times).asi8.astype(float)/1e9
 
@@ -142,14 +177,14 @@ def main():
             path=args.stage15_root/f"US-Ho1_{y}"/"verified_receipt.json"
         else:
             path=args.stage18_root/f"ERA5_{y}_lat{lat:+07.2f}_lon{lon:+08.2f}"/"verified_receipt.json"
-        path=path.resolve(strict=True)
-        if sha(path)!=m19["cds_receipt_sha256"].get(str(path)):
-            raise ValueError("Pinned verified receipt differs: "+str(path))
+        path=verify_ledger_file(path,m19["cds_receipt_sha256"],
+                                "Stage19 receipt for US-Ho1 "+str(y))
         obj=json.loads(path.read_text())
-        nc=Path(obj["netcdf_path"]).resolve(strict=True)
-        if sha(nc)!=obj["netcdf_sha256"] or \
-           sha(nc)!=m19["verified_netcdf_sha256"].get(str(nc)):
-            raise ValueError("Pinned ERA5 NetCDF differs: "+str(nc))
+        nc=verify_ledger_file(
+            obj["netcdf_path"],m19["verified_netcdf_sha256"],
+            "Stage19 ERA5 NetCDF for US-Ho1 "+str(y))
+        if sha(nc)!=obj["netcdf_sha256"]:
+            raise ValueError("Receipt-pinned ERA5 NetCDF SHA256 mismatch: "+str(nc))
         group=args.stage15_root.resolve() if r["existing_Stage15_verified"] else args.stage18_root.resolve()
         if group not in nc.parents:raise ValueError("ERA5 path escaped source group")
         if r["existing_Stage15_verified"]:

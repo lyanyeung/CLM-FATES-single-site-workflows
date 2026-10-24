@@ -1044,3 +1044,5 @@ Stage31 passed on IRIDIS6 and classified all 4,884 held targets by original temp
 ### Stage32 result, Stage33 US-Ho1 clock alignment sensitivity
 
 Stage32 completed on IRIDIS6: all 4,884 held records re-verified, 431 Td-transfer negative-water-VPD conflicts (Ho1 425, GLE 6), and 2,782 ERA5 ice-RH warnings. All remain SCIENTIFIC HOLD, no repairs approved. Stage33 uses already downloaded SHA-pinned ERA5 NetCDF grid-years to compare hypothetical local-minus-UTC offsets -7 to -3 against original observed QC0 temperature, separately for all covered years, winter and held targets. This is not independent timezone certification. See [science provenance and stage details](docs/cold_humidity_scientific_review_20261024.md).
+
+**Stage33 v2 path-identity hotfix:** original Stage19 receipt ledger used unreconciled `/home` spelling; Stage33 originally resolved `/iridisfs/home` before ledger lookup. V2 compares aliases of the **same file** but strictly checks SHA256 against Stage19 and the verified NetCDF receipt. See [review notes](docs/cold_humidity_scientific_review_20261024.md). Do not run `set -e` unguarded on interactive HPC login shells during diagnosis.
