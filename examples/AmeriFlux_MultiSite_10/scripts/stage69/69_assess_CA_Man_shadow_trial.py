@@ -50,7 +50,7 @@ def read_csv(path,required):
 def number(x):
     try:
         z=float(x)
-        return z if math.isfinite(z) else None
+        return z if math.isfinite(z) and z > -9990 else None
     except (TypeError,ValueError):
         return None
 
