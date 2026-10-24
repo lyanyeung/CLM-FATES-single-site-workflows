@@ -1645,3 +1645,11 @@ events stay separate. This is an isolated science-ledger integration,
 not approval to overwrite DATM or run models.
 [Stage63 IRIDIS6 results and Stage64 pinned command](docs/stage63_PASS_stage64_9389_consolidated_source_hard_20261024.md).
 Stage64 GitHub-published but not yet executed on IRIDIS6.
+
+### Stage64 9389 independent water humidity candidate reconciliation PASS; Stage65 wider original BIF XLSX metadata search (25 Oct 2026)
+
+Operator Stage64 IRIDIS6 syntax, self-test, source check and full audit passed. Report: reports/stage64_9389_unique_ERA5_humidity_candidates_20261024T232045Z_c8678d94. Exactly 26332 original source hard RH/VPD event identities accounted: 4411 Stage60 candidates, 4801 Stage62 candidates and 177 Stage63 original-cold-temperature-confirmed candidates; **9389** unique independent CDS ERA5 water-RH/VPD/QBOT proposals; remaining **16943** hard source HOLD (US-Ho1 16788 original time offset, US-BZS 86 original release BIF, 69 Stage63 T evidence). All original files, netCDF, DATM and model jobs remain unmodified and scientific model input approval remains false.
+
+Critical metadata format correction: official AmeriFlux BADM BIF is often published as .xlsx (site naming convention AMF_SITE_BIF_YYYYMMDD.xlsx), while prior Stage63 searched principally for *BIF*.csv. The new [Stage65 bounded source-pinned BIF CSV/XLSX/ZIP discovery and 69-T-HOLD inventory](scripts/stage65/65_find_official_release_BIF_xlsx_and_triage_69.py) supports XLSX without added third-party dependencies and only labels site UTC_OFFSET as exact-release evidence when the identical original primary CSV (SHA256) and unique valid SITE_ID BIF are present in one archive. It never silently equates site longitude with archived UTC_OFFSET.
+
+[Stage64 exact operator results and Stage65 verified GitHub run details](docs/stage64_PASS_stage65_BIF_xlsx_original_release_and_69T_20261025.md). Stage65 not yet executed on IRIDIS6.
