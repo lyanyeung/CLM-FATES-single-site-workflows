@@ -899,7 +899,12 @@ See the [Stage10e–10g verified quality evidence ledger](docs/STAGE10E_TO_10G_Q
 US-NR3 showed zero source-labeled measured TA_F and VPD_F records in
 2017, 2018 and 2023, despite nearly complete numeric meteorology.
 The [Stage10h provenance script](scripts/stage10/10h_original_qc_source_provenance.py)
-is committed but **has not yet been run on IRIDIS6**; it will distinguish
-source QC0/1/2 and original downscaled ERA dependence at all 1,924
-pinned humidity blockers. No humidity replacements, time offset or spinup
+is the historical v1 attempt; it incorrectly required identical whole-file
+source/ERA coverage and stopped without reports. The [Stage10h-v2 timestamp-keyed audit](scripts/stage10/10h_v2_timestamp_keyed_qc_provenance.py)
+**completed on IRIDIS6**: 1,924/1,924 exact event matches, 1,866 VPD QC2
+ERA-downscaled, 58 VPD QC1 gapfilled, zero VPD QC0; 100% of the selected
+primary timestamps match the broader companion ERA native timeline.
+The [Stage10i source ERA VPD saturation audit](scripts/stage10/10i_source_ERA_vpd_saturation_audit.py)
+is committed as the next **unrun** read-only diagnosis. No humidity repairs,
+time-offset approvals, Post-v5 acceptance or spinups are authorized. No humidity replacements, time offset or spinup
 has been approved.
