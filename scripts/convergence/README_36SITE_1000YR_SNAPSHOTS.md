@@ -33,7 +33,48 @@ Each site gets exactly four standard PNG figures and their derived annual-carbon
 
 The GitHub publisher copies **only derived PNG/CSV/JSON and SHA256SUMS** to the matching `examples/FLUXNET_MultiSite_<batch>/figures/convergence_snapshots/<snapshot>/` path. It does not upload raw observations, forcing, surface inputs, NetCDF annual model histories, CIME files or restarts. Older figures are not overwritten.
 
-## IRIDIS6 instructions
+## 24 October 2026 correction — run interactively on the login node
+
+Job 4714875 failed after 3 seconds because the compute node reported that
+`/research/xclimatetbm/ly3n24/CLM_FATES` was not writable/visible. This is
+not evidence of a Python plotting error, missing model history, or GitHub
+network failure. The revised Stage 31 script checks actual filesystem
+writability, preferentially writes to Research Filestore, and stages derived
+outputs under `~/FLUXNET36_derived` if Research Filestore is unavailable.
+
+**The preferred procedure for this specific operator is direct foreground
+execution on the login node, without submitting a Slurm job**, subject to
+local login-node usage policy:
+
+```bash
+set -o pipefail
+cd ~/CLM-FATES-single-site-workflows
+git fetch origin main
+git show origin/main:scripts/convergence/31_crossbatch_convergence_ec_36sites.py > "$HOME/FLUXNET36_analysis.py"
+PY="$HOME/.conda/envs/clm_fates_env/bin/python"
+"$PY" -m py_compile "$HOME/FLUXNET36_analysis.py"
+"$PY" -u -B "$HOME/FLUXNET36_analysis.py" run --batch all --publish 2>&1 | tee "$HOME/FLUXNET36_analysis.log"
+```
+
+For a preflight first, execute `"$PY" -u -B "$HOME/FLUXNET36_analysis.py" audit --batch all`.
+The `-u` flag streams annual-file progress live. Failed sites are explicitly
+recorded and their batch is not published. The two unfinished sites are always
+excluded. Publishing runs only after all required derived files in the given
+batch are validated and accesses GitHub via the login node.
+
+For any successful batch that had to stage its output under Home, transfer its
+derived products to Research Filestore later (from a node with RFS access),
+then publish if needed:
+
+```bash
+"$PY" -u -B "$HOME/FLUXNET36_analysis.py" sync --snapshot /home/ly3n24/FLUXNET36_derived/FLUXNET_MultiSite_<batch>/convergence_snapshots/<actual_snapshot> --dry-run
+"$PY" -u -B "$HOME/FLUXNET36_analysis.py" sync --snapshot /home/ly3n24/FLUXNET36_derived/FLUXNET_MultiSite_<batch>/convergence_snapshots/<actual_snapshot>
+```
+
+Do not run the older Slurm step below; it is retained only as a historical
+alternative and caused the recorded RFS mounting failure on job 4714875.
+
+## Older IRIDIS6 Slurm instructions (superseded for this operator)
 
 ### A. Fetch and audit on login node (no git pull needed)
 
