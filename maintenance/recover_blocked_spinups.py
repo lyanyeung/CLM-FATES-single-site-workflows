@@ -142,12 +142,24 @@ def inspect_case(batch, site, check_jobs=True):
         actual = xval(case, key)
         if actual.upper() != expected.upper():
             raise Stop(f"{name}: {key}={actual!r} expected {expected!r}")
-    expected_type = ("branch" if (batch, site) ==
-                     ("FLUXNET_MultiSite_11", "IT-Noe") else "startup")
+    expected_type = ("branch" if (batch, site) in (
+        ("FLUXNET_MultiSite_11", "IT-Noe"),
+        ("FLUXNET_MultiSite_11", "CH-Aws"),
+    ) else "startup")
     if xval(case, "RUN_TYPE").lower() != expected_type:
         raise Stop(f"RUN_TYPE mismatch for {name}")
-    if expected_type == "branch" and xval(case, "RUN_REFDATE") != "2009-01-01":
-        raise Stop("IT-Noe branch RUN_REFDATE unexpectedly changed")
+    if (batch, site) == ("FLUXNET_MultiSite_11", "IT-Noe"):
+        if xval(case, "RUN_REFDATE") != "2009-01-01":
+            raise Stop("IT-Noe branch RUN_REFDATE unexpectedly changed")
+    if (batch, site) == ("FLUXNET_MultiSite_11", "CH-Aws"):
+        if (xval(case, "RUN_REFCASE") != "CH-Aws_FATES_SPINUP1000_RH34A"
+                or xval(case, "RUN_REFDATE") != "2016-01-01"):
+            raise Stop("CH-Aws RH42A-V8 branch source metadata mismatch")
+        from check_four_spinups import verified_chaws_branch_baseline
+        baseline, evidence = verified_chaws_branch_baseline(
+            case, name, start, target)
+        if baseline != 10:
+            raise Stop("CH-Aws RH42A-V8 source provenance failed: " + evidence)
     if xval(case, "MPILIB").lower() != "openmpi":
         raise Stop("Unexpected MPILIB")
     for component in ("ATM", "LND", "CPL"):
