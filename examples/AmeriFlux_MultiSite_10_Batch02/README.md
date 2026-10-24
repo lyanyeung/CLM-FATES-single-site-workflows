@@ -1328,3 +1328,25 @@ All cold-water/ice humidity review flags remain attached and **none
 of the 4,884 are auto-approved as model forcing**; Stage53 444
 independent RH candidates remain unchanged. Stage56 published on
 GitHub but not yet executed on IRIDIS6.
+
+
+### Stage57: investigate exact 63 TA_F vs independent ERA5 temperature discrepancies >8 C (24 October 2026)
+
+Stage56 operator check and full audit **PASSED**: 3,904
+Stage11 source tower TA_F values are numerically valid and within
+8 C of independent CDS ERA5 T2m and are retained in isolated
+RH/VPD/QBOT candidates. Remaining discrepancy cases: **US-EML 27,
+US-GLE 6, US-ICt 30** (63 total). All 917 US-Ho1 site-time-offset
+records remain separate HOLD. No source or DATM writes made.
+
+For the exact 63, new
+[Stage57 original-source-and-neighbourhood audit](scripts/stage57/57_manual_review_63_tower_T_vs_ERA5.py)
+verifies Stage56 provenance plus the immutable original tower
+primary SHA256, then prints original TA_F/QA, same-source independent
+ERA5 T2m, temperature difference sign/magnitude, ±30/60/120-minute
+original tower neighbors with their QC, nearest QC0 observation,
+day median and temporal clustering. It does NOT automatically
+claim EC tower errors or replace TA_F with ERA5. **All 63 remain
+science HOLD pending manual inspection of actual row-level evidence.**
+[Stage57 pinned instructions and science review rubric](docs/stage57_manual_review_63_ec_tower_temperature_gt8C_20261024.md).
+Stage57 is published on GitHub but has not yet run on IRIDIS6.
