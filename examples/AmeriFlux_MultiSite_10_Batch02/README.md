@@ -1051,3 +1051,8 @@ Stage32 completed on IRIDIS6: all 4,884 held records re-verified, 431 Td-transfe
 ### Stage33 checked; Stage34 QC2 temperature-provenance audit
 
 Stage33 v2 passed: US-Ho1 nominal UTC-5 best matched 106,336 observed-T QC0 timestamps among tested offsets -7 to -3 (MAE 1.472 C), but the 425 negative dewpoint-transfer VPD cases persist regardless of offset (421-427). Missing original QC0 temperatures in multiple anomaly years demand a source-focused review. Stage34 is now the next read-only script; it checks the 425 negative-VPD QC2 timestamps against independently downloaded CDS ERA5 temperature/dewpoint and original FLUXNET temperature gapfill by year. See the science review in docs/cold_humidity_scientific_review_20261024.md. Zero repairs approved.
+
+
+### Stage34 verified and Stage35 neighbouring Howland QC0 audit
+
+Stage34 passed with 917 Ho1 held, 425/425 negative Td-transfer VPD events in QC2 temperatures, and large CDS vs FLUXNET temperature differences (median +11.7672C within the 425). Stage35 now checks original site-QC0 temperature from nearby Ho2 and Ho3, with pinned input SHA256 and no forcing or model changes. See docs/cold_humidity_scientific_review_20261024.md. No science approvals.
