@@ -21,6 +21,14 @@
 
 Stage77 has already calculated all 18 corrected ERA5 states and Stage77/78 confirms that they are thermodynamically consistent and remove every original RH<1% observation. **No CDS re-download** is necessary. Stage79 determined that the earlier 89 warnings were predominantly **ERA5-to-unchanged-tower source switches**, and the user's instruction chooses not to extend the replacements, even if some RH transitions remain large. Do not misinterpret their presence as a failure to implement the rule.
 
+## Actual first IRIDIS6 run and fixed threshold bug
+
+The first Stage80 `--trial` stopped at CA-Ca3 after printing the first unchanged site, with `Stage77 RH<1 target census mismatch CA-Ca3`. **Cause:** Stage77's human-readable change ledger stores `original_RH_pct` rounded to **six decimal places**. Stage80 originally classified the already rounded display number using `rh<1`, while the authoritative Stage75 full-precision T/Q/P computation determines the 7+2+1+8 source targets. A value just below 1% can round to `1.000000` and drop out of the selection.
+
+The corrected Stage80 **always recalculates original RH at full precision from the exact SHA-pinned Stage75 forcing row** and checks the rounded Stage77 source ledger only for timestamp coverage and recorded six-decimal agreement. It adds an explicit synthetic regression for **RH=0.9999996% rendered 1.000000%**. The 18 replacement values still come directly from the already-pinned Stage77 native ERA5 full-state trial. **No CDS downloads or Stage77/78/79 reruns**. Rerun the corrected `--self-test` then `--trial` with a **NEW output directory** because the original Stage80 attempt already created a partial output directory.
+
+**DATM preparation next:** after Stage80 confirms the final 10-site forcing manifest, independently prepare NetCDF meteorological forcing and DATM streams with site-time/NOLEAP and forcing variable-name/unit checks. Existing [Batch01 readiness history](../../README.md) reports that tower sensor-height **ZBOT provenance for CA-Cbo and CA-Man remains unresolved**; do not silently fill heights or claim ten-site science-ready DATM without resolving this. It is possible to prepare isolated *technical preview* DATM files separately from scientific production approval.
+
 ## Stage80 script
 
 [80_operator_RH_lt1_only_native_ERA5_selected.py](80_operator_RH_lt1_only_native_ERA5_selected.py)
