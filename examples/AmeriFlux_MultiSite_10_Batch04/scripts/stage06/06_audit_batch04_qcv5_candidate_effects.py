@@ -34,7 +34,7 @@ HOLD_FIELDS = ("site", "TIMESTAMP_START", "TIMESTAMP_END", "reason")
 NATIVE_FIELDS = ("TIMESTAMP_START", "TIMESTAMP_END",
                  "TA_F", "PA_F", "VPD_F", "RH",
                  "TA_F_QC", "PA_F_QC", "VPD_F_QC")
-MISSING = {"", "-9999", "-9999.0", "NA", "NAN"}
+MISSING = {"", "-9999", "-9999.0", "-6999", "-6999.0", "NA", "NAN"}
 
 
 def sha(path):
