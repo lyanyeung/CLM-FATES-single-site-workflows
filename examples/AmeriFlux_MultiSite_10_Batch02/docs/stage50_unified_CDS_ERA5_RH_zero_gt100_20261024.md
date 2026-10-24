@@ -1,7 +1,7 @@
 # Stage50 — One external CDS ERA5 rule for all original RH=0 / RH>100
 
 Date: 24 October 2026.
-**Status: scripts published on GitHub; live Stage50 not yet run on IRIDIS6.**
+**Status: live Stage50 IRIDIS6 build PASSED on 24 October 2026: 444 ERA5 RH candidates, 405 supersaturation/phase reviews, 12 zero-RH retained-T candidates, 27 joint T/RH review cases; approved forcing repairs = 0.** For exact operator-reported results and Stage51, see [Stage50 completed / Stage51 next](stage50_operator_success_and_stage51_review_20261024.md).
 Inputs: verified Stage49 ten-site original-source ledger, exact Stage04b
 source SHA256 inventory, original same-release BIF site coordinates and
 UTC_OFFSET metadata, verified CDS ERA5 point-timeseries NetCDF receipts.
