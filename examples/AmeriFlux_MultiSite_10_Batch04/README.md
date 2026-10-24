@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 04
 
-> **Operational status (2026-10-24): Stage00–02 structural metadata 10/10 PASS, Stage02C HH continuity 10/10 PASS; Stage04 3/3 targeted diagnostics PASS; Stage05/06 3-site candidate and physical audits PASS; Stage07 3 full derived CSVs WRITTEN (376 exact-time ERA5 VPD replacements, 1,566 US-Ton QC0 native readings protected); Stage08 7/7 full derived CSVs VERIFIED (416 patch rows / 696 HOLD); 10/10 complete candidate FLUXMET files generated; Stage09 zero repairs VERIFIED; Stage10 independent ERA5-Land US-Rpf/US-SRM 689/689 fixes SUCCESS; Stage11 unified latest-ten derived manifest prepared.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 post-approval 10/10 PASS verified on IRIDIS6; US-Seg approved BIF GROUP_ID 1495 coordinates/elevation validated.** See [final Stage02 results](docs/STAGE02_POST_APPROVAL_VERIFIED_2026-10-24.md). See [Stage02 evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). [Stage02B US-Seg diagnostic](scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py) has been executed. Paired BIF GROUP_ID 1479 vs 1495 evidence is documented in the [Stage02B ledger](docs/STAGE02B_US_SEG_PROVENANCE_VERIFIED_2026-10-24.md); The [human-approved decision](docs/STAGE02_US_SEG_GROUP1495_USER_APPROVAL_2026-10-24.md) is latitude 34.3623, longitude -106.7020 and elevation 1596 m. Stage02C full-HH timestamp audit **completed 10/10 PASS**, with scientific QC concerns preserved in the [Stage02C report](docs/STAGE02C_FULL_HH_TIME_QC_AUDIT_2026-10-24.md). No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
+> **Operational status (2026-10-24): Stage00–02 structural metadata 10/10 PASS, Stage02C HH continuity 10/10 PASS; Stage04 3/3 targeted diagnostics PASS; Stage05/06 3-site candidate and physical audits PASS; Stage07 3 full derived CSVs WRITTEN (376 exact-time ERA5 VPD replacements, 1,566 US-Ton QC0 native readings protected); Stage08 7/7 full derived CSVs VERIFIED (416 patch rows / 696 HOLD); 10/10 complete candidate FLUXMET files generated; Stage09 zero repairs VERIFIED; Stage10 689/689 ERA5-Land fixes SUCCESS; Stage11 latest-ten manifest VERIFIED 10/10; Stage12 155 non-US-Syv science holds and 2 SP1 jump exceptions ready, not yet run.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 post-approval 10/10 PASS verified on IRIDIS6; US-Seg approved BIF GROUP_ID 1495 coordinates/elevation validated.** See [final Stage02 results](docs/STAGE02_POST_APPROVAL_VERIFIED_2026-10-24.md). See [Stage02 evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). [Stage02B US-Seg diagnostic](scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py) has been executed. Paired BIF GROUP_ID 1479 vs 1495 evidence is documented in the [Stage02B ledger](docs/STAGE02B_US_SEG_PROVENANCE_VERIFIED_2026-10-24.md); The [human-approved decision](docs/STAGE02_US_SEG_GROUP1495_USER_APPROVAL_2026-10-24.md) is latitude 34.3623, longitude -106.7020 and elevation 1596 m. Stage02C full-HH timestamp audit **completed 10/10 PASS**, with scientific QC concerns preserved in the [Stage02C report](docs/STAGE02C_FULL_HH_TIME_QC_AUDIT_2026-10-24.md). No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
 
 Fourth independent ten-site AmeriFlux campaign following [Batch03](../AmeriFlux_MultiSite_10_Batch03/), [Batch02](../AmeriFlux_MultiSite_10_Batch02/) and [Batch01](../AmeriFlux_MultiSite_10/). This directory contains the exact release manifest and reproducible scripts. Never commit raw tower ZIPs or derived large files to GitHub.
 
@@ -274,6 +274,33 @@ On IRIDIS6 first run `--check`, and then optionally `--run` for **new reports on
 ```
 
 Stage06 reports go into a new `reports/stage06_qcv5_candidate_effects_*` folder with SHA receipts and a boundary review list, without editing original or Stage05 files. **No production sparse-patch merge before the 754 HOLDs and boundary/physical QC have been resolved and seven remaining Batch04 sites have completed appropriate scientific screening.**
+
+## Stage11 operator VERIFIED / Stage12 active non-Syv fixes (2026-10-25)
+
+**Stage11 operator result VERIFIED:** all 10 latest complete derived FLUXMET HH source files SHA-checked, full CSVs not duplicated, new `LATEST_10_SITES_FOR_POSTV5_INPUT.tsv` written:
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch04/qcv5_stage11_latest_ten_manifest/candidate_20261024T232100Z_1c6ef02a/LATEST_10_SITES_FOR_POSTV5_INPUT.tsv`.
+
+Current source selection: Stage07 3 sites, Stage08 5 sites, Stage10 2 sites; 689/689 previous Rpf/SRM humidity faults are resolved. The old science HOLD ledger still has **761 entries**: **606 US-Syv deferred** and **155 other sites** (US-SP1 147; US-Seg 4; US-Uaf 2; US-SRG 1; US-Ton 1), plus up to 12 Stage07 skipped ERA jump-edge event timestamps which may overlap old HOLDs (2 SP1, 10 Syv).
+
+**Next Stage12**: [source-repair script](scripts/stage12/12_repair_non_syv_science_holds.py) with [method and progress record](docs/STAGE11_VERIFIED_AND_STAGE12_NON_SYV_2026-10-25.md). It targets the 155 non-Syv old holds plus two SP1 missed jump-edge timestamps. It retains physically consistent original tower temperature/VPD wherever corroborated by trustworthy neighbouring native measurements and acquires **independent ERA5-Land** hourly T2m/dewpoint/surface pressure at precisely BIF located and local-standard UTC-offset-aligned years where source VPD is invalid or a high-jump edge was not repaired. It uses the pinned Stage10 helper to recover/download NetCDF. It creates new complete derived CSVs **only for actually modified sites**, a new latest-ten-site TSV, resolved/unresolved decision ledger and SHA receipt. US-Syv not touched. Any ambiguous original BIF holds only its site.
+
+To run on IRIDIS6, download BOTH scripts beside each other (Stage12 imports Stage10 helper by filename):
+
+```bash
+(
+  set -euo pipefail
+  REPO="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows"
+  BASE="$HOME/ameriflux_batch04_stage12"
+  mkdir -p "$BASE"
+  curl -fLsS --retry 3 "$REPO/c3a44684134a6a50e4086543301adc05e66365d9/examples/AmeriFlux_MultiSite_10_Batch04/scripts/stage12/12_repair_non_syv_science_holds.py" -o "$BASE/12_repair_non_syv_science_holds.py"
+  curl -fLsS --retry 3 "$REPO/b8ff0c2aaf41683d70bb94e9d70715c25c5eea45/examples/AmeriFlux_MultiSite_10_Batch04/scripts/stage10/10_era5land_independent_humidity_fill.py" -o "$BASE/10_era5land_independent_humidity_fill.py"
+  python3 -B -m py_compile "$BASE/12_repair_non_syv_science_holds.py"
+  python3 -B "$BASE/12_repair_non_syv_science_holds.py" --self-test
+  python3 -B "$BASE/12_repair_non_syv_science_holds.py" --run --max-downloads 3 2>&1 | tee "$BASE/stage12_run.log"
+)
+```
+
+Stage12 is **committed but not yet executed**. Its actual science repair counts are to be established by the IRIDIS6 operator output; model-ready Post-v5, DATM and spinup remain unapproved.
 
 ## Batch04 Stage10 VERIFIED 689/689; Stage11 ten-site latest-source selection ready
 
