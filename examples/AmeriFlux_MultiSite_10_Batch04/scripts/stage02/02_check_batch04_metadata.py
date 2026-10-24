@@ -3,7 +3,7 @@
 
 Read only original release BIF and meteorology first HH/HR interval. No site-
 level coordinates are invented or silently selected when multiple original
-candidates exist. No external metadata fallback, unreviewed coordinate overrides,
+candidates exist. Human-approved US-Seg BIF GROUP_ID=1495 is the only permitted coordinate exception; no unreviewed overrides,
 source modifications, forcing, surfaces, case writes or job submissions.
 This is not full time-series QC or a FATES PFT/measurement-height selection.
 """
@@ -75,22 +75,33 @@ def bif_metadata(path, site, selected=None):
         lat, lon = coordinates(selected["latitude"], selected["longitude"])
         if lat not in vals["LOCATION_LAT"] or lon not in vals["LOCATION_LONG"]:
             raise ValueError("Selected coordinates missing from original BIF: " + repr(selected))
-        matched = {"LOCATION_LAT": set(), "LOCATION_LONG": set()}
+        matched = {k: set() for k in
+                   ("LOCATION_LAT", "LOCATION_LONG", "LOCATION_ELEV", "LOCATION_DATE_START")}
         with path.open(encoding="utf-8-sig", newline="") as stream:
             for record in csv.DictReader(stream):
                 if (record.get("GROUP_ID") or "").strip() != selected["group_id"]:
                     continue
-                variable = (record.get("VARIABLE") or "").strip().upper()
-                if variable in matched:
-                    v = (record.get("DATAVALUE") or "").strip()
-                    if v and v != "-9999":
-                        matched[variable].add(float(v))
-        if matched["LOCATION_LAT"] != {lat} or matched["LOCATION_LONG"] != {lon}:
-            raise ValueError("Selected coordinates not paired in specified BIF GROUP_ID: " + repr(matched))
-        coord_source = "RELEASE_BIF_EXPLICIT_GROUP_" + selected["group_id"]
-    return {"latitude": lat, "longitude": lon, "igbp_labels": sorted(labels),
-            "igbp_codes": vegetation_codes(labels), "height_records": heights,
-            "coordinate_source": coord_source, "source": str(path)}
+                key = (record.get("VARIABLE") or "").strip().upper()
+                if key in matched:
+                    value = (record.get("DATAVALUE") or "").strip()
+                    if value and value != "-9999":
+                        matched[key].add(value)
+        if ( {float(v) for v in matched["LOCATION_LAT"]} != {lat}
+                or {float(v) for v in matched["LOCATION_LONG"]} != {lon}
+                or {float(v) for v in matched["LOCATION_ELEV"]} !=
+                {float(selected["elevation_m"])}
+                or matched["LOCATION_DATE_START"] != {selected["location_date_start"]} ):
+            raise ValueError("Approved coordinates/elevation/date not paired "
+                             "in original BIF GROUP_ID: " + repr(matched))
+        coord_source = "RELEASE_BIF_APPROVED_GROUP_" + selected["group_id"]
+    result = {"latitude": lat, "longitude": lon, "igbp_labels": sorted(labels),
+              "igbp_codes": vegetation_codes(labels), "height_records": heights,
+              "coordinate_source": coord_source, "source": str(path)}
+    if selected:
+        result.update({"elevation_m": float(selected["elevation_m"]),
+                       "location_date_start": selected["location_date_start"],
+                       "coordinate_decision": selected["approval"]})
+    return result
 
 
 def inspect_met(raw, site, package):
@@ -124,7 +135,7 @@ def inspect_met(raw, site, package):
     return result
 
 
-def inspect(row, root):
+def inspect(row, root, decisions):
     site, package = row["site"], row["package"]
     raw = root / site / "forcing" / "raw" / package
     if not raw.is_dir() or raw.is_symlink():
@@ -138,7 +149,7 @@ def inspect(row, root):
         raise ValueError("Non-regular BIF: " + str(bifs[0]))
     # Any missing or conflicting original coordinate values cause review,
     # never an implicit selection. Decisions must be separately documented.
-    info = bif_metadata(bifs[0], site)
+    info = bif_metadata(bifs[0], site, decisions.get(site))
     info.update({"site": site, "package": package, "meteorology": inspect_met(raw, site, package)})
     notes = []
     if len(info["igbp_codes"]) != 1:
@@ -169,14 +180,35 @@ def main():
                 or not re.fullmatch(r"AMF_" + re.escape(row["site"])
                                     + r"_FLUXNET_[A-Za-z0-9_.-]+", row["package"])):
             parser.error("Invalid manifest site/package")
+    # Only explicitly approved US-Seg BIF group 1495 can resolve duplicate longitudes.
+    decisions = table(HERE / "coordinate_decisions.tsv")
+    required = {"site", "package", "group_id", "latitude", "longitude",
+                "elevation_m", "location_date_start", "approval"}
+    if len(decisions) != 1 or set(decisions[0]) != required:
+        parser.error("Expected one exact, human-approved coordinate decision")
+    chosen = decisions[0]
+    matching = next((x for x in rows if x["site"] == "US-Seg"), None)
+    if (matching is None or chosen["package"] != matching["package"]
+            or chosen["site"] != "US-Seg"
+            or chosen["group_id"] != "1495"
+            or chosen["approval"] != "APPROVED_BY_USER"
+            or (chosen["latitude"], chosen["longitude"], chosen["elevation_m"],
+                chosen["location_date_start"]) !=
+               ("34.3623", "-106.7020", "1596", "200701010000")):
+        parser.error("US-Seg decision differs from approved BIF 1495 values")
+    decisions = {"US-Seg": chosen}
     passed, failed = [], []
     print("READ-ONLY BATCH04 STAGE02: coordinates, IGBP, height inventory, first source interval")
     for row in rows:
         print("\n========== {} ==========".format(row["site"]), flush=True)
         try:
-            info = inspect(row, args.sites_root.expanduser())
+            info = inspect(row, args.sites_root.expanduser(), decisions)
             passed.append(info)
             print("COORDINATES: LAT={} LON={}".format(info["latitude"], info["longitude"]))
+            if "elevation_m" in info:
+                print("APPROVED SITE ELEVATION: {} m | {} | GROUP_ID {} | start {}".format(
+                    info["elevation_m"], info["coordinate_decision"],
+                    decisions[row["site"]]["group_id"], info["location_date_start"]))
             print("IGBP LABELS:", ", ".join(info["igbp_labels"]) or "NOT FOUND")
             print("COORDINATE SOURCE:", info["coordinate_source"], info["source"])
             if "source_notes" in info:
