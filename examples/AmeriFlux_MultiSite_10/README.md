@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 01
 
+> **LATEST checkpoint, 24 October 2026:** User executed Stage80 RH<1-only final forcing selection successfully and [Stage81 NetCDF technical build](scripts/stage81/README.md) successfully. **213/213 annual 30-minute NOLEAP NetCDF from 10/10 sites and 10 unactivated DATM stream templates**, all recorded at `reports/stage81_DATM_technical_20261024T162235Z/` (fully qualified root: `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/`). Only 18 original RH<1% records are ERA5-replaced; all 1,091 original RH1–5% remain. This **supersedes the 22 October note immediately below that said DATM files had not been generated**. Remaining blocking work is **case coupling**, `ZBOT` provenance (especially CA-Cbo/CA-Man), interval centering / source time semantics, verified domain and stream configuration, and CIME smoke runs; all original cases/jobs unchanged.
+
+
 **Current checkpoint (operator-reported 22 October 2026):** all ten Batch 01 pinned releases extracted; point surfaces created; original QC v5 candidate forcing generated (nine stations via Stage18, US-Bar in isolated Stage20); 10/10 independent numerical audits PASS (Stage21); Stage22 read-only extreme/source QC completed. **Science approval, ZBOT, PFT/footprint verification, DATM and spin-up are still pending.** GitHub records operator results but cannot independently inspect live HPC outputs.
 
 
