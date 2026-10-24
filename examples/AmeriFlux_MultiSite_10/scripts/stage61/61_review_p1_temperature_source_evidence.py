@@ -59,8 +59,10 @@ def num(value):
 def data_csv(path,required):
     if not path.is_file():
         raise RuntimeError('Missing input file: '+str(path))
+    # Site manifests are TSV; Stage59/60 reports are ordinary CSV.
+    delimiter='\t' if path.suffix.lower()=='.tsv' else ','
     with path.open(newline='',encoding='utf-8-sig') as fp:
-        reader=csv.DictReader(fp)
+        reader=csv.DictReader(fp,delimiter=delimiter)
         fields=reader.fieldnames or []
         if len(fields)!=len(set(fields)) or not set(required).issubset(fields):
             raise RuntimeError('Invalid CSV schema: '+str(path)+', missing='+str(set(required)-set(fields)))
@@ -297,17 +299,52 @@ def build(args):
         raise RuntimeError('Expected 96 P1 evidence rows')
     return s59,s60,e_records,align_records,ctx_records,raw_provenance
 
+def self_test():
+    """Test TSV/CSV input parsing and source-clock sensitivity without HPC files."""
+    import tempfile
+    with tempfile.TemporaryDirectory(prefix='stage61_test_') as temporary:
+        folder=Path(temporary)
+        tsv=folder/'sites.tsv'
+        tsv.write_text('site\\tpackage\\tfirst_year\\tlast_year\\n'
+                       'CA-Man\\tAMF_CA-Man_FLUXNET\\t1994\\t2008\\n'
+                       'US-Bar\\tAMF_US-Bar_FLUXNET\\t2004\\t2023\\n',
+                       encoding='utf-8')
+        parsed=data_csv(tsv,['site','package'])
+        assert len(parsed)==2 and parsed[0]['site']=='CA-Man'
+        assert parsed[1]['package']=='AMF_US-Bar_FLUXNET'
+        csvp=folder/'review.csv'
+        csvp.write_text('site,package\\nCA-Man,example\\n',encoding='utf-8')
+        assert data_csv(csvp,['site','package'])[0]['package']=='example'
+        context={}
+        source={}
+        zero=datetime(2018,1,1)
+        for i in range(60):
+            t=zero+timedelta(minutes=30*i)
+            val=10+4*math.sin(i*0.3)
+            context[('CA-Man',t.strftime('%Y-%m-%d %H:%M:%S'))]={
+                'temperature_C':str(val),'flagged_at_time':'NO'}
+            source[canonical(t)]={'TA_F':str(val)}
+        rows,best,status=lag_metrics('CA-Man',context,source)
+        assert len(rows)==5 and best==0
+        assert status=='PROVISIONAL_DISTINCT_MINIMUM_NOT_VERIFIED'
+    print('SELF-TEST PASS: TSV site manifest, CSV review and clock offsets')
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     mode=p.add_mutually_exclusive_group(required=True)
     mode.add_argument('--check',action='store_true')
     mode.add_argument('--audit',action='store_true')
+    mode.add_argument('--self-test',action='store_true')
     p.add_argument('--stage59-dir',type=Path,required=True)
     p.add_argument('--stage60-dir',type=Path,required=True)
     p.add_argument('--sites-tsv',type=Path,default=Path(__file__).resolve().parents[2]/'sites.tsv')
     p.add_argument('--raw-root',type=Path,default=DEFAULT_RAW)
     p.add_argument('--experiment-root',type=Path,default=DEFAULT_EXP)
     a=p.parse_args()
+    if a.self_test:
+        self_test()
+        return
     root=a.experiment_root.resolve(strict=True)
     s59,s60,p1,steps,ctx,packages,m59,m60=read_inputs(a)
     print('STAGE61 P1 EVIDENCE | READ-ONLY INPUTS')
