@@ -156,6 +156,13 @@ def build_plan(mod,events,info,missing_bif):
             raise ValueError("Incompatible shared ERA5 grid-year")
     return pd.DataFrame(rows),jobs
 
+def reset_receipt_plan_after_fetch(plan):
+    """Re-test downloaded CDS receipts but preserve any missing official BIF HOLD."""
+    eligible=plan.retrieval_status.ne("HOLD_UNVERIFIED_RELEASE_BIF")
+    plan.loc[eligible,"retrieval_status"]="PENDING_RECEIPT_CHECK"
+    plan.loc[eligible,"verified_receipt"]=""
+    return plan
+
 def locate_receipts(mod,plan,jobs):
     found={};missing=[]
     for key in sorted(jobs,key=lambda x:(x[2],x[0],x[1])):
@@ -286,6 +293,14 @@ def physics(mod,events,info,found,holds):
 def self_test():
     assert sum(SITES.values())==5133
     assert sum(SITES.values())+N_HO1==21921
+    demo=pd.DataFrame({"retrieval_status":["CDS_DOWNLOAD_REQUIRED",
+        "HOLD_UNVERIFIED_RELEASE_BIF","VERIFIED_INDEPENDENT_CDS_ERA5_REUSE"],
+        "verified_receipt":["","", "/receipt"]})
+    reset_receipt_plan_after_fetch(demo)
+    assert demo.retrieval_status.tolist()==[
+        "PENDING_RECEIPT_CHECK","HOLD_UNVERIFIED_RELEASE_BIF",
+        "PENDING_RECEIPT_CHECK"]
+    assert demo.verified_receipt.tolist()==["","",""]
     assert 4411+21921==26332
     # An existing relative-humidity reference cannot be used as ice VPD.
     tw=np.array([-30.,20.])
@@ -332,9 +347,7 @@ def main():
             # Re-open the previous download-required plan rows: locate_receipts
             # only refreshes PENDING_RECEIPT_CHECK, so an unchanged plan would
             # falsely continue reporting already verified downloads as missing.
-            eligible=plan.retrieval_status.ne("HOLD_UNVERIFIED_RELEASE_BIF")
-            plan.loc[eligible,"retrieval_status"]="PENDING_RECEIPT_CHECK"
-            plan.loc[eligible,"verified_receipt"]=""
+            reset_receipt_plan_after_fetch(plan)
             found,missing=locate_receipts(mod,plan,jobs)
             completed+=before_count-len(missing)
             print("STAGE62 AUTO CDS VERIFIED",completed,"/",original_missing,
