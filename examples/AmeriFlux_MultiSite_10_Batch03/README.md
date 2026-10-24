@@ -2,8 +2,7 @@
 
 This separate batch follows [Batch02](../AmeriFlux_MultiSite_10_Batch02/) for
 the ten exact operator-supplied releases in [sites.tsv](sites.tsv).
-Stages00–01 are ready for transfer and extraction. No live upload,
-extraction, meteorological QC, DATM or model execution has been verified.
+The operator has completed and verified Stage00–10d diagnostic execution on IRIDIS6 as of 2026-10-24. All 10 packages were transferred and extracted; 3/10 Stage07 numeric QC-v5 trials completed, 7/10 remain humidity-blocked; all 32 required ERA5-Land year-site products are present; 1,924 residual humidity records passed Stage10d evidence triage. These are **scientific investigations, not approved forcing repairs**. No Post-v5 acceptance, DATM or CLM-FATES spin-up is authorized. Refer to the **[Stage00–10d scientific status and decision ledger](docs/SCIENTIFIC_REVIEW_STATUS_2026-10-24.md)** for verified operator results and limitations.
 
 | Site | Exact package | Release year labels |
 | --- | --- | --- |
@@ -841,8 +840,7 @@ humidity decisions must not be copied as Batch03 evidence.
 6. Establish ZBOT/PFT and forcing-loop settings, then generate DATM and
    prepare spin-up cases after those checks.
 
-Stages00–04a are implemented here; PFT science review and meteorological QC remain pending. Later stages will use the actual
-Batch03 results. No forcing cycle, CO2 setting or spin-up length is selected.
+Stages00–10d now have repository scripts and operator-reported IRIDIS results. The updated [science status report](docs/SCIENTIFIC_REVIEW_STATUS_2026-10-24.md) supersedes earlier interim progress numbers in this historical README. All remaining 1,924 events require science review, and PFT/forcing/DATM/spin-up approval has not been granted. No forcing cycle, CO2 setting or spin-up length is selected.
 
 ## Implementation and validation
 
@@ -863,5 +861,31 @@ Local validation passed Bash/Python syntax and isolated integration checks:
   and missing-source preflight without raw output creation.
 
 These mocks and synthetic packages do not access the operator's D drive or
-authenticate to IRIDIS. Live upload/extraction remains pending operator
-execution. Local validation does not establish actual source coverage or QC.
+authenticate to IRIDIS. They are historical pre-deployment tests, **not** substitutes for the separately reported live IRIDIS6 Stage00–10d validations.
+The [scientific decision ledger](docs/SCIENTIFIC_REVIEW_STATUS_2026-10-24.md) records subsequent operator results, including SHA-pinned reports and outstanding QC/clock/forcing holds.
+
+
+## Current run status (2026-10-24): Stage09h–10d
+
+The scripts for these additional stages are available in
+[stage09](scripts/stage09) and [stage10](scripts/stage10): Stage09h BIF/time-axis
+audit, Stage09i temperature-based offset sensitivity, Stage10a solar-radiation
+clock cross-check, Stage10b 1,924-event two-transfer humidity sensitivity,
+Stage10c independent water/ice thermodynamic verification, and Stage10d
+SHA-pinned 183-episode manual review prioritization.
+
+**Latest live IRIDIS6 results:** 32/32 ERA5-Land year-site products verified;
+7/7 affected towers pass native timestamp checks; 6 published BIF UTC offsets
+and US-Me2 UTC−8 hypothetical only; 1,924/1,924 humidity records audited.
+Absolute-vapor-pressure transfer passed 1,897/1,924 water-physics screens;
+grid-RH transfer passed 1,924/1,924. Stage10c found 27 absolute-transfer
+water-physics failures, 170 A and 78 B ice-supersaturation cautions; Stage10d
+identified 150 tower/grid temperature-difference cautions, 183 event clusters,
+and 31 priority-P0 entries (27 failure events plus four US-Me2 clock holds).
+**All repair approvals remain zero.**
+
+Read the [full science and provenance status report](docs/SCIENTIFIC_REVIEW_STATUS_2026-10-24.md)
+for exact existing IRIDIS directories, per-site breakdowns, decision gates,
+recheck commands, and the distinction between scripts committed on GitHub and
+full raw numerical evidence retained on IRIDIS. No new forcing, Post-v5,
+DATM/CIME case or Slurm job has been created or approved by these stages.
