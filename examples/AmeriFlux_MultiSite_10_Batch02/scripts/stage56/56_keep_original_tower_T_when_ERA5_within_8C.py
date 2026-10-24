@@ -62,8 +62,6 @@ def temp_choice(site,ta,era,qc):
         return "HOLD_ORIGINAL_TA_NUMERIC_INVALID"
     if not np.isfinite(era) or not (-90 < era < 65):
         return "HOLD_ERA5_TEMPERATURE_INVALID"
-    if not np.isfinite(qc) or qc not in (0,1,2,3):
-        return "HOLD_ORIGINAL_TA_QC_UNRECOGNISED"
     if site=="US-Ho1":
         return "HOLD_HO1_LOCAL_UTC_OFFSET_PROVISIONAL"
     if abs(ta-era)>THRESHOLD_C:
@@ -76,10 +74,11 @@ def self_test():
     assert temp_choice("US-EML",5,-3.001,1)=="HOLD_TA_DIFF_FROM_ERA5_GT8C"
     assert temp_choice("US-Ho1",0,0,0)=="HOLD_HO1_LOCAL_UTC_OFFSET_PROVISIONAL"
     assert temp_choice("US-GLE",-9999,-10,2)=="HOLD_ORIGINAL_TA_NUMERIC_INVALID"
+    assert temp_choice("US-EML",5,5,float("nan"))=="KEEP_ORIGINAL_TA_F_WITHIN8C"
     v,q=water_vpd_qbot([20],[50],[100])
     assert abs(v[0]-11.6847)<.02 and .007<q[0]<.008
     assert sum(COUNTS.values())==4884
-    print("STAGE56 SELF-TEST PASS | <=8C keeps original tower TA_F even QC1/2; Ho1 protected")
+    print("STAGE56 SELF-TEST PASS | <=8C keeps original TA_F regardless of QC code; Ho1 protected")
 
 def load_existing():
     if git_blob_sha(STAGE55_SCRIPT)!=STAGE55_GIT_BLOB:
@@ -143,6 +142,7 @@ def classify(data):
     x["TA_F_minus_ERA5_T2M_C"]=ta-era
     x["TA_F_abs_ERA5_delta_C"]=np.abs(ta-era)
     x["original_TA_F_QC_numeric"]=qc
+    x["original_TA_QC_missing_or_nonstandard"]=~np.isin(qc,[0,1,2,3])
     x["original_TA_valid"]=np.isfinite(ta)&(ta>-80)&(ta<65)
     x["original_PA_valid"]=np.isfinite(pressure)&(pressure>50)&(pressure<110)
     x["temp_decision"]=[temp_choice(site,a,b,c) for site,a,b,c in
@@ -195,10 +195,11 @@ def main():
           original_TA_QC_nonzero_kept=int(z.T_QC_nonzero_but_retained.sum()),
           original_TA_gt8C_HOLD=int(z.temp_decision.eq(
               "HOLD_TA_DIFF_FROM_ERA5_GT8C").sum()),
-          original_TA_QC_or_numeric_invalid_HOLD=int(z.temp_decision.isin([
+          original_TA_or_ERA5_invalid_HOLD=int(z.temp_decision.isin([
               "HOLD_ORIGINAL_TA_NUMERIC_INVALID",
-              "HOLD_ORIGINAL_TA_QC_UNRECOGNISED",
               "HOLD_ERA5_TEMPERATURE_INVALID"]).sum()),
+          retained_TA_with_missing_or_nonstandard_QC=int((
+              z.original_TA_retained & z.original_TA_QC_missing_or_nonstandard).sum()),
           HO1_offset_HOLD=int(z.temp_decision.eq(
               "HOLD_HO1_LOCAL_UTC_OFFSET_PROVISIONAL").sum()),
           original_pressure_invalid=int((~z.original_PA_valid).sum()),
