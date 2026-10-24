@@ -23,6 +23,7 @@ import subprocess
 import sys
 import tempfile
 import traceback
+import shutil
 import types
 from datetime import datetime, timezone
 from pathlib import Path
@@ -38,6 +39,7 @@ CASES = ROOT / "cases"
 SCRATCH_ARCH = Path("/scratch") / UID / "CTSM_FATES_OUTPUTS/archive"
 ALIAS_ARCH = Path("/iridisfs/scratch") / UID / "CTSM_FATES_OUTPUTS/archive"
 RFS = Path("/research/xclimatetbm") / UID / "CLM_FATES"
+HOME_OUTPUT = Path.home() / "FLUXNET36_derived"
 SCRIPT6 = "examples/FLUXNET_MultiSite_6/scripts/"
 SCRIPT11 = "examples/FLUXNET_MultiSite_11/scripts/"
 
@@ -297,12 +299,45 @@ def analyze_one(batch, entry, dest, m, args):
         "ResultDir":str(out)}
 
 
-def safe_rfs():
-    if not RFS.is_dir() or not os.access(RFS, os.W_OK):
-        raise RuntimeError(f"Research Filestore not writable: {RFS}")
-    mount = cmd("stat","-f","-c","%T",str(RFS))
-    if mount.lower() not in ("nfs","nfs4"):
-        raise RuntimeError(f"Research Filestore is not NFS ({mount})")
+def is_writable_root(root):
+    """Probe real write permission; no NFS-only test (IRIDIS mounts vary)."""
+    if not root.is_dir() or not os.access(root, os.W_OK):
+        return False
+    try:
+        with tempfile.NamedTemporaryFile(
+            prefix=".fluxnet36_write_probe_", dir=str(root), delete=True
+        ) as check:
+            check.write(b"rfs_preflight")
+            check.flush()
+        return True
+    except (OSError, PermissionError):
+        return False
+
+
+def output_base(requested=None):
+    """Prefer RFS on a login node, otherwise stage ONLY derived files in Home."""
+    if requested:
+        selected = requested.expanduser().resolve()
+        approved = {RFS.resolve(), HOME_OUTPUT.resolve()}
+        if selected not in approved:
+            raise RuntimeError("Output root must be RFS or the dedicated Home staging root; "
+                               f"requested {selected}")
+        if selected == HOME_OUTPUT.resolve():
+            selected.mkdir(parents=True, exist_ok=True)
+        if not is_writable_root(selected):
+            raise RuntimeError(f"Explicit analysis output root inaccessible: {selected}")
+        return selected
+    if is_writable_root(RFS):
+        print(f"OUTPUT: Research Filestore available at {RFS}", flush=True)
+        return RFS
+    HOME_OUTPUT.mkdir(parents=True, exist_ok=True)
+    if not is_writable_root(HOME_OUTPUT):
+        raise RuntimeError("Neither Research Filestore nor dedicated Home staging is writable")
+    print(f"WARNING: RFS not mounted/writable on this node: {RFS}", flush=True)
+    print(f"STAGING: writing derived figures/CSVs to {HOME_OUTPUT} instead (not Scratch)", flush=True)
+    print("STAGING: original archive/EC inputs remain read-only; "
+          "use 'sync' later to copy verified results to RFS.", flush=True)
+    return HOME_OUTPUT
 
 
 def batches(which):
@@ -310,10 +345,10 @@ def batches(which):
 
 
 def batch_run(batch, m, args):
-    safe_rfs()
+    base = output_base(args.output_base)
     stamp=datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     suffix="1000year" if (args.standard1000 or batch!="6") else "latest"
-    dest=RFS / f"FLUXNET_MultiSite_{batch}" / "convergence_snapshots" / (
+    dest=base / f"FLUXNET_MultiSite_{batch}" / "convergence_snapshots" / (
         f"{stamp}_Batch{batch}_{suffix}_science36")
     if dest.exists():
         raise FileExistsError(dest)
@@ -336,7 +371,7 @@ def batch_run(batch, m, args):
         "warning":"Completion does not prove ecological equilibrium; check each station."
     },ensure_ascii=False,indent=2,default=str)+"\n",encoding="utf-8")
     ok=sum(r["Status"]=="OK" for r in results)
-    print(f"\nBATCH {batch} SUMMARY: {ok}/{len(ROWS[batch])} fully validated; RFS={dest}",flush=True)
+    print(f"\nBATCH {batch} SUMMARY: {ok}/{len(ROWS[batch])} fully validated; OUTPUT={dest}",flush=True)
     return dest,ok==len(ROWS[batch])
 
 
@@ -374,8 +409,9 @@ def all_files(snapshot):
 
 def publish(snapshot, dry_run):
     snapshot=snapshot.resolve(strict=True)
-    if snapshot.parent.name!="convergence_snapshots" or snapshot.parent.parent.parent!=RFS:
-        raise ValueError("Unexpected source: only batch RFS convergence_snapshots allowed")
+    allowed = {RFS.resolve(), HOME_OUTPUT.resolve()}
+    if snapshot.parent.name!="convergence_snapshots" or snapshot.parent.parent.parent not in allowed:
+        raise ValueError("Unexpected source: only batch RFS or Home staging snapshots allowed")
     batch,files=all_files(snapshot)
     target=Path(f"examples/FLUXNET_MultiSite_{batch}/figures/convergence_snapshots")/snapshot.name
     print(f"PUBLISH PREFLIGHT PASS: batch {batch}, {len(files)} derived files, {target}",flush=True)
@@ -419,6 +455,48 @@ def publish(snapshot, dry_run):
         print("GITHUB LOCATION: https://github.com/lyanyeung/CLM-FATES-single-site-workflows/tree/main/"+str(target))
 
 
+def sync_to_rfs(snapshot, dry_run=False):
+    """Copy a successful derived Home snapshot to its matching RFS directory.
+    Never copy, delete or modify original CIME/model/observation inputs.
+    """
+    snapshot = snapshot.resolve(strict=True)
+    if snapshot.parent.parent.parent != HOME_OUTPUT.resolve():
+        raise ValueError("Sync accepts only the dedicated Home staging snapshots")
+    batch, files = all_files(snapshot)
+    if not is_writable_root(RFS):
+        raise RuntimeError(f"Research Filestore is not currently writable: {RFS}")
+    target = RFS / f"FLUXNET_MultiSite_{batch}" / "convergence_snapshots" / snapshot.name
+    print(f"SYNC PREFLIGHT PASS: {len(files)} files | Home {snapshot} -> RFS {target}", flush=True)
+    if target.exists():
+        raise FileExistsError(f"Refusing overwrite of existing RFS snapshot: {target}")
+    if dry_run:
+        print("SYNC DRY RUN: no copies made", flush=True)
+        return
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temp = target.parent / (".transferring_" + target.name)
+    if temp.exists():
+        raise FileExistsError(f"Incomplete transfer already exists: {temp}")
+    temp.mkdir()
+    try:
+        for src in files:
+            rel = src.relative_to(snapshot)
+            dest = temp / rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dest)
+            h1, h2 = hashlib.sha256(), hashlib.sha256()
+            for current, digest in [(src,h1),(dest,h2)]:
+                with current.open("rb") as fin:
+                    for chunk in iter(lambda:fin.read(1024*1024),b""):
+                        digest.update(chunk)
+            if h1.digest()!=h2.digest():
+                raise RuntimeError(f"SHA256 mismatch after RFS copy: {rel}")
+        temp.rename(target)
+    except Exception:
+        print(f"SYNC INCOMPLETE: leave partial files for inspection at {temp}", flush=True)
+        raise
+    print(f"RFS SYNC SUCCESS: {target}", flush=True)
+
+
 def audit(batch, m, standard1000):
     _, stage, _, core, _ = m
     bad=0
@@ -439,7 +517,7 @@ def audit(batch, m, standard1000):
 
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("mode",choices=["audit","run","publish"])
+    ap.add_argument("mode",choices=["audit","run","publish","sync"])
     ap.add_argument("--batch",choices=["all","6","8","11","13"],default="all")
     ap.add_argument("--standard1000",action="store_true",
                     help="For six-site cohort, stop at exactly 1000 years for comparability")
@@ -449,11 +527,16 @@ def main():
                     help="After each fully successful batch, commit derived products to GitHub")
     ap.add_argument("--snapshot",type=Path)
     ap.add_argument("--dry-run",action="store_true")
+    ap.add_argument("--output-base",type=Path,
+                    help="Output root (default: prefer RFS; fallback to ~/FLUXNET36_derived)")
     args=ap.parse_args()
-    if args.mode=="publish":
+    if args.mode in ("publish","sync"):
         if not args.snapshot:
-            ap.error("publish requires --snapshot /actual/RFS/snapshot")
-        publish(args.snapshot,args.dry_run)
+            ap.error(args.mode+" requires --snapshot /actual/derived/snapshot")
+        if args.mode=="publish":
+            publish(args.snapshot,args.dry_run)
+        else:
+            sync_to_rfs(args.snapshot,args.dry_run)
         return 0
     m=modules()
     if args.mode=="audit":
