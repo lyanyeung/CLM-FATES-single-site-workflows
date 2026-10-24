@@ -110,9 +110,11 @@ def request_plan(events):
  requests=[]
  for (site,year),dates in sorted(groups.items()):
   lat,lon,_,_=SITES[site]
-  # A full event-year plus padded adjacent days covers LST-to-UTC rollover.
-  start=datetime(year,1,1)-timedelta(days=2)
-  end=datetime(year+1,1,1)+timedelta(days=1)
+  # Only the actual flagged event span, with a two-day safety margin for
+  # local-standard-time -> UTC and the hourly interpolation bracketing.
+  # The v1 full-calendar-year request was unnecessarily large.
+  start=min(dates)-timedelta(days=2)
+  end=max(dates)+timedelta(days=2)
   request={
    'variable':VARS,
    'location':{'latitude':lat,'longitude':lon},
@@ -224,7 +226,7 @@ def at_source(site,stamp,native):
 def source_download(args,events):
  reqs=request_plan(events)
  print('STAGE77 NATIVE ERA5: ALL 1109 ORIGINAL RH<5; 6 SITES')
- print('Requests:',len(reqs),'site/year bundles')
+ print('Requests:',len(reqs),'site/year bundles; event-span windows +/- 2 days, NOT full years')
  for r in reqs:
   print(r['site'],r['year'],'events',r['n_events'],
         'CDS date',r['request']['date'],
@@ -445,6 +447,9 @@ def test():
  assert sum(v[3] for v in SITES.values())==1109
  tests={'CA-Ca3':{datetime(2005,6,1)},'US-Aud':{datetime(2010,5,1)}}
  assert len(request_plan(tests))==2
+ reqs=request_plan(tests)
+ assert reqs[0]['request']['date']==['2005-05-30','2005-06-03']
+ assert reqs[1]['request']['date']==['2010-04-29','2010-05-03']
  a=source_state({'t2m_K':'290','d2m_K':'280','sp_Pa':'100000'})
  assert a['vpd']>=0
  print('SELF-TEST PASS: ALL 1109/6 operator census, same ERA T/D2M/SP humidity closure, CDS-year plan')
