@@ -1167,11 +1167,35 @@ unchanged as per the verified Stage11j screen. This is only a science
 review flag and not an automatic permission to replace RH.
 
 The corrected [Stage11k v2 SHA-protected read-only reconciliation](scripts/stage11/11k_v2_four_event_unrepaired_neighbour_RH_review.py)
-has been committed as a **new file** and is **NOT YET RUN on IRIDIS6**.
-[Precise v1 failure explanation and v2 audit gate]
+**PASSED IRIDIS6 --self-test and --check** on 2026-10-24. It verified
+**25/25 source screening records = 11 untouched US-NC2 neighbour points
++ 3 Stage07-only repairs + 7 other Stage11h-changed neighbours + 4
+Stage11h-centre points**; no forcing writes were performed.
+[Documented historical v1 diagnostic failure and corrected v2 gate]
 (docs/STAGE11K_V1_FAILURE_RECONCILED_AND_V2_REVIEW_GATE_2026-10-24.md).
-The immutable Stage11j, Stage11h and Stage07 inputs remain untouched.
-Post-v5, DATM and spinup approvals remain at zero.
+
+The user then **explicitly approved all 11 remaining US-NC2 neighbours**
+for companion ERA5 **RH-only** reconstruction, while **keeping every EC
+tower candidate TA_USE/TBOT value unchanged**. The new human decisions
+are separately recorded as [eleven SHA-verifiable native event choices]
+(docs/STAGE11L_USER_APPROVED_11_US_NC2_NEIGHBOUR_RH_ADDITIONS_2026-10-24.csv).
+The original 62-event user ledger remains untouched: **53 old + 11 new
+= 64 ERA-RH target half-hours**, plus 6 existing Stage07 TA KEEP events
+and 3 existing Stage07 VPD KEEP events.
+
+[Stage11l isolated humidity-only successor]
+(scripts/stage11/11l_us_nc2_11_neighbour_humidity_only_shadow.py)
+is **committed but has NOT been run on IRIDIS6**. It tests the exact
+11 newly human-selected source timestamps, keeps ALL 367,920 US-NC2
+temperature values as in Stage11h, and prints all six beginning/ending
+boundaries around three extended humidity events. It writes only ONE
+new research-only US-NC2 full-year successor CSV; unchanged US-MOz and
+US-Mpj remain Stage11h SHA references to save scratch files/inodes.
+[Stage11l method, exact decisions and science hold]
+(docs/STAGE11L_HUMIDITY_ONLY_11_ADDITIONS_AND_BOUNDARY_VALIDATION_2026-10-24.md).
+
+All existing source, Stage07 and Stage11h files and INCOMPLETE markers
+stay unchanged. Post-v5, DATM and spinup approvals remain zero.
 
 The existing IRIDIS `62_human_review_WORKING_COPY.csv` and SHA-sealed
 original Stage11f report have NOT been updated by GitHub commits.
