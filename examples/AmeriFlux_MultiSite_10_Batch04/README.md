@@ -275,6 +275,17 @@ On IRIDIS6 first run `--check`, and then optionally `--run` for **new reports on
 
 Stage06 reports go into a new `reports/stage06_qcv5_candidate_effects_*` folder with SHA receipts and a boundary review list, without editing original or Stage05 files. **No production sparse-patch merge before the 754 HOLDs and boundary/physical QC have been resolved and seven remaining Batch04 sites have completed appropriate scientific screening.**
 
+## Stage06 VERIFIED; Stage07 new full derived ERA5 VPD repair ready (2026-10-24)
+
+Stage06 user execution: full original SHA checks, 5,336 Stage05 candidate variable patches and 754 holds VERIFIED; 210 flagged VPD jump edges (19 US-SP1; 12 US-Syv; 179 US-Ton), plus 2,259 original US-Ton QC0 VPD values potentially overwritten. Operator report:
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch04/reports/stage06_qcv5_candidate_effects_20261024T105030Z_8cc1f59c`.
+
+**New user direction:** directly replace both endpoints of **these 210 flagged VPD jump edges** with **same-exact-native-timestamp packaged ERA5 `VPD_ERA`**, compute physically consistent derived RH at **retained EC tower temperature**, and create actual **three full-length derived FLUXMET HH CSVs** in a new isolated Stage07 version. Any nonphysical ERA VPD/pair is recorded as a skipped new HOLD; original native site VPD and stage05 source remain unchanged. **Outside the flagged edges**, protect original physically admissible US-Ton VPD QC0 and drop its previous Stage05 humidity overwrite. Defer the 419 bad US-Syv ERA pair cases.
+
+[Stage07 script](scripts/stage07/07_apply_jump_ERA5_vpd_three_sites.py) | [Science method and executable shell command](docs/STAGE07_USER_APPROVED_DIRECT_ERA5_VPD_REPAIR_2026-10-24.md). The Stage07 Python code is **published but has not yet been run on IRIDIS6**. Only its user execution can confirm counts of valid vs invalid same-time ERA endpoints.
+
+The paired FLUXNET `ERA5_HH` fields are downscaled ERA-derived data **not independently downloaded ERA5-Land**. Original ZIP/CSV, prior Stage05/06 results, `processed_v5`, DATM, CIME and Slurm jobs are not touched. Post-v5 model authorization remains withheld pending remaining scientific holds.
+
 ## Scientific gates outstanding after structural/timestamp preflight
 
 1. Inventory each site's actual BIF, FLUXMET, FLUXES and companion products and native HH versus HR cadence, time zone, timestamp continuity and actual year coverage.
