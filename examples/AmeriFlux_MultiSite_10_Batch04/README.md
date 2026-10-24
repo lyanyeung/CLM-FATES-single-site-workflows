@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 04
 
-> **Operational status (2026-10-24): STAGE00 + STAGE01 VERIFIED (10/10 sites each) from operator logs.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 post-approval 10/10 PASS verified on IRIDIS6; US-Seg approved BIF GROUP_ID 1495 coordinates/elevation validated.** See [final Stage02 results](docs/STAGE02_POST_APPROVAL_VERIFIED_2026-10-24.md). See [Stage02 evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). [Stage02B US-Seg diagnostic](scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py) has been executed. Paired BIF GROUP_ID 1479 vs 1495 evidence is documented in the [Stage02B ledger](docs/STAGE02B_US_SEG_PROVENANCE_VERIFIED_2026-10-24.md); The [human-approved decision](docs/STAGE02_US_SEG_GROUP1495_USER_APPROVAL_2026-10-24.md) is latitude 34.3623, longitude -106.7020 and elevation 1596 m. Stage02C full-HH timestamp audit **completed 10/10 PASS**, with scientific QC concerns preserved in the [Stage02C report](docs/STAGE02C_FULL_HH_TIME_QC_AUDIT_2026-10-24.md). No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
+> **Operational status (2026-10-24): Stage00–02 structural metadata 10/10 PASS, Stage02C HH continuity 10/10 PASS; Stage04 3/3 targeted diagnostics PASS; Stage05 priority 3-site QCv5 candidate overlay BUILT, 5,336 variable patches / 754 HOLD.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 post-approval 10/10 PASS verified on IRIDIS6; US-Seg approved BIF GROUP_ID 1495 coordinates/elevation validated.** See [final Stage02 results](docs/STAGE02_POST_APPROVAL_VERIFIED_2026-10-24.md). See [Stage02 evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). [Stage02B US-Seg diagnostic](scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py) has been executed. Paired BIF GROUP_ID 1479 vs 1495 evidence is documented in the [Stage02B ledger](docs/STAGE02B_US_SEG_PROVENANCE_VERIFIED_2026-10-24.md); The [human-approved decision](docs/STAGE02_US_SEG_GROUP1495_USER_APPROVAL_2026-10-24.md) is latitude 34.3623, longitude -106.7020 and elevation 1596 m. Stage02C full-HH timestamp audit **completed 10/10 PASS**, with scientific QC concerns preserved in the [Stage02C report](docs/STAGE02C_FULL_HH_TIME_QC_AUDIT_2026-10-24.md). No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
 
 Fourth independent ten-site AmeriFlux campaign following [Batch03](../AmeriFlux_MultiSite_10_Batch03/), [Batch02](../AmeriFlux_MultiSite_10_Batch02/) and [Batch01](../AmeriFlux_MultiSite_10/). This directory contains the exact release manifest and reproducible scripts. Never commit raw tower ZIPs or derived large files to GitHub.
 
@@ -239,6 +239,41 @@ This is NOT a blanket RH replacement: isolated low-RH values can be physically p
 ```
 
 By default the **build** creates a new, never-overwritten directory under `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch04/qcv5_stage05_candidates/`, containing sparse `candidate_patch.csv` and `unresolved_hold.csv` plus SHA256-pinned `report.json`. The script is NOT a complete processed forcing dataset; a separately audited patch materialisation and Post-v5 gate are required before model forcing may use the overlay. Continue full Stage03 review on the other seven sites.
+
+## Stage05 — QCv5 research candidates actually built (2026-10-24)
+
+Stage05 **self-test PASS; preview PASS; `--build-candidates` PASS on IRIDIS6**, priority **3/3** stations (US-SP1, US-Syv, US-Ton), no runtime failures and no original file edits. **5,336 variable-level candidate patch entries** consist of **16 local TA/PA interpolation/joint-zero entries** and **2,660 humidity times × 2 RH+VPD fields = 5,320 entries**. **754 HOLD rows** remain (US-SP1 147, US-Syv 606, US-Ton 1). Original FLUXMET HH rows scanned in this targeted pass total **1,244,784**. Exact counts, science caveats and the source output location are in [Stage05 operator-verified execution record](docs/STAGE05_VERIFIED_3_SITE_QCV5_CANDIDATE_BUILD_2026-10-24.md).
+
+**Created operator output on IRIDIS6:**
+```
+/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch04/qcv5_stage05_candidates/candidate_20261024T103113Z/
+```
+
+Stage05 generated *sparse repairs*, not `processed_v5` model forcing; the files are `candidate_patch.csv`, `unresolved_hold.csv`, `report.json` and `README.txt`. The 754 unresolved cases are predominantly US-Syv ERA humidity pair/temperature-screen failures. They are **not** silently replaced from invalid `*_ERA` values. The FLUXNET source and all other site files remain immutable. **Post-v5, DATM and spin-up remain unapproved.**
+
+## Stage06 — source SHA, paired humidity physics and new VPD jump audit (READY, NOT EXECUTED)
+
+[06_audit_batch04_qcv5_candidate_effects.py](scripts/stage06/06_audit_batch04_qcv5_candidate_effects.py) reads exactly the previously generated Stage05 candidate version, checks `report.json` origin SHA256, confirms per-site 87/534/4715 patch rows and 147/606/1 holds, independently reconciles each sparse candidate with original native source half-hours and ERA-RH/VPD thermodynamics at **retained site temperature**, counts cold temperature/source-QC0 changes, and flags **new VPD half-hour jumps greater than 4 hPa or increasing by more than 2 hPa**. The thresholds are *review flags*, not invalidity proofs and never trigger automatic smoothing. Failures halt without modifying candidates.
+
+On IRIDIS6 first run `--check`, and then optionally `--run` for **new reports only**:
+
+```bash
+(
+  set -euo pipefail
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+  REL="examples/AmeriFlux_MultiSite_10_Batch04"
+  BASE="$HOME/ameriflux_batch04_stage06"
+  mkdir -p "$BASE/scripts/stage06"
+  SCRIPT="$BASE/scripts/stage06/06_audit_batch04_qcv5_candidate_effects.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage06/06_audit_batch04_qcv5_candidate_effects.py" -o "$SCRIPT"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  python3 -B "$SCRIPT" --check 2>&1 | tee "$BASE/stage06_check.log"
+  python3 -B "$SCRIPT" --run 2>&1 | tee "$BASE/stage06_report.log"
+)
+```
+
+Stage06 reports go into a new `reports/stage06_qcv5_candidate_effects_*` folder with SHA receipts and a boundary review list, without editing original or Stage05 files. **No production sparse-patch merge before the 754 HOLDs and boundary/physical QC have been resolved and seven remaining Batch04 sites have completed appropriate scientific screening.**
 
 ## Scientific gates outstanding after structural/timestamp preflight
 
