@@ -275,6 +275,42 @@ On IRIDIS6 first run `--check`, and then optionally `--run` for **new reports on
 
 Stage06 reports go into a new `reports/stage06_qcv5_candidate_effects_*` folder with SHA receipts and a boundary review list, without editing original or Stage05 files. **No production sparse-patch merge before the 754 HOLDs and boundary/physical QC have been resolved and seven remaining Batch04 sites have completed appropriate scientific screening.**
 
+## Latest verified: Stage07 three complete site candidates DONE; Stage08 remaining seven prepared
+
+**Stage07 IRIDIS6 execution verified on 2026-10-24.** Three complete native-length derived FLUXMET_HH files were written, with original Stage05/Stage06 inputs SHA-pinned and unchanged:
+
+- **US-SP1:** 368,208 source rows; 32 direct same-time ERA5 VPD replacements; 62 actual rows changed; SHA256 `9390f88948eaf621b4e697682da701675f08330b268f3661d5a98cd130364b28`
+- **US-Syv:** 438,288 rows; 12 direct ERA5 VPD replacements; 270 actual rows changed; SHA256 `5086cbc0f08f73b218d08fdcf34cf0643a6ae1ea95c05c200a98800452b5b32e`
+- **US-Ton:** 438,288 rows; 332 direct ERA5 VPD replacements; 961 actual rows changed; SHA256 `4ca4467a7f6180136ef06c8595bb36d2f25ae5413c91cd357c5c0d84a99d5646`
+
+**Totals:** 376 successful physical ERA5 VPD substitutions among 388 distinct Stage06 jump-endpoint times; 12 unsuccessful exact-source cases remain skipped/HOLD. **1,566** physically plausible native US-Ton QC0 samples preserved against other Stage05 proposed overrides. 1,293 unique native rows changed in derived full CSVs. 754 Stage05 HOLD entries carried forward and may overlap the 12 new skip entries. Verified output:
+
+```
+/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch04/qcv5_stage07_applied/candidate_20261024T114538Z_6a6b36ba
+```
+
+[Stage07 verified output and SHA record](docs/STAGE07_VERIFIED_THREE_FULL_DERIVED_CSVS_2026-10-24.md). **This is a derived research candidate, not approved Post-v5/CIME/DATM spinup forcing.**
+
+**Stage08 next:** the [remaining seven site candidate-generation script](scripts/stage08/08_build_remaining_seven_qcv5_candidates.py) is now committed and **not yet run** on IRIDIS6 for US-Rpf, US-Seg, US-Ses, US-Slt, US-SRG, US-SRM, US-Uaf. It extends the established Stage05 QCv5 max4-HH interpolation + physically screened same-time ERA RH method, but **protects physically plausible native VPD QC0 readings** and **does not treat positive RH<5% alone as an ERA replacement requirement**. It does not invent the US-Syv one-off joint-zero TA fix for other sites. A source RH column is optional if missing in a particular FLUXMET release. It writes a new independent seven-site sparse candidate and HOLD ledger, original source SHA receipts, **no original or existing model edits**. The seven-site pipeline can advance without reopening the successful three-site Stage07 derived runs.
+
+Execute:
+```bash
+(
+  set -euo pipefail
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/4cb4dcdb39259305a1bed423d8fc30dff5cb7765"
+  REL="examples/AmeriFlux_MultiSite_10_Batch04"
+  BASE="$HOME/ameriflux_batch04_stage08"
+  SCRIPT="$BASE/scripts/stage08/08_build_remaining_seven_qcv5_candidates.py"
+  mkdir -p "$(dirname "$SCRIPT")"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage08/08_build_remaining_seven_qcv5_candidates.py" -o "$SCRIPT"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  python3 -B "$SCRIPT" --build-candidates 2>&1 | tee "$BASE/stage08_build.log"
+)
+```
+Output: new `qcv5_stage08_remaining_seven_candidates/candidate_*` folder with exact site source SHA256 + `candidate_patch.csv`, `unresolved_hold.csv`, `report.json` and research-candidate warning. Scientific warning: packaged ERA5 comes from the FLUXNET release and is not independent gridded ERA5-Land truth.
+
 ## Stage06 VERIFIED; Stage07 new full derived ERA5 VPD repair ready (2026-10-24)
 
 Stage06 user execution: full original SHA checks, 5,336 Stage05 candidate variable patches and 754 holds VERIFIED; 210 flagged VPD jump edges (19 US-SP1; 12 US-Syv; 179 US-Ton), plus 2,259 original US-Ton QC0 VPD values potentially overwritten. Operator report:
