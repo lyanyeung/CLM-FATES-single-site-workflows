@@ -1377,3 +1377,28 @@ The Stage57 pasted evidence ends in `STAGE57 CHECK PASS`,
 not Stage57 AUDIT; Stage58 regenerates and pins original evidence
 rather than relying on an unverified Stage57 report folder.
 **Stage58 has been published but not yet executed on IRIDIS6.**
+
+
+### Stage58 live PASS and Stage59 isolated water/ice humidity review (24 October 2026)
+
+Operator verified pinned Stage58 script and passed syntax/self-test/source
+check/audit. Actual report:
+`reports/stage58_63_manual_T_approved_3967_T_total_20261024T110141Z_e65bde6c`.
+Original EC TA_F is accepted in **3,967 of 4,884** Stage11 records:
+3,904 within 8 C of independently acquired CDS ERA5 T2m plus 63
+user-reviewed extreme cold readings. The remaining **917 US-Ho1
+rows** stay HOLD pending site release UTC_OFFSET validation. All
+3,967 have numerically consistent same-CDS water RH / tower-TA_F and
+original-PA_F VPD/QBOT candidate values. None are forcing-approved.
+[Verified Stage58 output](docs/stage58_operator_PASS_3967_temperature_retained_20261024.md).
+
+**Next Stage59:** [Script for 3,967 water-vs-ice humidity diagnostics
+and US-Ho1 source BIF inventory](scripts/stage59/59_review_water_vs_ice_RH_for_3967.py).
+It verifies the completed Stage58 report SHA256; converts the
+source-pinned ERA5 water RH + original EC TA_F to equivalent
+RH with respect to ice and VPD over ice without clipping; quantifies
+ice supersaturation and negative ice VPD; separately inventories
+source-adjacent US-Ho1 BIF UTC_OFFSET candidates. These are **science
+review flags, not automatic defects or original data edits**.
+All RH/VPD/QBOT, original Stage11/53, DATM and model forcing remain
+under existing HOLD. Stage59 has not yet been run on IRIDIS6.
