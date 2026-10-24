@@ -91,3 +91,72 @@ figures, tables and the report are written to Research Filestore.
 The results **cannot be concluded** until the IRIDIS6 script has run and
 the current snapshot CSVs have been inspected. The old 1715-year R2 and drift
 metrics must not be reused as the 2425-year result.
+
+## Verified DK-Sor stage-29 results — 2026-10-24
+
+The operator executed Stage 29 successfully, and reported \`Status=OK\`
+with **2425/2425** unique archived annual \`h0a\` histories, no missing years,
+a matching 4421 checkpoint, and an original-EC flux comparison with
+340 matched months per metric.
+
+Authoritative RFS result location (derived outputs, not inputs):
+
+\`\`\`text
+/research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/convergence_snapshots/20261024T100510Z_DK_Sor_2425_archive_snapshot/
+\`\`\`
+
+| Carbon pool | Last 100y drift (%) | Last 250y drift (%) | Phase-aligned adjacent-cycle absolute mean change (%) |
+|---|---:|---:|---:|
+| TOTECOSYSC | +1.153824 | +2.819 | 0.365077 |
+| TOTSOMC | +1.142844 | +2.880 | 0.364869 |
+| TOTLITC | +1.645038 | +0.108 | 0.562725 |
+| FATES_VEGC | -2.224546 | -1.853 | 2.066402 |
+| FATES_STOREC | -1.104 | -0.437 | 2.106 |
+| FATES_STRUCTC | -2.537 | -2.189 | 2.534 |
+
+All shown metrics failed the project's exploratory 1% stage-27 convergence
+screen. Soil carbon continues increasing, while vegetation carbon decreases.
+**Classification: incomplete convergence by the selected project screen; the
+2425-year spin-up must not be labeled fully equilibrated.**
+
+| Original EC vs model (paired monthly, 1996–2024) | GPP | NEE |
+|---|---:|---:|
+| Valid paired months | 340 | 340 |
+| Correlation R | 0.969 | 0.932 |
+| Skill R2 = 1 - SSE/SST | 0.912177 | 0.790629 |
+| RMSE (g C m^-2 d^-1) | 1.504133 | 1.309300 |
+| Model − EC bias (g C m^-2 d^-1) | -0.604326 | +0.647671 |
+
+The final dominant PFT is
+\`broadleaf_colddecid_extratrop_tree\`, consistent at broad class level with
+the tower's DBF biome. This does not validate PFT areal shares or site-level
+land-surface fractions. High monthly flux skill alone does not imply soil or
+whole-ecosystem carbon equilibrium. The listed scores apply to **model years
+4374–4402 mapped onto original EC years 1996–2024**, not to the residual 18
+model years after that cycle.
+
+### Upload original derived figures, CSV, JSON and report to GitHub
+
+A single-site publication script is provided at
+[\`30_publish_DK_Sor_2425_to_github.py\`](../scripts/30_publish_DK_Sor_2425_to_github.py).
+It validates all original Stage 29 output files and the exact 2425-year
+metadata, creates SHA256 checksums, and uses a fresh checkout so a local
+unmerged Git working tree is not modified. It copies **only** the four PNG
+figures, generated CSV summaries, JSON metadata, and the generated Markdown
+report into the repository's \`figures/convergence_snapshots/\` folder.
+
+On IRIDIS6:
+
+\`\`\`bash
+set -euo pipefail
+cd ~/CLM-FATES-single-site-workflows
+git fetch origin main
+git show origin/main:examples/FLUXNET_MultiSite_6/scripts/30_publish_DK_Sor_2425_to_github.py > "$HOME/DK_Sor_2425_publisher.py"
+"$HOME/.conda/envs/clm_fates_env/bin/python" -B "$HOME/DK_Sor_2425_publisher.py" --dry-run
+"$HOME/.conda/envs/clm_fates_env/bin/python" -B "$HOME/DK_Sor_2425_publisher.py"
+\`\`\`
+
+The source RFS outputs remain untouched. **Until the publisher reports
+\`GITHUB PUBLISH SUCCESS\`, the original PNG/CSV/JSON files have not been
+proven uploaded**. This documentation preserves the numerical results
+independently of that publication step.
