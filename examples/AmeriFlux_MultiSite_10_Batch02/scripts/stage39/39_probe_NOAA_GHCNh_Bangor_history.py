@@ -154,10 +154,16 @@ def parse_psv(blob,year):
     reader=csv.DictReader(io.StringIO(source),delimiter="|")
     names=reader.fieldnames or []
     fields={n.strip().lower():n for n in names}
-    needed={"date","station_id","temperature"}
-    if not needed<=set(fields):
-        raise ValueError("Unknown GHCNh schema (missing "+str(needed-set(fields))+
+    needed={"date","temperature"}
+    if not needed<=set(fields) or not ({"station","station_id"}&set(fields)):
+        missing=needed-set(fields)
+        if not ({"station","station_id"}&set(fields)):
+            missing.add("station OR station_id")
+        raise ValueError("Unknown GHCNh schema (missing "+str(missing)+
                          "), header sample="+str(names[:16]))
+    # NOAA's real station/year PSV files use STATION; earlier synthetic tests
+    # used Station_ID. Accept either without weakening the ID equality check.
+    station_field=fields.get("station") or fields.get("station_id")
     qcfields=[f for f in names if "temperature" in f.lower() and
               any(z in f.lower() for z in ("quality","measurement","source","code"))]
     counts={}
@@ -167,7 +173,7 @@ def parse_psv(blob,year):
     other_ids=set()
     for row in reader:
         n+=1
-        ident=(row.get(fields["station_id"]) or "").strip()
+        ident=(row.get(station_field) or "").strip()
         if ident!=STATION:
             other_ids.add(ident)
             if len(other_ids)>5:raise ValueError("NOAA PSV has inconsistent station identifiers")
@@ -228,19 +234,41 @@ def probe(year,targets):
     return len(times)
 
 def test():
-    synthetic=("Station_ID|DATE|temperature|temperature_Quality_Code\n"
-               "USW00014606|1999-02-13T04:00:00|8.0|C\n"
-               "USW00014606|1999-02-13T05:00:00|8.5|C\n").encode()
-    a,b,c,times,n,sm=parse_psv(synthetic,1999)
-    assert n==2 and len(times)==2 and b==["temperature_Quality_Code"]
+    # Regression reproduces the *actual* NOAA header reported on IRIDIS6.
+    actual_header=("STATION|Station_name|DATE|Year|Month|Day|Hour|Minute|"
+                   "LATITUDE|LONGITUDE|ELEVATION|temperature|"
+                   "temperature_Measurement_Code|temperature_Quality_Code|"
+                   "temperature_Report_Type|temperature_Source_Code\n")
+    rows=("USW00014606|BANGOR|1999-02-13T04:00:00|1999|2|13|4|0|"
+          "44.8|-68.8|58|8.0|A|C|FM-16|X\n"
+          "USW00014606|BANGOR|1999-02-13T05:00:00|1999|2|13|5|0|"
+          "44.8|-68.8|58|8.5|A|C|FM-16|X\n")
+    a,b,c,times,n,sm=parse_psv((actual_header+rows).encode(),1999)
+    assert n==2 and len(times)==2
+    assert {"temperature_Quality_Code","temperature_Source_Code",
+            "temperature_Measurement_Code"}<=set(b)
     assert nearest(times,datetime(1999,2,13,4,30))==30
+    assert c[("temperature_Quality_Code","C")]==2
+    # Preserve the legacy alias, without requiring it in NOAA's actual PSV.
+    old=("Station_ID|DATE|temperature|temperature_Quality_Code\n"
+         "USW00014606|1999-02-13T04:00:00|8.0|C\n")
+    _,old_qc,_,old_times,old_n,_=parse_psv(old.encode(),1999)
+    assert old_n==1 and len(old_times)==1 and old_qc==["temperature_Quality_Code"]
+    # Never silently accept a mismatched station identifier.
+    wrong=actual_header+rows.replace("USW00014606","USW00014607")
+    try:
+        parse_psv(wrong.encode(),1999)
+    except ValueError as err:
+        assert "station identifiers" in str(err)
+    else:
+        raise AssertionError("Unexpected station identity was accepted")
     # Regression: np.allclose produces a scalar bool, not an array with .all().
     measured=np.array([2.5,np.nan,3.0])
     same=np.array([2.5,np.nan,3.0])
     altered=np.array([2.5,np.nan,4.0])
     assert np.allclose(measured,same,atol=1e-6,rtol=0,equal_nan=True)
     assert not np.allclose(measured,altered,atol=1e-6,rtol=0,equal_nan=True)
-    print("STAGE39 SELF-TEST PASS | schema, UTC, and scalar np.allclose preflight guard")
+    print("STAGE39 SELF-TEST PASS | actual NOAA STATION PSV, station-ID rejection, legacy alias, UTC, QC fields, and np.allclose guard")
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)

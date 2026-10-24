@@ -1078,3 +1078,7 @@ Stage38 identified the 319 Ho1 cases without neighbouring QC0 as 1998 64 (4 epis
 ### Stage39 v2 preflight bug fix (24 October 2026)
 
 Initial Stage39 --self-test passed, and three original source checksums passed, but --check failed before NOAA network access due to invalid `.all()` calls on the scalar bool returned by `np.allclose()`. Stage39 v2 corrects both checks, retains SHA256 and strict numerical comparisons, and adds a synthetic regression case. **No NOAA probe was launched, no original data were changed, and no repair was approved.** See [scientific audit record](docs/cold_humidity_scientific_review_20261024.md).
+
+### Stage39 v3 NOAA PSV STATION field fix
+
+Stage39 v2 passed original data checks and reached NOAA for 1998, 1999 and 2001, but its `--probe` parser mistakenly required `station_id` rather than the actual NOAA `STATION` field. Stage39 v3 accepts the correct header, rejects station-ID mismatches, and adds an actual-header regression test. NOAA numeric-temperature availability/QC is **not verified until v3 runs on IRIDIS6**. Original forcing/model records remain untouched; science HOLD 4,884/4,884. See [audit log](docs/cold_humidity_scientific_review_20261024.md).
