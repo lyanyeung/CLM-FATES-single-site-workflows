@@ -13,6 +13,19 @@
 
 **CA-Man Batch01 example (24 October 2026):** Stage72 deliberately tested a *mixed-source* `TA_ERA + original QBOT` **sensitivity only**. Of 35 isolated QC1 temperature candidates, 20 met its basic physical gate but showed large RH/VPD changes; 15 failed the gate (some implied RH >100%); **zero edits are approved for production**. Its shadow must **not** be reused as a coupled meteorological correction. Next review must use a coherent same-source T–moisture–pressure combination, and keep the separate 2007-03-10 anchor case on HOLD. See [Stage72 scientific limitations](examples/AmeriFlux_MultiSite_10/scripts/stage72/README.md).
 
+### Human-review precedent: accept a remaining temperature jump rather than introduce implausible humidity
+
+**Operator's explicit CA-Man Batch01 decision, 24 October 2026 (Stages71–74):** First screen **36** isolated QC1 air-temperature jump events bracketed by QC0. One event (**2007-03-10 11:30**) remains a separate QC0-anchor HOLD. Of the other **35**, an alternative matched-row `FLUXNET ERA5_HH` bundle (`TA_ERA`, `VPD_ERA`, `PA_ERA`) passed basic physical/thermodynamic checks for **35/35**, but comparing the jointly computed RH, VPD and pressure against neighboring QC0 records produced two distinct groups:
+
+- **18/35 with `NO_LARGE_BOUNDARY_SHIFT_DETECTED`:** operator chooses a **scoped same-source joint T/Q/P/VPD substitution** (update `TBOT`, `TA_USE`, `QBOT`, `PSRF`, `VPD_USE` coherently) in a **new, provenance-pinned trial forcing file**. No clock/source verification or formal production sign-off is implied by a basic physical pass or this selection.
+- **17/35 with `REVIEW_LARGE_BOUNDARY_SHIFT`:** **retain the ORIGINAL complete meteorological forcing row**, **do not replace only its temperature**, and **accept the remaining >10°C/30-min temperature jump as a documented, operator-reviewed unresolved risk**. **Do not smooth or overwrite neighboring QC0 observations** merely to remove the anomaly. Retention **does not prove original RH/QBOT correct**; it reflects the operator's preference not to introduce a potentially larger moisture artifact.
+- **1/36 QC0-anchor ambiguity (2007-03-10):** preserve the original row and keep it independently on HOLD.
+
+**Reusable decision principle:** When a potential air-temperature repair is not supported by a *jointly coherent, time-matched moisture/pressure state* that also passes the established RH/VPD/pressure boundary review, **do not force temperature continuity at the expense of moisture credibility**. A documented temperature discontinuity may be retained. This 18/17 threshold partition is **specific to CA-Man and the Stage73 screening settings** (large RH step ≥25 percentage points, large VPD step ≥10 hPa, or ERA-to-original pressure discrepancy ≥2000 Pa); **do not apply the same numerical counts or thresholds blindly to other stations**. Use original observations, site climate, water/ice saturation convention and scientific context.
+
+**Reproducible record:** [Stage73 same-source audit](examples/AmeriFlux_MultiSite_10/scripts/stage73/README.md) and [Stage74 operator-decision, 18-replacement trial](examples/AmeriFlux_MultiSite_10/scripts/stage74/README.md). Stage74 has `--self-test`, `--check` (read-only) and `--trial` (creates a separate candidate only), with **exact 18 changed timestamps, 17 unchanged flagged cases and one unchanged anchor**, SHA manifests and a full 15-year scan. The Stage72 `ERA T + original QBOT` shadow remains **sensitivity-only and must not be used as an approved repair**. All active CIME/Slurm cases and original source/forcing files stay untouched.
+
+
 <!-- MULTIBATCH_SPINUP1000_STATUS_START -->
 ## ICOS sites — four multi-site spin-up campaigns (IRIDIS6 status, 20 October 2026)
 
