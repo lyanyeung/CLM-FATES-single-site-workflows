@@ -240,6 +240,34 @@ def neighbour_support(r,left,right):
         return ("NATIVE_NEIGHBOUR_TA_INTERPOLATION",(a+b)/2)
     return None
 
+def independent_grid_t_c(grid, utc):
+    """Interpolate verified ERA5-Land T2m to exact native half-hour in °C."""
+    if grid is None:return None
+    diff=(utc-grid["start_utc"]).total_seconds()/3600
+    pos=math.floor(diff); f=diff-pos
+    values=grid["values"]["t2m"]
+    if pos<0 or pos+1>=len(values):return None
+    a,b=float(values[pos])-273.15,float(values[pos+1])-273.15
+    v=a+(b-a)*f
+    return v if math.isfinite(v) and -55<=v<=52 else None
+
+
+def external_temperature_fallback(row,left,right,grid,utc):
+    """ERA T only for invalid or non-QC0 tower T; never displace credible QC0."""
+    tower=value(row.get("TA_F"))
+    if tower is not None and -55<=tower<=52 and row["TA_F_QC"].strip()=="0":
+        return None
+    t=independent_grid_t_c(grid,utc)
+    if t is None:return None
+    for adj in (left,right):
+        if adj is None:continue
+        a=value(adj.get("TA_F"))
+        if a is not None and -55<=a<=52 and adj["TA_F_QC"].strip() in ("0","1"):
+            if abs(t-a)>6:
+                return None
+    return ("INDEPENDENT_ERA5LAND_TA_FOR_INVALID_TOWER",t)
+
+
 def build_decisions(targets,contexts,points,grids,external):
     chosen=defaultdict(dict);status={};needsgrid=defaultdict(set)
     for (site,k),reasons in sorted(targets.items()):
@@ -248,9 +276,15 @@ def build_decisions(targets,contexts,points,grids,external):
         decision=neighbour_support(r,left,right)
         is_jump="STAGE07_SKIPPED_ERA_EDGE" in reasons
         if decision is None:
-            status[site,k]="NEIGHBOUR_TEMPERATURE_NOT_CONFIRMED"
             needsgrid[site,int(k[:4])].add(k)
-            continue
+            grid=grids.get((site,int(k[:4])))
+            if grid is not None:
+                utc=external.local_to_utc(k,points[site]["offset_hours"])
+                decision=external_temperature_fallback(r,left,right,grid,utc)
+            if decision is None:
+                status[site,k]=("ERA5LAND_YEAR_MISSING" if grid is None
+                                else "NEIGHBOUR_OR_GRID_TEMPERATURE_NOT_CONFIRMED")
+                continue
         why,t=decision
         rawv=value(r.get("VPD_F"))
         if physics(t,rawv) and not is_jump:
@@ -259,7 +293,8 @@ def build_decisions(targets,contexts,points,grids,external):
             rawrh=value(r.get("RH"))
             if rawrh is None or rawrh<0 or rawrh>100.05:
                 chosen[site][k]={"RH":rh_from(t,rawv)}
-            if why=="NATIVE_NEIGHBOUR_TA_INTERPOLATION":
+            if why in ("NATIVE_NEIGHBOUR_TA_INTERPOLATION",
+                       "INDEPENDENT_ERA5LAND_TA_FOR_INVALID_TOWER"):
                 chosen[site][k]["TA_F"]=t
             status[site,k]="RESOLVED_RETAIN_PHYSICAL_NATIVE_"+why
             continue
@@ -281,7 +316,8 @@ def build_decisions(targets,contexts,points,grids,external):
             status[site,k]="GRID_RECONSTRUCTION_PHYSICALLY_INVALID"
             continue
         chosen[site][k]={"VPD_F":vpd,"RH":rh}
-        if why=="NATIVE_NEIGHBOUR_TA_INTERPOLATION":
+        if why in ("NATIVE_NEIGHBOUR_TA_INTERPOLATION",
+                   "INDEPENDENT_ERA5LAND_TA_FOR_INVALID_TOWER"):
             chosen[site][k]["TA_F"]=t
         status[site,k]="RESOLVED_INDEPENDENT_ERA5LAND_"+why
     return chosen,status,needsgrid
@@ -333,6 +369,15 @@ def self_test():
     assert neighbour_support(t,left,right)==("NATIVE_NEIGHBOUR_TA_INTERPOLATION",10)
     assert physics(10,0) and not physics(10,50)
     assert rh_from(10,0)==100
+    grid={"start_utc":datetime(2025,1,1,tzinfo=timezone.utc),
+          "values":{"t2m":[283.15,285.15]}}
+    assert abs(independent_grid_t_c(grid,datetime(2025,1,1,0,30,tzinfo=timezone.utc))-11)<1e-9
+    assert external_temperature_fallback(
+        {"TA_F":"-9999","TA_F_QC":"2"},None,None,grid,
+        datetime(2025,1,1,0,30,tzinfo=timezone.utc))[1]==11
+    assert external_temperature_fallback(
+        {"TA_F":"10","TA_F_QC":"0"},None,None,grid,
+        datetime(2025,1,1,0,30,tzinfo=timezone.utc)) is None
     assert len(SELECT)==5 and sum(HOLD_COUNT.values())==155
     print("STAGE12 SELF-TEST PASS: native temperature neighbours, valid VPD retention, 5-site hold scope")
 
