@@ -1014,9 +1014,19 @@ The six modified QC0 values all have
 `isolated_spike_ERA_confirmed|short_gap_interpolated` event reason.
 [Verified Stage11c data interpretation and event list](docs/STAGE11C_VERIFIED_QC0_MANUAL_REVIEW_2026-10-24.md).
 
-[Stage11d](scripts/stage11/11d_priority_change_context_review.py) is now
-committed **but not yet executed on IRIDIS6**. It creates a read-only review
-packet of original, companion ERA and processed_v5 values for native +/-2h
-around the specific QC0, ERA replacement, manual-review and low-RH events.
-This is meant to support manual science signoff, not automatic data editing.
-All Post-v5/DATM/CIME/Slurm permissions remain zero.
+[Stage11d](scripts/stage11/11d_priority_change_context_review.py) has now
+**passed IRIDIS6 --self-test, --check and --run**. Its 62 distinct review
+cases (US-MOz 1, US-Mpj 6, US-NC2 55) have 558 source-native +/-2h
+context records. The 38 US-NC2 VPD source values were original
+`VPD_F_QC=1` numerical gapfill values, and all carry reason
+`TA_VPD_inconsistent_VPD_only|remaining_gap_filled_ERA` before secondary
+ERA replacement. Six source QC0 air-temperature spikes, five RH<1% cases,
+and four unchanged manual-review rows remain on science hold. See
+[Stage11d verified source evidence](docs/STAGE11D_VERIFIED_PRIORITY_SOURCE_REVIEW_2026-10-24.md).
+
+[Stage11e final source-physics triage](scripts/stage11/11e_priority_scientific_triage.py)
+is **committed but not yet run on IRIDIS6**. It will use the sealed 62-target
+Stage11d report to independently classify original VPD/T water thermodynamics,
+check six QC0 edits against native neighbours and report 38 QC1 VPD
+inconsistencies. The output is a scientific review queue, not permission to
+write new forcing. All Post-v5/DATM/CIME/Slurm approvals remain zero.
