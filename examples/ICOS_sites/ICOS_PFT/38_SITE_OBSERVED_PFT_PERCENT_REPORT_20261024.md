@@ -45,7 +45,7 @@
 | [DE-Hzd](https://meta.icos-cp.eu/resources/stations/ES_DE-Hzd) (DBF) | DBF oak regeneration; percentages unavailable | No stand PFT percentage available — Hetzdorf disturbed forest EC tower | **No measured percentage** |
 | [CH-Dav](https://besjournals.onlinelibrary.wiley.com/doi/10.1002/2688-8319.70218) (ENF) | ENF Picea >99.5% of research-stand trees | Forest inventory tree species share — Seehornwald Davos research stand | Numeric, different denominator |
 | [BE-Vie](https://bg.copernicus.org/articles/17/1583/2020/bg-17-1583-2020-supplement.pdf) (MF) | DBF 43%; ENF 37%; unresolved 20% of reported stand composition | Stand species percentages; measurement basis unclear — Vielsalm mixed forest stand | Numeric, different denominator |
-| [IT-Lav](https://lawexplores.com/carbon-water-and-energy-fluxes-of-terrestrial-ecosystems-in-italy/) (ENF) | ENF 85%; DBF 15% (tower-associated stand composition) | Tree stand species shares; specific measurement denominator not provided — Lavarone micrometeorological tower stand | Numeric, different denominator |
+| [IT-Lav](https://www.mdpi.com/2073-445X/11/11/1903) (ENF) | ENF 85%; DBF 15% (tower-associated stand composition) | Tree stand species shares; specific measurement denominator not provided — Lavarone micrometeorological tower stand | Numeric, different denominator |
 
 ### FLUXNET_MultiSite_11
 
@@ -131,7 +131,7 @@ These sites need original field vegetation census or plot/quadrat cover, EC-flux
 ## Traceable evidence
 
 - [Flechard et al. (2020), Table S2: European stand species composition](https://bg.copernicus.org/articles/17/1583/2020/bg-17-1583-2020-supplement.pdf).
-- [Tharandt ICOS station composition](https://meta.icos-cp.eu/resources/stations/ES_DE-Tha), [Loobos 500-m vegetation survey](https://essd.copernicus.org/articles/18/2023/2026/), [Lavarone stand](https://lawexplores.com/carbon-water-and-energy-fluxes-of-terrestrial-ecosystems-in-italy/), [Lägeren mixed-canopy composition](https://bg.copernicus.org/articles/21/3571/2024/).
+- [Tharandt ICOS station composition](https://meta.icos-cp.eu/resources/stations/ES_DE-Tha), [Loobos 500-m vegetation survey](https://essd.copernicus.org/articles/18/2023/2026/), [Lavarone stand](https://www.mdpi.com/2073-445X/11/11/1903), [Lägeren mixed-canopy composition](https://bg.copernicus.org/articles/21/3571/2024/).
 - [Hainich stand tree carbon](https://bg.copernicus.org/articles/19/4315/2022/), [FI-Let 2016 selection harvesting](https://www.sciencedirect.com/science/article/pii/S0048969723040445), [ES-Agu vegetation cover](https://www.mdpi.com/2072-4292/13/15/2970), [FR-Pue ICOS holm oak cover](https://meta.icos-cp.eu/resources/stations/ES_FR-Pue).
 - Exact original source URLs and alternative conflicting sources for **each of the 38 stations** are in [version-2 data table](38_site_observed_PFT_percent_evidence_v2_20261024.csv).
 
