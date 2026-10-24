@@ -905,9 +905,8 @@ source/ERA coverage and stopped without reports. The [Stage10h-v2 timestamp-keye
 ERA-downscaled, 58 VPD QC1 gapfilled, zero VPD QC0; 100% of the selected
 primary timestamps match the broader companion ERA native timeline.
 The [Stage10i source ERA VPD saturation audit](scripts/stage10/10i_source_ERA_vpd_saturation_audit.py)
-is committed as the next **unrun** read-only diagnosis. No humidity repairs,
-time-offset approvals, Post-v5 acceptance or spinups are authorized. No humidity replacements, time offset or spinup
-has been approved.
+has since **passed** the actual IRIDIS6 `--check` and `--run`. See the current
+Stage10i–j section below. No humidity, time-offset, Post-v5 or spinup approval has been granted.
 
 
 ### Stage10i verified and Stage10j next (2026-10-24)
@@ -920,10 +919,15 @@ site median overage was US-MtB (0.257 hPa); US-NR3 covered 1,484 records.
 This **does not** establish that actual atmospheric water vapour pressure
 was negative, or identify which upstream ERA/downscaling step is at fault.
 
-[Stage10j (code only; not yet run on IRIDIS)](scripts/stage10/10j_source_vs_grid_humidity_counterfactuals.py)
-will compare the original source `TA_ERA` and `VPD_ERA` against the previously
-obtained, SHA-pinned ERA5-Land temperature/dewpoint evidence, using only exact
-same source-row IDs and arithmetic sensitivities. It is not a humidity
-correction method. Full results and strict scientific caveats are in the
-[Stage10e–10i evidence ledger](docs/STAGE10E_TO_10G_QC_EVIDENCE_2026-10-24.md).
-**All repairs and spinups remain unapproved.**
+[Stage10j — verified on IRIDIS6](scripts/stage10/10j_source_vs_grid_humidity_counterfactuals.py)
+compared existing source ERA and ERA5-Land meteorology at the same 1,924 event
+identities. A numerical VPD-only swap made implied vapour pressure nonnegative
+in 1,922 events (99.90%), versus 188 under a temperature-only swap. The 2
+VPD-only exceptions were both US-NR3. The swap is **not** a scientifically
+approved correction and does not constitute independent validation.
+
+[Stage10k — new diagnostic code, not yet run on IRIDIS6](scripts/stage10/10k_exception_provenance_science_gate.py)
+will independently check those two records, QC2/other source provenance,
+and the 1,924 source/grid comparison classes. Exact logs/report path and
+interpretation are in the [Stage10e–10j evidence ledger](docs/STAGE10E_TO_10G_QC_EVIDENCE_2026-10-24.md).
+**All humidity and clock approvals remain zero; no Post-v5 or model runs.**
