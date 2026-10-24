@@ -1251,4 +1251,4 @@ must reconcile `site+timestamp_start` against Stage11's
 cohort, preventing accidentally applying two different decisions
 to one original tower record. [Verified Stage53 result and Stage54
 run instructions](docs/stage53_operator_pass_stage54_overlap_plan_20261024.md).
-Stage54 is published but has **not yet run on IRIDIS6**.
+Stage54 has now **passed** in IRIDIS6 with **zero** exact same-site/original-tower-local-time collisions (444 Stage53 only; 4,884 Stage11 only). See [Stage54 operator-verified result](docs/stage54_operator_verified_zero_overlap_20261024.md). No model input was altered.
