@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 04
 
-> **Operational status (2026-10-24): STAGE00 + STAGE01 VERIFIED (10/10 sites each) from operator logs.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 metadata audit code is now prepared but not yet run.** No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
+> **Operational status (2026-10-24): STAGE00 + STAGE01 VERIFIED (10/10 sites each) from operator logs.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 executed: 9/10 PASS, US-Seg coordinate conflict needs provenance review.** See [Stage02 evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). [Stage02B US-Seg diagnostic](scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py) is prepared but not yet executed. No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
 
 Fourth independent ten-site AmeriFlux campaign following [Batch03](../AmeriFlux_MultiSite_10_Batch03/), [Batch02](../AmeriFlux_MultiSite_10_Batch02/) and [Batch01](../AmeriFlux_MultiSite_10/). This directory contains the exact release manifest and reproducible scripts. Never commit raw tower ZIPs or derived large files to GitHub.
 
@@ -104,6 +104,29 @@ On the **IRIDIS6 login terminal**, run:
 ```
 
 This script **does not write any output** itself. The shell `tee` saves an external operator log. A successful output ends with `STAGE02 SUMMARY: 10/10 coordinate + first-interval checks PASS; failures: none`; that PASS still does not establish full timestamp/coverage/QC science. Coordinate conflicts, missing metadata or ambiguous IGBP must be reviewed rather than filled automatically. Investigate exclusions (WET/CRO/WAT), non-forest PFT applicability, sensor-to-TA mapping and time continuity in later independent scientific stages.
+
+## Stage02B — investigate US-Seg coordinate provenance (READ ONLY)
+
+The original US-Seg BIF contains latitude `34.3623`, longitude candidates `-106.7020` and `-106.7019`. These longitudes are only about 9.18 m apart, but the currently published AmeriFlux site point is `34.3603, -106.7003`, roughly 267–272 m from these BIF candidates. The [research team site](https://www.litvaklab.org/grassland---us-seg.html) lists `34.3623, -106.7019`. No replacement of original data, no coordinate decision and no model surface selection is justified without reviewing BIF `GROUP_ID`, dates and site history.
+
+Run **on IRIDIS6** after Stage02; the diagnostic is read-only:
+
+```bash
+(
+  set -euo pipefail
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+  REL="examples/AmeriFlux_MultiSite_10_Batch04"
+  BASE="$HOME/ameriflux_batch04_stage02"
+  mkdir -p "$BASE/scripts/stage02"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  SCRIPT="$BASE/scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py" -o "$SCRIPT"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" 2>&1 | tee "$BASE/stage02b_US_Seg_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+Stage02 remains 9/10 until an explicit coordinate decision is documented. External point coordinates in this diagnostic are **only references**, never automatic corrections.
 
 ## Scientific gates after extraction (not yet executed)
 
