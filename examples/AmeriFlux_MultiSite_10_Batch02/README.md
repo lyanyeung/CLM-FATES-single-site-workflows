@@ -1313,8 +1313,9 @@ distinct Stage11 HOLD records**: **retain ORIGINAL FLUXNET TA_F**, even
 if TA_F_QC is QC1/QC2, when it is numerically valid and the absolute
 difference to the same independent CDS ERA5 T2m is **≤8.0 °C**.
 Do not use the Stage11 retained T as a substitute without checking its
-equality to original TA_F. Invalid original T/QC or >8 C site/ERA5
-differences remain explicit temperature HOLD; no automatic replacement
+equality to original TA_F. Invalid original T/ERA5 T or >8 C site/ERA5
+differences remain explicit temperature HOLD; unusual or missing QC
+codes are flagged, but QC by itself never forces T replacement. No automatic replacement
 of tower T is authorized. **US-Ho1 stays provisional for all 917
 records** until site metadata/UTC_OFFSET is independently confirmed.
 
