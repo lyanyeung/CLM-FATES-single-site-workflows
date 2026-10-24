@@ -1274,4 +1274,33 @@ or authorize any forcing/model writes. If the matching Stage19
 report does not already exist, Stage55 explicitly stops and directs
 the operator to generate Stage19's isolated report from verified
 existing CDS data. [Stage55 reproducible IRIDIS6 instructions](docs/stage54_pass_stage55_existing_4884_ERA5_triage_20261024.md).
-Stage55 not yet executed on IRIDIS6.
+Stage55 has subsequently passed on IRIDIS6; see the verified checkpoint below.
+
+
+### Stage55 AUDIT PASS: 4,884 existing ERA5 candidates numerically valid; science HOLD remains (2026-10-24)
+
+IRIDIS6 Stage55 syntax, self-test, exact-source check and full audit
+**PASSED**, using the existing Stage19 4,884-row external CDS ERA5
+report. Stage54 zero-overlap with the 444 Stage53 RH proposals was
+confirmed. Stage55 found **0 numeric-invalid** records; 4,884/4,884
+are still science HOLD. Primary exclusive review groups:
+- 3,245 original temperature-QC concern,
+- 689 water/ice saturation review,
+- 33 tower vs ERA5 air-temperature discrepancy >8 C,
+- 917 US-Ho1 UTC−5 provisional alignment.
+
+The exclusive routes are prioritization only. Across all records
+the overlapping raw flags show **3,946** original TA QC not 0,
+**4,884** original VPD QC not 0, **433** tower-minus-ERA5
+T absolute differences >8 C, and **4,884** water/ice cautions.
+None was automatically released for forcing/model runs.
+The 444 Stage53 RH choices are still isolated staging records,
+not actual DATM writes.
+
+[Detailed verified Stage55 operator checkpoint and remaining science gates](docs/stage55_operator_PASS_checkpoint_20261024.md).
+Further action: scientifically adjudicate the 4,884 Stage11 HOLD
+records and US-Ho1 UTC offset; then audit combined independent
+stage revisions against the broader Stage48 original hard-physics
+census before a new forcing build. The source 26,332 hard cases
+are NOT automatically covered by the 5,328 distinct Stage53+Stage11
+targets. No model spinup has begun for this Batch02 workflow.
