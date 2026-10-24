@@ -72,9 +72,9 @@ These are **all at positive temperatures**: water-vs-ice saturation is *not the 
 
 Contains 62-event physics evidence, six QC0 neighbour-source rows, all 38 original QC1 VPD conflicts, five preserved near-zero RH cases and a SHA-pinned `scientific_hold_receipt.json`.
 
-## Next: Stage11f review package (new code; not yet run on IRIDIS6)
+## Stage11f review package (VERIFIED on IRIDIS6)
 
-[11f_human_review_signoff_queue.py](../scripts/stage11/11f_human_review_signoff_queue.py) verifies Stage11e-v2's input SHA256 and Stage11d's unchanged-manual receipt, recomputes the contiguous QC1 VPD clusters, preserves six QC0 neighbour **values and QC codes**, and prepares an **unsigned** human-review template for each of the 62 event IDs.
+[11f_human_review_signoff_queue.py](../scripts/stage11/11f_human_review_signoff_queue.py) **PASSED** IRIDIS6 `--self-test`, `--check` and `--run` (2026-10-24), verifying Stage11e-v2's input SHA256 and Stage11d's unchanged-manual receipt. It confirmed 62 unique reviewer targets and the expected four consecutive QC1 VPD clusters (12, 7, 10 and 9 half-hours), preserved six QC0 neighbour values/QC codes and generated an **unsigned** human-review template. Exact output: `reports/stage11f_human_science_review_20261024T074958Z_6ae6d5d7/`. See [full verified Stage11f evidence](STAGE11F_VERIFIED_HUMAN_REVIEW_QUEUE_2026-10-24.md).
 
 **Do not automatically sign off the 62 events.** Human-reviewed decisions require source quality documentation, native timestamp/clock verification, tower measurement location/height, independent meteorological evidence where available, uncertainty, and written decision rationale. Only then can a separately versioned Post-v5 scientific approval process begin, including full-year meteorological impacts, PFT/surface and CO2 protocol checks.
 
