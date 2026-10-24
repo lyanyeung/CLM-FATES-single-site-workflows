@@ -1,0 +1,13 @@
+# Stage69 — Independent CA-Man shadow temperature trial science assessment
+
+**Stage68 was the first controlled editing experiment, NOT a production forcing fix.** The original CA-Man forcing (SHA256 `fac0bc4a82050a087e462c3af1b05ec16e1f3f803a66bde7bf87c0b3a39d3705`) remained intact. A separate 15-year candidate changed exactly **19 half-hour QC1 rows** in `TBOT`, `TA_USE`, and `VPD_USE` (keeping `QBOT` and `PSRF` unchanged). The Stage58 temperature discontinuity count declined from **185 to 150**. Of 36 Stage67 CA-Man QC0→QC1 P1 boundaries, 34 were short and bounded; 19 yielded physically bounded shadow temperatures, 15 failed the unchanged-QBOT RH/VPD gate, and two failed anchor-consistency criteria.
+
+**The improvement of >10°C steps is a numerical metric only; it does not establish that 19 meteorological corrections are scientifically valid.** For example, some changed rows lowered computed RH from ~50–70% to ~15–30%. This may have large implications for atmospheric dryness, VPD and simulated stomatal conductance.
+
+`69_assess_CA_Man_shadow_trial.py` independently checks Stage68's explicit scientific HOLD flags, SHA256 pins, ledger entries, and the original and shadow forcing's full **262,800 aligned half-hour rows**. It verifies all non-target rows and fields are unchanged, recomputes T/RH/VPD physical closure at all 19 modified records, records adjacent 30-minute step metrics, and compares ERA5 differences **as provisional contextual evidence only**. It flags large RH/VPD changes for scientific review without automatically approving any candidate.
+
+Run the pinned GitHub script with `--self-test` first (synthetic temperature/humidity and CSV field-change regression), then `--check --stage68-dir <exact> --stage61-dir <exact>` (writes nothing); then optionally `--audit` which adds ONLY a new report directory under `reports/stage69_CA-Man_shadow_science_assessment_*` with the event-level review CSV and input checksums.
+
+**Next decision:** Independently validate the 19 alternative temperatures using actual site clock conventions, QC0 native sensor/height provenance, humidity/dewpoint consistency and continuity with adjacent records. The 15 Stage68 moisture-failed cases remain unedited and should be evaluated as a *paired temperature-moisture candidate* **only** if source-level RH/VPD constraints or independent evidence support one; do not globally modify QBOT to make the physics gate pass. US-Bar 13 gapfill boundaries, its QC0 sensor extreme, 14 clock-ambiguous P1 groups, 184 P2 groups, and 17 unresolved low-RH cases remain separately on HOLD.
+
+No script in Stage69 modifies the original or shadow forcing, submits Slurm jobs or approves DATM/CIME or production spin-up.
