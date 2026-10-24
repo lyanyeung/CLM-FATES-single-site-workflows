@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 04
 
-> **Operational status (2026-10-24): PREPARED, NOT YET VERIFIED ON IRIDIS6.** Stage00 and Stage01 code is published; this is not evidence that any original data have been uploaded or extracted. The operator must run the WSL command below and retain its output. No forcing modification, QC repair, DATM input, surface modification, CIME case or spin-up is approved by this preparation.
+> **Operational status (2026-10-24): STAGE00 VERIFIED — 10/10 original ZIPs transferred to IRIDIS6 and local/remote SHA256 matched.** Operator-supplied output includes the explicit 10/10 success marker. Full checksums and package sizes are preserved in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md). **Stage01 extraction is pending.** No forcing modification, QC repair, DATM input, surface modification, CIME case or spin-up is approved.
 
 Fourth independent ten-site AmeriFlux campaign following [Batch03](../AmeriFlux_MultiSite_10_Batch03/), [Batch02](../AmeriFlux_MultiSite_10_Batch02/) and [Batch01](../AmeriFlux_MultiSite_10/). This directory contains the exact release manifest and reproducible scripts. Never commit raw tower ZIPs or derived large files to GitHub.
 
@@ -59,7 +59,7 @@ UPLOAD VERIFIED: 10/10 (AmeriFlux Batch 04). Originals retained. No extraction o
 
 Store the WSL upload log outside GitHub; it contains actual sizes, SHA256 digests, SSH errors (if any) and the verified site tally. Confirm remote disk/inode quotas if transfers fail.
 
-## Stage01 — Extraction and structure inventory (only AFTER Stage00 passes)
+## Stage01 — Extraction and structure inventory (Stage00 has now passed)
 
 Stage01 script is ready at [scripts/stage01/01_extract_ameriflux_batch04.py](scripts/stage01/01_extract_ameriflux_batch04.py), adapted from Batch03. It extracts CSV products without altering original archives; recursively handles nested ZIPs; checks output CRC/size and inventory structure; records a timestamped JSON report. It does **not** approve site meteorology, produce forcing or submit model jobs.
 
