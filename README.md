@@ -21,6 +21,12 @@
 
 Use [Stage75 — complete ten-site MET release-risk audit](examples/AmeriFlux_MultiSite_10/scripts/stage75/README.md) and its [read-only audit script](examples/AmeriFlux_MultiSite_10/scripts/stage75/75_batch01_MET_release_risk_audit.py) to verify per-site meteorological bounds, low RH, original P1/P2 review queues and the exact CA-Man Stage74 trial. Even if the numerical audit passes, **it is not production approval**. The specific user decision to accept the CA-Man residual temperature jumps rather than damage moisture consistency remains documented above.
 
+### Extreme and very-low RH follow-up: Stage76 (24 October 2026)
+
+Batch01 Stage75 numerically scanned all ten sites and found **17 still-unresolved RH<1% half-hours** (CA-Ca3: 7, CA-Cbo: 2, US-Bar: 8) plus **1,091 RH 1–5% half-hours** (CA-Ca3: 34; CA-Cbo: 26; CA-Man: 120; CA-TP4: 6; US-Aud: 874; US-Bar: 31). These are **candidate quality flags, not automatic errors**. Stage76 is a read-only/native-ERA5-assisted scientific review: calculate each extreme RH event using a **matched actual ERA5 2m air temperature, 2m dewpoint and surface pressure** when CDS native data and site UTC offsets are available; separately report provisional **FLUXNET TA_ERA + VPD_ERA + PA_ERA *inferred* dewpoint** if native dewpoint is not yet available. Never mislabel an inferred dewpoint as a native ERA5 dewpoint; never mix ERA temperature with old tower QBOT. Group all RH1–5 records into contiguous episodes, inspect temperature/VPD/tower QC and neighbouring half-hours, and obtain an explicit human decision before any forcing change. **The one existing CA-Man RH<1% operator-accepted risk is not part of the unresolved 17.**
+
+See [Stage76 code, CDS native-ERA5 retrieval and human-review instructions](examples/AmeriFlux_MultiSite_10/scripts/stage76/README.md). Until its source/clock and station-level evidence is reviewed, **0 further humidity replacements are approved**.
+
 ### Human-review precedent: accept a remaining temperature jump rather than introduce implausible humidity
 
 **Operator's explicit CA-Man Batch01 decision, 24 October 2026 (Stages71–74):** First screen **36** isolated QC1 air-temperature jump events bracketed by QC0. One event (**2007-03-10 11:30**) remains a separate QC0-anchor HOLD. Of the other **35**, an alternative matched-row `FLUXNET ERA5_HH` bundle (`TA_ERA`, `VPD_ERA`, `PA_ERA`) passed basic physical/thermodynamic checks for **35/35**, but comparing the jointly computed RH, VPD and pressure against neighboring QC0 records produced two distinct groups:
