@@ -18,3 +18,13 @@ Modes:
 **Decision gate:** To select scientifically supportable coupled TA–QBOT changes, first verify clock conventions, original tower air temperature and independent humidity (RH/dewpoint/VPD) observations or credible auxiliary station evidence. Neither preserving an implied original RH nor preserving an implied original VPD is itself grounds for a repair. The original Stage68 shadow forcing must remain a non-production sensitivity experiment. Do not run a production spin-up or automatically modify QBOT.
 
 Other unresolved cases: 13 US-Bar QC0→QC1 gaps, its 2015-11-06 native QC0 sensor jump, 14 time-ambiguous P1 episodes, ten currently unavailable BASE event sources, 15 Stage68 fixed-Q rejected cases, remaining P2 temperature episodes, and 17 low-RH science holds.
+
+## Stage70A: manual science-review docket (run BEFORE Stage70 scenarios)
+
+Stage70 v1 failed safely in preflight because Stage59's `manifest.json` specifies `"stage":"59"` (string) while the initial Stage70 erroneously expected an integer `59`. GitHub Stage70 was patched; **no forcing/report edits occurred during that failed run**.
+
+The conservative next step is `70a_manual_science_review_docket.py`, which reconciles prior pinned Stage59, 60, 61, 64, 67, 68 and 69 outputs and the exact Stage68 code. It enumerates **280** disjoint temperature episode groups (96 P1, 184 P2), and separately lists 17 unresolved RH<1% records (plus one previously documented risk). For the 36 CA-Man QC0→QC1 P1 groups, it explicitly classifies **19 shadow-only temperature interpolations awaiting moisture science approval**, **15 fixed-Q physical-reject candidates**, and **2 anchor-inconsistent candidates**. These are review categories, **not approved repairs**. Every temperature episode remains HOLD pending independent validation.
+
+Use `--self-test` and `--check` before `--audit`. Only `--audit` creates a new small timestamped human review report with four temperature queues and one low-RH queue. Neither mode touches original/shadow forcing or submits a model job. A formal science-review signoff requires verified native sensor/height, humidity source and clock convention, not merely a reduced temperature-step count or an ERA5 comparison.
+
+**Do not run Stage70 alternative T/Q repair proposals until the review docket and high-risk observations have been independently assessed.** The updated Stage70 script recognizes the literal Stage59 manifest version `"59"`, but still produces mathematical counterfactual hypotheses only, not scientifically validated corrections.
