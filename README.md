@@ -1,6 +1,12 @@
 # CLM-FATES single-site workflows
 
 
+## Stage82 VERIFIED — 213/213 DATM NetCDF SHA checks pass (24 October 2026)
+
+**Actual user-supplied IRIDIS6 outcome:** Stage82 complete `--check --hash-all` and `--report --hash-all` PASS, 10/10 sites, all 213 yearly NC files verified by SHA, plus first/last yearly NC structure checks per site; report `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage82_DATM_case_integration_preflight_20261024T231124502670Z/`. Full Stage80 original RH<1 only (18) correction and Stage81 ten-site annual DATM NetCDF creation are **finished**. Reference case was **not yet supplied** to Stage82. The shell detected a possible NL-Loo recovery directory with `env_run.xml` at `/home/ly3n24/NL_Loo_recovery_20261021/direct_20261021T021800Z_1708443/`, but it is not yet established to be a functional CIME case. [Next Stage82 case-only read-only check](examples/AmeriFlux_MultiSite_10/scripts/stage82/README.md) should use `--reference-case` for that known path, then inspect DATM/CDEPS version and site-independent structure. Unresolved time centering, domain, ZBOT and actual smoke test continue to block production.
+
+
+
 ## Stage82 — DATM case integration preflight (read-only)
 
 After the operator-confirmed successful Stage81 **213 annual NC / 10-site** technical build, next run the [Stage82 read-only case-integration and NetCDF integrity check](examples/AmeriFlux_MultiSite_10/scripts/stage82/README.md). It SHA-verifies the Stage80/81 source receipts and annual files, validates sample NOLEAP NetCDF, and optionally inventories an actual existing CIME case (`--reference-case`) without changing it. Further tasks: verify DATM/CDEPS stream format, model domain, native station timestamp centering, and site-specific ZBOT sensor height (notably CA-Cbo/CA-Man) before an isolated 1–5-day smoke test. **Do not submit production spin-up or activate Stage81 placeholder stream templates yet.**
