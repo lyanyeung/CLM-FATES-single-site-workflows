@@ -94,16 +94,16 @@ metrics must not be reused as the 2425-year result.
 
 ## Verified DK-Sor stage-29 results — 2026-10-24
 
-The operator executed Stage 29 successfully, and reported \`Status=OK\`
-with **2425/2425** unique archived annual \`h0a\` histories, no missing years,
+The operator executed Stage 29 successfully, and reported `Status=OK`
+with **2425/2425** unique archived annual `h0a` histories, no missing years,
 a matching 4421 checkpoint, and an original-EC flux comparison with
 340 matched months per metric.
 
 Authoritative RFS result location (derived outputs, not inputs):
 
-\`\`\`text
+```text
 /research/xclimatetbm/ly3n24/CLM_FATES/FLUXNET_MultiSite_6/convergence_snapshots/20261024T100510Z_DK_Sor_2425_archive_snapshot/
-\`\`\`
+```
 
 | Carbon pool | Last 100y drift (%) | Last 250y drift (%) | Phase-aligned adjacent-cycle absolute mean change (%) |
 |---|---:|---:|---:|
@@ -128,7 +128,7 @@ screen. Soil carbon continues increasing, while vegetation carbon decreases.
 | Model − EC bias (g C m^-2 d^-1) | -0.604326 | +0.647671 |
 
 The final dominant PFT is
-\`broadleaf_colddecid_extratrop_tree\`, consistent at broad class level with
+`broadleaf_colddecid_extratrop_tree`, consistent at broad class level with
 the tower's DBF biome. This does not validate PFT areal shares or site-level
 land-surface fractions. High monthly flux skill alone does not imply soil or
 whole-ecosystem carbon equilibrium. The listed scores apply to **model years
@@ -138,25 +138,25 @@ model years after that cycle.
 ### Upload original derived figures, CSV, JSON and report to GitHub
 
 A single-site publication script is provided at
-[\`30_publish_DK_Sor_2425_to_github.py\`](../scripts/30_publish_DK_Sor_2425_to_github.py).
+[`30_publish_DK_Sor_2425_to_github.py`](../scripts/30_publish_DK_Sor_2425_to_github.py).
 It validates all original Stage 29 output files and the exact 2425-year
 metadata, creates SHA256 checksums, and uses a fresh checkout so a local
 unmerged Git working tree is not modified. It copies **only** the four PNG
 figures, generated CSV summaries, JSON metadata, and the generated Markdown
-report into the repository's \`figures/convergence_snapshots/\` folder.
+report into the repository's `figures/convergence_snapshots/` folder.
 
 On IRIDIS6:
 
-\`\`\`bash
+```bash
 set -euo pipefail
 cd ~/CLM-FATES-single-site-workflows
 git fetch origin main
 git show origin/main:examples/FLUXNET_MultiSite_6/scripts/30_publish_DK_Sor_2425_to_github.py > "$HOME/DK_Sor_2425_publisher.py"
 "$HOME/.conda/envs/clm_fates_env/bin/python" -B "$HOME/DK_Sor_2425_publisher.py" --dry-run
 "$HOME/.conda/envs/clm_fates_env/bin/python" -B "$HOME/DK_Sor_2425_publisher.py"
-\`\`\`
+```
 
 The source RFS outputs remain untouched. **Until the publisher reports
-\`GITHUB PUBLISH SUCCESS\`, the original PNG/CSV/JSON files have not been
+`GITHUB PUBLISH SUCCESS`, the original PNG/CSV/JSON files have not been
 proven uploaded**. This documentation preserves the numerical results
 independently of that publication step.
