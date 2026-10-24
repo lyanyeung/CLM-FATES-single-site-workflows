@@ -114,10 +114,16 @@ def read_meta(folder):
     return meta
 
 
-def context_needed(patches, holds):
-    wanted = defaultdict(set)
+def required_target_keys(patches, holds):
+    """Pure, explicit original event keys; never rely on caller locals."""
+    required = defaultdict(set)
     for item in patches + holds:
-        wanted[item["site"]].add(item["TIMESTAMP_START"])
+        required[item["site"]].add(item["TIMESTAMP_START"])
+    return required
+
+
+def context_needed(patches, holds):
+    wanted = required_target_keys(patches, holds)
     for item in patches:
         if item["variable"] == "VPD_F":
             ts = item["TIMESTAMP_START"]
@@ -125,7 +131,8 @@ def context_needed(patches, holds):
     return wanted
 
 
-def read_source_context(meta, wanted):
+def read_source_context(meta, wanted, required_keys):
+    """Read exact original event keys plus optional adjacent VPD context."""
     source = {}
     for site, timestamps in wanted.items():
         path = Path(meta["sites"][site]["paths"]["native"])
@@ -146,9 +153,7 @@ def read_source_context(meta, wanted):
             raise ValueError("Full original row count changed for " + site)
         missing = timestamps - set(source[site])
         # Context adjacent to exact source limits may be missing.
-        required = {
-            x["TIMESTAMP_START"] for x in patches + holds if x["site"] == site
-        }
+        required = required_keys.get(site, set())
         if missing & required:
             raise ValueError("Missing native target(s): " + repr(sorted(missing & required)[:8]))
         print("SOURCE VERIFIED", site, "total_rows", scanned,
@@ -317,7 +322,14 @@ def self_test():
     assert stamp_shift("202503181800",30)=="202503181830"
     assert abs(sat(0)-6.112)<1e-10
     assert_approx(100*(1-2/sat(10)),100*(1-2/sat(10)),"es closure")
-    print("STAGE06 SELF-TEST PASS: source timestamps, saturation physics, direct pair checks")
+    demo_patch = [{"site": "TEST", "TIMESTAMP_START": "202503181830", "variable": "VPD_F"}]
+    demo_hold = [{"site": "TEST", "TIMESTAMP_START": "202503191000"}]
+    required = required_target_keys(demo_patch, demo_hold)
+    wanted = context_needed(demo_patch, demo_hold)
+    assert required["TEST"] == {"202503181830", "202503191000"}
+    assert wanted["TEST"] == {"202503181800", "202503181830",
+                              "202503181900", "202503191000"}
+    print("STAGE06 SELF-TEST PASS: source timestamps, physics, explicit event-key scope")
 
 
 def write_csv(path,rows,headers):
@@ -344,7 +356,9 @@ def main():
     holds=read_csv(folder/"unresolved_hold.csv",HOLD_FIELDS)
     if len(patches)!=5336 or len(holds)!=754:
         raise ValueError("Stage05 unique candidate/HOLD counts mismatch")
-    source=read_source_context(meta,context_needed(patches,holds))
+    source=read_source_context(
+        meta, context_needed(patches, holds), required_target_keys(patches, holds)
+    )
     result=audit(patches,holds,source)
     print("\nSTAGE06 EXACT SHA-VERIFIED QCv5 CANDIDATE EFFECTS:")
     allsites=sorted(EXPECTED)
