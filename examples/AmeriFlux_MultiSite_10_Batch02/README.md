@@ -1532,3 +1532,33 @@ and never overwrites original inputs/NetCDF/DATM.
 IRIDIS6 Stage62 --auto command](docs/stage62_operator_pass_next_auto_CDS_20261024.md).
 Stage62 `--auto` published on GitHub but not yet
 executed on IRIDIS6.
+
+
+### Stage62 --auto interrupted by existing verified_receipt.json; checksum-safe resumable fix (24 October 2026)
+
+The operator's Stage62 `--auto` run downloaded
+and verified an initial batch of **8 CDS grid-years**, then verified
+one 2013 grid-year. The following 2014 CDS request completed,
+but creating
+`.../ERA5_2014_lat+031.75_lon-0110.25/verified_receipt.json`
+raised `FileExistsError` because the file already existed
+before exclusive receipt creation. Its source/hash validity is
+**unknown until independently verified**. No Stage62 automatic final
+5,133-candidate restaging or forcing writes occurred in that
+interrupted run. Previously verified grid-years can be reused.
+
+A revised Stage62 Git blob
+`4438a236ac8b0a9f4d8562ea0fae9612f979ffed`
+(under commit `ad8919d90cbaf2f60b4ac6c11b7455b6c79deac9`)
+adds a CDS-cache POSIX exclusive lock and validates existing
+receipts or file-creation races using the SHA256-pinned source,
+NETCDF t2m/d2m/sp and complete expected grid/year UTC calendar.
+It **never deletes or overwrites** existing receipts or source
+files; invalid/conflicting receipts remain a hard STOP.
+Re-run `--auto --max-new 8` from the cache rather
+than discarding previous CDS downloads.
+
+[Interruption diagnostics, scientific boundaries and pinned
+restart command](docs/stage62_operator_pass_next_auto_CDS_20261024.md).
+The race-safe retry script has been committed, but it has not
+yet run on the operator's cluster.
