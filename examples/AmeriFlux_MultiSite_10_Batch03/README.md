@@ -889,3 +889,17 @@ for exact existing IRIDIS directories, per-site breakdowns, decision gates,
 recheck commands, and the distinction between scripts committed on GitHub and
 full raw numerical evidence retained on IRIDIS. No new forcing, Post-v5,
 DATM/CIME case or Slurm job has been created or approved by these stages.
+
+
+## Latest observation-provenance audit (Stage10e–10h, 2026-10-24)
+
+See the [Stage10e–10g verified quality evidence ledger](docs/STAGE10E_TO_10G_QC_EVIDENCE_2026-10-24.md) for
+89 P0/P1 events in 19 clusters, corrected dual TA+VPD QC0 definitions,
+6h/24h/72h/7d observation availability, and annual QC0 coverage.
+US-NR3 showed zero source-labeled measured TA_F and VPD_F records in
+2017, 2018 and 2023, despite nearly complete numeric meteorology.
+The [Stage10h provenance script](scripts/stage10/10h_original_qc_source_provenance.py)
+is committed but **has not yet been run on IRIDIS6**; it will distinguish
+source QC0/1/2 and original downscaled ERA dependence at all 1,924
+pinned humidity blockers. No humidity replacements, time offset or spinup
+has been approved.
