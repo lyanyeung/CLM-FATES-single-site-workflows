@@ -100,7 +100,7 @@ def ice_es(t):
         return 6.112*np.exp(22.46*t/(t+272.62))
 
 
-def exact_pair(source,diagnostic):
+def exact_pair(source,diagnostic,expected_size=1924,expected_sites=None):
     for a in (source,diagnostic):
         if a.duplicated(KEYS).any():
             raise ValueError("Duplicate (site,original row,time) IDs in source or diagnostic")
@@ -108,8 +108,9 @@ def exact_pair(source,diagnostic):
         raise ValueError("Source and Stage08c event row identities differ")
     result=diagnostic.merge(source,on=KEYS,how="inner",validate="one_to_one",
                             suffixes=("_stage08c","_stage10h"))
-    if len(result)!=1924 or result.site.value_counts().to_dict()!=EXPECTED:
-        raise ValueError("Source matched record count differs from 1924")
+    site_counts=EXPECTED if expected_sites is None else expected_sites
+    if len(result)!=expected_size or result.site.value_counts().to_dict()!=site_counts:
+        raise ValueError("Source matched record count or site distribution differs")
     return result
 
 
@@ -269,7 +270,7 @@ def selftest():
     b=df.loc[:,KEYS].copy()
     b["ERA_RH_pct"]=100*(s-2)/s
     assert len(b)==1 and b.ERA_RH_pct.iloc[0]<-2
-    c=exact_pair(df,b[KEYS])
+    c=exact_pair(df,b[KEYS],expected_size=1,expected_sites={"US-TEST":1})
     assert len(c)==1
     print("STAGE10I SELF-TEST PASS: subzero water/ice saturation and literal row identity",flush=True)
 
