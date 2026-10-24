@@ -7,7 +7,7 @@ This collection keeps AmeriFlux batches separate from the existing [ICOS multi-s
 | [AmeriFlux Batch 01](../AmeriFlux_MultiSite_10/) | 10 | See the batch-specific operational record and scripts |
 | **[AmeriFlux Batch 02](../AmeriFlux_MultiSite_10_Batch02/)** | 10 | Stages00–10 published. Operator Stage07: 5 numeric candidates; 5 sites blocked by 4,904 unresolved humidity pairs. Stage08 sensitivity and the follow-on Post-v5 gates/runner are ready for execution. |
 | **[AmeriFlux Batch 03](../AmeriFlux_MultiSite_10_Batch03/)** | 10 | Stages00–01 ready: single-connection WSL upload and recursive extraction; live transfer pending. |
-| **[AmeriFlux Batch 04](../AmeriFlux_MultiSite_10_Batch04/)** | 10 | **Stage00 transfer SHA256 10/10 and Stage01 extraction/structure 10/10 VERIFIED** from operator logs; Stage02 9/10 PASS; Stage02B confirmed two paired US-Seg BIF GROUP_ID sources (approval pending); Stage02C full-HH audit ready. |
+| **[AmeriFlux Batch 04](../AmeriFlux_MultiSite_10_Batch04/)** | 10 | **Stage00 transfer SHA256 10/10 and Stage01 extraction/structure 10/10 VERIFIED** from operator logs; Stage02 original 9/10; operator approved US-Seg BIF group 1495 (rerun pending); Stage02C HH time 10/10 PASS, science QC HOLD. |
 
 Batch04 sites: US-Rpf, US-Seg, US-Ses, US-Slt, US-SP1, US-SRG, US-SRM, US-Syv, US-Ton and US-Uaf. Exact [release manifest](../AmeriFlux_MultiSite_10_Batch04/sites.tsv), [README and transfer command](../AmeriFlux_MultiSite_10_Batch04/README.md). These ten release labels are not by themselves a QC or model-approval record.
 
