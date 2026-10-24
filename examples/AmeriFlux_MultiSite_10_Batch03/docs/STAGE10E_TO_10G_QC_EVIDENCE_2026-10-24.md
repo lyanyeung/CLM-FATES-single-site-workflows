@@ -115,5 +115,26 @@ Latest run: `event_join=1924/1924 affected_site_years=32/32 VPD_QC2_at_blockers=
 
 **Scientifically important preexisting result:** Stage08c calculated `ERA_RH_pct` from the *paired* `TA_ERA_C` and `VPD_ERA_hPa` using liquid-water saturation. All 1,924 residuals were classified as `ERA_RH_BELOW_MINUS2_PCT`, so the inconsistency is already present under the paired companion ERA-derived quantities: this is not necessarily an artefact of mixing ERA VPD with tower retained air temperature. This algebraic result does **not** identify the faulty stage of source generation or justify RH/VPD clipping.
 
-Next code committed but **not executed on IRIDIS**:
-[Stage10i source ERA VPD vs saturation audit](../scripts/stage10/10i_source_ERA_vpd_saturation_audit.py), a SHA-pinned independent recalculation and year/month inventory of the implied nonphysical negative water vapour pressure. It remains evidence-only; no humidity/clock/forcing changes, and the QC-v5 scientific hold stays in force.
+### Stage10i — VERIFIED ERA source temperature/VPD inconsistency
+
+[Stage10i source ERA VPD vs saturation audit](../scripts/stage10/10i_source_ERA_vpd_saturation_audit.py) subsequently **passed IRIDIS6** `--self-test`, `--check` and `--run`. It independently reproduced Stage08c's `ERA_RH_pct` for all 1,924/1,924 events, with every event satisfying `VPD_ERA > es_water(TA_ERA)`: source-pair implied water vapour pressure was negative in 1,924/1,924 events. Original `VPD_F_QC2` accounted for 1,866 events and matched original companion `VPD_ERA` within 0.01 hPa. No clock/repair approvals were given.
+
+| Site | Events | Median ERA-derived water RH (%) | Median source VPD above es_water(T) (hPa) | Maximum overage (hPa) |
+| --- | ---: | ---: | ---: | ---: |
+| US-Kon | 229 | -10.599 | 0.205305 | 0.696663 |
+| US-MMS | 18 | -13.049 | 0.150566 | 0.342470 |
+| US-Me2 | 4 | -3.694 | 0.153912 | 0.167077 |
+| US-Me6 | 1 | -3.827 | 0.033836 | 0.033836 |
+| US-MtB | 15 | -8.279 | 0.256513 | 0.427115 |
+| US-NR1 | 173 | -10.111 | 0.203790 | 0.678531 |
+| US-NR3 | 1,484 | -13.699 | 0.186228 | 0.889337 |
+
+**Scientific interpretation:** The negative implied vapour pressure occurs using the paired `TA_ERA` and `VPD_ERA` from the source companion, without tower retained temperature. This does NOT establish that actual atmospheric vapour pressure was negative or which source downscaling algorithm introduced the algebraic inconsistency. The official [FLUXNET FULLSET specification](https://fluxnet.org/data/fluxnet2015-dataset/fullset-data-product/) identifies downscaled, linearly regressed `VPD_ERA` and the consolidated `VPD_F`; independently regressed variables can lose joint physical consistency, but that is a hypothesis, **not yet a demonstrated root cause**. The reanalysis product behind each site's exact release must not be assumed identical to the separately requested ERA5-Land evidence.
+
+US-Me2's retained/original FLUXMET T was 9.533 C colder than source `TA_ERA` at the median of its four events, so it needs special metadata/height/clock investigation in addition to the common source-pair inconsistency.
+
+Stage10i results retained on IRIDIS6:
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage10i_era_vpd_physics_20261024T055509Z_b5a44de8/`
+
+Next proposed diagnostic (code committed, **not yet executed on IRIDIS6**): [Stage10j source-versus-grid counterfactual](../scripts/stage10/10j_source_vs_grid_humidity_counterfactuals.py). This will contrast existing original ERA temperature/VPD with existing SHA-pinned ERA5-Land gridded T/dewpoint evidence at identical 1,924 event IDs, without any new meteorological download or repair. A single-input mathematical substitution is a diagnostic sensitivity **only**, not a valid repair recommendation.
+
