@@ -171,12 +171,18 @@ def read_site(site,spec,pins,outputs):
     companion=checked_original(spec,pins,"era")
     rawcols=set(pd.read_csv(source,nrows=0).columns)
     eracols=set(pd.read_csv(companion,nrows=0).columns)
-    wants={"TIMESTAMP_START",*RAW_VARS,*[v+"_QC" for v in RAW_VARS]}
+    wants={"TIMESTAMP_START",*RAW_VARS}
     era_wants={"TIMESTAMP_START",*[v.replace("_F","_ERA") for v in RAW_VARS]}
     if not wants<=rawcols or not era_wants<=eracols:
         raise ValueError("Original raw/ERA field schema changed for "+site)
-    raw=pd.read_csv(source,usecols=sorted(wants),
+    qcs=sorted({v+"_QC" for v in RAW_VARS}&rawcols)
+    raw=pd.read_csv(source,usecols=sorted(wants)+qcs,
                     dtype={"TIMESTAMP_START":str},low_memory=False)
+    # Native Stage07 engine explicitly allows missing optional *_F_QC
+    # columns and represents them as NaN (unknown, NEVER QC0).
+    for var in RAW_VARS:
+        if var+"_QC" not in raw.columns:
+            raw[var+"_QC"]=np.nan
     times=native_dt(raw["TIMESTAMP_START"])
     valid=(times.dt.year.between(first,last)&
            ~((times.dt.month==2)&(times.dt.day==29)))
@@ -258,7 +264,7 @@ def event_audit(site,raw,force,era,changes,manual):
         final=number(pd.Series([force.iloc[i][col]]))[0]
         if var=="PA_F": final/=1000
         if var=="P_F": final*=step*60
-        if not (np.isfinite(q) and equal_measure(original,
+        if not (equal_measure(original,
                 number(pd.Series([item["original_value"]]))[0])
             and equal_measure(final,number(pd.Series([item["final_value"]]))[0])
             and equal_measure(q,number(pd.Series([item["official_qc"]]))[0])):
@@ -413,15 +419,8 @@ def self_test():
         "final_source":"candidate_test","reason":"test_change"
     }])
     manual=pd.DataFrame(columns=[*REQUIRED_MANUAL,"native_key"])
-    # Avoid hardcoding real-data site tally in the unit test.
-    global EXPECTED_QC0
-    original=EXPECTED_QC0
-    try:
-        EXPECTED_QC0={**EXPECTED_QC0,"US-MOz":1}
-        detail=event_audit("US-MOz",native,force,companion,events,manual)
-        assert len(detail)==1 and detail.original_QC0_modified.iloc[0]
-    finally:
-        EXPECTED_QC0=original
+    detail=event_audit("US-MOz",native,force,companion,events,manual)
+    assert len(detail)==1 and detail.original_QC0_modified.iloc[0]
     assert str(timekey(pd.Series(["2020-01-01T00:30:00"])).iloc[0])=="202001010030"
     assert equal_measure(np.nan,np.nan)
     assert not equal_measure(1.,2.)
