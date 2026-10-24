@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 04
 
-> **Operational status (2026-10-24): STAGE00 + STAGE01 VERIFIED (10/10 sites each) from operator logs.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 executed: 9/10 PASS, US-Seg coordinate conflict needs provenance review.** See [Stage02 evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). [Stage02B US-Seg diagnostic](scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py) is prepared but not yet executed. No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
+> **Operational status (2026-10-24): STAGE00 + STAGE01 VERIFIED (10/10 sites each) from operator logs.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 executed: 9/10 PASS, US-Seg coordinate conflict needs provenance review.** See [Stage02 evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). [Stage02B US-Seg diagnostic](scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py) has been executed. Paired BIF GROUP_ID 1479 vs 1495 evidence is documented in the [Stage02B ledger](docs/STAGE02B_US_SEG_PROVENANCE_VERIFIED_2026-10-24.md); US-Seg coordinate approval remains pending. Stage02C full-HH read-only audit is ready. No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
 
 Fourth independent ten-site AmeriFlux campaign following [Batch03](../AmeriFlux_MultiSite_10_Batch03/), [Batch02](../AmeriFlux_MultiSite_10_Batch02/) and [Batch01](../AmeriFlux_MultiSite_10/). This directory contains the exact release manifest and reproducible scripts. Never commit raw tower ZIPs or derived large files to GitHub.
 
@@ -127,6 +127,29 @@ Run **on IRIDIS6** after Stage02; the diagnostic is read-only:
 ```
 
 Stage02 remains 9/10 until an explicit coordinate decision is documented. External point coordinates in this diagnostic are **only references**, never automatic corrections.
+
+## Stage02C — full HH time-series and basic scientific flags (READ ONLY)
+
+[Stage02C script](scripts/stage02/02c_audit_batch04_HH_time_coverage.py) is now published but has not yet been run. It checks all 10 original `FLUXMET_HH` series for full chronological continuity, malformed timestamps, non-30-minute intervals, gaps and overlaps, plus missing/available counts for basic named meteorological fields and review-only negative VPD/RH/PA/wind/precipitation diagnostics. Variables not present under the explicit names are marked `NOT_FOUND`, not silently inferred. **It does not approve or apply repairs**, shift UTC, choose US-Seg coordinates or create model jobs.
+
+On IRIDIS6, run:
+
+```bash
+(
+  set -euo pipefail
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+  REL="examples/AmeriFlux_MultiSite_10_Batch04"
+  BASE="$HOME/ameriflux_batch04_stage02"
+  mkdir -p "$BASE/scripts/stage02"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  SCRIPT="$BASE/scripts/stage02/02c_audit_batch04_HH_time_coverage.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage02/02c_audit_batch04_HH_time_coverage.py" -o "$SCRIPT"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" 2>&1 | tee "$BASE/stage02c_HH_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+For a smaller audit use `python3 -B "$SCRIPT" --sites US-Rpf US-Seg`. The `STAGE02C SUMMARY` indicates timestamp gates, **not** full scientific QC. No file writes occur inside the Python audit; shell `tee` creates only an operator log.
 
 ## Scientific gates after extraction (not yet executed)
 
