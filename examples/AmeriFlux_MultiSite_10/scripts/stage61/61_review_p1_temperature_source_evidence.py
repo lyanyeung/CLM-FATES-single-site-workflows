@@ -305,15 +305,15 @@ def self_test():
     with tempfile.TemporaryDirectory(prefix='stage61_test_') as temporary:
         folder=Path(temporary)
         tsv=folder/'sites.tsv'
-        tsv.write_text('site\\tpackage\\tfirst_year\\tlast_year\\n'
-                       'CA-Man\\tAMF_CA-Man_FLUXNET\\t1994\\t2008\\n'
-                       'US-Bar\\tAMF_US-Bar_FLUXNET\\t2004\\t2023\\n',
+        tsv.write_text('site\tpackage\tfirst_year\tlast_year\n'
+                       'CA-Man\tAMF_CA-Man_FLUXNET\t1994\t2008\n'
+                       'US-Bar\tAMF_US-Bar_FLUXNET\t2004\t2023\n',
                        encoding='utf-8')
         parsed=data_csv(tsv,['site','package'])
         assert len(parsed)==2 and parsed[0]['site']=='CA-Man'
         assert parsed[1]['package']=='AMF_US-Bar_FLUXNET'
         csvp=folder/'review.csv'
-        csvp.write_text('site,package\\nCA-Man,example\\n',encoding='utf-8')
+        csvp.write_text('site,package\nCA-Man,example\n',encoding='utf-8')
         assert data_csv(csvp,['site','package'])[0]['package']=='example'
         context={}
         source={}
