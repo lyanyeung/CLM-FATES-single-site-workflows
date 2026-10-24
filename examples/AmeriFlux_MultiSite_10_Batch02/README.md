@@ -1402,3 +1402,41 @@ source-adjacent US-Ho1 BIF UTC_OFFSET candidates. These are **science
 review flags, not automatic defects or original data edits**.
 All RH/VPD/QBOT, original Stage11/53, DATM and model forcing remain
 under existing HOLD. Stage59 has not yet been run on IRIDIS6.
+
+
+### Stage59 live PASS; Stage60 4,411 independent ERA5 water-humidity policy staging (24 October 2026)
+
+Operator Stage59 downloaded verified pinned blob and completed syntax,
+self-test, source check and AUDIT PASS. Actual report:
+`reports/stage59_water_ice_review_3967_20261024T110624Z_2dc93fb4`.
+Of 3,967 accepted original-EC-temperature humidity candidates,
+2,257 are subzero without ice RH supersaturation,
+687 have ice RH 100–105%, 1,013 have ice RH >105%, and
+10 have original TA_F >=0 C. **These 1,700 water-to-ice phase
+oversaturations are not 1,700 invalid water-RH/QBOT data**:
+CLM-FATES forcing needs consistent QBOT, original EC T/PA,
+and an explicitly defined water vapour reference; over-ice RH
+and ice VPD are diagnostic-only, not inputs.
+
+The user delegated a physical-rule-based correction rather
+than manual review of these 3,967 ice-supersaturation flags.
+New [Stage60 source-verified 4,411-row automated unified
+humidity-policy script](scripts/stage60/60_stage_unified_4411_ERA5_water_humidity_and_hold_Ho1.py)
+stages **3,967 Stage58/59 + 444 Stage53** unique EC site/local
+times with independent CDS ERA5 water-reference RH and paired
+water VPD/QBOT calculated at original EC temperature/pressure.
+It confirms original Stage54 no-overlap, provenance SHA256,
+same underlying ERA5 product, per-site counts and thermodynamic
+identities. **No forcing/model edits or DATM approval**: source
+Stage48/07/08 full hard-physics coverage and 10-site native
+NO_LEAP forcing validation remain outstanding.
+
+US-Ho1 917 cases **remain UTC-offset HOLD**: the source-release
+folder contains no adjacent matching BIF metadata, so the
+published AmeriFlux site profile is not sufficient proof
+of release UTC_OFFSET. The decision is to retrieve and
+authenticate same-product (FLUXNET 3-6) official BADM/BIF
+rather than guess from nearby station/timezone.
+[Stage59 operator PASS, Stage60 pinned IRIDIS6 command,
+physical policy and remaining gates](docs/stage59_operator_PASS_and_stage60_auto_4411_water_humidity_20261024.md).
+Stage60 has not yet been run on IRIDIS6.
