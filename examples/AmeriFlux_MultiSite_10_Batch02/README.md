@@ -1350,3 +1350,30 @@ claim EC tower errors or replace TA_F with ERA5. **All 63 remain
 science HOLD pending manual inspection of actual row-level evidence.**
 [Stage57 pinned instructions and science review rubric](docs/stage57_manual_review_63_ec_tower_temperature_gt8C_20261024.md).
 Stage57 is published on GitHub but has not yet run on IRIDIS6.
+
+
+### Stage57 human review: 63 extreme-cold original tower temperatures approved; Stage58 temperature-only integration (24 October 2026)
+
+After inspecting the **actual 63** Stage57 read-only rows, the operator
+explicitly approved retaining original tower **TA_F** in all cases:
+US-EML 27 (TA QC0), US-GLE 6 (TA QC0), US-ICt 30 (TA QC2). Every
+original temperature is **below freezing**, warmer than ERA5 by
+8.01–11.63 °C, continuous with adjacent tower observations within
+3 °C, and none flagged as an isolated tower spike. This is a
+**temperature** acceptance, not an automated release of
+RH/VPD/QBOT or forcing.
+
+[Stage58 independent-source-rechecked temperature sign-off](scripts/stage58/58_accept_63_manual_extreme_cold_tower_temperatures.py)
+pins original Stage57 source and Stage56/19/11 provenance, joins
+the 63 human decisions with the earlier 3,904 retained EC
+temperatures, and stages **3,967 original EC temperatures kept**;
+**917 US-Ho1** entries retain provisional UTC-offset HOLD.
+Candidate ERA5 RH-coupled VPD/QBOT values for 3,967 are recomputed
+using original EC TA_F and PA_F but retain full **water/ice-phase
+humidity scientific HOLD** and no model/forcing approval.
+[63-row evidence, Stage58 reproducible commands and next physical
+checks](docs/stage57_manual_approval_and_stage58_temperature_integration_20261024.md).
+The Stage57 pasted evidence ends in `STAGE57 CHECK PASS`,
+not Stage57 AUDIT; Stage58 regenerates and pins original evidence
+rather than relying on an unverified Stage57 report folder.
+**Stage58 has been published but not yet executed on IRIDIS6.**
