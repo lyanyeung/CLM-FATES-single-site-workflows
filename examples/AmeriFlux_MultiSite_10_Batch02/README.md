@@ -1082,3 +1082,8 @@ Initial Stage39 --self-test passed, and three original source checksums passed, 
 ### Stage39 v3 NOAA PSV STATION field fix
 
 Stage39 v2 passed original data checks and reached NOAA for 1998, 1999 and 2001, but its `--probe` parser mistakenly required `station_id` rather than the actual NOAA `STATION` field. Stage39 v3 accepts the correct header, rejects station-ID mismatches, and adds an actual-header regression test. NOAA numeric-temperature availability/QC is **not verified until v3 runs on IRIDIS6**. Original forcing/model records remain untouched; science HOLD 4,884/4,884. See [audit log](docs/cold_humidity_scientific_review_20261024.md).
+
+
+### Stage39 v3 verified; Stage40 source-specific NOAA temperature-QC comparison
+
+Stage39 v3 retrieved ALL three Bangor GHCNh PSV station-years (1998/1999/2001) and found a raw numeric temperature report within +/-30 minutes for all 319 unanchored US-Ho1 negative-VPD events. Stage40, located at scripts/stage40/40_compare_NOAA_Bangor_QC_with_Ho1_CDS.py, reuses the pinned Stage39 source gate and exact NOAA PSV SHA256s, applies provisional legacy source-specific quality codes (223/1 or 335/5) with matching station provenance and then reports NOAA vs original Ho1 QC2 vs CDS ERA5 temperature comparison. It separately counts distinct NOAA reports to avoid half-hour pseudo-replication. Airport microclimate and Ho1 UTC offset remain unresolved, and NO forcing repairs are approved. See docs/cold_humidity_scientific_review_20261024.md.
