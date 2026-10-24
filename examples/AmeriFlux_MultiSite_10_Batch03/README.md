@@ -1135,12 +1135,33 @@ is false. [Verified Stage11i analysis and four-event hold]
 (docs/STAGE11I_VERIFIED_FOUR_HUMIDITY_JUMPS_2026-10-24.md).
 
 [Stage11j targeted +/-3h source-context review](scripts/stage11/11j_four_jump_source_context_review.py)
-is **committed but not yet run on IRIDIS6**. It compares exact-time
-original source FLUXMET QC, companion ERA5 site-downscaled RH, Stage07
-and the sealed Stage11h research shadow at the four high-jump events
-(52 native half-hour context rows). It produces only read-only reviews,
-never forcing writes. Independent source/ERA5-Land, clock, PFT/CO2,
-Post-v5, DATM and spinup science approval remains ZERO.
+**PASSED IRIDIS6 --self-test, --check and --run** on 2026-10-24.
+It SHA-verified original source FLUXMET QC, companion site-downscaled
+ERA5 RH, Stage07 and Stage11h across all **52 native half-hour context
+records**, centered on four >2hPa introduced-jump events. It wrote only
+`reports/stage11j_four_jump_original_ERA_context_20261024T092017Z_5fc4bfd6/`
+review outputs with no changes to forcing.
+
+The source contexts expose a scientific **event-mask boundary problem**:
+after US-NC2 202503231230 was corrected to ERA RH 47.79%, the original
+QC1 13:00-15:00 source humidity still implies ~2-8% water RH while
+companion ERA indicates ~42-47%; at US-NC2 202503250900, the original
+QC1 adjacent 08:00, 08:30, 09:30 and 10:00 timestamps also imply
+~4-9% RH versus companion ERA ~33-64%. Comparing the entire four ±3h
+windows yielded **11 additional unmodified source-native VPD records**
+with original RH <10%, companion RH >=20% and discrepancy >=20 percentage
+points, **plus three original source rows already corrected in Stage07**.
+These are science-review candidates, NOT a user-approved expanded ERA
+replacement mask. [Verified Stage11j four-event context](docs/STAGE11J_VERIFIED_FOUR_EVENT_CONTEXT_AND_UNREPAIRED_NEIGHBOURS_2026-10-24.md).
+
+[Stage11k source-neighbour RH screening](scripts/stage11/11k_four_event_unrepaired_neighbour_RH_review.py)
+is **committed but not yet run on IRIDIS6**. It checks the Stage11j
+read-only report SHA, independently recomputes original versus companion
+water RH for all 52 native intervals and distinguishes 11 never repaired
+source neighbour events, three already Stage07-corrected neighbours and
+four previously Stage11h-corrected central events. It never automatically
+extends the existing 53-row human-approved trial, changes forcing, or
+grants Post-v5/DATM/spinup approval.
 
 The existing IRIDIS `62_human_review_WORKING_COPY.csv` and SHA-sealed
 original Stage11f report have NOT been updated by GitHub commits.
