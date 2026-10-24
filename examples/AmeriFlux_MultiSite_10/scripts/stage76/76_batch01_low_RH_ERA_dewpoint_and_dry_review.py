@@ -267,7 +267,11 @@ def main():
  parser.add_argument('--native-era5-csv',type=Path)
  parser.add_argument('--utc-offsets-json',type=Path)
  a=parser.parse_args()
- if a.self_test:selftest();return
+ if a.self_test:
+  selftest()
+  print('SUPERSEDED: use Stage77 native ERA5 for ALL 1109 RH<5 cases')
+  return
+ raise RuntimeError('Stage76 SUPERSEDED by operator 2026-10-24: all 1109 RH<5 events require native ERA5 T2m+2m dewpoint+SP, use scripts/stage77 instead')
  if bool(a.native_era5_csv)!=bool(a.utc_offsets_json):
   parser.error('Use --native-era5-csv together with --utc-offsets-json, never silently guess clocks')
  offsets=json.loads(a.utc_offsets_json.read_text()) if a.utc_offsets_json else {}
