@@ -13,7 +13,7 @@ import csv
 import json
 import math
 from collections import Counter,defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 EXP=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10")
