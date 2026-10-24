@@ -237,14 +237,22 @@ def source_download(args,events):
  try:import cdsapi
  except ImportError as exc:raise RuntimeError('cdsapi missing; install cdsapi>=0.7.7') from exc
  dest=args.outdir.resolve()
- if dest.exists():raise RuntimeError('Refusing to overwrite existing download directory')
- dest.mkdir(parents=True)
+ if dest.exists():
+  if not args.resume or not (dest/'raw').is_dir():
+   raise RuntimeError('Download output exists. Pass --resume to safely reuse verified existing raw CDS files.')
+ else:
+  if args.resume:raise RuntimeError('--resume requested but no download directory exists')
+  dest.mkdir(parents=True)
+ raw=dest/'raw';raw.mkdir(exist_ok=True)
  cli=cdsapi.Client()
- raw=dest/'raw';raw.mkdir()
  unique={};checks=[]
  for req in reqs:
   filename=raw/f"{req['site']}_{req['year']}_ERA5_T2m_D2m_SP.csv"
-  cli.retrieve(DATASET,req['request'],str(filename))
+  if filename.is_file() and filename.stat().st_size>0:
+   print('RESUME VERIFY EXISTING CDS SOURCE:',filename)
+  else:
+   if filename.exists():raise RuntimeError('Zero-byte source exists; remove manually after investigation: '+str(filename))
+   cli.retrieve(DATASET,req['request'],str(filename))
   rows=unpack_csv(filename)
   if not rows:raise RuntimeError('CDS returned empty records '+str(filename))
   for line in rows:
@@ -448,8 +456,10 @@ def main():
   mode.add_argument('--'+name,dest='mode',action='store_const',const=name)
  p.add_argument('--native-csv',type=Path)
  p.add_argument('--outdir',type=Path)
+ p.add_argument('--resume',action='store_true',help='resume interrupted CDS downloads from existing raw files; never skip file validation')
  a=p.parse_args()
  if not a.mode:p.error('Specify --self-test, --plan, --download, --check or --trial')
+ if a.resume and a.mode!='download':p.error('--resume applies only to --download')
  if a.mode=='self-test':test();return
  events,paths,records=selected_events()
  if a.mode in ('plan','download'):source_download(a,events)
