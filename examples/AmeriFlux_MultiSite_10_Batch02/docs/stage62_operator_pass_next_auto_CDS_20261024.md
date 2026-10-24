@@ -92,3 +92,81 @@ on IRIDIS6.
 - 86 US-BZS and 16,788 US-Ho1 require version-matched source time metadata;
   official public site coordinates/timezones do not independently prove the
   exact processed release's station UTC_OFFSET.
+
+
+## 24 October 2026 — Interrupted --auto and race-safe receipt fix
+
+The operator executed Stage62 --auto with original pinned Git blob
+`0e39900b827d545f524f6e8e40e75a44d2e2312a`.
+The first bounded batch completed and verified **8/22** previously
+missing CDS ERA5 grid-years. Another CDS grid-year for 2013
+(`ERA5_2013_lat+045.25_lon-0068.75`) was printed
+as verified. The subsequent request for
+`ERA5_2014_lat+031.75_lon-0110.25`
+reported CDS success but failed on
+`FileExistsError: verified_receipt.json`
+when Stage62 attempted exclusive creation of the existing receipt.
+**This does not establish that the existing 2014 receipt is valid or
+corrupt**. The run stopped before the final candidate-restaging
+phase. Previously verified CDS data and Stage60 remained intact;
+do not delete receipts, download everything again, or assert model
+forcing changes.
+
+The new Stage62 script, pinned at Git commit
+`ad8919d90cbaf2f60b4ac6c11b7455b6c79deac9`,
+Git blob
+`4438a236ac8b0a9f4d8562ea0fae9612f979ffed`,
+makes resume safe:
+- A POSIX exclusive lock under the isolated Stage62 CDS cache
+  prevents concurrent Stage62 --auto/--fetch executions from
+  writing the same payload or receipt.
+- If a receipt exists on entry, Stage50's full verified-read
+  validates its grid/year, dataset, source payload SHA256, NetCDF
+  SHA256 and calendar; if valid, it is safely reused.
+- If a receipt appears during the download, the script catches
+  the exclusive-create conflict, validates the existing receipt
+  against the just independently verified original payload and
+  NetCDF SHA, and accepts only an exact match. It **does not
+  delete, replace or overwrite** the existing receipt.
+- Any incomplete/invalid/mismatched receipt stops the workflow
+  with a clear error instead of silently approving a suspect
+  CDS source. In particular, a failed verification should be
+  returned to ChatGPT for a targeted read-only diagnosis, not
+  manually removed without inspection.
+- Resume in the same command from the existing cache; one
+  complete source/receipt validation plus new Stage62 5,133
+  candidate/HOLD report after all 50 accessible grid-years are
+  verified.
+
+### Pinned restart on IRIDIS6
+
+```bash
+(
+  set -euo pipefail
+  conda activate clm_fates_env
+  PY="$CONDA_PREFIX/bin/python"
+  REL="examples/AmeriFlux_MultiSite_10_Batch02"
+  SCRIPT="$HOME/CLM-FATES-single-site-workflows/$REL/scripts/stage62/62_reuse_or_fetch_CDS_ERA5_for_5133_nonHo1_hard_humidity.py"
+  COMMIT="ad8919d90cbaf2f60b4ac6c11b7455b6c79deac9"
+  EXPECTED="4438a236ac8b0a9f4d8562ea0fae9612f979ffed"
+  TMP="$(mktemp)"
+  trap 'rm -f "$TMP"' EXIT
+  curl -fLsS --retry 3 \
+    "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL/scripts/stage62/62_reuse_or_fetch_CDS_ERA5_for_5133_nonHo1_hard_humidity.py" \
+    -o "$TMP"
+  ACTUAL="$(git hash-object "$TMP")"
+  echo "EXPECTED: $EXPECTED"
+  echo "ACTUAL:   $ACTUAL"
+  test "$ACTUAL" = "$EXPECTED"
+  cp "$TMP" "$SCRIPT"
+  "$PY" -m py_compile "$SCRIPT"
+  "$PY" -B "$SCRIPT" --self-test
+  "$PY" -B "$SCRIPT" --auto --max-new 8 \
+    2>&1 | tee "$HOME/Batch02_Stage62_auto_resume_$(date -u +%Y%m%dT%H%M%SZ).log"
+)
+```
+
+Expected terminal result:
+`STAGE62 AUTO PASS | verified all accessible CDS grid-years; full 5133 candidate/hold census generated`.
+This new script has been GitHub-published and exact blob verified
+by the assistant but not yet run against the operator's IRIDIS6 filesystem.
