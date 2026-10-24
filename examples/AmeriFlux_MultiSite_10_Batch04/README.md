@@ -210,6 +210,36 @@ Run on IRIDIS6:
 
 No original file, forcing, temperature, vapor or pressure values are modified. An external, independently retrieved ERA5/ERA5-Land meteorology source with independently validated units, times and spatial interpolation must be reviewed before authorizing per-timestamp substitutions.
 
+## Stage04 operator verified / Stage05 QCv5 candidate repair builder
+
+The operator ran Stage04 self-test and checked all three priority sites: `STAGE04 SUMMARY: examined=3/3 failed=none`. See [Stage04 evidence, previous QCv5 policy and explicit user repair instruction](docs/STAGE04_VERIFIED_AND_STAGE05_QCV5_APPROVED_METHOD_2026-10-24.md).
+
+The user explicitly selected the historical QCv5 short-gap interpolation for obvious `TA_F`/`PA_F` outliers and ERA-based humidity reconstruction for problematic `RH`. We therefore published an **isolated candidate builder**, [Stage05](scripts/stage05/05_build_batch04_qcv5_repair_candidates.py) (prepared, not yet executed on IRIDIS6). It is strictly scoped to `US-SP1 US-Syv US-Ton`, uses only the original exact FLUXMET and packaged ERA5 products, and follows the historic `TA_F/PA_F/VPD_F` 4-HH (2-hour) **complete-run** interpolation cap. The 2004 and 2016 multi-row pressure pulses are detected as `PA_F<65 kPa` so the 49–51 kPa shoulders are not silently preserved. A single `TA_F=0,VPD_F=6.110,RH=0` joint anomaly is separately identified. With a physically valid **same-source** `TA_ERA,VPD_ERA,PA_ERA` pair and `|TA_tower-TA_ERA|<=8°C`, suspect `RH<5%` or `RH>100%` is estimated from ERA source humidity **at preserved tower temperature**, with corresponding `VPD_F` changed consistently.
+
+This is NOT a blanket RH replacement: isolated low-RH values can be physically plausible, subzero humidity phase definitions require review, and the packaged ERA-derived products contain documented absurd values in some windows. Invalid ERA cases are routed to `unresolved_hold.csv`, not patched. Missing raw RH alone is not an error if consolidated TA/VPD/PA are usable. No native CSV, archived source, existing case or DATM is altered.
+
+**IRIDIS6 command — first inspect, then write isolated sparse candidate and hold ledgers:**
+
+```bash
+(
+  set -euo pipefail
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+  REL="examples/AmeriFlux_MultiSite_10_Batch04"
+  BASE="$HOME/ameriflux_batch04_stage05"
+  mkdir -p "$BASE/scripts/stage05"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  SCRIPT="$BASE/scripts/stage05/05_build_batch04_qcv5_repair_candidates.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage05/05_build_batch04_qcv5_repair_candidates.py" -o "$SCRIPT"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  python3 -B "$SCRIPT" 2>&1 | tee "$BASE/stage05_preview_$(date +%Y%m%d_%H%M%S).log"
+  python3 -B "$SCRIPT" --build-candidates \
+    2>&1 | tee "$BASE/stage05_build_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+By default the **build** creates a new, never-overwritten directory under `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch04/qcv5_stage05_candidates/`, containing sparse `candidate_patch.csv` and `unresolved_hold.csv` plus SHA256-pinned `report.json`. The script is NOT a complete processed forcing dataset; a separately audited patch materialisation and Post-v5 gate are required before model forcing may use the overlay. Continue full Stage03 review on the other seven sites.
+
 ## Scientific gates outstanding after structural/timestamp preflight
 
 1. Inventory each site's actual BIF, FLUXMET, FLUXES and companion products and native HH versus HR cadence, time zone, timestamp continuity and actual year coverage.
