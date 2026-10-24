@@ -201,7 +201,7 @@ def classify(a,b):
 def self_test():
     t=pd.DataFrame({"flags":["RH_RAW_ZERO|RH_INFERRED_LT0","RH_RAW_LT1_POS",
         "RH_RAW_GT100","RH_INFERRED_LT0|ACTUAL_VAPOR_NONPOSITIVE"]})
-    vals=t.flags.str.split("|")
+    vals=t["flags"].str.split("|")
     assert vals.apply(lambda f:bool(HARD_FLAGS&set(f))).sum()==3
     assert vals.apply(lambda f:"RH_RAW_LT1_POS" in f).sum()==1
     assert sum(ORIGINAL_HARD_PER_SITE.values())==26332
