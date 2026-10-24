@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
-> **Latest scientific status (2026-10-24):** Stage10k completed on IRIDIS6 for 1,924/1,924 residual cold-humidity events, including the two US-NR3 exceptions. There are **0 approved humidity repairs, 0 approved UTC offsets, and no Post-v5/DATM/spinup approval**. See [Stage10k science decision gate](docs/STAGE10K_SCIENTIFIC_DECISION_GATE_2026-10-24.md). Full SHA-pinned event reports remain on IRIDIS6; GitHub has scripts and operator-verified summaries.
+> **Latest scientific status (2026-10-24):** Stage11M successfully inspected **four residual US-NC2 VPD transitions** (three introduced by Stage11L humidity-only additions, one inherited from Stage11H), including all **40 exact source-context rows**. The user selected **11 additional Stage11L ERA-RH humidity-only trial targets** after the original Stage11F choices, but **none has formal Post-v5 production acceptance**. Stage07/Stage11H/Stage11L remain SHA-protected, EC-tower temperature unchanged, and no DATM/spinup approval. [Stage11M verified log and boundary ledger](docs/STAGE11M_VERIFIED_FOUR_RESIDUAL_BOUNDARY_CONTEXT_2026-10-24.md). [Stage11N read-only US-NC2 2025 clock/grid availability check](scripts/stage11/11n_us_nc2_grid_clock_preflight.py) is prepared, not yet executed.
 
 
 This separate batch follows [Batch02](../AmeriFlux_MultiSite_10_Batch02/) for
@@ -1226,3 +1226,32 @@ The existing IRIDIS `62_human_review_WORKING_COPY.csv` and SHA-sealed
 original Stage11f report have NOT been updated by GitHub commits.
 No candidate forcing has been changed, and all Post-v5, DATM,
 PFT/CO2 and spinup authorization flags stay at ZERO.
+
+## Stage11M — verified four-boundary science HOLD (2026-10-24)
+
+The operator ran `11m_four_stage11l_boundary_source_science_audit.py` on IRIDIS6 with verified source and Stage11L SHA receipts. `--self-test`, `--check`, and `--run` succeeded. Output: **367,920** US-NC2 NO_LEAP half-hours audited, 11/11 user-selected new Stage11L humidity events preserved, **four residual high-jump boundaries**, **40** exact original/source ERA/Stage07/11H/11L context rows, and **0** new repair approvals. Stage11M wrote **reports only**, not forcing, CIME or model jobs. The exact report directory and per-event evidence are in [Stage11M ledger](docs/STAGE11M_VERIFIED_FOUR_RESIDUAL_BOUNDARY_CONTEXT_2026-10-24.md).
+
+Three boundaries worsened in Stage11L: March 18 18:00→18:30 (+3.687 hPa jump), March 23 15:00→15:30 (+2.760), and March 25 10:00→10:30 (+5.808); March 23 08:30→09:00 was already high in Stage11H (9.467 hPa) and is unchanged. **Do not reverse an ERA-RH selection merely to minimise VPD jumps**; the original source can imply negative actual vapour pressure, and the transitions can cross separate source provenance or QC categories. The 2025-03-25 10:30 right endpoint already has a Stage07 VPD correction and was **not** among the 11 additional Stage11L approved shadow events.
+
+## Stage11N — US-NC2 original BIF clock and independent ERA5-Land availability preflight
+
+[Read-only Stage11N script](scripts/stage11/11n_us_nc2_grid_clock_preflight.py) uses the original 2005–2025 US-NC2 release BIF to enumerate `UTC_OFFSET` and location metadata (including `GROUP_ID`) and confirms all eight exact original boundary endpoint timestamps. It checks whether a preexisting **US-NC2 2025** gridded ERA5-Land T2m/dewpoint/pressure source is present under the previously used external-evidence hierarchy. It **does not** download, assert UTC alignment, interpret a grid file as approved, select a time offset, reconstruct RH or write any data. The earlier Batch03 Stage09 external queue comprised **seven other named stations**, so US-NC2 grid coverage must not be assumed from a 32-site-year download count.
+
+On IRIDIS6:
+
+```bash
+(
+  set -euo pipefail
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+  REL="examples/AmeriFlux_MultiSite_10_Batch03"
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  SCRIPT="$BASE/scripts/stage11/11n_us_nc2_grid_clock_preflight.py"
+  mkdir -p "$(dirname "$SCRIPT")"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage11/11n_us_nc2_grid_clock_preflight.py" -o "$SCRIPT"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  python3 -B "$SCRIPT" 2>&1 | tee "$HOME/batch03_stage11n_US-NC2_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+If no usable 2025 gridded source is available, the next scientific step is to separately plan a source-verified, timestamp-aligned ERA5-Land/ERA5 point retrieval for US-NC2, not to alter the already-reviewed 11-event Stage11L mask. **No new automatic interpolation**, force balancing, arbitrary RH flooring, or Post-v5/DATM/spinup approval is authorised by Stage11M/N.
