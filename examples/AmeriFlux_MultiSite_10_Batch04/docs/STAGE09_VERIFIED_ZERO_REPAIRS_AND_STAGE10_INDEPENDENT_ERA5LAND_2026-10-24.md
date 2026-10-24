@@ -39,7 +39,7 @@ Stage09 produced a new complete (unchanged) US-Rpf and US-SRM derived FLUXMET co
 ```bash
 (
   set -euo pipefail
-  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/c5ed3d7479fed807fa371101bb19322f03811709"
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/3d1d15e5a8d0c3403446fa67f0a9e32c4e2ea15d"
   REL="examples/AmeriFlux_MultiSite_10_Batch04"
   BASE="$HOME/ameriflux_batch04_stage10"
   SCRIPT="$BASE/scripts/stage10/10_era5land_independent_humidity_fill.py"
