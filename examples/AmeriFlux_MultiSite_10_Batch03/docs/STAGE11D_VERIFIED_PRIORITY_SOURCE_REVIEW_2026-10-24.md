@@ -67,3 +67,9 @@ Main evidence:
 The Stage11e source/ERA comparison is *not* an independent measurement; the output is a human science decision queue, **not an approved repair or readiness certification**.
 
 **All approvals remain zero:** humidity correction, original QC0 replacement, clock adjustment, Post-v5, DATM, PFT/CO2 protocol or spinup. Stage07's `INCOMPLETE_DO_NOT_USE_FOR_DATM_OR_SPINUP` marker must remain.
+
+## Stage11e-v1 self-test failure and corrected v2
+
+The operator attempted [Stage11e-v1](../scripts/stage11/11e_priority_scientific_triage.py) on IRIDIS6 after downloading and verifying the script. The syntax check passed, but the `--self-test` stopped in `triage()` with `ValueError: Target-centre merge lost or duplicated a review record` **before source reports were read or any data modified**. Root cause: `triage()` mandated `len(primary)==62` even when invoked on its *one-record synthetic self-test*. The error alone does not establish a real Stage11d join problem.
+
+[Stage11e-v2](../scripts/stage11/11e_v2_priority_scientific_triage.py), committed 2026-10-24, supplies `expected_n=62` for production, `expected_n=1` for the synthetic test and explicit negative tests for a mismatched source key and default 62-record enforcement. It retains the existing sealed Stage11d evidence, no-approval guards, and no-modification behavior. **The corrected v2 has not yet been run on actual IRIDIS6 evidence**; no Phase-0 or Post-v5 acceptance has changed.
