@@ -1076,3 +1076,30 @@ remain HOLD** for a separate decision: US-Mpj 201410210830, US-NC2
 All Stage11f sealed CSVs and source files remain unchanged; the separate
 62-row working copy has not been updated from this GitHub documentation.
 No approval to alter Post-v5, DATM, CIME, site PFT, CO2 or spinups.
+
+
+### Stage11f 62/62 decisions CLOSED — ERA5 validation pending (2026-10-24)
+
+The user explicitly selected to **retain all six already-interpolated
+Stage07 source-QC0 TA candidates**, use an **ERA5-based humidity method** for
+**53 distinct** source-nonpositive-implied-vapour or candidate water-RH<1%
+VPD events, and **retain the existing Stage07 VPD** for the final **three**
+original-positive but near-zero-water-vapour events:
+US-Mpj 201410210830, US-NC2 202503220130 and 202503270730.
+This yields a complete **62/62 user-selected method census**, but is **not**
+scientific validation of those selected meteorological values.
+
+[Final human-science decision ledger (Markdown)](docs/STAGE11F_FINAL_62_USER_DECISIONS_AND_ERA5_VALIDATION_2026-10-24.md)
+and [machine-readable 62 native event choices (CSV)](docs/STAGE11F_ALL62_USER_DECISIONS_2026-10-24.csv)
+are committed. The separate
+[Stage11g ERA5 provenance/physical-method feasibility audit](scripts/stage11/11g_user62_ERA5_source_method_audit.py)
+is **committed but not yet executed on IRIDIS6**. It compares direct
+source companion `VPD_ERA` and source companion `TA_ERA/VPD_ERA`
+relative-humidity transfer at the existing tower/site TA/PSRF/QBOT,
+and explicitly leaves separate ERA5-Land grid dewpoint source
+**NOT VERIFIED**. A physical success is not independent tower validation.
+
+The existing IRIDIS `62_human_review_WORKING_COPY.csv` and SHA-sealed
+original Stage11f report have NOT been updated by GitHub commits.
+No candidate forcing has been changed, and all Post-v5, DATM,
+PFT/CO2 and spinup authorization flags stay at ZERO.
