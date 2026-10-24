@@ -23,6 +23,7 @@ import argparse, hashlib, importlib.util, json, os, sys, traceback
 from pathlib import Path
 from datetime import datetime,timezone
 import pandas as pd
+import numpy as np
 sys.dont_write_bytecode=True
 VERSION="batch03-stage12f-v1-20261024-2810-missing-source-year-CDS-queue"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
@@ -146,6 +147,20 @@ def evidence():
     assert sum(x["unresolved_humidity"] for x in expectedplan)==2810
     return expectedplan,t,pilot,receipt
 
+def validate_physics(variables):
+    if set(variables)!={"t2m","d2m","sp"}:
+        raise ValueError("ERA5-Land source variables missing")
+    ta=np.asarray(variables["t2m"],dtype=float)
+    td=np.asarray(variables["d2m"],dtype=float)
+    pa=np.asarray(variables["sp"],dtype=float)
+    if (not (np.isfinite(ta).all() and np.isfinite(td).all()
+             and np.isfinite(pa).all())
+        or not ((ta>=160)&(ta<=340)).all()
+        or not ((td>=160)&(td<=340)).all()
+        or not ((td<=ta+0.1)).all()
+        or not ((pa>=50000)&(pa<=110000)).all()):
+        raise ValueError("Downloaded ERA5-Land humidity/temperature/pressure physical QA failed")
+
 def target(item):
     folder=OUT/item["site"]/str(item["year"])
     stem="ERA5Land_"+item["site"]+"_"+str(item["year"])+"_stage12f_t2m_d2m_sp"
@@ -173,6 +188,7 @@ def status(item,t):
         or r.get("site")!=item["site"] or int(r.get("year",-1))!=item["year"]
         or r.get("request")!=item["request"]
         or r.get("dataset")!=DATASET or r.get("artifact_sha256")!=sha(result)
+        or r.get("source_Stage12e_receipt_SHA256")!=sha(E/"stage12e_research_only_sha_receipt.json")
         or r.get("artifact_path")!=str(result)
         or r.get("tower_clock_approved") is not False
         or r.get("scientific_repair_approved") is not False):
@@ -180,8 +196,9 @@ def status(item,t):
     pos=item["request"]["location"]
     years,fields,coords=t.grid_fields(result,item["year"],
                              (pos["latitude"],pos["longitude"]))
-    if not len(years)>8760 or set(fields)!={"t2m","d2m","sp"}:
-        raise ValueError("Downloaded source missing time/vars")
+    if not len(years)>8760:
+        raise ValueError("Downloaded source missing expected UTC hourly coverage")
+    validate_physics(fields)
     return "VERIFIED",{"path":str(result),"sha256":sha(result),
                         "utc_hours":len(years),"grid":coords}
 
@@ -209,8 +226,7 @@ def download(item,t,pilot,stage12e_receipt_sha):
     pos=item["request"]["location"]
     dt,fields,cell=t.grid_fields(validation,item["year"],
                                 (pos["latitude"],pos["longitude"]))
-    if set(fields)!={"t2m","d2m","sp"}:
-        raise ValueError("Final ERA5-Land validator missing a field")
+    validate_physics(fields)
     datafile=folder/(stem+ext)
     if datafile.exists():raise FileExistsError("Unexpected destination conflict")
     validation.rename(datafile)
