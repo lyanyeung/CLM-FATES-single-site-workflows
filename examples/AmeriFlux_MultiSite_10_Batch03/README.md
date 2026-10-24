@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
-> **Latest scientific status (2026-10-24):** Stage11M successfully inspected **four residual US-NC2 VPD transitions** (three introduced by Stage11L humidity-only additions, one inherited from Stage11H), including all **40 exact source-context rows**. The user selected **11 additional Stage11L ERA-RH humidity-only trial targets** after the original Stage11F choices, but **none has formal Post-v5 production acceptance**. Stage07/Stage11H/Stage11L remain SHA-protected, EC-tower temperature unchanged, and no DATM/spinup approval. [Stage11M verified log and boundary ledger](docs/STAGE11M_VERIFIED_FOUR_RESIDUAL_BOUNDARY_CONTEXT_2026-10-24.md). [Stage11N read-only US-NC2 2025 clock/grid availability check](scripts/stage11/11n_us_nc2_grid_clock_preflight.py) is prepared, not yet executed.
+> **Latest scientific status (2026-10-24):** Stage11M successfully inspected **four residual US-NC2 VPD transitions** (three introduced by Stage11L humidity-only additions, one inherited from Stage11H), including all **40 exact source-context rows**. The user selected **11 additional Stage11L ERA-RH humidity-only trial targets** after the original Stage11F choices, but **none has formal Post-v5 production acceptance**. Stage07/Stage11H/Stage11L remain SHA-protected, EC-tower temperature unchanged, and no DATM/spinup approval. [Stage11M verified log and boundary ledger](docs/STAGE11M_VERIFIED_FOUR_RESIDUAL_BOUNDARY_CONTEXT_2026-10-24.md). [Stage11N check](docs/STAGE11N_VERIFIED_US_NC2_CLOCK_AND_2025_ERA5LAND_GAP_2026-10-24.md) verified original tower location (35.8030,-76.6685; 5 m), published UTC_OFFSET=-5 (unapproved for automatic alignment), 4/4 boundaries, and NO existing US-NC2 2025 ERA5-Land bundle at the standard path. [Stage11O independent March 2025 ERA5-Land request](scripts/stage11/11o_us_nc2_2025_march_era5land_evidence.py) is ready, not executed.
 
 
 This separate batch follows [Batch02](../AmeriFlux_MultiSite_10_Batch02/) for
@@ -1255,3 +1255,30 @@ On IRIDIS6:
 ```
 
 If no usable 2025 gridded source is available, the next scientific step is to separately plan a source-verified, timestamp-aligned ERA5-Land/ERA5 point retrieval for US-NC2, not to alter the already-reviewed 11-event Stage11L mask. **No new automatic interpolation**, force balancing, arbitrary RH flooring, or Post-v5/DATM/spinup approval is authorised by Stage11M/N.
+
+## Stage11N VERIFIED / Stage11O targeted external 2025-03 humidity evidence
+
+Stage11N was executed by the operator and **PASS**: original BIF `GROUP_ID=12759` contains site coordinates **35.8030 N, -76.6685 E** and 5 m elevation; `GROUP_ID=12767` contains `UTC_OFFSET=-5`. All four Stage11M source-native boundaries correspond to exactly eight matched source timestamps. The usual 2025 US-NC2 ERA5-Land evidence directory has **no standard pre-existing bundle**. This does not establish that no unrelated or other external files exist. See the [verified Stage11N ledger](docs/STAGE11N_VERIFIED_US_NC2_CLOCK_AND_2025_ERA5LAND_GAP_2026-10-24.md). No clock or boundary repair was approved.
+
+**Stage11O script:** [11o_us_nc2_2025_march_era5land_evidence.py](scripts/stage11/11o_us_nc2_2025_march_era5land_evidence.py). Uses the already-tested Batch03 Stage09b CDS point-timeseries request convention; independently retrieves ERA5-Land hourly *2 m temperature, 2 m dewpoint temperature, surface pressure* at the **original BIF site coordinates**, across UTC `2025-03-16` through `2025-03-27` (288 hours). Nearest-grid selection (0.1°) is verified from response metadata, and complete exact UTC coverage, units K/K/Pa, dewpoint<=T+0.1 K, gross pressure/temperature bounds and SHA256 provenance are checked. It never edits existing source, Stage07, Stage11H/L, repaired forcing, model cases or existing signed ledgers.
+
+On the IRIDIS6 login node:
+
+```bash
+(
+  set -euo pipefail
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+  REL="examples/AmeriFlux_MultiSite_10_Batch03"
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
+  SCRIPT="$BASE/scripts/stage11/11o_us_nc2_2025_march_era5land_evidence.py"
+  mkdir -p "$(dirname "$SCRIPT")"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage11/11o_us_nc2_2025_march_era5land_evidence.py" -o "$SCRIPT"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  python3 -B "$SCRIPT" --check
+  python3 -B "$SCRIPT" --download 2>&1 | tee "$HOME/Batch03_Stage11O_US-NC2_2025March.log"
+  python3 -B "$SCRIPT" --audit
+)
+```
+
+A CDS credential and installed `cdsapi`, `numpy` and `netCDF4` are needed for actual download/audit. The command makes exactly **one** CDS query (the `--check` mode makes none). Do not run `--download` again after successful download; non-overwrite protection intentionally blocks it. If the CDS request fails and leaves a `.download.partial`, inspect it rather than deleting an original or bypassing checks. Report remains **scientific evidence only**: UTC-5 is a published offset but not an automatically approved tower clock shift, and this ERA5-derived data cannot independently prove tower RH truth. A separate future time-offset sensitivity comparison of the four Stage11M VPD discontinuities is required before any new change or Post-v5/DATM/CLM-FATES model approval.
