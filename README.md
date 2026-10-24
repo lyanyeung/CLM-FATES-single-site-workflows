@@ -12,7 +12,7 @@
 | CA-TP4 | 6 | 10 | 3 | 5 | 5 |
 | US-Aud | 874 | 1,031 | 3 | 1 | **0** |
 | US-Bar | 39 | 56 | 3 | 11 | 11 |
-| **Total** | **1,109** | **1,388** | **109** | **96** | **89** |
+| **Total** | **1,109** | **1,388** | **112** | **94** | **89** |
 
 **Interpretation:** The 179 flagged by Stage77 used new RH compared with *old-neighbor* values and are not 179 confirmed newly introduced discontinuities. Stage78 finds **89 affected half-hour edges for targeted source/clock/discontinuity review**; these are *edges, not necessarily 89 separate affected records or mandatory re-edits*. Some groups overall improve even where individual boundaries worsen. CA-Ca3 and US-Bar merit first review because the number of RH≥25 pp edges rose; US-Aud creates **0 new/worsened large RH or >10°C T edges** despite 874 native ERA substitutions. Final RH<1%=0 in all six native trials; 65 original-targeted US-Aud rows remain RH1–5% based on ERA5; this is a genuine co-sourced ERA result, not an incomplete replacement.
 
