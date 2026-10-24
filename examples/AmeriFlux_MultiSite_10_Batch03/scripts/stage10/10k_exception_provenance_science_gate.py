@@ -229,7 +229,7 @@ def self_test():
     # does not remove negative ea, but grid temperature-alone can.
     t_source=np.array([-20.0,-30.0])
     t_grid=np.array([-10.0,-10.0])
-    td_grid=np.array([-25.0,-11.0])
+    td_grid=np.array([-11.0,-25.0])
     source_vpd=np.array([2.0,1.2])
     # Check algebra identities and phase-independent source negativity.
     source_ea=e_water(t_source)-source_vpd
