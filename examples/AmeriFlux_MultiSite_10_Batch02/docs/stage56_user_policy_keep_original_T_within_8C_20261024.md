@@ -16,8 +16,9 @@ original Stage19/Stage11 and Stage54 verified zero-overlap evidence.
   Preserve and report original QC classification; this is a
   user-specified pragmatic screening policy, not proof that QC1/2
   observations equal independent tower measurements.
-- If |difference| >8 C, original T invalid or original QC metadata
-  unrecognized, keep that row in temperature HOLD. **Do not automatically
+- If |difference| >8 C, original T invalid, or ERA5 T invalid,
+  keep that row in temperature HOLD. QC codes outside 0/1/2/3 or
+  missing are flagged but do not alone override a plausible TA_F. **Do not automatically
   replace TA_F with ERA5 T2m.**
 - **US-Ho1** still has an unverified release BIF / UTC offset. Its
   independent ERA5 comparison is provisional and **all 917 rows remain
@@ -52,9 +53,9 @@ It writes a new isolated report only on `--audit`.
 ## GitHub script and command
 
 [Stage56 script](../scripts/stage56/56_keep_original_tower_T_when_ERA5_within_8C.py),
-first published under commit
-`2440b61948b4efb63c9619b27a58e0f1bcf3c590`,
-Git blob `b602061f735150682aa537e5ccff19e9ac442ebe`.
+updated and pinned under commit
+`1fee499b439e5bd9457edba4ab6726a3a5c3e9c9`,
+Git blob `e9d48b73f948a1d34a516e841ed3c8d589f9494a`.
 
 ```bash
 (
@@ -64,8 +65,8 @@ Git blob `b602061f735150682aa537e5ccff19e9ac442ebe`.
   REL="examples/AmeriFlux_MultiSite_10_Batch02"
   BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
   SCRIPT="$BASE/scripts/stage56/56_keep_original_tower_T_when_ERA5_within_8C.py"
-  COMMIT="2440b61948b4efb63c9619b27a58e0f1bcf3c590"
-  EXPECTED="b602061f735150682aa537e5ccff19e9ac442ebe"
+  COMMIT="1fee499b439e5bd9457edba4ab6726a3a5c3e9c9"
+  EXPECTED="e9d48b73f948a1d34a516e841ed3c8d589f9494a"
   mkdir -p "$BASE/scripts/stage56"
   TMP="$(mktemp)"
   trap 'rm -f "$TMP"' EXIT
