@@ -1056,3 +1056,23 @@ separate working copy of the unsigned queue, with documented measurement,
 QC and uncertainty evidence. The Stage11f hash-sealed original must not
 be edited. All corrections, time offsets, Post-v5/DATM/CIME, PFT/CO2 and
 spinup authorizations remain ZERO; Stage07's INCOMPLETE marker remains.
+
+
+### Stage11f human-directed selection (2026-10-24; NOT a new forcing release)
+
+[User-directed decision ledger](docs/STAGE11F_USER_REVIEW_DECISIONS_2026-10-24.md)
+records explicit review intentions for **59 of 62 distinct three-site Stage11f
+targets**: keep the six existing Stage07 QC0-temperature interpolation
+candidates, select an **ERA5-based candidate** for 49 originally
+nonpositive-implied-vapour source humidity records and four additional
+positive RH<1% candidates (five RH<1% total, one overlapping the 49).
+The user's chosen ERA5 source/product and VPD/RH conversion are **not yet
+fully specified**, so this is a requested method, not a replacement
+applied on IRIDIS.
+
+Exactly **three original positive-but-near-zero-vapour VPD review events
+remain HOLD** for a separate decision: US-Mpj 201410210830, US-NC2
+202503220130 and 202503270730 (source-native times).
+All Stage11f sealed CSVs and source files remain unchanged; the separate
+62-row working copy has not been updated from this GitHub documentation.
+No approval to alter Post-v5, DATM, CIME, site PFT, CO2 or spinups.
