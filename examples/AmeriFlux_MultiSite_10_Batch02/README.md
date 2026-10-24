@@ -1180,3 +1180,24 @@ completed its IRIDIS6 build**: 10/10 verified external CDS ERA5 grid-years,
 405 RH>100 phase-review proposals, and 27 joint-T/RH manual reviews.
 All remain unapproved for model forcing. See the Stage50 operator log
 summary and [Stage51 read-only joint-temperature review](docs/stage50_operator_success_and_stage51_review_20261024.md).
+
+
+### Stage51 completed and Stage52 scientific review (24 October 2026)
+
+Operator-reported Stage51 **AUDIT PASS** after the completed Stage50 build:
+all **444** independent CDS ERA5 RH candidates reconciled and remain
+scientifically **unapproved**. **12** original RH=0 rows can retain
+tower T for a humidity-only candidate; **405** RH>100 rows require
+supersaturation/phase review (**396 US-Ha1 and 9 US-ICh**); **27**
+original RH=0 cases require T-quality review (**all US-ICt**).
+All 27 original US-ICt T QC flags are nonzero, but none has
+|Tsite - independent ERA5 T2m| >8 C. This does NOT prove the original
+site T valid or justify automatic joint T replacement.
+
+[Stage51 exact operator results and Stage52 run instructions](docs/stage51_operator_success_and_stage52_next_20261024.md)
+and the new [Stage52 read-only RH/T QC audit](scripts/stage52/52_review_original_RH_supersaturation_and_ICt_temperature_QC.py)
+retain the prior Stage50/51 SHA256 provenance. Stage52 will quantify the
+405 RH exceedances and below-zero phase evidence, and show original
+QC distributions and same-ERA5 alternative T/RH/VPD/QBOT for all
+27 ICt events. **Stage52 not yet executed on IRIDIS6; 0 forcing edits
+approved and Stage08 4,884 remain scientific HOLD.**
