@@ -198,11 +198,16 @@ def read_receipt(path,key,site_membership=None):
     if r.get("science_approval",r.get("science_approved")) is not False:
         raise ValueError("Unverified receipt state")
     if "grid_year_key" in r:
-        if tuple(r["grid_year_key"])!=key:raise ValueError("Stage18 key mismatch")
-        if not set(site_membership or []) & set(r.get("all_sites_sharing_grid",[])):
-            # The same ERA5 grid is physically the same source, but membership
-            # MUST be checked against original Stage17 source plan by site.
-            raise ValueError("Unlisted site in Stage18 grid receipt")
+        if tuple(r["grid_year_key"])!=key:raise ValueError("CDS grid-year key mismatch")
+        if r.get("schema") not in (
+           "STAGE18_VERIFIED_GRIDYEAR_v1","STAGE50_VERIFIED_CDS_ERA5_GRIDYEAR_v1"):
+            raise ValueError("Unknown CDS receipt schema")
+        # The NetCDF grid and calendar are revalidated directly; Stage18
+        # membership is the historic Stage17 target subset and must not
+        # exclude a new site sharing exactly the same verified ERA5 grid.
+        if r.get("schema")=="STAGE50_VERIFIED_CDS_ERA5_GRIDYEAR_v1" and not (
+           set(site_membership or []) & set(r.get("sites",[]))):
+            raise ValueError("Stage50 receipt site membership mismatch")
     elif "year" in r:
         if r["year"]!=key[2] or r.get("site") not in (site_membership or []):
             raise ValueError("Stage15 site/year mismatch")
@@ -277,7 +282,7 @@ def candidate_rows(targets,siteinfo,jobs,receipts):
             utc=d.local_time-pd.to_timedelta(meta["utc_offset"],unit="h")
             # No year rollover shortcuts: use real UTC instantaneous times.
             ts=times.view("int64")/1e9
-            x=utc.view("int64")/1e9
+            x=utc.astype("int64")/1e9
             if np.any(x<ts.min()) or np.any(x>ts.max()):
                 raise ValueError("ERA5 UTC does not bracket native time")
             t_era=np.interp(x,ts,t);td_era=np.interp(x,ts,td)
@@ -388,11 +393,30 @@ def main():
         cache.mkdir(parents=True,exist_ok=True)
         for k in missing[:opt.max_new]:
             folder=cache/grid_name(k)
-            folder.mkdir(parents=True,exist_ok=False)
+            folder.mkdir(parents=True,exist_ok=True)
             marker=folder/"INCOMPLETE_DO_NOT_USE"
-            marker.write_text("CDS request pending independent verification.\n")
-            payload,request=request_payload(k,jobs[k],folder)
-            nc=extract(payload,folder)
+            if (folder/"verified_receipt.json").exists():
+                raise ValueError("Receipt present but not accepted: "+str(folder))
+            if not marker.exists():
+                if any(folder.iterdir()):
+                    raise ValueError("Unrecognized pre-existing CDS folder: "+str(folder))
+                marker.write_text("CDS request pending independent verification.\n")
+            if not marker.is_file():
+                raise ValueError("Expected recovery marker absent")
+            payload=folder/"original_CDS_payload"
+            request=dict(variable=VARIABLES,
+                location=dict(latitude=jobs[k]["latitude"],
+                              longitude=jobs[k]["longitude"]),
+                date=[f"{k[2]-1}-12-29",f"{k[2]+1}-01-03"],
+                data_format="netcdf")
+            if payload.is_file() and payload.stat().st_size>100:
+                print("STAGE50 RECOVERING EXISTING CDS PAYLOAD",grid_name(k))
+            elif payload.exists():
+                raise ValueError("Incomplete CDS payload requires manual inspection: "+str(payload))
+            else:
+                payload,request=request_payload(k,jobs[k],folder)
+            nc_file=folder/"era5_dewpoint_hourly_UTC.nc"
+            nc=nc_file if nc_file.is_file() else extract(payload,folder)
             verify_nc(nc,k[2],k[:2])
             receipt=dict(schema="STAGE50_VERIFIED_CDS_ERA5_GRIDYEAR_v1",
                 grid_year_key=list(k),dataset=DATASET,variables=VARIABLES,
