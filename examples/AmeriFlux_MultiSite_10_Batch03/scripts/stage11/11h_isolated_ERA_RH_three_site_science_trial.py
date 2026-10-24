@@ -178,10 +178,9 @@ def inputs():
         set(map(tuple,ledger[KEY].to_numpy()))):
         raise ValueError("Stage11g target IDs do not match GitHub 62-row decisions")
     pair=preview.merge(ledger[KEY+["human_decision"]],on=KEY,
-                       how="left",validate="one_to_one",indicator=True,
-                       suffixes=("_preview","_ledger"))
-    if not pair["_merge"].eq("both").all() or not (
-        pair.human_decision_preview.eq(pair.human_decision_ledger)).all():
+                       how="left",validate="one_to_one",indicator=True)
+    if (not pair["_merge"].eq("both").all()
+        or not pair["user_decision"].eq(pair["human_decision"]).all()):
         raise ValueError("User decision changed between Stage11f and Stage11g")
     if preview.user_decision.value_counts().to_dict()!={
             T_RULE:6,ERA_RULE:53,V_RULE:3}:
@@ -340,7 +339,20 @@ def self_test():
     assert np.isfinite(q) and 0<float(q)<0.08
     # Large opposite provenance temperature must not change retained site T.
     assert t==20.
-    print("STAGE11H SELF-TEST PASS: retain site T, companion RH transfer, derived QBOT, zero approval",
+    # Synthetic decision-to-preview merge: the two source columns use
+    # DIFFERENT names (user_decision vs human_decision), so no suffixes.
+    left=pd.DataFrame({"site":["US-MOz"],"native_key":["201603172200"],
+                       "variable":["TA_F"],"user_decision":[T_RULE]})
+    right=pd.DataFrame({"site":["US-MOz"],"native_key":["201603172200"],
+                        "variable":["TA_F"],"human_decision":[T_RULE]})
+    joint=left.merge(right,on=KEY,validate="one_to_one",indicator=True)
+    assert len(joint)==1 and joint["_merge"].eq("both").all()
+    assert joint["user_decision"].eq(joint["human_decision"]).all()
+    wrong=right.copy()
+    wrong["human_decision"]=V_RULE
+    bad=left.merge(wrong,on=KEY,validate="one_to_one")
+    assert not bad["user_decision"].eq(bad["human_decision"]).all()
+    print("STAGE11H SELF-TEST PASS: retained site T, ERA RH and QBOT, 62-join column schema, zero approval",
           flush=True)
 
 
