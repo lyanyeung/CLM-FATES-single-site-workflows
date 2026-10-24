@@ -87,7 +87,8 @@ def load(stage59,stage61,stage64,stage67,stage68,stage69,script):
     dirs=[stage59,stage61,stage64,stage67,stage68,stage69]
     for i,d in zip((59,61,64,67,68,69),dirs):
         m=json.loads((d/'manifest.json').read_text(encoding='utf-8'))
-        if m.get('stage')!=i:raise RuntimeError('Stage report mismatch: '+str(i))
+        expected='59' if i==59 else i
+        if m.get('stage')!=expected:raise RuntimeError('Stage report mismatch: '+str(i)+'; observed '+repr(m.get('stage')))
     m68=json.loads((stage68/'manifest.json').read_text(encoding='utf-8'))
     m69=json.loads((stage69/'manifest.json').read_text(encoding='utf-8'))
     if (m68.get('modified_rows'),m68.get('science_approved'),
