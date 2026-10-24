@@ -1199,5 +1199,35 @@ and the new [Stage52 read-only RH/T QC audit](scripts/stage52/52_review_original
 retain the prior Stage50/51 SHA256 provenance. Stage52 will quantify the
 405 RH exceedances and below-zero phase evidence, and show original
 QC distributions and same-ERA5 alternative T/RH/VPD/QBOT for all
-27 ICt events. **Stage52 not yet executed on IRIDIS6; 0 forcing edits
-approved and Stage08 4,884 remain scientific HOLD.**
+27 ICt events. **Stage52 has now passed on IRIDIS6; see the Stage52 completed results and Stage53 staging policy below.**
+
+### Stage52 VERIFIED; Stage53 same-CDS-ERA5 RH-only staged-policy candidate (24 October 2026)
+
+Operator Stage52 **AUDIT PASS**: 444 original RH defects comprise
+39 zero-RH and 405 >100% events. Of 405 supersaturation events,
+396 occur at US-Ha1 (102: 100–100.5%, 101: 100.5–101%,
+181: 101–105%, 12: >105%, max 110.8%);
+9 occur at US-ICh (all 100–100.5%, max 100.3%).
+All 405 original source VPD values are near zero, and
+229 RH>100 events are below freezing (Ha1 220; ICh 9).
+
+The 27 US-ICt original RH=0 T-quality review events are
+**14 original TA QC1 + 13 original TA QC2**; none has
+abs(Tsite - independent CDS ERA5 T2m) >8 °C, maximum 5.193 °C.
+Do not infer QC1/2 air temperature valid solely from the ERA5
+temperature-difference screen.
+
+**User-selected policy:** calculate and stage replacement RH for
+**all 444/444 source RH=0 or RH>100 records from the same independently
+downloaded CDS ERA5 t2m/d2m/sp source**, preserving EC tower T and
+pressure and recomputing physically consistent candidate VPD and
+QBOT. No unrequested TA substitution is performed; the 27
+original-T QC1/QC2 cases retain a separate scientific gate, as
+do all 405 phase/supersaturation events. This staging policy
+does **not** mean the corrections have been written to DATM.
+The unrelated Stage08 4,884-case HOLD remains in force.
+
+[Stage52 verified numerical counts, Stage53 science policy,
+full reproducible commands](docs/stage52_operator_success_and_stage53_RH_only_staging_20261024.md)
+and [Stage53 isolated sparse patch script](scripts/stage53/53_stage_user_selected_444_external_ERA5_RH_only_patch.py)
+are published in GitHub; Stage53 has not yet been run on IRIDIS6.
