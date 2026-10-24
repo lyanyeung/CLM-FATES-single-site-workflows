@@ -1,5 +1,23 @@
 # CLM-FATES single-site workflows
 
+### Stage78 actual trial edge audit completed (24 October 2026)
+
+**User-confirmed Stage78 execution:** exact SHA-pinned Stage77 native ERA5 trial candidates **6/6**, with **1,109/1,109 recomputed RH<5% half-hours** (six changed sites) and 4 unchanged site inputs, have been included in the *10-site candidate manifest*. Full old-to-old vs new-to-new consecutive half-hour edge comparison succeeded. Reports are in `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage78_1109_operator_versioned_selected_boundary_20261024T115621557398Z/`.
+
+| Site | Recomputed RH<5% rows | affected 30-min edges | old RH edge ≥25 pp | new RH edge ≥25 pp | edges flagged for targeted review |
+|---|---:|---:|---:|---:|---:|
+| CA-Ca3 | 41 | 50 | 0 | 13 | 13 |
+| CA-Cbo | 28 | 51 | 22 | 20 | 18 |
+| CA-Man | 121 | 190 | 81 | 44 | 42 |
+| CA-TP4 | 6 | 10 | 3 | 5 | 5 |
+| US-Aud | 874 | 1,031 | 3 | 1 | **0** |
+| US-Bar | 39 | 56 | 3 | 11 | 11 |
+| **Total** | **1,109** | **1,388** | **109** | **96** | **89** |
+
+**Interpretation:** The 179 flagged by Stage77 used new RH compared with *old-neighbor* values and are not 179 confirmed newly introduced discontinuities. Stage78 finds **89 affected half-hour edges for targeted source/clock/discontinuity review**; these are *edges, not necessarily 89 separate affected records or mandatory re-edits*. Some groups overall improve even where individual boundaries worsen. CA-Ca3 and US-Bar merit first review because the number of RH≥25 pp edges rose; US-Aud creates **0 new/worsened large RH or >10°C T edges** despite 874 native ERA substitutions. Final RH<1%=0 in all six native trials; 65 original-targeted US-Aud rows remain RH1–5% based on ERA5; this is a genuine co-sourced ERA result, not an incomplete replacement.
+
+**Decision:** all 1,109 replacements are **scientifically chosen by the operator** and **physically validated in independent trial files**, but **no active DATM/CIME/Slurm input has been changed**. Before production activation, inspect actual worsened edge groups (especially 13 CA-Ca3, 11 US-Bar, 5 CA-TP4) and independently confirm site LST↔UTC / interval-centering. Preserve original checksums, Stage77 replacement ledgers, and Stage78 warnings. [Stage78 workflow](examples/AmeriFlux_MultiSite_10/scripts/stage78/README.md).
+
 ### Stage77 IRIDIS6 execution — actual trial complete (24 October 2026)
 
 **Verified user-provided run log:** all 45 native CDS ERA5 source requests were completed; `--check` passed for all **1,109** RH<5% events across six Batch01 sites, and the **corrected Stage77 `--trial` finished**: CA-Ca3 41, CA-Cbo 28, CA-Man 121, CA-TP4 6, US-Aud 874, US-Bar 39. Each entire forcing CSV passed Stage58 structural/thermodynamic checks; only the five coupled fields at selected timestamps were edited; the original inputs and model cases were not modified. The six full **TRIAL_NOT_PRODUCTION** candidate files and per-timestamp ledgers are on IRIDIS6 at `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage77_1109_RH_lt5_fixed_20261024T114333Z/`.
