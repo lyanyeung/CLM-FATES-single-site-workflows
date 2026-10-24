@@ -1,12 +1,12 @@
 # Four FLUXNET cohorts: EC tower PFT evidence versus final FATES PFT (24 October 2026)
 
-**Source-verified repository integration; scientific screening, not fractional composition validation.** This document combines the original 38-station field-evidence inventory with model-output `FATES_VEGC_PF` at the latest completed-and-published snapshot for 34 stations. It updates, rather than copies, the older 15-site DE-Hai-era table.
+**Reproducible repository-source synthesis; a scientific screening, not independent primary-literature verification or fractional composition validation.** This document combines the original 38-station field-evidence inventory with model-output `FATES_VEGC_PF` at the latest completed-and-published snapshot for 34 stations. It updates, rather than copies, the older 15-site DE-Hai-era table.
 
 ## Executive findings
 
 - **38 stations covered** (batches 6/8/11/13). **34** have published complete final PFT distributions, **2** (DE-Lnf, ES-Agu) completed model years but have no GitHub final PFT due to EC-data discovery failures, and **2** (IT-Noe, CH-Aws) are not at 1000 model years in the operator's supplied latest progress.
 - Among the 34 with final model PFT outputs: **6 broad dominant-class matches, 2 partial mixed-forest matches, 26 mismatches**. These categories compare *functional identities* only; no model PFT carbon share can be directly subtracted from observed species area, count, basal area or biomass percentages without denominator matching.
-- **All 34 final model PFT vectors have zero needleleaf evergreen (`needleleaf_evergreen_extratrop_tree`) and zero needleleaf deciduous (`needleleaf_colddecid_extratrop_tree`) vegetation carbon.** This is a striking cross-cohort inconsistency given multiple spruce- and pine-dominated EC forests. The table proves an output pattern, not its mechanism; inspect active FATES PFT allocation/parameterization, initial surface, biogeography, viability, competition, forcing and effective namelists before attributing cause.
+- **All 34 final model PFT vectors have zero needleleaf evergreen (`needleleaf_evergreen_extratrop_tree`) and zero needleleaf deciduous (`needleleaf_colddecid_extratrop_tree`) vegetation carbon.** This is a striking cross-cohort inconsistency given multiple spruce- and pine-dominated EC forests. All 34 had nonzero needleleaf VegC at the first model year, but the needleleaf contribution later disappeared. The table proves an output pattern, not its mechanism; inspect active FATES PFT allocation/parameterization, initial surface, biogeography, viability, competition, forcing and effective namelists before attributing cause.
 - Dominant modeled PFT groups: **25 deciduous broadleaf (DBF), 3 evergreen broadleaf (EBF), 4 grass-dominant** (2 cool C3 and 2 C4), **1 Arctic C3 grass, 1 tropical hydrodeciduous broadleaf**. Note that the tropical hydrodeciduous type is listed separately but functionally deciduous broadleaf; 26/34 have a deciduous broadleaf tree dominant if it is grouped with DBF.
 
 ### Screening counts by batch
@@ -112,6 +112,23 @@ The previous [15-station host-surface audit](../../../../carbon_flux_convergence
 | CZ-Stn | C3 non-Arctic grass (59.0%) | 52.2 | 47.8 | DBF | `cool_c3_grass` |
 
 **The remaining 23 stations are not covered by that existing original CLM surface audit; their input PFT fractions have not been guessed.** High host crop fractions at forest stations (e.g., DE-Hai 38.1%, DK-Sor 44.6%, FR-Fon 50.8%) are pre-existing surface audit flags; they **do not prove** crops were actively simulated under the effective FATES landunit configuration.
+
+## Needleleaf persistence audit: first model year versus last year
+
+**This follows the full archived `FATES_VEGC_PF` annual trajectories for all 34 successfully published stations.** It is more informative than only inspecting the terminal snapshot and revises any earlier suggestion that needleleaf PFTs were absent from initialization.
+
+- At the **first annual model output**, evergreen + deciduous needleleaf PFTs were present at **all 34 sites**, comprising **21.59–40.66%** of initial modeled live vegetation carbon (median **35.40%**). The distribution is a *model first-year biomass distribution*, not the original observed footprint PFT fraction.
+- At the **final annual model output**, the same two needleleaf PFT categories account for exactly **0%** of modeled VegC at **all 34 sites**.
+- The median **last spin-up year when combined needleleaf VegC exceeded 1% was year 16**. The median last year exceeding **0.01% was year 34**. In **28/34 sites**, needleleaf had already fallen below 0.01% by the end of spin-up year 50.
+- The six sites retaining more than 0.01% beyond model year 50 were: **GL-ZaH year 55, CZ-Stn year 152, IT-Tor year 511, IT-Ren year 525, DE-Obe year 529, CH-Dav year 589**. All ultimately reached 0% by their published end snapshot.
+- The first-year presence of needleleaf PFT VegC **rules out literal absence of needleleaf biomass at all sites from the first archived annual output**. The observed pattern is rapid or delayed disappearance *during spin-up*. It does not, by itself, prove that competition caused the decline: other initialization, climate, mortality, physiology, or landunit constraints may contribute.
+- The old CLM host `PCT_NAT_PFT` surface values, model first-year `FATES_VEGC_PF` values and model final-year `FATES_VEGC_PF` values are **three distinct measurements with different denominators and behavior**. Do not use first-year percent carbon as prescribed initial PFT area.
+
+### Cohort-wide diagnostics file
+
+[**34-site initial-to-final needleleaf loss and last-presence timing (CSV)**](four_batch_initial_to_final_needleleaf_extinction_34sites.csv). The file records initial ENF/DNF VegC separately, first-year modeled dominant PFT, exact first- and last-year needleleaf percentage, maximum percentage, and last spin-up year above 1% and 0.01% for each station. These values were extracted *directly from the existing published annual PFT composition CSV files*, without re-running the model or changing sources.
+
+**Recommended follow-up:** sample live woody PFT carbon, recruitment, mortality, GPP, respiration, and competition every year over spin-up years 1–60 (and through years 600 for the six late survivors). Check whether the initial PFT carbon distributions are effectively similar across highly dissimilar towers, and verify the CIME/FATES case config, parameter values and PFT biogeography. An observed decline is not by itself a model-code bug diagnosis.
 
 ## Interpretation of key sites
 
