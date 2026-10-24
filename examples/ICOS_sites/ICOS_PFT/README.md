@@ -1,5 +1,23 @@
 # ICOS_PFT: observed vegetation evidence for four FLUXNET multisite campaigns
 
+## Consolidated 38-site PFT evidence and model audit — 24 October 2026
+
+**Use these links as the authoritative entry points for the current four-batch comparison:**
+
+| Deliverable | Coverage and meaning |
+|---|---|
+| [**MASTER 38-site observed vs FATES PFT table (CSV)**](MASTER_38_SITE_OBSERVED_VS_FATES_PFT_20261024.csv) | **38 rows × 38 fields**, one per EC station: original field percentages and their measured denominators, original reference URLs, FATES end-spin-up dominant PFT/percentages, earlier CLM host-surface audit where available, and mismatch/status |
+| [**Observed PFT percentages: full 38-site report (Markdown)**](38_SITE_OBSERVED_PFT_PERCENT_REPORT_20261024.md) | Per-station source evidence and percentage definitions, differences among tree species share, cover, area, basal area and tree carbon; explicit qualitative-data gaps |
+| [**Observed vegetation source table v2 (CSV)**](38_site_observed_PFT_percent_evidence_v2_20261024.csv) | **28** stations with some numeric vegetation evidence (NOT necessarily measured PFT area) and **10** with only qualitative descriptions |
+| [**FATES model PFT outcome and site-consistency report**](comparison_20261024/FOUR_BATCH_EC_PFT_VS_FATES_REPORT_20261024.md) | **34** published final 14-class FATES VegC vectors: **6** broad functional matches, **2** partly matching mixed forests, **26** mismatches; 4 sites have no published final model-PFT comparison |
+| [**34-site needleleaf disappearance timing (CSV)**](comparison_20261024/four_batch_initial_to_final_needleleaf_extinction_34sites.csv) | First-year needleleaf VegC vs last-year 0% at all 34 published sites; spin-up extinction timing |
+
+**Scientific safeguards:** 28 numeric records do **not** mean 28 valid fixed-biogeography area vectors. The most promising *spatial fraction candidates* are DE-Tha and NL-Loo, both still needing footprint/landunit review. Species proportions (e.g., DE-Hai tree carbon or FI-Let basal area) cannot be equated to FATES modeled vegetation-carbon share or used directly as prescribed PFT area. No station is yet marked as an approved area-fraction forcing prescription.
+
+**Scope:** batches 6, 8, 11 and 13 have 38 tower stations. In the archived October 24 monitoring snapshot, IT-Noe and CH-Aws had not completed their 1000-year runs; DE-Lnf and ES-Agu had completed model years but lacked GitHub-published PFT because the combined plotting pipeline could not locate original EC half-hourly files. These four have explicit missing/pending states in the master comparison rather than invented FATES percentages.
+
+---
+
 ## New cross-batch modeled PFT realism report — 24 October 2026
 
 **[Four-batch tower vegetation vs FATES PFT report](comparison_20261024/FOUR_BATCH_EC_PFT_VS_FATES_REPORT_20261024.md)** joins the previously curated 38-site vegetation-evidence inventory, published model-end FATES vegetation carbon shares, and the existing 15-site CLM input surface audit.
