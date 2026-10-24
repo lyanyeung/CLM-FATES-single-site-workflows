@@ -66,10 +66,10 @@ the model's variable lineage before actual DATM writes.
 
 ### Exact pinned command on IRIDIS6
 
-Stage61 first committed as
-`bcdf84be469572e8030f1ee215497e81ac3ffc83`
+Stage61 corrected and pinned as
+`332d7a553118fd29f1c55c8721d1841924a6abd6`
 with Git blob
-`7d1e63809f6f2ba7bacfeeba77aadd31267d6c10`.
+`9d67aafa960c4c5e6e41d9c67f7f2eaf60f25d1d`.
 
 ```bash
 (
@@ -79,8 +79,8 @@ with Git blob
   REL="examples/AmeriFlux_MultiSite_10_Batch02"
   BASE="$HOME/CLM-FATES-single-site-workflows/$REL"
   SCRIPT="$BASE/scripts/stage61/61_exact_original_humidity_hard_screen_vs_4411_repair_coverage.py"
-  COMMIT="bcdf84be469572e8030f1ee215497e81ac3ffc83"
-  EXPECTED="7d1e63809f6f2ba7bacfeeba77aadd31267d6c10"
+  COMMIT="332d7a553118fd29f1c55c8721d1841924a6abd6"
+  EXPECTED="9d67aafa960c4c5e6e41d9c67f7f2eaf60f25d1d"
   mkdir -p "$BASE/scripts/stage61"
   TMP="$(mktemp)"
   trap 'rm -f "$TMP"' EXIT
@@ -102,7 +102,7 @@ with Git blob
 
 On pass, look for:
 `STAGE61 AUDIT PASS | original hard anomalies reconciled to selected 4411 exact times`.
-Only Stage61's actual output can establish how many original hard
+Stage61 initially failed in its synthetic self-test due to the pandas `DataFrame.flags` property name collision (`t.flags`); the repository script was fixed to use `t["flags"]`. No original input or forcing was changed by the failed self-test. Only Stage61's actual output can establish how many original hard
 screens remain unaddressed: the arithmetic 26,332−4,411 is **not**
 a valid source-level answer without exact event-identity matching.
 
