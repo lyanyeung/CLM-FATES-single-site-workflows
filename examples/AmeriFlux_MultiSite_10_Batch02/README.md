@@ -1304,3 +1304,26 @@ stage revisions against the broader Stage48 original hard-physics
 census before a new forcing build. The source 26,332 hard cases
 are NOT automatically covered by the 5,328 distinct Stage53+Stage11
 targets. No model spinup has begun for this Batch02 workflow.
+
+
+### Stage56 original-EC-temperature retention policy (≤8 °C compared with verified ERA5) — 24 October 2026
+
+The operator selected a specific temperature QC rule for the **4,884
+distinct Stage11 HOLD records**: **retain ORIGINAL FLUXNET TA_F**, even
+if TA_F_QC is QC1/QC2, when it is numerically valid and the absolute
+difference to the same independent CDS ERA5 T2m is **≤8.0 °C**.
+Do not use the Stage11 retained T as a substitute without checking its
+equality to original TA_F. Invalid original T/QC or >8 C site/ERA5
+differences remain explicit temperature HOLD; no automatic replacement
+of tower T is authorized. **US-Ho1 stays provisional for all 917
+records** until site metadata/UTC_OFFSET is independently confirmed.
+
+[Published Stage56 script](scripts/stage56/56_keep_original_tower_T_when_ERA5_within_8C.py)
+uses the previously verified Stage19 ERA5 RH to recompute consistent
+candidate VPD/QBOT against original TA_F and original PA_F where
+safe. [Stage56 complete policy, safeguards and pinned IRIDIS6
+commands](docs/stage56_user_policy_keep_original_T_within_8C_20261024.md).
+All cold-water/ice humidity review flags remain attached and **none
+of the 4,884 are auto-approved as model forcing**; Stage53 444
+independent RH candidates remain unchanged. Stage56 published on
+GitHub but not yet executed on IRIDIS6.
