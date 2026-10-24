@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 04
 
-> **Operational status (2026-10-24): STAGE00 + STAGE01 VERIFIED (10/10 sites each) from operator logs.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 executed: 9/10 PASS, US-Seg coordinate conflict needs provenance review.** See [Stage02 evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). [Stage02B US-Seg diagnostic](scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py) has been executed. Paired BIF GROUP_ID 1479 vs 1495 evidence is documented in the [Stage02B ledger](docs/STAGE02B_US_SEG_PROVENANCE_VERIFIED_2026-10-24.md); US-Seg coordinate approval remains pending. Stage02C full-HH read-only audit is ready. No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
+> **Operational status (2026-10-24): STAGE00 + STAGE01 VERIFIED (10/10 sites each) from operator logs.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 original run: 9/10 PASS; US-Seg user-approved BIF GROUP_ID 1495 location now recorded, revised Stage02 rerun pending.** See [Stage02 evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). [Stage02B US-Seg diagnostic](scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py) has been executed. Paired BIF GROUP_ID 1479 vs 1495 evidence is documented in the [Stage02B ledger](docs/STAGE02B_US_SEG_PROVENANCE_VERIFIED_2026-10-24.md); The [human-approved decision](docs/STAGE02_US_SEG_GROUP1495_USER_APPROVAL_2026-10-24.md) is latitude 34.3623, longitude -106.7020 and elevation 1596 m. Stage02C full-HH timestamp audit **completed 10/10 PASS**, with scientific QC concerns preserved in the [Stage02C report](docs/STAGE02C_FULL_HH_TIME_QC_AUDIT_2026-10-24.md). No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
 
 Fourth independent ten-site AmeriFlux campaign following [Batch03](../AmeriFlux_MultiSite_10_Batch03/), [Batch02](../AmeriFlux_MultiSite_10_Batch02/) and [Batch01](../AmeriFlux_MultiSite_10/). This directory contains the exact release manifest and reproducible scripts. Never commit raw tower ZIPs or derived large files to GitHub.
 
@@ -82,9 +82,9 @@ To run only after a verified 10/10 upload, execute **on IRIDIS6**:
 
 The Stage01 CLI also supports `--audit-only`, `--sites US-Rpf`, `--sites-root` and `--reports-dir`. Stage01 runs no Slurm jobs. Default output inventory location: `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch04/reports/`.
 
-## Stage02 — READ-ONLY BIF metadata and native time-step check (pending execution)
+## Stage02 — approved US-Seg GROUP_ID 1495; read-only rerun pending
 
-Batch04 Stage02 follows the established Batch03 metadata-preflight design, **without** Batch03's site-specific coordinate decision or FULLSET fallback files. All 10 Stage01 products have BIF; each release must have exactly one original BIF file. Ambiguous or missing BIF coordinates are reported as review failures. There is **no automatic selection** of alternative coordinates, vegetation percentages, FATES PFTs or measurement-height/ZBOT values.
+Batch04 Stage02 follows the Batch03 metadata preflight, with one **explicit user-approved coordinate exception** in [coordinate_decisions.tsv](coordinate_decisions.tsv): **US-Seg original BIF GROUP_ID 1495, latitude 34.3623, longitude -106.7020, elevation 1596 m, LOCATION_DATE_START 200701010000**. Script verifies the exact BIF group pairing and elevation/date before accepting. The other nine sites still require unambiguous original BIF locations; no general fallback or silent coordinate guessing. IGBP and FATES PFT/height selections remain independently unapproved.
 
 On the **IRIDIS6 login terminal**, run:
 
@@ -96,6 +96,7 @@ On the **IRIDIS6 login terminal**, run:
   BASE="$HOME/ameriflux_batch04_stage02"
   mkdir -p "$BASE/scripts/stage02"
   curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  curl -fLsS --retry 3 "$RAW/$REL/coordinate_decisions.tsv" -o "$BASE/coordinate_decisions.tsv"
   SCRIPT="$BASE/scripts/stage02/02_check_batch04_metadata.py"
   curl -fLsS --retry 3 "$RAW/$REL/scripts/stage02/02_check_batch04_metadata.py" -o "$SCRIPT"
   python3 -B -m py_compile "$SCRIPT"
@@ -103,11 +104,11 @@ On the **IRIDIS6 login terminal**, run:
 )
 ```
 
-This script **does not write any output** itself. The shell `tee` saves an external operator log. A successful output ends with `STAGE02 SUMMARY: 10/10 coordinate + first-interval checks PASS; failures: none`; that PASS still does not establish full timestamp/coverage/QC science. Coordinate conflicts, missing metadata or ambiguous IGBP must be reviewed rather than filled automatically. Investigate exclusions (WET/CRO/WAT), non-forest PFT applicability, sensor-to-TA mapping and time continuity in later independent scientific stages.
+This script **does not write any output** itself. The shell `tee` saves an external operator log. A **new execution** should produce `STAGE02 SUMMARY: 10/10 coordinate + first-interval checks PASS; failures: none` if the approved BIF group remains intact and all ten checks succeed. This has NOT yet been rerun. The historical 9/10 before approval remains in the [original evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). Investigate exclusions (WET/CRO/WAT), non-forest PFT applicability, sensor-to-TA mapping and time continuity in later independent scientific stages.
 
-## Stage02B — investigate US-Seg coordinate provenance (READ ONLY)
+## Stage02B — US-Seg coordinate provenance (completed; approval recorded)
 
-The original US-Seg BIF contains latitude `34.3623`, longitude candidates `-106.7020` and `-106.7019`. These longitudes are only about 9.18 m apart, but the currently published AmeriFlux site point is `34.3603, -106.7003`, roughly 267–272 m from these BIF candidates. The [research team site](https://www.litvaklab.org/grassland---us-seg.html) lists `34.3623, -106.7019`. No replacement of original data, no coordinate decision and no model surface selection is justified without reviewing BIF `GROUP_ID`, dates and site history.
+The original US-Seg BIF contains latitude `34.3623`, longitude candidates `-106.7020` and `-106.7019`. These longitudes are only about 9.18 m apart, but the currently published AmeriFlux site point is `34.3603, -106.7003`, roughly 267–272 m from these BIF candidates. The [research team site](https://www.litvaklab.org/grassland---us-seg.html) lists `34.3623, -106.7019`. The source mismatch has been investigated; the operator has now **explicitly selected original BIF GROUP_ID 1495**. The decision is recorded in [the approval ledger](docs/STAGE02_US_SEG_GROUP1495_USER_APPROVAL_2026-10-24.md). Other reference points are retained only for provenance and are not used in the approved site location.
 
 Run **on IRIDIS6** after Stage02; the diagnostic is read-only:
 
@@ -126,11 +127,11 @@ Run **on IRIDIS6** after Stage02; the diagnostic is read-only:
 )
 ```
 
-Stage02 remains 9/10 until an explicit coordinate decision is documented. External point coordinates in this diagnostic are **only references**, never automatic corrections.
+The original Stage02 result was 9/10; the explicit location approval is now documented, but **the revised read-only Stage02 checker still needs an operator rerun**. External points remain historical references only, not selected coordinates.
 
 ## Stage02C — full HH time-series and basic scientific flags (READ ONLY)
 
-[Stage02C script](scripts/stage02/02c_audit_batch04_HH_time_coverage.py) is now published but has not yet been run. It checks all 10 original `FLUXMET_HH` series for full chronological continuity, malformed timestamps, non-30-minute intervals, gaps and overlaps, plus missing/available counts for basic named meteorological fields and review-only negative VPD/RH/PA/wind/precipitation diagnostics. Variables not present under the explicit names are marked `NOT_FOUND`, not silently inferred. **It does not approve or apply repairs**, shift UTC, choose US-Seg coordinates or create model jobs.
+[Stage02C script](scripts/stage02/02c_audit_batch04_HH_time_coverage.py) **was executed by the operator: time_pass=10, review=none, failed=none**. See [full HH results and QC HOLD report](docs/STAGE02C_FULL_HH_TIME_QC_AUDIT_2026-10-24.md). It checks all 10 original `FLUXMET_HH` series for full chronological continuity, malformed timestamps, non-30-minute intervals, gaps and overlaps, plus missing/available counts for basic named meteorological fields and review-only negative VPD/RH/PA/wind/precipitation diagnostics. Variables not present under the explicit names are marked `NOT_FOUND`, not silently inferred. **It does not approve or apply repairs**, shift UTC, choose US-Seg coordinates or create model jobs.
 
 On IRIDIS6, run:
 
@@ -151,7 +152,7 @@ On IRIDIS6, run:
 
 For a smaller audit use `python3 -B "$SCRIPT" --sites US-Rpf US-Seg`. The `STAGE02C SUMMARY` indicates timestamp gates, **not** full scientific QC. No file writes occur inside the Python audit; shell `tee` creates only an operator log.
 
-## Scientific gates after extraction (not yet executed)
+## Scientific gates outstanding after structural/timestamp preflight
 
 1. Inventory each site's actual BIF, FLUXMET, FLUXES and companion products and native HH versus HR cadence, time zone, timestamp continuity and actual year coverage.
 2. Audit tower-specific coordinates, vegetation/PFT evidence and instrument/measurement heights. Do not assign tower vegetation or ZBOT from coarse IGBP or unverified sensor layers.
