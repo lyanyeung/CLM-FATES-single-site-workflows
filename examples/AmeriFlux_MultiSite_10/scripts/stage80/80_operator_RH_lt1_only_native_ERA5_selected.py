@@ -81,24 +81,52 @@ def state(row):
   raise RuntimeError('Invalid derived RH '+str(row.get('time')))
  return tc,rh
 
-def parse_targets(path,site):
+def parse_targets(path,site,baseline):
+ # Stage77 ledger rounds RH to SIX decimals for human readability.
+ # Exactly-at-threshold values can become "1.0" despite an actual RH < 1.
+ # Therefore select with UNROUNDED Stage75 baseline T/Q/P, and use the
+ # Stage77 ledger only to confirm the candidate is in the approved RH<5 set.
  with path.open(newline='',encoding='utf-8-sig') as f:
   reader=csv.DictReader(f)
   need={'timestamp_local_standard','original_RH_pct','operator_decision','site'}
-  if not need.issubset(reader.fieldnames or []):raise RuntimeError('Stage77 ledger schema changed')
-  values={}
+  if not need.issubset(reader.fieldnames or []):
+   raise RuntimeError('Stage77 ledger schema changed')
+  rounded={}
   for row in reader:
    t=row['timestamp_local_standard']
-   if t in values or row['site']!=site:
+   if t in rounded or row['site']!=site:
     raise RuntimeError('Duplicate or wrong-site Stage77 ledger row '+site+' '+t)
    if row['operator_decision']!='RECOMPUTE_ALL_RH_BELOW_5_NATIVE_ERA5_T_D2M_SP':
     raise RuntimeError('Stage77 ledger decision changed '+site+' '+t)
-   values[t]=number(row['original_RH_pct'])
- if len(values)!=RH_LT1.get(site,0)+RH_1TO5.get(site,0):
+   rounded[t]=number(row['original_RH_pct'])
+ if len(rounded)!=RH_LT1.get(site,0)+RH_1TO5.get(site,0):
   raise RuntimeError('Stage77 all RH<5 target census mismatch '+site)
- target={t for t,rh in values.items() if rh<1}
+ target=set();reconciled={};boundary_rounding=[]
+ with baseline.open(newline='',encoding='utf-8-sig') as f:
+  reader=csv.DictReader(f)
+  if not {'time','TBOT','QBOT','PSRF'}.issubset(reader.fieldnames or []):
+   raise RuntimeError('Stage75 baseline forcing schema changed '+site)
+  for row in reader:
+   stamp=row['time']
+   if stamp not in rounded:continue
+   if stamp in reconciled:
+    raise RuntimeError('Duplicate Stage75 low-RH candidate time '+site+' '+stamp)
+   _,precise_rh=state(row)
+   if not 0<=precise_rh<5:
+    raise RuntimeError('Stage77 low-RH ledger points outside original RH<5: '+site+' '+stamp)
+   if abs(round(precise_rh,6)-rounded[stamp])>1.1e-6:
+    raise RuntimeError('Stage77 rounded RH disagrees with unrounded Stage75: '+site+' '+stamp)
+   reconciled[stamp]=precise_rh
+   if precise_rh<1:target.add(stamp)
+   if (precise_rh<1)!=(rounded[stamp]<1):
+    boundary_rounding.append((stamp,rounded[stamp],precise_rh))
+ if set(reconciled)!=set(rounded):
+  raise RuntimeError('Stage77 ledger has timestamps absent from selected Stage75 baseline '+site)
  if len(target)!=RH_LT1.get(site,0):
-  raise RuntimeError('Stage77 RH<1 target census mismatch '+site)
+  raise RuntimeError('PRECISE Stage75 RH<1 target census mismatch '+site+
+                     ' actual='+str(len(target)))
+ if boundary_rounding:
+  print('ROUNDED_STAGE77_LEDGER_THRESHOLD_RECONCILED',site,repr(boundary_rounding[:10]))
  return target
 
 def choose(original,stage77_trial,site,targets):
@@ -229,6 +257,28 @@ def selftest():
  retained,changed=choose(old,stage,'CA-Ca3',set())
  assert not changed and retained is old
  assert 0<state(old)[1]<1 and state(stage)[1]>1
+ # Precision regression: a valid RH=.9999996% MUST remain below 1
+ # even when the Stage77 human ledger shows a rounded 1.000000%.
+ import tempfile
+ with tempfile.TemporaryDirectory() as folder:
+  p=Path(folder)
+  base=p/'baseline.csv';ledger=p/'stage77_rounded_ledger.csv'
+  t=25.0;pressure=100000.0;rh_target=0.9999996
+  vapour=saturation=6.112*math.exp(17.67*t/(t+243.5))
+  vapour=saturation*rh_target/100.0
+  q=.622*vapour/(pressure/100.0-.378*vapour)
+  with base.open('w',newline='',encoding='utf-8') as f:
+   w=csv.DictWriter(f,fieldnames=('time','TBOT','QBOT','PSRF'))
+   w.writeheader()
+   w.writerow({'time':'2010-01-01 12:00:00','TBOT':str(t+273.15),
+               'QBOT':repr(q),'PSRF':str(pressure)})
+  with ledger.open('w',newline='',encoding='utf-8') as f:
+   w=csv.DictWriter(f,fieldnames=('site','timestamp_local_standard','original_RH_pct','operator_decision'))
+   w.writeheader()
+   w.writerow({'site':'CA-Man','timestamp_local_standard':'2010-01-01 12:00:00',
+               'original_RH_pct':'1.0',
+               'operator_decision':'RECOMPUTE_ALL_RH_BELOW_5_NATIVE_ERA5_T_D2M_SP'})
+  assert '2010-01-01 12:00:00' in parse_targets(ledger,'CA-Man',base)
  print('SELF-TEST PASS: exactly 18 original RH<1 ERA coupled replacements; 1091 RH1-5 retained; unrelated fields preserved')
 
 def main():
@@ -265,7 +315,7 @@ def main():
   if ny:
    if site not in changed or str(source)!=str(changed[site]['before']):
     raise RuntimeError('Stage77 input Stage75 mismatch '+site)
-   targets=parse_targets(changed[site]['ledger_path'],site)
+   targets=parse_targets(changed[site]['ledger_path'],site,source)
    first,last=meta[site]
    location=(out/site/'forcing'/'processed_stage80_RH_lt1_native_ERA5') if out else None
    if location is not None:
