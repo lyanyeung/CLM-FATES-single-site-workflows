@@ -1040,7 +1040,19 @@ The [verified Stage11e outcome and provenance](docs/STAGE11E_VERIFIED_AND_STAGE1
 contains station statistics, native timestamps and report location.
 
 [Stage11f unsigned human science review queue](scripts/stage11/11f_human_review_signoff_queue.py)
-has been **committed but not yet run on IRIDIS6**. It will use sealed
-Stage11e-v2 and Stage11d evidence to generate an event-level review queue
-and four contiguous March 2025 QC1 VPD episode summaries. All decisions,
-Post-v5/DATM/CIME/Slurm permissions and spinup authorizations remain ZERO.
+**PASSED IRIDIS6 self-test, --check and --run** on 2026-10-24.
+It reports **62 distinct native event IDs** (US-MOz 1, US-Mpj 6,
+US-NC2 55), **six QC0 temperature changes**, **38 US-NC2 originally
+VPD QC1 source conflicts in four contiguous episodes (12/7/10/9 native
+half-hours)**, **five positive RH <1%**, and four manual-review entries
+preserved unchanged. The 62-record unsigned review worksheet and
+independent SHA256 receipt are in
+`reports/stage11f_human_science_review_20261024T074958Z_6ae6d5d7/`
+on IRIDIS6. See [verified Stage11f evidence and human decision protocol]
+(docs/STAGE11F_VERIFIED_HUMAN_REVIEW_QUEUE_2026-10-24.md).
+
+Next action is **source-specific human scientific adjudication** using a
+separate working copy of the unsigned queue, with documented measurement,
+QC and uncertainty evidence. The Stage11f hash-sealed original must not
+be edited. All corrections, time offsets, Post-v5/DATM/CIME, PFT/CO2 and
+spinup authorizations remain ZERO; Stage07's INCOMPLETE marker remains.
