@@ -154,7 +154,7 @@ For a smaller audit use `python3 -B "$SCRIPT" --sites US-Rpf US-Seg`. The `STAGE
 
 ## Stage03 — timestamped extreme meteorology and same-label ERA5 comparison (READ ONLY)
 
-**Prepared, not executed.** The [Stage03 script](scripts/stage03/03_audit_batch04_extreme_met_and_ERA5.py) reports every station's counts and top-eight most extreme timestamped examples per category for `TA_F < -80 °C`, `TA_F > 60 °C`, `PA_F <= 0`, `PA_F < 50 kPa`, `PA_F > 115 kPa`, `RH < 1%`, `1% <= RH < 5%`, `RH > 100%` and `VPD_F < 0`. It prints native values, available original native QC columns, derived `RH(TA_F,VPD_F)` for valid tower values, and **only exact raw string timestamp-label matched** ERA5 HH variables if present. It never changes inputs, makes UTC assumptions, adopts external station coordinates or combines unrelated-source ERA variables to produce humidity/forcing.
+**Prepared and executed for 3/10 priority stations; remaining seven not executed.** The [Stage03 script](scripts/stage03/03_audit_batch04_extreme_met_and_ERA5.py) reports every station's counts and top-eight most extreme timestamped examples per category for `TA_F < -80 °C`, `TA_F > 60 °C`, `PA_F <= 0`, `PA_F < 50 kPa`, `PA_F > 115 kPa`, `RH < 1%`, `1% <= RH < 5%`, `RH > 100%` and `VPD_F < 0`. It prints native values, available original native QC columns, derived `RH(TA_F,VPD_F)` for valid tower values, and **only exact raw string timestamp-label matched** ERA5 HH variables if present. It never changes inputs, makes UTC assumptions, adopts external station coordinates or combines unrelated-source ERA variables to produce humidity/forcing.
 
 For a first targeted audit on US-SP1, US-Syv and US-Ton, run on **IRIDIS6**:
 
@@ -175,6 +175,40 @@ For a first targeted audit on US-SP1, US-Syv and US-Ton, run on **IRIDIS6**:
 ```
 
 For all ten sites later, omit the `--sites` argument. The Stage03 output is a **read-only scientific screening, not a repair ledger or production approval**. Exact raw timestamp-label matches do not by themselves establish time-zone equivalence, forcing units, or a permitted replacement. Review events manually before any ERA5 repairs.
+
+## Stage03 priority execution — 3/3 site science HOLD (2026-10-24)
+
+The operator executed the initial Stage03 diagnostic for `US-SP1 US-Syv US-Ton`: `flagged=US-SP1,US-Syv,US-Ton none_of_selected_flags=none failed=none`. Actual event counts, timestamps and source values are documented in the [Stage03 priority ledger](docs/STAGE03_PRIORITY_MET_ERA_DIAG_2026-10-24.md).
+
+**Important correction:** packaged `ERA5_HH` columns `TA_ERA` and `PA_ERA` should not be assumed to be physically independent unadjusted ERA5 reanalysis. The standard FLUXNET naming system denotes `*_ERA` as **downscaled/calibrated ERA-derived products**, while `*_F` consolidates tower and ERA-derived values. For example `PA_F_QC=2` denotes an ERA-downscaled fallback (see [FLUXNET variable codes](https://fluxnet.org/data/fluxnet2015-dataset/fullset-data-product/)). v1.3 has updated ONEFlux processing, so further details must be verified from its own BIFVARINFO metadata. `PA_F=PA_ERA` can thus reflect product lineage rather than independent confirmation. Anomalous `TA_ERA` values of -243 to -271 °C at flagged rows make blind replacement scientifically unsafe.
+
+The Stage03 script also supports `--sites US-Rpf US-Seg US-Ses US-Slt US-SRG US-SRM US-Uaf` for the remaining seven stations. **No repair policy is approved**.
+
+## Stage04 — focused source lineage and neighbour checks (READ ONLY; not executed)
+
+New script: [04_trace_batch04_meteorology_ERA_neighbours.py](scripts/stage04/04_trace_batch04_meteorology_ERA_neighbours.py).
+
+Stage04 inspects exactly selected extreme time windows with two original half-hours on each side for US-SP1, US-Syv and US-Ton. It reports native `TA`, `TA_F_MDS`, `TA_F`, `TA_ERA`, `PA`, `PA_F`, `PA_ERA`, `VPD`, `VPD_F`, `VPD_ERA`, `RH` and available QC columns alongside **time-label matching** packaged ERA5 variables. It flags exact equality but never considers equality independent validation.
+
+Run on IRIDIS6:
+
+```bash
+(
+  set -euo pipefail
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+  REL="examples/AmeriFlux_MultiSite_10_Batch04"
+  BASE="$HOME/ameriflux_batch04_stage04"
+  mkdir -p "$BASE/scripts/stage04"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  SCRIPT="$BASE/scripts/stage04/04_trace_batch04_meteorology_ERA_neighbours.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage04/04_trace_batch04_meteorology_ERA_neighbours.py" -o "$SCRIPT"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  python3 -B "$SCRIPT" 2>&1 | tee "$BASE/stage04_neighbours_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+No original file, forcing, temperature, vapor or pressure values are modified. An external, independently retrieved ERA5/ERA5-Land meteorology source with independently validated units, times and spatial interpolation must be reviewed before authorizing per-timestamp substitutions.
 
 ## Scientific gates outstanding after structural/timestamp preflight
 
