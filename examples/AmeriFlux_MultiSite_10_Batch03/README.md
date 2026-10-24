@@ -1185,17 +1185,42 @@ and 3 existing Stage07 VPD KEEP events.
 
 [Stage11l isolated humidity-only successor]
 (scripts/stage11/11l_us_nc2_11_neighbour_humidity_only_shadow.py)
-is **committed but has NOT been run on IRIDIS6**. It tests the exact
-11 newly human-selected source timestamps, keeps ALL 367,920 US-NC2
-temperature values as in Stage11h, and prints all six beginning/ending
-boundaries around three extended humidity events. It writes only ONE
-new research-only US-NC2 full-year successor CSV; unchanged US-MOz and
-US-Mpj remain Stage11h SHA references to save scratch files/inodes.
-[Stage11l method, exact decisions and science hold]
-(docs/STAGE11L_HUMIDITY_ONLY_11_ADDITIONS_AND_BOUNDARY_VALIDATION_2026-10-24.md).
+**PASSED IRIDIS6 syntax, --self-test, --check and --run** on
+2026-10-24. It SHA-verified the original 62 selections, then rebuilt
+humidity for exactly 11 newly approved US-NC2 native half-hours,
+achieving **64 ERA-RH target events** (53 earlier + 11 additional);
+all **11 new VPD values changed** compared with Stage11h. The entire
+367,920 half-hour US-NC2 EC tower air temperature `TA_USE` and `TBOT`
+remained UNCHANGED; no ERA temperature was substituted. Only new target
+`VPD_USE` and corresponding `QBOT` could change.
+One new unapproved US-NC2 full-year shadow file was written to
+`science_trials/stage11l_US-NC2_humidity_only_20261024T100319Z_31a4697e/`
+on IRIDIS6, with SHA receipts and an INCOMPLETE marker; US-MOz/US-Mpj
+remain SHA references to the previous Stage11h shadow.
 
-All existing source, Stage07 and Stage11h files and INCOMPLETE markers
-stay unchanged. Post-v5, DATM and spinup approvals remain zero.
+The main previously introduced transitions improved: US-NC2
+2025-03-23 12:30→13:00 now **0.598 hPa** (was 9.761), and
+2025-03-25 09:00→09:30 now **2.145 hPa** (was 8.651).
+However **four high-VPD boundary transitions remain**: 2025-03-23
+08:30→09:00 (9.467 hPa, pre-existing); 2025-03-25 10:00→10:30
+(5.859 hPa, +5.808 newly added); 2025-03-18 18:00→18:30
+(4.997 hPa, +3.687); 2025-03-23 15:00→15:30
+(4.813 hPa, +2.760). DO NOT automatically smooth or extend the mask.
+[Verified Stage11l results and four boundary holds]
+(docs/STAGE11L_VERIFIED_11_HUMIDITY_ONLY_AND_BOUNDARY_HOLDS_2026-10-24.md).
+
+[Stage11m read-only four-boundary science source audit]
+(scripts/stage11/11m_four_stage11l_boundary_source_science_audit.py)
+is committed but **not yet executed on IRIDIS6**. It will SHA-verify
+Stage11l/Stage11h/Stage07 + original FLUXMET and paired ERA5 source,
+then display **40 native half-hour context rows** (±2h around the
+four residual boundary transitions) including source QC, original
+and ERA RH and Stage07/11h/11l VPD. It only creates optional separate
+review reports and cannot modify or approve any forcing.
+
+All original source, Stage07 and Stage11h files and INCOMPLETE markers
+remain untouched. Stage11l and all others remain SCIENTIFIC HOLD.
+Post-v5, DATM and spinup approvals remain ZERO.
 
 The existing IRIDIS `62_human_review_WORKING_COPY.csv` and SHA-sealed
 original Stage11f report have NOT been updated by GitHub commits.
