@@ -29,6 +29,12 @@ The corrected Stage80 **always recalculates original RH at full precision from t
 
 **DATM preparation next:** after Stage80 confirms the final 10-site forcing manifest, independently prepare NetCDF meteorological forcing and DATM streams with site-time/NOLEAP and forcing variable-name/unit checks. Existing [Batch01 readiness history](../../README.md) reports that tower sensor-height **ZBOT provenance for CA-Cbo and CA-Man remains unresolved**; do not silently fill heights or claim ten-site science-ready DATM without resolving this. It is possible to prepare isolated *technical preview* DATM files separately from scientific production approval.
 
+## Actual second IRIDIS6 run: zero-residual counter regression fixed
+
+After the rounded-ledger fix, the user executed the latest Stage80 `--self-test` and `--check`. The CA-Ca3 **two RH source values rounded to 1.000000 but evaluated at full precision below 1** were correctly reconciled (`2006-02-17 15:30` and `16:00`). Stage80 then stopped at `KeyError: 'selected_lt1'`. Explanation: `Counter` internally represents a missing counter as zero, **but the function returned `dict(flags)`**, which omits any counter that never increments. When successful replacements leave **zero** RH<1 records, this key is absent from the returned ordinary dictionary. The defect is not meteorological.
+
+**Corrected** to materialize all five important counters explicitly (including `selected_lt1: 0`) before returning and use defensive `counts.get(key,0)` in the caller. A new synthetic full-site, 41-record, **7 replacements / 34 original RH1–5 retained / 0 residual RH<1** test exercises the actual `audit_site` path. Do not rerun CDS downloads. Run corrected `--self-test`, `--check`, then `--trial` in a fresh unique folder (the first trial attempt may have left a partial folder). No production DATM exists or is changed at this step.
+
 ## Stage80 script
 
 [80_operator_RH_lt1_only_native_ERA5_selected.py](80_operator_RH_lt1_only_native_ERA5_selected.py)
