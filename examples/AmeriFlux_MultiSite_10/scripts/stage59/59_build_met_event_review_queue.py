@@ -123,7 +123,7 @@ def scan_events(path,site):
                 delta=tc-prior_tc
                 if abs(delta)>10:
                     event=dict(base,event_type="TA_STEP_GT10",
-                               delta_T_C=round(delta,5),"_previous_temp":prior_tc,
+                               delta_T_C=round(delta,5),_previous_temp=prior_tc,
                                event_class="UNCLASSIFIED",
                                priority="P1_TEMPERATURE",
                                review_scope="BATCH_EPISODE",
