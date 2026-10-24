@@ -1583,3 +1583,35 @@ No EC original, previous stage, DATM, NetCDF forcing or model writes.
 restart command](docs/stage62_operator_pass_next_auto_CDS_20261024.md).
 The new rescue path is published on GitHub but has not yet been
 executed on IRIDIS6.
+
+
+### Stage62 50/50 verified independent CDS grid-years PASS; Stage63 automated original-T evidence and BIF discovery (24 Oct 2026)
+
+The operator ran Stage62 pinned Git blob
+`0b68fa14a7e008bd7fb1b19153024e215f67c2bf` successfully.
+All **50** original-BIF-verified independent CDS ERA5 grid-years
+are SHA/calendar-verified, with **0** missing. The 5,133
+Stage61 non-Ho1 hard anomalies are fully categorized in
+`reports/stage62_nonHo1_5133_verified_CDS_stage_20261024T225848Z_db032320`:
+**4,801** physically numeric ERA5 water-RH/VPD/QBOT candidates
+with original EC T/PA, **246** EC T vs ERA5 discrepancies >8 C,
+and **86 US-BZS** site original-BIF time-alignment HOLD.
+Combined with Stage60's 4,411, **9,212** candidates are selected,
+but none have been applied to model forcing.
+All 16,788 original US-Ho1 hard source events, including its
+917 previously checked provisional-UTC subset, remain separate.
+
+New [Stage63 automated original EC temperature time-neighbor
+and QC gate, 246 rows](scripts/stage63/63_automatic_246_temperature_neighbor_and_metadata_triage.py)
+verifies original source file SHA256 and exact CSV native-time/row
+identity, checks local temperature stationarity/neighbor QC, and
+conservatively accepts only strongly supported extreme-cold
+tower temperatures without imposing a blanket ERA5-temperature
+overwrite. Uncertain cases remain documented HOLD. It also
+searches original US-BZS / US-Ho1 source-adjacent ZIP archives
+for BIF and only labels metadata as exact-release candidates
+when ZIP's original source CSV SHA256 matches the Stage49
+primary exactly. No original/model input writes.
+[Stage62 final operator PASS and Stage63 pinned one-paste
+IRIDIS6 procedure](docs/stage62_operator_PASS_and_stage63_246_auto_T_neighbour_20261024.md).
+Stage63 is committed, not yet run on IRIDIS6.
