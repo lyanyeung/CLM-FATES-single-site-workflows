@@ -99,7 +99,7 @@ def fetch_rows(path,needed):
 def raw_qc(site,needed,packages):
  folder=RAWDIR/site/'forcing/raw'/packages[site]
  possibles=sorted(folder.glob('*FLUXMET_HH*.csv'))
- if len(poss)!=1:return {},'MISSING_OR_AMBIGUOUS_FLUXMET_HH'
+ if len(possibles)!=1:return {},'MISSING_OR_AMBIGUOUS_FLUXMET_HH'
  wanted={datetime.fromisoformat(t).strftime('%Y%m%d%H%M') for t in needed}
  result={}
  with possibles[0].open(newline='',encoding='utf-8-sig') as f:
@@ -250,12 +250,17 @@ def write(path,rows,fields):
 
 def selftest():
  assert sum(SITE_EDGES.values())==89
+ # Regression guard: missing raw FLUXMET source should be a classified
+ # provenance gap, never a NameError (v1 used len(poss) by mistake).
+ qc,status=raw_qc('__STAGE79_SELFTEST_NONEXISTENT__',set(),
+                   {'__STAGE79_SELFTEST_NONEXISTENT__':'NO_SUCH_PACKAGE'})
+ assert qc=={} and status=='MISSING_OR_AMBIGUOUS_FLUXMET_HH'
  a={'candidate_RH_left':70,'candidate_RH_right':5}
  x={'rh':75};y={'rh':70}
  assert derive(a,x,y,True,False)=='ERA_TOWER_UNCHANGED_NEIGHBOR_CONFLICT_GE25PP'
  assert derive(a,x,y,True,True)=='BOTH_ENDS_NATIVE_ERA_CONTINUITY'
  assert derive(a,None,y,True,False)=='MISSING_ERA_CONTEXT_HOLD'
- print('SELF-TEST PASS: 89 original-new boundary checks, ERA/native difference and no forced QC0 patches')
+ print('SELF-TEST PASS: 89 original-new boundary checks, ERA/native difference, FLUXMET source missing/ambiguous guard, no forced QC0 patches')
 
 def main():
  p=argparse.ArgumentParser(description=__doc__)
