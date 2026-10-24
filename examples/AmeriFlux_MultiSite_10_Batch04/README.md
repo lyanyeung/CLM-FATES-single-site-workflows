@@ -169,7 +169,7 @@ For a first targeted audit on US-SP1, US-Syv and US-Ton, run on **IRIDIS6**:
   SCRIPT="$BASE/scripts/stage03/03_audit_batch04_extreme_met_and_ERA5.py"
   curl -fLsS --retry 3 "$RAW/$REL/scripts/stage03/03_audit_batch04_extreme_met_and_ERA5.py" -o "$SCRIPT"
   python3 -m py_compile "$SCRIPT"
-  python3 -B "$SCRIPT" --sites US-SP1 US-Syv US-Ton \\
+  python3 -B "$SCRIPT" --sites US-SP1 US-Syv US-Ton
     2>&1 | tee "$BASE/stage03_priority_$(date +%Y%m%d_%H%M%S).log"
 )
 ```
