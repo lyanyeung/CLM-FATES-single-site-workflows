@@ -271,6 +271,9 @@ def external_temperature_fallback(row,left,right,grid,utc):
 def build_decisions(targets,contexts,points,grids,external):
     chosen=defaultdict(dict);status={};needsgrid=defaultdict(set)
     for (site,k),reasons in sorted(targets.items()):
+        if site not in points:
+            status[site,k]="BIF_COORDINATE_OR_UTC_OFFSET_UNRESOLVED"
+            continue
         r=contexts[site][k]
         left=contexts[site].get(plus(k,-30));right=contexts[site].get(plus(k,30))
         decision=neighbour_support(r,left,right)
@@ -396,9 +399,17 @@ def main():
     ext=helper()
     selections,targets,grouping,met=get_inputs()
     contexts=source_context(selections,targets)
-    points={s:point_for(s,met[s]["native"]) for s in SELECT}
+    points={}
+    missing_points={}
+    for site in SELECT:
+        try:
+            points[site]=point_for(site,met[site]["native"])
+        except ValueError as exc:
+            missing_points[site]=str(exc)
+            print("BIF SITE HOLD, OTHER SITES CONTINUE",site,str(exc),flush=True)
     years=grid_targets(targets,contexts)
-    pending=sorted(years,key=lambda q:(-len(years[q]),q[0],q[1]))
+    pending=sorted((k for k in years if k[0] in points),
+                   key=lambda q:(-len(years[q]),q[0],q[1]))
     print("STAGE12 TARGETS inherited=155, original skipped-SP1-edge=2, unique",len(targets))
     print("STAGE12 CDS REQUIRED",len(years),"site-years")
     for site,year in pending:
@@ -465,7 +476,9 @@ def main():
                          "new_VPD_F_hPa":fmt(p["VPD_F"]) if "VPD_F" in p else "",
                          "new_RH_pct":fmt(p["RH"]) if "RH" in p else ""})
     proof={"stage11_source_manifest_sha256":sha(S11/"LATEST_10_SITES_FOR_POSTV5_INPUT.tsv"),
-           "original_native_BIF_points":points,"ERA5Land_source_sha256":gridsha,
+           "original_native_BIF_points":points,
+           "site_BIF_metadata_holds":missing_points,
+           "ERA5Land_source_sha256":gridsha,
            "target_unique_non_Syv_events":len(targets),
            "successfully_resolved":successes,"unresolved":oldhold,
            "per_site_statuses":{site:dict(Counter(v for (s,k),v in status.items() if s==site)) for site in SELECT},
