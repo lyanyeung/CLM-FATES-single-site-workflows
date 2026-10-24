@@ -1,6 +1,6 @@
 # Batch03 — user-directed Stage11f science decision ledger, 2026-10-24
 
-**Type: user decision / intended method; NOT a completed forcing replacement, verified ERA5 file selection, source QC sign-off or Post-v5 approval.** Based on the user's explicit instruction in the current review discussion plus an operator-provided exhaustive 62-row Stage11f working-copy inspection. Source evidence on IRIDIS6 remains SHA sealed.
+> **Historical snapshot superseded (2026-10-24):** This file intentionally preserves the earlier 59/62 decisions and three pending holds. The user subsequently decided to **KEEP the existing Stage07 VPD candidates** at US-Mpj 201410210830, US-NC2 202503220130 and 202503270730. The current authoritative [62/62 final decision ledger](STAGE11F_FINAL_62_USER_DECISIONS_AND_ERA5_VALIDATION_2026-10-24.md) and [62-row CSV](STAGE11F_ALL62_USER_DECISIONS_2026-10-24.csv) supersede the three HOLD entries here. No source/forcing writes, Post-v5, DATM or spinup approvals occurred.\n\n**Type: user decision / intended method; NOT a completed forcing replacement, verified ERA5 file selection, source QC sign-off or Post-v5 approval.** Based on the user's explicit instruction in the current review discussion plus an operator-provided exhaustive 62-row Stage11f working-copy inspection. Source evidence on IRIDIS6 remains SHA sealed.
 
 Exact sealed Stage11f report:
 `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage11f_human_science_review_20261024T074958Z_6ae6d5d7/`
