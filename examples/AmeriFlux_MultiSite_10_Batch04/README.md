@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 04
 
-> **Operational status (2026-10-24): STAGE00 + STAGE01 VERIFIED (10/10 sites each) from operator logs.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 original run: 9/10 PASS; US-Seg user-approved BIF GROUP_ID 1495 location now recorded, revised Stage02 rerun pending.** See [Stage02 evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). [Stage02B US-Seg diagnostic](scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py) has been executed. Paired BIF GROUP_ID 1479 vs 1495 evidence is documented in the [Stage02B ledger](docs/STAGE02B_US_SEG_PROVENANCE_VERIFIED_2026-10-24.md); The [human-approved decision](docs/STAGE02_US_SEG_GROUP1495_USER_APPROVAL_2026-10-24.md) is latitude 34.3623, longitude -106.7020 and elevation 1596 m. Stage02C full-HH timestamp audit **completed 10/10 PASS**, with scientific QC concerns preserved in the [Stage02C report](docs/STAGE02C_FULL_HH_TIME_QC_AUDIT_2026-10-24.md). No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
+> **Operational status (2026-10-24): STAGE00 + STAGE01 VERIFIED (10/10 sites each) from operator logs.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 post-approval 10/10 PASS verified on IRIDIS6; US-Seg approved BIF GROUP_ID 1495 coordinates/elevation validated.** See [final Stage02 results](docs/STAGE02_POST_APPROVAL_VERIFIED_2026-10-24.md). See [Stage02 evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). [Stage02B US-Seg diagnostic](scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py) has been executed. Paired BIF GROUP_ID 1479 vs 1495 evidence is documented in the [Stage02B ledger](docs/STAGE02B_US_SEG_PROVENANCE_VERIFIED_2026-10-24.md); The [human-approved decision](docs/STAGE02_US_SEG_GROUP1495_USER_APPROVAL_2026-10-24.md) is latitude 34.3623, longitude -106.7020 and elevation 1596 m. Stage02C full-HH timestamp audit **completed 10/10 PASS**, with scientific QC concerns preserved in the [Stage02C report](docs/STAGE02C_FULL_HH_TIME_QC_AUDIT_2026-10-24.md). No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
 
 Fourth independent ten-site AmeriFlux campaign following [Batch03](../AmeriFlux_MultiSite_10_Batch03/), [Batch02](../AmeriFlux_MultiSite_10_Batch02/) and [Batch01](../AmeriFlux_MultiSite_10/). This directory contains the exact release manifest and reproducible scripts. Never commit raw tower ZIPs or derived large files to GitHub.
 
@@ -82,7 +82,7 @@ To run only after a verified 10/10 upload, execute **on IRIDIS6**:
 
 The Stage01 CLI also supports `--audit-only`, `--sites US-Rpf`, `--sites-root` and `--reports-dir`. Stage01 runs no Slurm jobs. Default output inventory location: `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch04/reports/`.
 
-## Stage02 — approved US-Seg GROUP_ID 1495; read-only rerun pending
+## Stage02 — APPROVED AND REVERIFIED (10/10 PASS)
 
 Batch04 Stage02 follows the Batch03 metadata preflight, with one **explicit user-approved coordinate exception** in [coordinate_decisions.tsv](coordinate_decisions.tsv): **US-Seg original BIF GROUP_ID 1495, latitude 34.3623, longitude -106.7020, elevation 1596 m, LOCATION_DATE_START 200701010000**. Script verifies the exact BIF group pairing and elevation/date before accepting. The other nine sites still require unambiguous original BIF locations; no general fallback or silent coordinate guessing. IGBP and FATES PFT/height selections remain independently unapproved.
 
@@ -104,7 +104,7 @@ On the **IRIDIS6 login terminal**, run:
 )
 ```
 
-This script **does not write any output** itself. The shell `tee` saves an external operator log. A **new execution** should produce `STAGE02 SUMMARY: 10/10 coordinate + first-interval checks PASS; failures: none` if the approved BIF group remains intact and all ten checks succeed. This has NOT yet been rerun. The historical 9/10 before approval remains in the [original evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). Investigate exclusions (WET/CRO/WAT), non-forest PFT applicability, sensor-to-TA mapping and time continuity in later independent scientific stages.
+This script **does not write any output** itself. The shell `tee` saves an external operator log. The operator **reran the revised checker** successfully: `STAGE02 SUMMARY: 10/10 coordinate + first-interval checks PASS; failures: none`. Final execution details are in [Stage02 post-approval verification](docs/STAGE02_POST_APPROVAL_VERIFIED_2026-10-24.md). The historical 9/10 before approval remains in the [original evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). Investigate exclusions (WET/CRO/WAT), non-forest PFT applicability, sensor-to-TA mapping and time continuity in later independent scientific stages.
 
 ## Stage02B — US-Seg coordinate provenance (completed; approval recorded)
 
@@ -127,7 +127,7 @@ Run **on IRIDIS6** after Stage02; the diagnostic is read-only:
 )
 ```
 
-The original Stage02 result was 9/10; the explicit location approval is now documented, but **the revised read-only Stage02 checker still needs an operator rerun**. External points remain historical references only, not selected coordinates.
+The original Stage02 result was 9/10; the explicit location approval is now documented, but **the revised read-only Stage02 checker has now passed 10/10 on IRIDIS6**. External points remain historical references only, not selected coordinates.
 
 ## Stage02C — full HH time-series and basic scientific flags (READ ONLY)
 
@@ -151,6 +151,30 @@ On IRIDIS6, run:
 ```
 
 For a smaller audit use `python3 -B "$SCRIPT" --sites US-Rpf US-Seg`. The `STAGE02C SUMMARY` indicates timestamp gates, **not** full scientific QC. No file writes occur inside the Python audit; shell `tee` creates only an operator log.
+
+## Stage03 — timestamped extreme meteorology and same-label ERA5 comparison (READ ONLY)
+
+**Prepared, not executed.** The [Stage03 script](scripts/stage03/03_audit_batch04_extreme_met_and_ERA5.py) reports every station's counts and top-eight most extreme timestamped examples per category for `TA_F < -80 °C`, `TA_F > 60 °C`, `PA_F <= 0`, `PA_F < 50 kPa`, `PA_F > 115 kPa`, `RH < 1%`, `1% <= RH < 5%`, `RH > 100%` and `VPD_F < 0`. It prints native values, available original native QC columns, derived `RH(TA_F,VPD_F)` for valid tower values, and **only exact raw string timestamp-label matched** ERA5 HH variables if present. It never changes inputs, makes UTC assumptions, adopts external station coordinates or combines unrelated-source ERA variables to produce humidity/forcing.
+
+For a first targeted audit on US-SP1, US-Syv and US-Ton, run on **IRIDIS6**:
+
+```bash
+(
+  set -euo pipefail
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main"
+  REL="examples/AmeriFlux_MultiSite_10_Batch04"
+  BASE="$HOME/ameriflux_batch04_stage03"
+  mkdir -p "$BASE/scripts/stage03"
+  curl -fLsS --retry 3 "$RAW/$REL/sites.tsv" -o "$BASE/sites.tsv"
+  SCRIPT="$BASE/scripts/stage03/03_audit_batch04_extreme_met_and_ERA5.py"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage03/03_audit_batch04_extreme_met_and_ERA5.py" -o "$SCRIPT"
+  python3 -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --sites US-SP1 US-Syv US-Ton \\
+    2>&1 | tee "$BASE/stage03_priority_$(date +%Y%m%d_%H%M%S).log"
+)
+```
+
+For all ten sites later, omit the `--sites` argument. The Stage03 output is a **read-only scientific screening, not a repair ledger or production approval**. Exact raw timestamp-label matches do not by themselves establish time-zone equivalence, forcing units, or a permitted replacement. Review events manually before any ERA5 repairs.
 
 ## Scientific gates outstanding after structural/timestamp preflight
 
