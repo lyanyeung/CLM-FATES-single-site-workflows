@@ -1230,4 +1230,25 @@ The unrelated Stage08 4,884-case HOLD remains in force.
 [Stage52 verified numerical counts, Stage53 science policy,
 full reproducible commands](docs/stage52_operator_success_and_stage53_RH_only_staging_20261024.md)
 and [Stage53 isolated sparse patch script](scripts/stage53/53_stage_user_selected_444_external_ERA5_RH_only_patch.py)
-are published in GitHub; Stage53 has not yet been run on IRIDIS6.
+are published in GitHub; Stage53 was subsequently executed successfully on IRIDIS6 and an isolated 444-row staging ledger now exists.
+
+### Stage53 operator PASS; Stage54 exact 444 vs 4,884 collision audit (24 October 2026)
+
+The operator's Stage53 `--self-test`, `--check`, and `--stage` **ALL PASSED** with pinned blob
+`824f18c7868fa451274b1e359906ece2fd84a199`.
+Real Stage53 output:
+`reports/stage53_444_ERA5_RH_only_staging_20261024T100652Z_543ef3f1`.
+Exactly 444 RH=0/>100 source rows have user-selected independent
+CDS ERA5 humidity replacements and same-RH/tower-T/PA
+physically consistent VPD and QBOT in an isolated sparse patch.
+The 27 US-ICt original T QC1/2 uncertainties and 405 RH>100
+phase questions retain explicit scientific review flags; **not
+approved for DATM or spinup**. Original data and forcing unchanged.
+
+Next, [Stage54 read-only exact-overlap script](scripts/stage54/54_crosswalk_444_ERA5_RH_stage11_4884_HOLD.py)
+must reconcile `site+timestamp_start` against Stage11's
+`site+time` for the separate 4,884 scientific HOLD
+cohort, preventing accidentally applying two different decisions
+to one original tower record. [Verified Stage53 result and Stage54
+run instructions](docs/stage53_operator_pass_stage54_overlap_plan_20261024.md).
+Stage54 is published but has **not yet run on IRIDIS6**.
