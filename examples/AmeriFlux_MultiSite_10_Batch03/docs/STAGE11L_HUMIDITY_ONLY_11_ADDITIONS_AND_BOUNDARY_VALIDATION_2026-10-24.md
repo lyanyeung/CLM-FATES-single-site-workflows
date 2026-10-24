@@ -55,7 +55,7 @@ The script rejects any modification of `TA_USE` or `TBOT` in all 367,920 US-NC2 
 
 ## Scientific status
 
-**61? No. Exactly:** 62 original reviewed records + 11 new candidate repair choices = **73 distinct human-reviewed source event IDs**, of which **64 are ERA-humidity-targeted IDs**, six are KEEP TA and three are KEEP VPD. The additional 11 are *human approved as a trial repair method* only, **not formally approved as physically correct observations or Post-v5**.
+**Decision accounting:** 62 original reviewed records + 11 new candidate repair choices = **73 distinct human-reviewed source event IDs**, of which **64 are ERA-humidity-targeted IDs**, six are KEEP TA and three are KEEP VPD. The additional 11 are *human approved as a trial repair method* only, **not formally approved as physically correct observations or Post-v5**.
 
 Existing Stage07, Stage11h and Stage11j source/receipts remain SHA-locked and unchanged. Other seven Batch03 sites retain 1,924 independent humidity blockers. Post-v5 accepted sites=0; DATM ready sites=0; spinup authorised=0.
 
