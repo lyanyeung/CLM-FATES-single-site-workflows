@@ -941,12 +941,12 @@ acceptance criteria.
 **All humidity and clock approvals remain zero; no Post-v5 or model runs.**
 
 
-### Stage11a — scientific decision matrix (code committed, awaiting IRIDIS verification)
+### Stage11a — VERIFIED scientific review matrix (2026-10-24)
 
 The [Stage11a source-pinned review script](scripts/stage11/11a_science_decision_matrix.py)
 uses SHA-receipted Stage10d event flags, Stage10h exact-source QC origins,
 Stage10k exception classifications, Stage10g QC-window evidence, and the
-Stage07 original input manifest. It is **not yet confirmed executed on IRIDIS6**.
+Stage07 original input manifest. It **passed IRIDIS6 self-test/check/run**, recording 1,687 evidence-insufficient holds, 233 physical/temperature-conflict holds and 4 US-Me2 clock holds (1,924/1,924).
 
 It is designed to create `1924_source_event_science_review.csv`,
 `32_site_year_science_decision_matrix.csv`, and
@@ -960,3 +960,16 @@ candidate sites are **not** Post-v5 certified; the other seven remain blocked.
 Do **not** use the Stage11a review route or a source/grid counterfactual
 pass percentage to start DATM, modify forcing, or submit a spinup. Scientific
 signoff is a separately documented human review decision.
+
+### Stage11b — three numeric candidates, Post-v5 Gate-0 (code committed)
+
+[Stage11b script](scripts/stage11/11b_three_site_postv5_gate0_audit.py)
+is committed but **has not yet been executed on IRIDIS6**. It rechecks
+the original SHA-pinned FLUXMET/ERA source and Stage07 `processed_v5` candidates
+for **US-MOz, US-Mpj and US-NC2**, including complete NO_LEAP native
+time steps, TBOT/QBOT/PSRF/PRECTmms physics and conversions, raw-to-v5
+change ledger, changed original QC0 records, manual review and ERA-RH floor
+counts. A successful Gate-0 is **numeric/provenance-only**, never official
+Post-v5 approval; `--check` writes nothing, `--run` creates one isolated
+read-only review report. The Stage07 INCOMPLETE marker is retained, no DATM
+or spinup authorised.
