@@ -75,7 +75,35 @@ def self_test():
     assert sum(EXPECT.values())==2810 and set(EXPECT)==set(SITES)
     assert len(PREVIOUS_KEYS)==4 and len(ALLOWED)==3
     assert "2025-03-01"==datetime.strptime("20250301","%Y%m%d").strftime("%Y-%m-%d")
-    print("STAGE12F SELF-TEST PASS: six sites 2810 missing-source holds, max 3 CDS requests, untouched site time/T, zero writes",flush=True)
+    # Regression: original seven-site Stage09a has 32 years, while
+    # Stage12e returns only the subset of six-site source-years.
+    fake=[{"site":"US-NR3","year":year} for year in range(1990,2021)]
+    fake.append({"site":"US-Me2","year":2022})
+    six={(r["site"],r["year"]):("verified",{}) for r in fake if r["site"] in SITES}
+    assert checked_six_site_catalog(fake,six)==31
+    try:
+        checked_six_site_catalog(fake,{})
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Unverified six-site evidence unexpectedly accepted")
+    print("STAGE12F SELF-TEST PASS: six sites 2810 missing-source holds, seven-site vs six-site catalog regression, max 3 CDS requests, untouched site time/T, zero writes",flush=True)
+
+def checked_six_site_catalog(original_seven_site_plan,verified_six_site_catalog):
+    if len(original_seven_site_plan)!=32:
+        raise ValueError("Original SHA-pinned Stage09a source plan no longer lists 32 seven-site years")
+    full=[(p["site"],int(p["year"])) for p in original_seven_site_plan]
+    if len(set(full))!=32:
+        raise ValueError("Original Stage09a seven-site source-year identities duplicated")
+    if not any(site=="US-Me2" for site,_ in full):
+        raise ValueError("Original Stage09a source-year plan unexpectedly excludes US-Me2")
+    expected={key for key in full if key[0] in SITES}
+    observed=set(verified_six_site_catalog)
+    if observed!=expected:
+        missing=sorted(expected-observed)
+        extra=sorted(observed-expected)
+        raise ValueError("Six-site SHA-verified catalog differs from 32-year Stage09a plan; missing="+str(missing)+" extra="+str(extra))
+    return len(expected)
 
 def evidence():
     if not E.is_dir() or E.is_symlink():
@@ -101,9 +129,11 @@ def evidence():
     e_mod=load(E_SCRIPT,E_BLOB,"stage12e_pinned_12f")
     pilot=load(B_SCRIPT,B_BLOB,"stage09b_pinned_12f")
     t,d,specs,ledger,years,rec=e_mod.verify()
-    if len(years)!=32:
-        raise ValueError("Stage09f 32 earlier verified yearly sources changed")
+    # Stage10b/09f originally verified ALL 32 seven-site source-years;
+    # Stage12e.verify() deliberately returns a CATALOG FILTERED TO SIX
+    # target sites, excluding US-Me2. A six-site catalog is NOT 32 rows.
     priorplan=t.load_queue().read_source()
+    checked_six_site_catalog(priorplan,years)
     positions={}
     for x in priorplan:
         site=x["site"]
