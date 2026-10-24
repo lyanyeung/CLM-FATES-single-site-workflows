@@ -1069,3 +1069,7 @@ Stage36 found exceptionally long exact Ho1–Ho3 original QC0 temperature matchi
 ### Stage37 verified; Stage38 historical measured-temperature source inventory
 
 Stage37 successfully traced Ho1's 319 negative-Td-VPD records with no neighbouring QC0: 1998 64, 1999 25, 2001 230. In 1999/2001 Ho2 *ERA gapfill* follows CDS ERA5 within ~0.65°C median, while Ho1 QC2 gapfill differs by ~9.4–11.6°C, suggesting a Ho1-specific processing problem, not independent observation validation. Stage38 performs a **read-only local Ho1 BASE/BADM archive inventory** and prints exact date windows and modern NOAA GHCNh candidate station-year sources, with explicit unverified-coverage warnings. No new downloads or model changes; see [scientific audit](docs/cold_humidity_scientific_review_20261024.md). All 4,884 remain on HOLD.
+
+### Stage38 verified; Stage39 memory-only NOAA GHCNh source probe
+
+Stage38 identified the 319 Ho1 cases without neighbouring QC0 as 1998 64 (4 episodes), 1999 25 (3), 2001 230 (9) and found only the original FLUXNET FULLSET ZIP in its bounded local search (not proof BASE/BADM is unavailable elsewhere). Stage39 adds a standalone read-only NOAA GHCNh station-year availability script with --self-test, offline --check, and explicit optional network --probe. It does not write external data or declare NOAA station quality accepted. [See detailed science record](docs/cold_humidity_scientific_review_20261024.md). 4,884 HOLD / 0 approved forcing replacements.
