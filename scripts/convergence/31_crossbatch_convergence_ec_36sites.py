@@ -407,52 +407,160 @@ def all_files(snapshot):
     return batch,files
 
 
-def publish(snapshot, dry_run):
+def publication_files(snapshot, allow_partial=False):
+    """Precisely validate completed site products; retain failures in manifest."""
+    root_items=[snapshot/name for name in ROOT_FILES]
+    for file in root_items:
+        if file.is_symlink() or not file.is_file():
+            raise ValueError(f"Missing/unsafe batch manifest: {file}")
+    info=json.loads(root_items[1].read_text(encoding="utf-8"))
+    batch=str(info.get("batch"))
+    if batch not in ROWS:
+        raise ValueError(f"Unknown batch in RUN_INFO.json: {batch}")
+    expected={site:case for site,_,_,case in ROWS[batch]}
+    with root_items[0].open(newline="",encoding="utf-8") as fin:
+        summary=list(csv.DictReader(fin))
+    if len(summary)!=len(expected) or {row.get("Site") for row in summary}!=set(expected):
+        raise ValueError("Batch summary does not match exact expected stations")
+    if len(info.get("results",[]))!=len(expected):
+        raise ValueError("RUN_INFO result count does not match batch")
+    reported={row.get("Site"):row for row in info["results"]}
+    if set(reported)!=set(expected):
+        raise ValueError("RUN_INFO site names do not match the batch summary")
+    for row in summary:
+        site=row["Site"]
+        if row.get("Case")!=expected[site]:
+            raise ValueError(f"Wrong case recorded for {site}")
+        if row.get("Status")!=reported[site].get("Status"):
+            raise ValueError(f"Conflicting result status between CSV and JSON for {site}")
+    success=sorted(row["Site"] for row in summary if row.get("Status")=="OK")
+    failed=sorted((row for row in summary if row.get("Status")!="OK"),
+                  key=lambda row:row["Site"])
+    if not success:
+        raise RuntimeError("No fully analysed stations to publish")
+    if failed and not allow_partial:
+        raise RuntimeError(
+            f"Batch {batch}: {len(success)}/{len(expected)} successful; "
+            f"pass --allow-partial to publish just verified stations; "
+            f"failed sites: {[r['Site'] for r in failed]}")
+    files=list(root_items)
+    for site in success:
+        folder=snapshot/site
+        if not folder.is_dir() or folder.is_symlink():
+            raise ValueError(f"Missing completed station directory: {folder}")
+        datafile=folder/(site+"_metadata.json")
+        if not datafile.is_file() or datafile.is_symlink():
+            raise ValueError(f"Missing full station metadata: {site}")
+        data=json.loads(datafile.read_text(encoding="utf-8"))
+        if (data.get("site")!=site or data.get("batch")!=batch or
+                data.get("case")!=expected[site] or data.get("status")!="OK"):
+            raise ValueError(f"Station provenance mismatch: {site}")
+        if not isinstance(data.get("archived_history_count"),int) or data["archived_history_count"]<1000:
+            raise ValueError(f"Archived annual histories insufficient: {site}")
+        if not isinstance(data.get("last_complete_model_forcing_cycle"),list) or len(data["last_complete_model_forcing_cycle"])!=2:
+            raise ValueError(f"No complete site forcing cycle: {site}")
+        scores=data.get("monthly_metrics",[])
+        if len(scores)!=2 or {entry.get("Flux") for entry in scores}!={"GPP","NEE"}:
+            raise ValueError(f"Incomplete observed EC flux comparison: {site}")
+        if any(int(entry.get("N",0))<2 for entry in scores):
+            raise ValueError(f"Insufficient matched EC months: {site}")
+        files.extend(folder/(site+suffix) for suffix in SITE_SUFFIXES)
+    for file in files:
+        if (file.is_symlink() or not file.is_file() or
+                not 0 < file.stat().st_size < 30*1024*1024 or
+                file.suffix not in {".png",".csv",".json"}):
+            raise ValueError(f"Missing, oversized or unsafe derived artifact: {file}")
+        if file.suffix==".png":
+            with file.open("rb") as fin:
+                if fin.read(8)!=b"\x89PNG\r\n\x1a\n":
+                    raise ValueError(f"Invalid PNG header: {file}")
+    status={
+        "schema":"fluxnet_crossbatch_publication_v1",
+        "batch":batch,
+        "analysis_snapshot":snapshot.name,
+        "source_dataset":"archived annual h0a and original FLUXNET EC",
+        "scope":"PARTIAL_VERIFIED" if failed else "COMPLETE_VERIFIED",
+        "expected_count":len(expected),
+        "published_success_count":len(success),
+        "published_success_sites":success,
+        "not_published_count":len(failed),
+        "not_published_sites":[
+            {"Site":r["Site"],"Status":r.get("Status"),"Problem":r.get("Problem","")}
+            for r in failed
+        ],
+        "other_incomplete_sites_excluded":["IT-Noe","CH-Aws"],
+        "note":"Only complete 4-PNG + CSV + JSON per-station products are published. A model reaching 1000 years does not prove convergence."
+    }
+    print(f"BATCH {batch}: {len(success)}/{len(expected)} fully validated stations",flush=True)
+    if failed:
+        for row in failed:
+            print(f"EXCLUDED from publish: {row['Site']} | {row.get('Problem','unavailable')}",flush=True)
+    return batch, files, status
+
+
+def sha256_of(path):
+    digest=hashlib.sha256()
+    with path.open("rb") as fin:
+        for chunk in iter(lambda:fin.read(1024*1024),b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def publish(snapshot, dry_run, allow_partial=False):
     snapshot=snapshot.resolve(strict=True)
-    allowed = {RFS.resolve(), HOME_OUTPUT.resolve()}
+    allowed={RFS.resolve(),HOME_OUTPUT.resolve()}
     if snapshot.parent.name!="convergence_snapshots" or snapshot.parent.parent.parent not in allowed:
         raise ValueError("Unexpected source: only batch RFS or Home staging snapshots allowed")
-    batch,files=all_files(snapshot)
+    batch,files,status=publication_files(snapshot,allow_partial=allow_partial)
     target=Path(f"examples/FLUXNET_MultiSite_{batch}/figures/convergence_snapshots")/snapshot.name
+    sums="\n".join(
+        sha256_of(src)+"  "+src.relative_to(snapshot).as_posix()
+        for src in files
+    )+"\n"
     print(f"PUBLISH PREFLIGHT PASS: batch {batch}, {len(files)} derived files, {target}",flush=True)
     if dry_run:
-        print("DRY RUN: no changes",flush=True)
+        print("DRY RUN: no Git changes",flush=True)
         return
     remote=cmd("git","-C",str(REPO),"remote","get-url","origin")
     if "lyanyeung/CLM-FATES-single-site-workflows" not in remote:
         raise RuntimeError(f"Unexpected GitHub remote: {remote}")
-    with tempfile.TemporaryDirectory(prefix=f"science36_b{batch}_",dir=str(Path.home())) as t:
-        clone=Path(t)/"checkout"
+    with tempfile.TemporaryDirectory(prefix=f"science36_b{batch}_",dir=str(Path.home())) as tmp:
+        clone=Path(tmp)/"checkout"
         cmd("git","clone","--depth","1","--single-branch","--branch","main",remote,str(clone))
-        if (clone/target).exists():
-            raise FileExistsError(f"Refusing overwrite: {target}")
+        destdir=clone/target
+        if destdir.exists():
+            old_manifest=destdir/"SHA256SUMS.txt"
+            if old_manifest.is_file() and old_manifest.read_text(encoding="utf-8")==sums:
+                print(f"GITHUB ALREADY PUBLISHED AND SHA256 VERIFIED: Batch {batch}; skipping duplicate",flush=True)
+                print("GITHUB LOCATION: https://github.com/lyanyeung/CLM-FATES-single-site-workflows/tree/main/"+str(target))
+                return
+            raise FileExistsError("GitHub target exists with differing files; refusing to overwrite: "+str(target))
         staged=[]
-        for file in files:
-            rel=file.relative_to(snapshot)
-            dest=clone/target/rel
-            dest.parent.mkdir(parents=True,exist_ok=True)
-            import shutil
-            shutil.copy2(file,dest)
+        for src in files:
+            rel=src.relative_to(snapshot)
+            dst=destdir/rel
+            dst.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copy2(src,dst)
+            if sha256_of(src)!=sha256_of(dst):
+                raise RuntimeError(f"Checksum mismatch during preparation: {rel}")
             staged.append(str(target/rel))
-        sums=[]
-        for file in files:
-            h=hashlib.sha256()
-            with file.open("rb") as reader:
-                for part in iter(lambda:reader.read(1024*1024),b""):
-                    h.update(part)
-            sums.append(h.hexdigest()+"  "+file.relative_to(snapshot).as_posix())
-        (clone/target/"SHA256SUMS.txt").write_text("\n".join(sums)+"\n")
-        staged.append(str(target/"SHA256SUMS.txt"))
+        (destdir/"SHA256SUMS.txt").write_text(sums,encoding="utf-8")
+        (destdir/"PUBLISH_STATUS.json").write_text(
+            json.dumps(status,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+        staged += [str(target/"SHA256SUMS.txt"),str(target/"PUBLISH_STATUS.json")]
         cmd("git","add","-f","--",*staged,cwd=clone)
         actual=set(cmd("git","diff","--cached","--name-only",cwd=clone).splitlines())
         if actual!=set(staged):
-            raise RuntimeError("Wrong staged files: "+str(sorted(actual ^ set(staged))))
+            raise RuntimeError("Unexpected Git staging: "+str(sorted(actual ^ set(staged))))
+        kind="PARTIAL" if status["not_published_count"] else "COMPLETE"
         cmd("git","-c","user.name=IRIDIS6 CLM-FATES",
             "-c","user.email=lyanyeung@users.noreply.github.com",
-            "commit","-m",f"Publish full Batch{batch} carbon/PFT/EC checkpoint comparison",cwd=clone)
+            "commit","-m",f"Publish {kind} Batch{batch} {status['published_success_count']}/{status['expected_count']} carbon/PFT/EC figures",cwd=clone)
         cmd("git","push","origin","HEAD:main",cwd=clone)
-        print("GITHUB PUBLISH SUCCESS",batch,cmd("git","rev-parse","HEAD",cwd=clone))
-        print("GITHUB LOCATION: https://github.com/lyanyeung/CLM-FATES-single-site-workflows/tree/main/"+str(target))
+        print("GITHUB PUBLISH SUCCESS",batch,
+              f"{status['published_success_count']}/{status['expected_count']}",
+              kind,cmd("git","rev-parse","HEAD",cwd=clone),flush=True)
+        print("GITHUB LOCATION: https://github.com/lyanyeung/CLM-FATES-single-site-workflows/tree/main/"+str(target),flush=True)
 
 
 def sync_to_rfs(snapshot, dry_run=False):
@@ -527,6 +635,8 @@ def main():
                     help="After each fully successful batch, commit derived products to GitHub")
     ap.add_argument("--snapshot",type=Path)
     ap.add_argument("--dry-run",action="store_true")
+    ap.add_argument("--allow-partial",action="store_true",
+                    help="Opt in to publishing only fully validated sites in an incomplete batch")
     ap.add_argument("--output-base",type=Path,
                     help="Output root (default: prefer RFS; fallback to ~/FLUXNET36_derived)")
     args=ap.parse_args()
@@ -534,7 +644,7 @@ def main():
         if not args.snapshot:
             ap.error(args.mode+" requires --snapshot /actual/derived/snapshot")
         if args.mode=="publish":
-            publish(args.snapshot,args.dry_run)
+            publish(args.snapshot,args.dry_run,args.allow_partial)
         else:
             sync_to_rfs(args.snapshot,args.dry_run)
         return 0
@@ -549,7 +659,7 @@ def main():
             print(f"BATCH {b} HAS FAILURES: publishing blocked; see {dest}",flush=True)
         elif args.publish:
             try:
-                publish(dest,dry_run=False)
+                publish(dest,dry_run=False,allow_partial=args.allow_partial)
             except Exception as e:
                 failures+=1
                 print(f"BATCH {b} PUBLISH FAILED (RFS outputs retained): {e}",flush=True)
