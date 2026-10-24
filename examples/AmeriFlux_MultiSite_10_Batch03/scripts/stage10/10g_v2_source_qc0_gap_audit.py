@@ -42,7 +42,7 @@ EVIDENCE_NAMES = {
     "site_QC0_evidence_summary.csv",
 }
 WINDOWS_H = (24, 72, 168)
-VERSION = "stage10g-v2-20261024-leading-digit-field-fix"
+VERSION = "stage10g-v2.1-20261024-ast-selftest"
 
 
 def safe_file(p):
@@ -242,10 +242,31 @@ def self_test():
     # The broken approach is prohibited; its error is replicated by itertuples:
     legacy=next(rows.itertuples(index=False))
     assert not hasattr(legacy, "24h_before_count_DUAL_QC0_valid")
-    source=Path(__file__).read_text(encoding="utf-8")
-    prohibited = "getattr(r,f" + chr(34) + "24h_"
-    if prohibited in source or "for r in target.itertuples(" in source:
-        raise ValueError("Old buggy leading-digit tuple-column access remains in script")
+    # Scan only the AST of the scientific analysis function.
+    # v2 scanned its own self-test string literal and always flagged itself.
+    import ast
+    tree=ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    functions=[node for node in tree.body
+               if isinstance(node, ast.FunctionDef) and node.name=="analyse"]
+    if len(functions)!=1:
+        raise ValueError("Stage10g analysis function missing or duplicated")
+    analysis=functions[0]
+    target_iterrows=[
+        node for node in ast.walk(analysis)
+        if isinstance(node, ast.For)
+        and isinstance(node.iter, ast.Call)
+        and isinstance(node.iter.func, ast.Attribute)
+        and node.iter.func.attr=="iterrows"
+        and isinstance(node.iter.func.value, ast.Name)
+        and node.iter.func.value.id=="target"
+    ]
+    if len(target_iterrows)!=1:
+        raise ValueError("Stage10g analysis must use literal-key-safe target.iterrows()")
+    if any(isinstance(node, ast.Call)
+           and isinstance(node.func, ast.Name)
+           and node.func.id=="getattr"
+           for node in ast.walk(analysis)):
+        raise ValueError("Stage10g analysis still uses unsafe getattr() field access")
     print(f"STAGE10G SELF-TEST: PASS version={VERSION}",flush=True)
 
 def main():
