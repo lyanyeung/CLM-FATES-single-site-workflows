@@ -162,7 +162,7 @@ def main():
                 pd.to_numeric(focus.retained_T_minus_ERA5_T_C,
                               errors="coerce").abs()>8).sum())))
     outroot=o.output_root.resolve()
-    if outroot==src or src in outroot.parents or outroot in src.parents:
+    if outroot==src or src in outroot.parents:
         raise ValueError("Unsafe output path overlaps Stage50")
     dest=outroot/("stage51_444_RH_and_27_joint_T_review_"+
         datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")+"_"+uuid4().hex[:8])
