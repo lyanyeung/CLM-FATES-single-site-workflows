@@ -96,6 +96,13 @@ def provenance():
     previous = pd.read_csv(safe_file(STAGE10F/"19_cluster_dual_QC0_evidence.csv"))
     anchors = pd.read_csv(safe_file(STAGE10F/"89_high_priority_source_events.csv"),
                           dtype={"site":str,"source_csv_row":str,"time":str}, low_memory=False)
+    required_10f = {"site", "cluster", "start_local", "end_local",
+                    "high_priority_events", "P0_events", "P1_events",
+                    "24h_before_count_DUAL_QC0_valid",
+                    "24h_after_count_DUAL_QC0_valid"}
+    if not required_10f.issubset(previous.columns):
+        raise ValueError("Stage10f cluster review lacks required literal columns: " +
+                         str(sorted(required_10f - set(previous.columns))))
     if (len(previous) != 19 or previous.cluster.duplicated().any()
             or len(anchors) != 89 or anchors.duplicated(["site","source_csv_row","time"]).any()
             or int(previous.P0_events.sum()) != 31
@@ -149,7 +156,9 @@ def analyse(mod, previous, anchors, original_sources):
                 "valid_dual_QC0_fraction":float(one.DUAL_QC0_valid.mean()) if n else np.nan,
                 "QC0_semantics":"Native source QC0; not a validated independent RH observation"
             })
-        for r in target.itertuples(index=False):
+        # Stage10f columns include names starting with a number (e.g. 24h_*).
+        # itertuples() silently renames these, so retain literal column names.
+        for _, r in target.iterrows():
             start=pd.Timestamp(r.start_local)
             end=pd.Timestamp(r.end_local)
             parts = site_events.loc[site_events.event_cluster_id==r.cluster]
@@ -182,7 +191,7 @@ def analyse(mod, previous, anchors, original_sources):
                     record[f"{side}_VPD_QC0_{hours}h_count"]=int(window.VPD_only_QC0_valid.sum())
                     record[f"{side}_physically_valid_{hours}h_count"]=int(window.water_valid.sum())
                     record[f"{side}_native_rows_{hours}h"]=len(window)
-                old_count=int(getattr(r,f"24h_{side}_count_DUAL_QC0_valid"))
+                old_count=int(r[f"24h_{side}_count_DUAL_QC0_valid"])
                 if old_count!=record[f"{side}_dual_QC0_24h_count"]:
                     raise ValueError("Stage10g 24h and Stage10f 24h QC0 counts disagree: "+str(r.cluster))
             record["both_sides_24h"]=(
