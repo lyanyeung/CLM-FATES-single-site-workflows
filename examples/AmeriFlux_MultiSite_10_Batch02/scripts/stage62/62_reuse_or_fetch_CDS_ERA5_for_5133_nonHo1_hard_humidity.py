@@ -329,6 +329,12 @@ def main():
         while missing:
             before_count=len(missing)
             fetch_new(mod,jobs,missing,min(args.max_new,before_count))
+            # Re-open the previous download-required plan rows: locate_receipts
+            # only refreshes PENDING_RECEIPT_CHECK, so an unchanged plan would
+            # falsely continue reporting already verified downloads as missing.
+            eligible=plan.retrieval_status.ne("HOLD_UNVERIFIED_RELEASE_BIF")
+            plan.loc[eligible,"retrieval_status"]="PENDING_RECEIPT_CHECK"
+            plan.loc[eligible,"verified_receipt"]=""
             found,missing=locate_receipts(mod,plan,jobs)
             completed+=before_count-len(missing)
             print("STAGE62 AUTO CDS VERIFIED",completed,"/",original_missing,
