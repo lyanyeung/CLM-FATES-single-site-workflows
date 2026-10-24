@@ -60,7 +60,7 @@ def qc_bin(value):
 
 def validate(source50,source51):
     if (source50/"INCOMPLETE_DO_NOT_USE").exists() or (
-        source51/"INCOMPLETE_DO_NOT_USE").exists()):
+        source51/"INCOMPLETE_DO_NOT_USE").exists():
         raise ValueError("An upstream stage has incomplete marker")
     p50=source50/"candidate_provenance.json"
     p51=source51/"review_provenance.json"
