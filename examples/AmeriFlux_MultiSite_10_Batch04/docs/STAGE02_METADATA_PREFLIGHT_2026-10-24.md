@@ -1,6 +1,6 @@
 # AmeriFlux Batch04 — Stage02 coordinate/IGBP operator results (2026-10-24)
 
-**Evidence:** user-supplied IRIDIS6 read-only Stage02 terminal output. Assistant has not independently accessed IRIDIS6.
+> **Historical pre-approval record:** On 2026-10-24 the user approved BIF GROUP_ID 1495 for US-Seg (34.3623, -106.7020, 1596 m). This original 9/10 result is preserved for provenance; see [human-approved location decision](STAGE02_US_SEG_GROUP1495_USER_APPROVAL_2026-10-24.md). A revised Stage02 rerun is still required.\n\n**Evidence:** user-supplied IRIDIS6 read-only Stage02 terminal output. Assistant has not independently accessed IRIDIS6.
 
 **Result:** `STAGE02 SUMMARY: 9/10 coordinate + first-interval checks PASS; failures: US-Seg`. No original file, surface, forcing, CIME case or Slurm job changed.
 
