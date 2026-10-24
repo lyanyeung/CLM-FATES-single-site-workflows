@@ -1,0 +1,122 @@
+{
+  "site": "CH-Dav",
+  "batch": "8",
+  "case": "CH-Dav_FATES_SPINUP500",
+  "status": "OK",
+  "mode": "1000_YEAR_STANDARD",
+  "initial_model_year": 1997,
+  "forcing_years": [
+    1997,
+    2025
+  ],
+  "model_history_years": [
+    1997,
+    2996
+  ],
+  "archived_history_count": 1000,
+  "checkpoint_model_year": 2997,
+  "checkpoint_path": "/scratch/ly3n24/CTSM_FATES_OUTPUTS/archive/CH-Dav_FATES_SPINUP500/rest/2997-01-01-00000",
+  "last_complete_model_forcing_cycle": [
+    2954,
+    2982
+  ],
+  "completed_forcing_cycles": 34,
+  "remaining_partial_years": 14,
+  "raw_ec_observation_source": [
+    {
+      "path": "/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/CH-Dav/forcing/raw/ICOS_CH-Dav_FLUXNET_1997-2026_v1.3_r1/ICOS_CH-Dav_FLUXNET_FLUXMET_HH_1997-2026_v1.3_r1.csv",
+      "gpp_column": "GPP_DT_VUT_REF"
+    }
+  ],
+  "GPP_column_preference": "GPP_DT_VUT_REF",
+  "EC_NEE": "NEE_VUT_REF",
+  "model_NEE": "-FATES_NEP",
+  "model_GPP": "FATES_GPP",
+  "flux_unit": "g C m-2 d-1",
+  "monthly_metrics": [
+    {
+      "Site": "CH-Dav",
+      "Flux": "GPP",
+      "Scale": "monthly",
+      "N": 348,
+      "R": 0.9160768133126679,
+      "R2": -1.4006241957203622,
+      "RMSE": 3.033090070738254,
+      "MAE": 2.2365080043045045,
+      "Bias": 2.0350807940040965,
+      "ModelCycleFirst": 2954,
+      "ModelCycleLast": 2982
+    },
+    {
+      "Site": "CH-Dav",
+      "Flux": "NEE",
+      "Scale": "monthly",
+      "N": 348,
+      "R": 0.45401825495164105,
+      "R2": -0.043843993133725334,
+      "RMSE": 2.009857093269214,
+      "MAE": 1.6125796495647324,
+      "Bias": 0.6063754194890845,
+      "ModelCycleFirst": 2954,
+      "ModelCycleLast": 2982
+    }
+  ],
+  "IGBP_in_original_BIF": [
+    "ENF"
+  ],
+  "dominant_FATES_PFT": {
+    "last_PFT_model_year": 2996,
+    "dominant_PFT_name": "broadleaf_evergreen_extratrop_tree",
+    "dominant_PFT_slot": 4,
+    "dominant_VEGC_pct": 93.68415732687504
+  },
+  "PFT_parameter_file": "/iridisfs/scratch/ly3n24/CLM_FATES/CTSM/cime/../src/fates/parameter_files/fates_params_default.json",
+  "FATES_effective_flags": {
+    "use_fates": ".true.",
+    "use_fates_sp": ".false.",
+    "use_fates_fixed_biogeog": ".false.",
+    "use_fates_nocomp": ".false.",
+    "create_crop_landunit": ".false.",
+    "use_crop": ".false."
+  },
+  "carbon_units": {
+    "TOTECOSYSC": {
+      "factor": 1.0,
+      "input": "gC/m^2",
+      "output": "g C m-2"
+    },
+    "TOTSOMC": {
+      "factor": 1.0,
+      "input": "gC/m^2",
+      "output": "g C m-2"
+    },
+    "TOTLITC": {
+      "factor": 1.0,
+      "input": "gC/m^2",
+      "output": "g C m-2"
+    },
+    "FATES_VEGC": {
+      "factor": 1.0,
+      "input": "kg m-2",
+      "output": "kg m-2"
+    },
+    "FATES_STOREC": {
+      "factor": 1.0,
+      "input": "kg m-2",
+      "output": "kg m-2"
+    },
+    "FATES_STRUCTC": {
+      "factor": 1.0,
+      "input": "kg m-2",
+      "output": "kg m-2"
+    }
+  },
+  "original_git_revision": "8f64dc94adcede3efc5b513213688a92ae867602",
+  "limitations": [
+    "Numerical 1% trend is a project-specific screen, not an equilibrium certificate",
+    "PFT vegetation carbon share is not tower-footprint species area or cover",
+    "Tower EC observations may be gap-filled FLUXNET products",
+    "NetCDF coverage and checkpoint are separate forms of evidence",
+    "Full FATES can have unrealistic vegetation despite a high GPP/NEE skill"
+  ]
+}
