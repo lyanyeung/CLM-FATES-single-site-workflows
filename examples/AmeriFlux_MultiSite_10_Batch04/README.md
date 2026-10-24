@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 04
 
-> **Operational status (2026-10-24): Stage00–02 structural metadata 10/10 PASS, Stage02C HH continuity 10/10 PASS; Stage04 3/3 targeted diagnostics PASS; Stage05/06 3-site candidate and physical audits PASS; Stage07 3 full derived CSVs WRITTEN (376 exact-time ERA5 VPD replacements, 1,566 US-Ton QC0 native readings protected); Stage08 remaining 7-site builder ready, not yet executed.** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 post-approval 10/10 PASS verified on IRIDIS6; US-Seg approved BIF GROUP_ID 1495 coordinates/elevation validated.** See [final Stage02 results](docs/STAGE02_POST_APPROVAL_VERIFIED_2026-10-24.md). See [Stage02 evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). [Stage02B US-Seg diagnostic](scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py) has been executed. Paired BIF GROUP_ID 1479 vs 1495 evidence is documented in the [Stage02B ledger](docs/STAGE02B_US_SEG_PROVENANCE_VERIFIED_2026-10-24.md); The [human-approved decision](docs/STAGE02_US_SEG_GROUP1495_USER_APPROVAL_2026-10-24.md) is latitude 34.3623, longitude -106.7020 and elevation 1596 m. Stage02C full-HH timestamp audit **completed 10/10 PASS**, with scientific QC concerns preserved in the [Stage02C report](docs/STAGE02C_FULL_HH_TIME_QC_AUDIT_2026-10-24.md). No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
+> **Operational status (2026-10-24): Stage00–02 structural metadata 10/10 PASS, Stage02C HH continuity 10/10 PASS; Stage04 3/3 targeted diagnostics PASS; Stage05/06 3-site candidate and physical audits PASS; Stage07 3 full derived CSVs WRITTEN (376 exact-time ERA5 VPD replacements, 1,566 US-Ton QC0 native readings protected); Stage08 7/7 full derived CSVs VERIFIED (416 patch rows / 696 HOLD); 10/10 complete candidate FLUXMET files generated; Stage09 US-Rpf/US-SRM native-VPD repair prepared (not yet run).** SHA256-protected original ZIPs are documented in the [Stage00 integrity ledger](docs/STAGE00_TRANSFER_VERIFIED_2026-10-24.md); all ten release packages extracted 16 CSVs each with 0 structural failures in the [Stage01 results](docs/STAGE01_EXTRACTION_VERIFIED_2026-10-24.md). **Stage02 post-approval 10/10 PASS verified on IRIDIS6; US-Seg approved BIF GROUP_ID 1495 coordinates/elevation validated.** See [final Stage02 results](docs/STAGE02_POST_APPROVAL_VERIFIED_2026-10-24.md). See [Stage02 evidence](docs/STAGE02_METADATA_PREFLIGHT_2026-10-24.md). [Stage02B US-Seg diagnostic](scripts/stage02/02b_diagnose_US_Seg_coordinate_conflicts.py) has been executed. Paired BIF GROUP_ID 1479 vs 1495 evidence is documented in the [Stage02B ledger](docs/STAGE02B_US_SEG_PROVENANCE_VERIFIED_2026-10-24.md); The [human-approved decision](docs/STAGE02_US_SEG_GROUP1495_USER_APPROVAL_2026-10-24.md) is latitude 34.3623, longitude -106.7020 and elevation 1596 m. Stage02C full-HH timestamp audit **completed 10/10 PASS**, with scientific QC concerns preserved in the [Stage02C report](docs/STAGE02C_FULL_HH_TIME_QC_AUDIT_2026-10-24.md). No scientific forcing repairs, DATM inputs, surface/PFT decisions, CIME cases or spin-ups are approved.
 
 Fourth independent ten-site AmeriFlux campaign following [Batch03](../AmeriFlux_MultiSite_10_Batch03/), [Batch02](../AmeriFlux_MultiSite_10_Batch02/) and [Batch01](../AmeriFlux_MultiSite_10/). This directory contains the exact release manifest and reproducible scripts. Never commit raw tower ZIPs or derived large files to GitHub.
 
@@ -275,6 +275,36 @@ On IRIDIS6 first run `--check`, and then optionally `--run` for **new reports on
 
 Stage06 reports go into a new `reports/stage06_qcv5_candidate_effects_*` folder with SHA receipts and a boundary review list, without editing original or Stage05 files. **No production sparse-patch merge before the 754 HOLDs and boundary/physical QC have been resolved and seven remaining Batch04 sites have completed appropriate scientific screening.**
 
+## Stage08 success and Stage09 next direct native-VPD fixes (2026-10-24)
+
+**Stage08 VERIFIED 7/7:** `US-Rpf, US-Seg, US-Ses, US-Slt, US-SRG, US-SRM, US-Uaf` have complete derived FLUXMET_HH CSVs. 2,384,448 original native half-hours were copied; exactly 208 half-hours in five sites received 416 RH/VPD variable-level patches. US-Rpf and US-Slt had no modified source values. Stage08 has **696 HOLD** records (US-Rpf 688, US-Seg 4, US-SRG 1, US-SRM 1, US-Uaf 2; US-Ses and US-Slt zero). See [Stage08 verified SHA receipt summary](docs/STAGE08_VERIFIED_SEVEN_SITE_DERIVED_CSVS_2026-10-24.md).
+
+**Actual Stage08 output:** `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch04/qcv5_stage08_remaining_seven_candidates/candidate_20261024T120137Z/`.
+
+**10/10 Batch04 site candidates now exist**, combining three Stage07 and seven Stage08 complete derived CSVs. They are NOT yet Post-v5 approved forcing.
+
+**Stage09 (ready, NOT run):** target **689** invalid paired ERA humidity HOLDs, including **688 US-Rpf + 1 US-SRM**, without touching the deferred US-Syv or any other site. Apply actual physically admissible short original tower VPD interpolations (maximum four half-hours, trustworthy original QC0/QC1 flank records) and derive RH when original VPD is already valid but separate RH is invalid. Long runs and physically implausible interpolations remain HOLD. The command creates **two new full derived source CSVs** (not merely a diagnostic report), retains all original/Stage08 file SHA receipts and never overwrites previous candidate directories.
+
+[Stage09 code](scripts/stage09/09_repair_ERA_invalid_native_humidity_short_gaps.py) | [Stage09 approved approach and run](docs/STAGE09_US_RPF_SRM_DIRECT_NATIVE_HUMIDITY_REPAIR_2026-10-24.md).
+
+Run on IRIDIS6:
+```bash
+(
+  set -euo pipefail
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/c794f403bac063092d17030d1939121fae3b94a9"
+  REL="examples/AmeriFlux_MultiSite_10_Batch04"
+  BASE="$HOME/ameriflux_batch04_stage09"
+  SCRIPT="$BASE/scripts/stage09/09_repair_ERA_invalid_native_humidity_short_gaps.py"
+  mkdir -p "$(dirname "$SCRIPT")"
+  curl -fLsS --retry 3 "$RAW/$REL/scripts/stage09/09_repair_ERA_invalid_native_humidity_short_gaps.py" -o "$SCRIPT"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  python3 -B "$SCRIPT" --apply 2>&1 | tee "$BASE/stage09_apply.log"
+)
+```
+
+The 754 Stage05 inherited HOLDs at the three original priority sites (plus 12 Stage07 invalid direct ERA edge targets, possibly overlapping) remain separate. The Stage08 696 HOLD entries and any Stage09 survivors must not be silently ignored in future model forcing.
+
 ## Latest verified: Stage07 three complete site candidates DONE; Stage08 remaining seven prepared
 
 **Stage07 IRIDIS6 execution verified on 2026-10-24.** Three complete native-length derived FLUXMET_HH files were written, with original Stage05/Stage06 inputs SHA-pinned and unchanged:
@@ -291,7 +321,7 @@ Stage06 reports go into a new `reports/stage06_qcv5_candidate_effects_*` folder 
 
 [Stage07 verified output and SHA record](docs/STAGE07_VERIFIED_THREE_FULL_DERIVED_CSVS_2026-10-24.md). **This is a derived research candidate, not approved Post-v5/CIME/DATM spinup forcing.**
 
-**Stage08 next:** the [remaining seven site candidate-generation script](scripts/stage08/08_build_remaining_seven_qcv5_candidates.py) is now committed and **not yet run** on IRIDIS6 for US-Rpf, US-Seg, US-Ses, US-Slt, US-SRG, US-SRM, US-Uaf. It extends the established Stage05 QCv5 max4-HH interpolation + physically screened same-time ERA RH method, but **protects physically plausible native VPD QC0 readings** and **does not treat positive RH<5% alone as an ERA replacement requirement**. It does not invent the US-Syv one-off joint-zero TA fix for other sites. A source RH column is optional if missing in a particular FLUXMET release. It writes a new independent seven-site **complete derived FLUXMET_HH CSV per site** plus sparse candidates and HOLD ledger, original source SHA receipts, **no original or existing model edits**. The seven-site pipeline can advance without reopening the successful three-site Stage07 derived runs.
+**Stage08 VERIFIED on IRIDIS6:** the [remaining seven-site script](scripts/stage08/08_build_remaining_seven_qcv5_candidates.py) was executed successfully for US-Rpf, US-Seg, US-Ses, US-Slt, US-SRG, US-SRM, US-Uaf. It extends the established Stage05 QCv5 max4-HH interpolation + physically screened same-time ERA RH method, but **protects physically plausible native VPD QC0 readings** and **does not treat positive RH<5% alone as an ERA replacement requirement**. It does not invent the US-Syv one-off joint-zero TA fix for other sites. A source RH column is optional if missing in a particular FLUXMET release. It writes a new independent seven-site **complete derived FLUXMET_HH CSV per site** plus sparse candidates and HOLD ledger, original source SHA receipts, **no original or existing model edits**. The seven-site pipeline can advance without reopening the successful three-site Stage07 derived runs.
 
 Execute:
 ```bash
