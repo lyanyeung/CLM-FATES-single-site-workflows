@@ -10,7 +10,8 @@ Source RH<5% alone is NOT evidence of a bad VPD and does not trigger ERA swap.
 Raw RH may be absent in the original FLUXMET schema and is treated as optional.
 
 Do NOT edit FLUXMET, packaged ERA5, surfaces, cases or DATM. --build-candidates
-writes only a NEW SEVEN-SITE sparse overlay, hold ledger, report and input checksums.
+writes a NEW seven-site sparse overlay, HOLD ledger, SHA report and
+SEVEN COMPLETE DERIVED FLUXMET_HH CSVs. Never overwrites sources or models.
 Missing raw RH alone is NOT a VPD defect; the model ultimately uses humidity
 derived from physically valid TA/VPD/PA, not an unverified raw RH column.
 Packaged ERA5_* variables are calibrated/downscaled FLUXNET-derived values,
@@ -400,6 +401,87 @@ def atomic_csv(path, fields, rows):
     tmp.replace(path)
 
 
+
+def write_full_derived_site_csvs(dest, manifest_map, site_names, patches, source_root):
+    """Materialize complete new seven-site FLUXMET copies; no source writes.
+
+    Sparse patches are checked against exact original native values and keys.
+    Unmodified rows and all original fields carry across unchanged.
+    """
+    index = defaultdict(dict)
+    for item in patches:
+        site, ts, var = item["site"], item["TIMESTAMP_START"], item["variable"]
+        if site not in site_names or var not in ("TA_F", "PA_F", "VPD_F", "RH"):
+            raise ValueError("Unexpected sparse candidate key for full materialization")
+        if var in index[(site, ts)]:
+            raise ValueError("Duplicate patch variable at full materialization")
+        index[(site, ts)][var] = item
+    outcomes = {}
+    for site in site_names:
+        original = original_file(source_root, site, manifest_map[site], "FLUXMET")
+        output = dest / (site + "_Stage08_QCv5_derived_FLUXMET_HH.csv")
+        output_partial = output.with_suffix(output.suffix + ".partial")
+        target_times = {stamp for (s, stamp) in index if s == site}
+        source_times_matched = set()
+        seen_changes = 0
+        n = 0
+        cells = 0
+        with original.open(encoding="utf-8-sig", newline="") as src, \
+             output_partial.open("x", encoding="utf-8", newline="") as dst:
+            reader = csv.DictReader(src)
+            if (not reader.fieldnames or len(set(reader.fieldnames)) != len(reader.fieldnames)
+                    or any(k not in reader.fieldnames for k in FIELDS)):
+                raise ValueError("Malformed source FLUXMET schema for " + site)
+            fieldnames = list(reader.fieldnames)
+            if "RH" not in fieldnames and any(
+                    "RH" in entries for (s, _), entries in index.items() if s == site):
+                fieldnames.append("RH")
+            writer = csv.DictWriter(dst, fieldnames=fieldnames)
+            writer.writeheader()
+            for row in reader:
+                n += 1
+                ts = row["TIMESTAMP_START"]
+                group = index.get((site, ts))
+                if group is not None:
+                    if ts in source_times_matched:
+                        raise ValueError("Duplicate native source timestamp: " + site + "/" + ts)
+                    source_times_matched.add(ts)
+                    anychange = False
+                    for var, p in group.items():
+                        if row["TIMESTAMP_END"] != p["TIMESTAMP_END"]:
+                            raise ValueError("Stage08 candidate wrong native end time")
+                        original_v = numeric(row.get(var))
+                        stored_v = numeric(p["original"])
+                        if (original_v is None) != (stored_v is None):
+                            raise ValueError("Candidate original missingness differs from source")
+                        if (original_v is not None and
+                                abs(original_v - stored_v) >
+                                1e-8 * max(1.0, abs(original_v), abs(stored_v))):
+                            raise ValueError("Original source numeric value mismatched: " + site)
+                        candidate_v = numeric(p["candidate"])
+                        if candidate_v is None:
+                            raise ValueError("Candidate value missing or nonfinite")
+                        if original_v is None or abs(original_v-candidate_v)>1e-10:
+                            row[var] = fmt(candidate_v)
+                            cells += 1
+                            anychange = True
+                    seen_changes += int(anychange)
+                writer.writerow(row)
+        if n < 100 or source_times_matched != target_times:
+            raise ValueError("Incomplete source full CSV rows or missing candidate timestamps " + site)
+        output_partial.replace(output)
+        outcomes[site] = {
+            "rows": n, "changed_native_times": seen_changes,
+            "changed_variables": cells, "full_derived_path": str(output),
+            "full_derived_sha256": full_sha(output),
+            "size": output.stat().st_size,
+        }
+        print("STAGE08 FULL DERIVED", site, "rows", n,
+              "changed_half_hours", seen_changes, "sha256",
+              outcomes[site]["full_derived_sha256"], flush=True)
+    return outcomes
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--sites-root", type=Path, default=ROOT)
@@ -448,6 +530,9 @@ def main():
         dest = args.output_root / ("candidate_" +
             datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"))
         dest.mkdir(parents=True, exist_ok=False)
+        (dest / "INCOMPLETE_DO_NOT_USE_FOR_DATM_OR_SPINUP").write_text(
+            "Stage08 full native-length research candidates. Original Stage08 HOLDs unresolved.\n",
+            encoding="utf-8")
         # Both original inputs are checksum-pinned only after the complete
         # preview succeeds, avoiding partial derived output on site failure.
         for site in args.sites:
@@ -459,6 +544,8 @@ def main():
                    sorted(patches, key=lambda x:
                           (x["site"], x["TIMESTAMP_START"], x["variable"])))
         atomic_csv(dest / "unresolved_hold.csv", HOLD_COLUMNS, holds)
+        report["derived_files"] = write_full_derived_site_csvs(
+            dest, packages, args.sites, patches, args.sites_root)
         report["created_utc"] = datetime.now(timezone.utc).isoformat()
         report["candidate_patch_sha256"] = full_sha(dest / "candidate_patch.csv")
         (dest / "report.json").write_text(
@@ -471,7 +558,7 @@ def main():
             "source is NOT independent native ERA5. Review unresolved_hold.csv.\n",
             encoding="utf-8")
         print("CANDIDATE OVERLAY WRITTEN:", dest)
-        print("SOURCE SHA256 AND PATCH SHA256 RECORDED IN report.json")
+        print("SEVEN FULL DERIVED FLUXMET_HH CSVs, ORIGINAL SOURCE SHA256 AND PATCH SHA256 RECORDED IN report.json")
     else:
         print("INSPECT ONLY: NO DATA OR PATCH FILES WRITTEN")
     print("STAGE08 SCIENCE STATUS: POST-QCV5 REVIEW REQUIRED; NO MODEL APPROVAL")
