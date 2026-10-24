@@ -273,13 +273,27 @@ def analyze_one(batch, entry, dest, m, args):
                     "AlignedCycleMeanAbsChange_pct",
                     "Exploratory_1pct_100yr_and_cycle_screen"]].to_string(index=False))
     print("MONTHLY ORIGINAL EC",score[["Flux","N","R2","RMSE","Bias"]].to_string(index=False))
+    focus={str(r["Variable"]):r for r in convergence.to_dict("records")}
+    anchors=("TOTECOSYSC","TOTSOMC","FATES_VEGC")
+    all_low=all(
+        focus.get(v,{}).get("Exploratory_1pct_100yr_and_cycle_screen")=="LOW_DRIFT"
+        for v in anchors
+    )
+    trend=lambda v: focus.get(v,{}).get("Last100y_trend_pct",float("nan"))
+    fluxrows={r["Flux"]:r for r in score.to_dict("records")}
     return {
         "Batch":batch,"Site":site,"Case":case,"Status":"OK","ElapsedYears":len(years),
         "Checkpoint":ckpt[0] if ckpt else "",
         "LastModelYear":years[-1],"CycleStart":fullcycle[0],"CycleEnd":fullcycle[-1],
         "PFT":(pft_summary or {}).get("dominant_PFT_name", ""),
-        "GPP_R2":next(float(x["R2"]) for x in score.to_dict("records") if x["Flux"]=="GPP"),
-        "NEE_R2":next(float(x["R2"]) for x in score.to_dict("records") if x["Flux"]=="NEE"),
+        "TOTECOSYSC_Last100y_pct":trend("TOTECOSYSC"),
+        "TOTSOMC_Last100y_pct":trend("TOTSOMC"),
+        "FATES_VEGC_Last100y_pct":trend("FATES_VEGC"),
+        "ExploratoryCarbonScreen":"LOW_DRIFT" if all_low else "NOT_LOW_OR_UNDETERMINED",
+        "GPP_R2":float(fluxrows["GPP"]["R2"]),
+        "GPP_Bias":float(fluxrows["GPP"]["Bias"]),
+        "NEE_R2":float(fluxrows["NEE"]["R2"]),
+        "NEE_Bias":float(fluxrows["NEE"]["Bias"]),
         "ResultDir":str(out)}
 
 
