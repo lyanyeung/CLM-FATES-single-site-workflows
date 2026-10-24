@@ -81,7 +81,7 @@ def state(row):
   raise RuntimeError('Invalid derived RH '+str(row.get('time')))
  return tc,rh
 
-def parse_targets(path,site,baseline):
+def parse_targets(path,site,baseline,expected_lt1=None,expected_1to5=None):
  # Stage77 ledger rounds RH to SIX decimals for human readability.
  # Exactly-at-threshold values can become "1.0" despite an actual RH < 1.
  # Therefore select with UNROUNDED Stage75 baseline T/Q/P, and use the
@@ -99,7 +99,9 @@ def parse_targets(path,site,baseline):
    if row['operator_decision']!='RECOMPUTE_ALL_RH_BELOW_5_NATIVE_ERA5_T_D2M_SP':
     raise RuntimeError('Stage77 ledger decision changed '+site+' '+t)
    rounded[t]=number(row['original_RH_pct'])
- if len(rounded)!=RH_LT1.get(site,0)+RH_1TO5.get(site,0):
+ lt1=RH_LT1.get(site,0) if expected_lt1 is None else expected_lt1
+ low=RH_1TO5.get(site,0) if expected_1to5 is None else expected_1to5
+ if len(rounded)!=lt1+low:
   raise RuntimeError('Stage77 all RH<5 target census mismatch '+site)
  target=set();reconciled={};boundary_rounding=[]
  with baseline.open(newline='',encoding='utf-8-sig') as f:
@@ -122,7 +124,7 @@ def parse_targets(path,site,baseline):
     boundary_rounding.append((stamp,rounded[stamp],precise_rh))
  if set(reconciled)!=set(rounded):
   raise RuntimeError('Stage77 ledger has timestamps absent from selected Stage75 baseline '+site)
- if len(target)!=RH_LT1.get(site,0):
+ if len(target)!=lt1:
   raise RuntimeError('PRECISE Stage75 RH<1 target census mismatch '+site+
                      ' actual='+str(len(target)))
  if boundary_rounding:
@@ -278,7 +280,7 @@ def selftest():
    w.writerow({'site':'CA-Man','timestamp_local_standard':'2010-01-01 12:00:00',
                'original_RH_pct':'1.0',
                'operator_decision':'RECOMPUTE_ALL_RH_BELOW_5_NATIVE_ERA5_T_D2M_SP'})
-  assert '2010-01-01 12:00:00' in parse_targets(ledger,'CA-Man',base)
+  assert '2010-01-01 12:00:00' in parse_targets(ledger,'CA-Man',base,expected_lt1=1,expected_1to5=0)
  print('SELF-TEST PASS: exactly 18 original RH<1 ERA coupled replacements; 1091 RH1-5 retained; unrelated fields preserved')
 
 def main():
