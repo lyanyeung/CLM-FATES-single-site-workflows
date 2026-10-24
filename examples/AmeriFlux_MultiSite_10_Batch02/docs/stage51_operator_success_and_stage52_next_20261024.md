@@ -79,7 +79,7 @@ report directory retains an INCOMPLETE_DO_NOT_USE marker.
     "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/$REL/scripts/stage52/52_review_original_RH_supersaturation_and_ICt_temperature_QC.py" \
     -o "$SCRIPT"
   test "$(git hash-object "$SCRIPT")" = \
-    "0ff12a3b6fdb3b64afa69327cf0b02ba62c46755"
+    "f39506e9c7b2393a14bcc1745e2018c671d81456"
   "$PY" -m py_compile "$SCRIPT"
   "$PY" -B "$SCRIPT" --self-test
   "$PY" -B "$SCRIPT" --audit \
@@ -88,7 +88,7 @@ report directory retains an INCOMPLETE_DO_NOT_USE marker.
 ```
 
 If successful: `STAGE52 AUDIT PASS | 405 RH>100 phase cases / 27 US-ICt T-QC cases`.
-Stage52 has **not yet been executed on live IRIDIS6**. Its outputs
+Stage52 GitHub script syntax guard was corrected in commit ec98ae8a7122e04e73cc45e656b2dfaaeced7058 after an unmatched closing parenthesis was detected by the operator on first attempt. Stage52 still **has not passed live IRIDIS6 execution**. Its outputs
 will determine whether raw RH>100 cases are tiny/below-freezing and
 which non-QC0 US-ICt original temperatures demand a more explicit
 joint replacement decision. Do not treat audit categories as approval.
