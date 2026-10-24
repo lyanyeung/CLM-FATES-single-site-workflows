@@ -1562,3 +1562,24 @@ than discarding previous CDS downloads.
 restart command](docs/stage62_operator_pass_next_auto_CDS_20261024.md).
 The race-safe retry script has been committed, but it has not
 yet run on the operator's cluster.
+
+
+### Stage62 original CDS source SHA256 mismatch at US-CMW 2014, isolated immutable rescue (24 October 2026)
+
+The resumed Stage62 preflight showed a concrete source
+`CDS source SHA256 mismatch` for
+`ERA5_2014_lat+031.75_lon-0110.25/original_CDS_payload`.
+The existing verified receipt and payload must **not** be overwritten
+or deleted. A new Stage62 Git blob
+`0b68fa14a7e008bd7fb1b19153024e215f67c2bf`
+adds an isolated recovery cache and a narrow SHA conflict-only gate:
+it re-downloads just this grid/year under a different directory,
+builds an independently verified receipt, reuses all other verified
+Stage15/18/50/62 CDS grid-years and then continues `--auto`
+towards the original 5,133-row candidate/hold census.
+Any other CDS integrity mismatch still stops without changing source.
+No EC original, previous stage, DATM, NetCDF forcing or model writes.
+[Confirmed failure, recovery provenance and exact pinned IRIDIS6
+restart command](docs/stage62_operator_pass_next_auto_CDS_20261024.md).
+The new rescue path is published on GitHub but has not yet been
+executed on IRIDIS6.
