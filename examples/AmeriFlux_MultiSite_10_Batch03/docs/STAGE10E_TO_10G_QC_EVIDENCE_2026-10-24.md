@@ -138,3 +138,26 @@ Stage10i results retained on IRIDIS6:
 
 Next proposed diagnostic (code committed, **not yet executed on IRIDIS6**): [Stage10j source-versus-grid counterfactual](../scripts/stage10/10j_source_vs_grid_humidity_counterfactuals.py). This will contrast existing original ERA temperature/VPD with existing SHA-pinned ERA5-Land gridded T/dewpoint evidence at identical 1,924 event IDs, without any new meteorological download or repair. A single-input mathematical substitution is a diagnostic sensitivity **only**, not a valid repair recommendation.
 
+
+### Stage10j — VERIFIED source vs ERA5-Land counterfactuals
+
+Stage10j [script](../scripts/stage10/10j_source_vs_grid_humidity_counterfactuals.py) passed IRIDIS6 `--self-test`, `--check` and `--run` on 2026-10-24. All 1,924 events and 32 site-years matched the existing SHA-pinned Stage10b (ERA5-Land T/Tdew) and Stage10i (source ERA temperature/VPD) reports. The original source `e_a=es_water(TA_ERA)-VPD_ERA` was negative for all 1,924; grid-derived dewpoint vapour pressure was positive for all 1,924. This is a **cross-reanalysis algebraic sensitivity**, not an independent observation of local humidity.
+
+Mutually exclusive source/grid single-variable counterfactual results:
+
+| Stage10j category | Count | Description |
+| --- | ---: | --- |
+| GRID_VPD_ONLY_REMOVES_NEGATIVE_EA | 1,736 | Substitute only ERA5-Land dewpoint-derived grid VPD at original source T; nonnegative implied vapour pressure |
+| BOTH_SINGLE_INPUT_SWAPS_REMOVE_NEGATIVE_EA | 186 | Either grid VPD alone or grid T alone eliminates negative implied vapour pressure |
+| GRID_T_ONLY_REMOVES_NEGATIVE_EA | **2** | Only grid T changes the sign; both exceptions were from **US-NR3** |
+| NEITHER_SINGLE_INPUT_SWAP_REMOVES_NEGATIVE_EA | 0 | Neither swap changes sign |
+
+Overall **1,922/1,924 = 99.90%** get nonnegative implied water vapour pressure under the VPD-only numerical counterfactual; only **188/1,924 = 9.77%** under the temperature-only one. **These are not approved replacement percentages.** FLUXNET source ERA and ERA5-Land are related, and replacing a VPD estimated at one 2m temperature with a grid VPD while retaining another temperature is not a thermodynamically validated prescription.
+
+Stage10j report (kept on IRIDIS6):
+
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage10j_ERA_counterfactuals_20261024T060351Z_eddc1a32/`
+
+Next code prepared, **not yet run against IRIDIS6 data**: [Stage10k exception provenance / science-gate check](../scripts/stage10/10k_exception_provenance_science_gate.py). It verifies the Stage10j SHA receipt, explicitly lists both US-NR3 exceptional event IDs, summarizes QC2/QC1 source provenance, and makes no forcing or approval changes.
+
+**Current approvals:** humidity repairs 0; UTC offsets 0; Post-v5 acceptance 0; CLM-FATES spinups 0.
