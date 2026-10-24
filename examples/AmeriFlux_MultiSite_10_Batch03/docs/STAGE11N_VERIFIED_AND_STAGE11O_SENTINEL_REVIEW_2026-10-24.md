@@ -22,8 +22,17 @@ The five March 23 targets appear most cohesive in the checked source-native cont
 
 ## Stage11o: read-only edge sentinel sensitivity
 
-[Stage11o script](../scripts/stage11/11o_two_shifted_boundary_sentinal_RH_READONLY.py) is committed but has not run on IRIDIS6. It adds precisely **two unapproved source-native edge sentinels**, US-NC2 202503181730 and 202503251100, to the original seven hypothetical candidates. It uses the existing SHA-sealed Stage11m 40-row context and Stage11l full native forcing, derives humidity from paired ERA RH at retained site TA, and compares eight in-memory scenarios over ten adjacent boundaries. It does not change tower temperature, original forcing, processing masks, or production approval.
+[Stage11o shifted-boundary sentinel script](../scripts/stage11/11o_two_shifted_boundary_sentinal_RH_READONLY.py) **PASSED IRIDIS6 syntax, --self-test, --check and --run on 2026-10-24**, and produced an SHA-sealed read-only report at `reports/stage11o_two_shifted_RH_boundaries_READ_ONLY_20261024T103620Z_6abc437f/` under the Batch03 IRIDIS6 experiment. It adds precisely **two unapproved source-native edge sentinels**, US-NC2 202503181730 and 202503251100, to the original seven hypothetical candidates. It uses the existing SHA-sealed Stage11m 40-row context and Stage11l full native forcing, derives humidity from paired ERA RH at retained site TA, and compares eight in-memory scenarios over ten adjacent boundaries. It does not change tower temperature, original forcing, processing masks, or production approval.
 
 The boundary source data indicate Mar18 17:30 original RH 17.161738% versus companion 24.698346%, and Mar25 11:00 original RH 10.786306% versus companion 26.855384%. These differences warrant further review but do not establish that ERA is ground truth.
 
 Scientific status: the original 64 ERA-RH candidate targets and 9 original TA/VPD KEEP choices remain unchanged; the seven and two sentinel candidates are unapproved. No Stage11o forcing output is permitted.
+
+
+## VERIFIED Stage11o nine-event what-if result
+
+Eight read-only scenarios and ten selected native adjacent intervals were compared, with EC tower temperature held fixed. Baseline Stage11l max selected jump was 9.467392 hPa, with five jumps >4 hPa. The all-seven-plus-two what-if scenario reduced the maximum to **2.691868 hPa**, with **zero selected jumps above 4 hPa**, and zero newly added jump greater than 2 hPa across the ten inspected edges. Seven-only max was 4.683863 hPa, revealing the shifted Mar25 10:30–11:00 jump.
+
+Nine *unapproved* source-native US-NC2 hypothetical timestamps are: 202503181730, 202503181800, 202503230730, 202503230800, 202503230830, 202503231530, 202503231600, 202503251030, 202503251100. Three were already amended by Stage07 (202503230730, 202503230800, 202503251030) and cannot be silently overwritten. Numeric boundary continuity within ten selected edges does not establish independently reliable tower humidity or full-year science acceptance. The 64 previously approved ERA-RH trial target times and all sealed Stage07/11h/11l forcing remain unchanged; no Post-v5/DATM/spinup permissions.
+
+Separate from this particular Stage11o: the repository contains a different `11o_us_nc2_2025_march_era5land_evidence.py` ERA5-Land evidence-acquisition workflow. The successful sentinel log alone does not establish the status of that download or its scientific validation.
