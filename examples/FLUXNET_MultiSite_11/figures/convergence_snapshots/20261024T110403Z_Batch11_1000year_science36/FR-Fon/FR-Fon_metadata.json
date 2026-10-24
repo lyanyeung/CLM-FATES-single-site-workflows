@@ -1,0 +1,128 @@
+{
+  "site": "FR-Fon",
+  "batch": "11",
+  "case": "FR-Fon_FATES_SPINUP500_11P",
+  "status": "OK",
+  "mode": "1000_YEAR_STANDARD",
+  "initial_model_year": 2005,
+  "forcing_years": [
+    2005,
+    2025
+  ],
+  "model_history_years": [
+    2005,
+    3004
+  ],
+  "archived_history_count": 1000,
+  "checkpoint_model_year": 3005,
+  "checkpoint_path": "/scratch/ly3n24/CTSM_FATES_OUTPUTS/archive/FR-Fon_FATES_SPINUP500_11P/rest/3005-01-01-00000",
+  "last_complete_model_forcing_cycle": [
+    2971,
+    2991
+  ],
+  "completed_forcing_cycles": 47,
+  "remaining_partial_years": 13,
+  "raw_ec_observation_source": [
+    {
+      "path": "/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/FR-Fon/forcing/raw_multisource_v1/ICOS/ICOS_FR-Fon_FLUXNET_FLUXMET_HH_2019-2026_v1.3_r1.csv",
+      "gpp_column": "GPP_DT_VUT_REF",
+      "valid_GPP_days": 2272,
+      "valid_NEE_days": 2272
+    },
+    {
+      "path": "/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/FR-Fon/forcing/raw_multisource_v1/FLX/FLX_FR-Fon_FLUXNET2015_FULLSET_HH_2005-2020_beta-3.csv",
+      "gpp_column": "GPP_DT_VUT_REF",
+      "valid_GPP_days": 5840,
+      "valid_NEE_days": 5840
+    }
+  ],
+  "GPP_column_preference": "GPP_DT_VUT_REF",
+  "EC_NEE": "NEE_VUT_REF",
+  "model_NEE": "-FATES_NEP",
+  "model_GPP": "FATES_GPP",
+  "flux_unit": "g C m-2 d-1",
+  "monthly_metrics": [
+    {
+      "Site": "FR-Fon",
+      "Flux": "GPP",
+      "Scale": "monthly",
+      "N": 252,
+      "R": 0.8836835887168538,
+      "R2": 0.7721715792166189,
+      "RMSE": 2.1784676616901684,
+      "MAE": 1.5119825535040574,
+      "Bias": 0.4034115614429487,
+      "ModelCycleFirst": 2971,
+      "ModelCycleLast": 2991
+    },
+    {
+      "Site": "FR-Fon",
+      "Flux": "NEE",
+      "Scale": "monthly",
+      "N": 252,
+      "R": 0.8899581036466352,
+      "R2": 0.5170912454138351,
+      "RMSE": 2.2158630311409206,
+      "MAE": 1.9365843856313,
+      "Bias": 1.5876255871658005,
+      "ModelCycleFirst": 2971,
+      "ModelCycleLast": 2991
+    }
+  ],
+  "IGBP_in_original_BIF": [],
+  "dominant_FATES_PFT": {
+    "last_PFT_model_year": 3004,
+    "dominant_PFT_name": "broadleaf_colddecid_extratrop_tree",
+    "dominant_PFT_slot": 6,
+    "dominant_VEGC_pct": 99.60169919638939
+  },
+  "PFT_parameter_file": "/iridisfs/scratch/ly3n24/CLM_FATES/CTSM/cime/../src/fates/parameter_files/fates_params_default.json",
+  "FATES_effective_flags": {
+    "use_fates": ".true.",
+    "use_fates_sp": ".false.",
+    "use_fates_fixed_biogeog": ".false.",
+    "use_fates_nocomp": ".false.",
+    "create_crop_landunit": ".false.",
+    "use_crop": ".false."
+  },
+  "carbon_units": {
+    "TOTECOSYSC": {
+      "factor": 1.0,
+      "input": "gC/m^2",
+      "output": "g C m-2"
+    },
+    "TOTSOMC": {
+      "factor": 1.0,
+      "input": "gC/m^2",
+      "output": "g C m-2"
+    },
+    "TOTLITC": {
+      "factor": 1.0,
+      "input": "gC/m^2",
+      "output": "g C m-2"
+    },
+    "FATES_VEGC": {
+      "factor": 1.0,
+      "input": "kg m-2",
+      "output": "kg m-2"
+    },
+    "FATES_STOREC": {
+      "factor": 1.0,
+      "input": "kg m-2",
+      "output": "kg m-2"
+    },
+    "FATES_STRUCTC": {
+      "factor": 1.0,
+      "input": "kg m-2",
+      "output": "kg m-2"
+    }
+  },
+  "original_git_revision": "8f64dc94adcede3efc5b513213688a92ae867602",
+  "limitations": [
+    "Numerical 1% trend is a project-specific screen, not an equilibrium certificate",
+    "PFT vegetation carbon share is not tower-footprint species area or cover",
+    "Tower EC observations may be gap-filled FLUXNET products",
+    "NetCDF coverage and checkpoint are separate forms of evidence",
+    "Full FATES can have unrealistic vegetation despite a high GPP/NEE skill"
+  ]
+}
