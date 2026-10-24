@@ -85,8 +85,10 @@ original 24 QC0 Stage07 edits are still separate science questions.
 Expected successful result begins with:
 `STAGE51 AUDIT PASS | exact 444 source-pinned ERA5 RH candidates`.
 
-**At present Stage51 is published but has not been run against the
-operator's actual IRIDIS6 Stage50 output.** The 27-row ERA5 T/RH
+**Stage51 has since PASSED on IRIDIS6.** Its 27 rows are all US-ICt,
+all original T QC nonzero, and none above 8 C original-minus-ERA5
+T discrepancy. See [Stage51 live results and Stage52 next](stage51_operator_success_and_stage52_next_20261024.md).
+The 27-row ERA5 T/RH
 alternative still requires explicit scientific choice before it could
 ever enter forcing. After Stage51 audit, review whether to use the
 observed Tsite for the 417 humidity-only proposals, how to treat the
