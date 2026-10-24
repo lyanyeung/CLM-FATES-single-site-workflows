@@ -30,6 +30,10 @@ The script `79_era_transition_source_diagnosis.py` uses only existing IRIDIS6 re
 
 Generated only with `--audit`: `89_edge_native_ERA_vs_unchanged_tower_context.csv`, `clustered_89_edge_source_review.csv`, and `manifest.json` in a new date-stamped `reports/stage79_89_native_ERA_source_transitions_*/` directory.
 
+## IRIDIS6 Stage79 first run: corrected script typo
+
+The initial Stage79 `--audit` run stopped safely at `raw_qc()` with **`NameError: name 'poss' is not defined`**. The code had defined `possibles=sorted(...)` but tested `len(poss)`. This is a Python script typo, **not** an ERA5 source, humidity, or forcing failure; it occurred before report generation. The corrected script now calls `len(possibles)` and its **self-test deliberately exercises the missing-FLUXMET-file condition**, so the bug cannot silently recur. Redownload the new pinned script and rerun `--audit`; no Stage77 native ERA5 downloads, forcing replacements or Stage78 analyses need to be repeated.
+
 ## Commands
 
 ```bash
