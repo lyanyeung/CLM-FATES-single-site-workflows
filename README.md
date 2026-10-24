@@ -1,6 +1,12 @@
 # CLM-FATES single-site workflows
 
 
+## Stage80 completed — 10-site forcing final; Stage81 DATM generation (24 October 2026)
+
+**Verified on IRIDIS6 by operator log:** Stage80 self-test, full read-only ten-site audit, and full candidate generation **all PASS**. Output: `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage80_RH_lt1_final_20261024T123353Z/`. **Only 18 original RH<1% records** replaced with native ERA5 jointly recomputed T/D2m/P; **1,091 original RH1–5%** and every other Stage75 value retained. Selected four new full forcing candidates (CA-Ca3 7; CA-Cbo 2; CA-Man 1; US-Bar 8) plus six unchanged originals. Stage80 flags **17 operator-accepted RH/T half-hour edge warnings** and preserves prior Stage74 CA-Man independent 18-row amendment. Selected ten-site checksum manifest: `10_site_selected_forcing_sources.tsv`. **RH repair now complete**.
+
+[**Stage81 DATM technical NetCDF generator**](examples/AmeriFlux_MultiSite_10/scripts/stage81/README.md) converts this exact checksum-pinned 10-site selection to annual 30-min NOLEAP CLM1PT-style NetCDF, with `SHUM` from Stage80 `QBOT`, measured-model-grid site coordinates from existing point surfaces and 10 unactivated DATM legacy XML stream templates. It does not fabricate ZBOT or change temporal support. Scientific model activation remains held for CA-Cbo/CA-Man sensor height, actual case domain/streams setup and interval centering. No active DATM or Slurm job automatically changed.
+
 ## ACTIVE Batch01 operator rule — only original RH <1% replaced (24 October 2026)
 
 **LATEST USER DECISION, superseding Stages77–79's broader low-RH replacement and edge-review instructions.** For the ten Stage75 Batch01 selected forcings: replace **only the 18 ORIGINAL half-hour records with RH<1%**, always using the already-computed same-source **native ERA5 T2m + 2m dewpoint + surface pressure** joint meteorological state (`TBOT`, `TA_USE`, `QBOT`, `PSRF`, `VPD_USE`). Counts: **CA-Ca3 7, CA-Cbo 2, CA-Man 1, US-Bar 8**. Keep **every other row unchanged**, including **all 1,091 original RH 1–5% records** (CA-Ca3 34; CA-Cbo 26; CA-Man 120; CA-TP4 6; US-Aud 874; US-Bar 31), and preserve the Stage75 CA-Man prior Stage74 approved edits as baseline. The older **all-1,109 RH<5% Stage77 trials are historical alternatives, NOT the current selected forcing version**.
