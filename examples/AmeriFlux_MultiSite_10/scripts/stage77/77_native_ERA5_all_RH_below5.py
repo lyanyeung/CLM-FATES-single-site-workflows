@@ -396,7 +396,13 @@ def build_trial(args,events,paths,records):
    writer.writeheader()
    for row in reader:writer.writerow(sitepatch.get(row['time'],row))
   total,changed=verify_diff(src,target,sitepatch)
-  yrfirst=int(src.stem.rsplit('_',2)[-2]);yrlast=int(src.stem.rsplit('_',2)[-1])
+  # Stage74 CA-Man baseline is named *_TRIAL_NOT_PRODUCTION.csv:
+  # NEVER infer forcing years by splitting a candidate basename.
+  # Use the canonical Stage58 site metadata for every candidate version.
+  years=[(first,last) for name,first,last,_,_ in mod.SITES if name==site]
+  if len(years)!=1:
+   raise RuntimeError('Stage58 site/year metadata missing or duplicate for '+site)
+  yrfirst,yrlast=years[0]
   baseline=mod.scan(src,yrfirst,yrlast)
   current=mod.scan(target,yrfirst,yrlast)
   if total!=(yrlast-yrfirst+1)*365*48 or current['structural_gate']!='PASS_REVIEW_ONLY':
