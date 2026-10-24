@@ -107,8 +107,6 @@ def check_manifests(s63,s65,s66):
         raise RuntimeError('Stage66/65 manifest SHA provenance mismatch')
     if m66.get('stage65_input_sha256')!=sha(s65/'targeted_60_temperature_events.csv'):
         raise RuntimeError('Stage66/65 source SHA provenance mismatch')
-    if m65.get('source_report_sha256')!=sha(s63.parent/'stage64_DO_NOT_INFER'):
-        pass  # Stage65 links Stage64, validated by Stage66; no invented Stage64 path.
 
 def classify(e,source,channel_rows):
     site=e['site'];direction=e['QC_direction']
