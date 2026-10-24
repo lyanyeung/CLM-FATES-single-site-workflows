@@ -1,5 +1,9 @@
 # AmeriFlux MultiSite 10 — Batch 01
 
+
+> **LATEST checkpoint, 24 October 2026 — Stage82 PASS:** complete 213/213 yearly NetCDF SHA256 verification, 10/10 sampled first-and-last-year NC readbacks, ten unchanged/unactivated stream templates and report at `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage82_DATM_case_integration_preflight_20261024T231124502670Z/`. Stage80 RH replacement and Stage81 NetCDF build are fully complete. **No actual CIME reference case was passed to Stage82**; shell discovery located one potential `env_run.xml` in `~/NL_Loo_recovery_20261021/direct_20261021T021800Z_1708443/`. Next: [read-only case inspection](scripts/stage82/README.md) with that exact path; validate domain, DATM vs CDEPS, actual stream placement, time centering and site-specific ZBOT before any isolated smoke run. Previous DATM blockers remain scientific coupling blockers, not missing NC files.
+
+
 > **LATEST checkpoint, 24 October 2026:** User executed Stage80 RH<1-only final forcing selection successfully and [Stage81 NetCDF technical build](scripts/stage81/README.md) successfully. **213/213 annual 30-minute NOLEAP NetCDF from 10/10 sites and 10 unactivated DATM stream templates**, all recorded at `reports/stage81_DATM_technical_20261024T162235Z/` (fully qualified root: `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/`). Only 18 original RH<1% records are ERA5-replaced; all 1,091 original RH1–5% remain. This **supersedes the 22 October note immediately below that said DATM files had not been generated**. Remaining blocking work is **case coupling**, `ZBOT` provenance (especially CA-Cbo/CA-Man), interval centering / source time semantics, verified domain and stream configuration, and CIME smoke runs; all original cases/jobs unchanged.
 
 
