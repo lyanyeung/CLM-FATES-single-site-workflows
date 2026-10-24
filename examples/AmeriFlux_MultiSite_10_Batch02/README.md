@@ -1056,3 +1056,7 @@ Stage33 v2 passed: US-Ho1 nominal UTC-5 best matched 106,336 observed-T QC0 time
 ### Stage34 verified and Stage35 neighbouring Howland QC0 audit
 
 Stage34 passed with 917 Ho1 held, 425/425 negative Td-transfer VPD events in QC2 temperatures, and large CDS vs FLUXNET temperature differences (median +11.7672C within the 425). Stage35 now checks original site-QC0 temperature from nearby Ho2 and Ho3, with pinned input SHA256 and no forcing or model changes. See docs/cold_humidity_scientific_review_20261024.md. No science approvals.
+
+### Stage35 passed; Stage36 original-source independence audit
+
+Stage35 verified all three original Howland tower SHA256 releases. In Ho1's 425 negative Td-transfer VPD cases, Ho2 QC0 overlaps **67**, Ho3 QC0 overlaps **106**, and **all 67 Ho2** records coincide with Ho3: only **106 unique** timestamps have neighbour QC0, with **319** lacking both. CDS ERA5 T is much closer to these QC0 sources than original Ho1 QC2 temperature; nevertheless, Ho3/Ho1 are suspiciously close (0.000°C mean difference in 85 held QC0 records in 2012). Stage36 tests for shared or duplicated original temperature source and does **not** approve any model forcing. See docs/cold_humidity_scientific_review_20261024.md for scientific limitations.
