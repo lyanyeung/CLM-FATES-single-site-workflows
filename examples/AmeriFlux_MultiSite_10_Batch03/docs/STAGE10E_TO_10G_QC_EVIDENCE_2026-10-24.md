@@ -158,6 +158,6 @@ Stage10j report (kept on IRIDIS6):
 
 `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage10j_ERA_counterfactuals_20261024T060351Z_eddc1a32/`
 
-Next code prepared, **not yet run against IRIDIS6 data**: [Stage10k exception provenance / science-gate check](../scripts/stage10/10k_exception_provenance_science_gate.py). It verifies the Stage10j SHA receipt, explicitly lists both US-NR3 exceptional event IDs, summarizes QC2/QC1 source provenance, and makes no forcing or approval changes.
+Stage10k [exception provenance / science-gate check](../scripts/stage10/10k_exception_provenance_science_gate.py) **passed IRIDIS6 self-test, SHA check and full audit** on 2026-10-24. The exact two US-NR3 VPD-only nonnegative failures occurred at native times **2018-02-21 09:30 and 10:00**, original source row IDs **195333 and 195334** (both VPD QC2). The grid T2m was respectively 5.49446 and 5.169997 °C warmer than the original ERA source T; substituting only the grid dewpoint-derived VPD still implied -0.033131 and -0.061299 hPa respectively when used at source T. Output retained on IRIDIS6 at `reports/stage10k_exception_provenance_20261024T061150Z_13a3a08a/`. See [Stage10k full outcome and formal scientific decision gate](STAGE10K_SCIENTIFIC_DECISION_GATE_2026-10-24.md). **Zero repair approvals; zero clock approvals.**
 
 **Current approvals:** humidity repairs 0; UTC offsets 0; Post-v5 acceptance 0; CLM-FATES spinups 0.
