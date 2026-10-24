@@ -15,7 +15,7 @@ authorized active production forcing/model submission.
 from __future__ import annotations
 import argparse,csv,hashlib,json,math
 from collections import Counter,defaultdict
-from datetime import datetime,timezone
+from datetime import datetime,timedelta,timezone
 from itertools import zip_longest
 from pathlib import Path
 
@@ -148,7 +148,11 @@ def compare(site,meta):
    if R1<1:counts['new_RH_below1']+=1
    if R1<5:counts['new_RH_below5']+=1
    if R0<5:counts['old_RH_below5']+=1
-   if prev is not None and (operator_row or prev['changed']):
+   # Only actual consecutive 30-minute edges; do not treat a skipped
+   # NOLEAP 29-Feb calendar boundary as a physical half-hour jump.
+   consecutive=(prev_t is not None and
+       datetime.fromisoformat(stamp)-datetime.fromisoformat(prev_t)==timedelta(minutes=30))
+   if prev is not None and consecutive and (operator_row or prev['changed']):
     # Each affected edge measured exactly once; works when two adjacent
     # original RH<5 half-hours are both replaced.
     p0,p1,pt=prev['old'],prev['new'],prev_t
