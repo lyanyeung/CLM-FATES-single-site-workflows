@@ -939,3 +939,24 @@ exceptions are 2018-02-21 09:30/10:00 local native time, source rows
 are recorded with exact IRIDIS report location and proposed source/physics
 acceptance criteria.
 **All humidity and clock approvals remain zero; no Post-v5 or model runs.**
+
+
+### Stage11a — scientific decision matrix (code committed, awaiting IRIDIS verification)
+
+The [Stage11a source-pinned review script](scripts/stage11/11a_science_decision_matrix.py)
+uses SHA-receipted Stage10d event flags, Stage10h exact-source QC origins,
+Stage10k exception classifications, Stage10g QC-window evidence, and the
+Stage07 original input manifest. It is **not yet confirmed executed on IRIDIS6**.
+
+It is designed to create `1924_source_event_science_review.csv`,
+`32_site_year_science_decision_matrix.csv`, and
+`10_site_post_v5_readiness.csv` in a new isolated report folder; its
+`--self-test` / `--check` modes do not write analysis reports. Event routing
+distinguishes US-Me2 clock metadata holds, flagged humidity/temperature
+physics conflicts and remaining absence of independent measurement evidence.
+All repair/clock/Post-v5 approvals remain **FALSE**. The three Stage07 numeric
+candidate sites are **not** Post-v5 certified; the other seven remain blocked.
+
+Do **not** use the Stage11a review route or a source/grid counterfactual
+pass percentage to start DATM, modify forcing, or submit a spinup. Scientific
+signoff is a separately documented human review decision.
