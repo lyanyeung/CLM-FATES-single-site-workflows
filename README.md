@@ -1,5 +1,11 @@
 # CLM-FATES single-site workflows
 
+### Stage79 transition-specific native ERA5 diagnosis (24 October 2026)
+
+**Observed Stage78 89-edge classification from IRIDIS6:** CA-Ca3 13, CA-Cbo 18, CA-Man 42, CA-TP4 5, US-Aud 0, US-Bar 11. Site-specific examples reveal *new* half-hour RH steps of **84.37 pp (CA-Man), 69.85 pp (US-Bar), 67.02 pp (CA-Cbo), 56.29 pp (CA-TP4) and 44.91 pp (CA-Ca3)** where the previous source had much smaller steps. These are actual before/after boundary risks, not just Stage77's 179 provisional old-neighbor flags. **Do not mark production MET ready solely based on thermodynamic closure or elimination of RH<1**.
+
+[Stage79](examples/AmeriFlux_MultiSite_10/scripts/stage79/README.md) independently compares the **actual native ERA5 T/D2/P RH on BOTH sides** of all 89 edges with the unmodified tower neighbors, plus exact-time FLUXMET QC columns when present. It forms an evidence-based source-switch vs ERA-internal-step classification, preserves all **1,109 operator-directed ERA substitutions as SHA-pinned trial candidates**, and generates only new audit reports. Missing independent local-standard-time/UTC and 30-minute interval verification remains an explicit model-production HOLD. Never auto-overwrite unflagged QC0 observations or blend incompatible moisture data merely to force smoothness.
+
 ### Stage78 actual trial edge audit completed (24 October 2026)
 
 **User-confirmed Stage78 execution:** exact SHA-pinned Stage77 native ERA5 trial candidates **6/6**, with **1,109/1,109 recomputed RH<5% half-hours** (six changed sites) and 4 unchanged site inputs, have been included in the *10-site candidate manifest*. Full old-to-old vs new-to-new consecutive half-hour edge comparison succeeded. Reports are in `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage78_1109_operator_versioned_selected_boundary_20261024T115621557398Z/`.
