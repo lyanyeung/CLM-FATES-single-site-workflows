@@ -291,13 +291,13 @@ Stage06 reports go into a new `reports/stage06_qcv5_candidate_effects_*` folder 
 
 [Stage07 verified output and SHA record](docs/STAGE07_VERIFIED_THREE_FULL_DERIVED_CSVS_2026-10-24.md). **This is a derived research candidate, not approved Post-v5/CIME/DATM spinup forcing.**
 
-**Stage08 next:** the [remaining seven site candidate-generation script](scripts/stage08/08_build_remaining_seven_qcv5_candidates.py) is now committed and **not yet run** on IRIDIS6 for US-Rpf, US-Seg, US-Ses, US-Slt, US-SRG, US-SRM, US-Uaf. It extends the established Stage05 QCv5 max4-HH interpolation + physically screened same-time ERA RH method, but **protects physically plausible native VPD QC0 readings** and **does not treat positive RH<5% alone as an ERA replacement requirement**. It does not invent the US-Syv one-off joint-zero TA fix for other sites. A source RH column is optional if missing in a particular FLUXMET release. It writes a new independent seven-site sparse candidate and HOLD ledger, original source SHA receipts, **no original or existing model edits**. The seven-site pipeline can advance without reopening the successful three-site Stage07 derived runs.
+**Stage08 next:** the [remaining seven site candidate-generation script](scripts/stage08/08_build_remaining_seven_qcv5_candidates.py) is now committed and **not yet run** on IRIDIS6 for US-Rpf, US-Seg, US-Ses, US-Slt, US-SRG, US-SRM, US-Uaf. It extends the established Stage05 QCv5 max4-HH interpolation + physically screened same-time ERA RH method, but **protects physically plausible native VPD QC0 readings** and **does not treat positive RH<5% alone as an ERA replacement requirement**. It does not invent the US-Syv one-off joint-zero TA fix for other sites. A source RH column is optional if missing in a particular FLUXMET release. It writes a new independent seven-site **complete derived FLUXMET_HH CSV per site** plus sparse candidates and HOLD ledger, original source SHA receipts, **no original or existing model edits**. The seven-site pipeline can advance without reopening the successful three-site Stage07 derived runs.
 
 Execute:
 ```bash
 (
   set -euo pipefail
-  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/4cb4dcdb39259305a1bed423d8fc30dff5cb7765"
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/33770619bbc68e9030a70190ffe3c901beb2187f"
   REL="examples/AmeriFlux_MultiSite_10_Batch04"
   BASE="$HOME/ameriflux_batch04_stage08"
   SCRIPT="$BASE/scripts/stage08/08_build_remaining_seven_qcv5_candidates.py"
@@ -309,7 +309,7 @@ Execute:
   python3 -B "$SCRIPT" --build-candidates 2>&1 | tee "$BASE/stage08_build.log"
 )
 ```
-Output: new `qcv5_stage08_remaining_seven_candidates/candidate_*` folder with exact site source SHA256 + `candidate_patch.csv`, `unresolved_hold.csv`, `report.json` and research-candidate warning. Scientific warning: packaged ERA5 comes from the FLUXNET release and is not independent gridded ERA5-Land truth.
+Output: new `qcv5_stage08_remaining_seven_candidates/candidate_*` folder with **seven complete derived FLUXMET_HH CSVs**, exact site source SHA256 + `candidate_patch.csv`, `unresolved_hold.csv`, `report.json` and INCOMPLETE research-candidate marker. Scientific warning: packaged ERA5 comes from the FLUXNET release and is not independent gridded ERA5-Land truth.
 
 ## Stage06 VERIFIED; Stage07 new full derived ERA5 VPD repair ready (2026-10-24)
 
