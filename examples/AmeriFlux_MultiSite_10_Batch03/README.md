@@ -964,7 +964,7 @@ signoff is a separately documented human review decision.
 ### Stage11b — three numeric candidates, Post-v5 Gate-0 (code committed)
 
 [Stage11b script](scripts/stage11/11b_three_site_postv5_gate0_audit.py)
-is committed but **has not yet been executed on IRIDIS6**. It rechecks
+has **passed IRIDIS6 self-test, check and full report run**. It rechecks
 the original SHA-pinned FLUXMET/ERA source and Stage07 `processed_v5` candidates
 for **US-MOz, US-Mpj and US-NC2**, including complete NO_LEAP native
 time steps, TBOT/QBOT/PSRF/PRECTmms physics and conversions, raw-to-v5
@@ -973,3 +973,26 @@ counts. A successful Gate-0 is **numeric/provenance-only**, never official
 Post-v5 approval; `--check` writes nothing, `--run` creates one isolated
 read-only review report. The Stage07 INCOMPLETE marker is retained, no DATM
 or spinup authorised.
+
+
+### Stage11b verified and Stage11c change-level review (2026-10-24)
+
+The [Stage11b numeric-only Post-v5 Gate-0 audit](scripts/stage11/11b_three_site_postv5_gate0_audit.py)
+**passed on IRIDIS6** for US-MOz, US-Mpj and US-NC2. The three candidate
+forcing CSVs cover 998,640 NO_LEAP native half-hour records combined, with
+105 original-to-candidate variable changes, **6 changes to original QC0 values**,
+18 manual-review rows, zero ERA RH clipping/floor records and **38 ERA-source
+variable replacements at US-NC2**. The minimum water-relative RH was 2.2064%,
+0.4392% and 0.0773% for US-MOz, US-Mpj and US-NC2 respectively. The full
+[verified Stage11b scientific evidence record](docs/STAGE11B_GATE0_VERIFIED_2026-10-24.md)
+includes exact IRIDIS report locations and outstanding Post-v5 holds.
+
+The next source-event [Stage11c audit script](scripts/stage11/11c_qc0_manual_era_change_review.py)
+has been committed but **not yet verified by running on IRIDIS6**. It
+reconciles all 105 source QC/ERA/processed-v5 changes by native source key,
+extracts 6 measured-QC0 changes, preserves 18 manual review entries, and
+audits RH<1% records. The script is evidence-only, not a repair generator.
+
+**All humidity, clock, PFT/CO2 protocol, Post-v5, DATM and spinup gates remain
+unapproved.** No original forcing, processed_v5 data, Stage07 incomplete marker,
+CIME case or Slurm job may be changed based on these audit results.
