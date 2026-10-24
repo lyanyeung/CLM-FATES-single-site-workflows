@@ -1,6 +1,14 @@
 # CLM-FATES single-site workflows
 
 
+## Stage81 FINISHED on IRIDIS6 — 213 annual DATM NetCDF + 10 unactivated stream templates (24 October 2026)
+
+**User-provided actual completed Stage81 output (not independently inspected from GitHub):** Stage81 `--self-test`, `--check` and `--build` all succeeded using the immutable Stage80 selection (18 original RH<1% native-ERA5 joint replacements, 1,091 original RH1–5% rows preserved). The script reports **10/10 sites; 213/213 yearly 30-minute NOLEAP NetCDF files** passing its annual readback check, and **10/10 DATM stream TEMPLATE files generated, NOT ACTIVATED**. Output and per-file SHA source-provenance manifest: `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage81_DATM_technical_20261024T162235Z/` (`manifest.json`).
+
+Annual files per station: BR-Ma2 **18** (1999–2016); CA-Ca3 **24** (2001–2024); CA-Cbo **29** (1996–2024); CA-LP1 **18** (2007–2024); CA-Man **15** (1994–2008); CA-TP1, CA-TP3 and CA-TP4 **22 each** (2002–2023); US-Aud **23** (2002–2024); US-Bar **20** (2004–2023). The metadata source is the existing point-surface grid coordinates, and all `ZBOT` are **UNRESOLVED**. The NetCDF science/case activation gate still requires validated sensor heights (particularly unresolved CA-Cbo and CA-Man), local timestamp and interval-centering policy, the actual point-domain and correct CIME DATM/CDEPS stream syntax, and a smoke test. **Do not call this an activated or scientifically released DATM**; no existing CSV, CIME case, DATM stream, or Slurm task was changed.
+
+See [Stage81 build documentation](examples/AmeriFlux_MultiSite_10/scripts/stage81/README.md) and its SHA-pinned inputs. Stage80 RH repair and Stage81 file generation are now complete; proceed to case-specific coupling/provenance checks, not another ERA5 data-repair loop.
+
 ## Stage80 completed — 10-site forcing final; Stage81 DATM generation (24 October 2026)
 
 **Verified on IRIDIS6 by operator log:** Stage80 self-test, full read-only ten-site audit, and full candidate generation **all PASS**. Output: `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage80_RH_lt1_final_20261024T123353Z/`. **Only 18 original RH<1% records** replaced with native ERA5 jointly recomputed T/D2m/P; **1,091 original RH1–5%** and every other Stage75 value retained. Selected four new full forcing candidates (CA-Ca3 7; CA-Cbo 2; CA-Man 1; US-Bar 8) plus six unchanged originals. Stage80 flags **17 operator-accepted RH/T half-hour edge warnings** and preserves prior Stage74 CA-Man independent 18-row amendment. Selected ten-site checksum manifest: `10_site_selected_forcing_sources.tsv`. **RH repair now complete**.
