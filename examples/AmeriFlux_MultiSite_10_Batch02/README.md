@@ -1252,3 +1252,26 @@ cohort, preventing accidentally applying two different decisions
 to one original tower record. [Verified Stage53 result and Stage54
 run instructions](docs/stage53_operator_pass_stage54_overlap_plan_20261024.md).
 Stage54 has now **passed** in IRIDIS6 with **zero** exact same-site/original-tower-local-time collisions (444 Stage53 only; 4,884 Stage11 only). See [Stage54 operator-verified result](docs/stage54_operator_verified_zero_overlap_20261024.md). No model input was altered.
+
+
+### Stage54 IRIDIS6 PASS: 444 and 4,884 have ZERO exact same-site/local-time overlap (24 October 2026)
+
+Operator source check and full Stage54 AUDIT both passed using
+Git blob `f74d004bf9277c0583309387ea1352703da76db7`.
+Intersection = **0**; Stage53-only = **444**, Stage11-only
+= **4,884**, 5,328 distinct *audited-target* timestamps across
+the two cohorts. Exact Stage11 distribution: US-EML 1,327;
+US-GLE 295; US-Ho1 917; US-ICh 169; US-ICt 2,176.
+This does not mean all original Stage48 26,332 hard-physics records
+are resolved and it does not remove the 4,884 science HOLD.
+[Archived exact Stage54 result](docs/stage54_operator_verified_zero_overlap_20261024.md).
+
+**Next:** [Stage55 read-only existing-ERA5 scientific triage](scripts/stage55/55_triage_existing_stage19_4884_ERA5_science_HOLD.py)
+reuses the previous independently retrieved CDS ERA5 Stage19
+4,884-row sensitivity report, verifying source SHA256 and source-local
+timestamps before classification. It does not download new ERA5
+or authorize any forcing/model writes. If the matching Stage19
+report does not already exist, Stage55 explicitly stops and directs
+the operator to generate Stage19's isolated report from verified
+existing CDS data. [Stage55 reproducible IRIDIS6 instructions](docs/stage54_pass_stage55_existing_4884_ERA5_triage_20261024.md).
+Stage55 not yet executed on IRIDIS6.
