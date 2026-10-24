@@ -1440,3 +1440,33 @@ rather than guess from nearby station/timezone.
 [Stage59 operator PASS, Stage60 pinned IRIDIS6 command,
 physical policy and remaining gates](docs/stage59_operator_PASS_and_stage60_auto_4411_water_humidity_20261024.md).
 Stage60 has not yet been run on IRIDIS6.
+
+
+### Stage60 IRIDIS6 PASS: 4,411 SHA-pinned independent CDS ERA5 water-humidity choices; Stage61 original-source hard-physics coverage (24 October 2026)
+
+Operator ran pinned Stage60 Git blob `7affb6854f479eb008fd566c2f0e5320320a092f`
+and passed Python syntax, self-test, source check and isolated STAGING.
+Exact Stage60 report:
+`reports/stage60_4411_ERA5_water_RH_VPD_QBOT_unified_20261024T112137Z_950f7adf`.
+The complete 4,411-row candidate set contains 3,967 accepted
+tower-TA/PA humidity replacement cases and 444 original RH=0/>100
+cases, with **zero** duplicated (site, tower-local-time), **zero**
+candidate water-RH>100 and **zero** negative candidate water-VPD.
+Ice RH>100 occurs in 1,700 diagnostic records and is **not**
+used as a basis for automatically clipping water RH. These are
+**isolated proposals, not yet applied to DATM or model spinup**.
+
+The original 10-site Stage48/49 source data have **26,332 hard
+humidity physics anomaly times** among **26,432 original-review
+records**. **Do not subtract 4,411 from 26,332** without joining
+the actual source identities: the Stage60 population is different.
+New [Stage61 original source vs selected Stage60 exact-identity
+coverage code](scripts/stage61/61_exact_original_humidity_hard_screen_vs_4411_repair_coverage.py)
+reuses Stage49 source-reported original RH/VPD QC and Stage58/
+Stage60 SHA-pinned reports; writes only isolated coverage outputs
+and the exact per-site/year/time still-uncovered source records.
+The 917 original US-Ho1 UTC-offset HOLDs stay separate from this
+forcing-ready science policy and no forcing is modified.
+
+[Stage60 PASS and complete Stage61 pinned IRIDIS6 instructions](docs/stage60_operator_PASS_and_stage61_full_original_hard_coverage_20261024.md).
+Stage61 published on GitHub; **not yet run on IRIDIS6**.
