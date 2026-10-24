@@ -7,6 +7,9 @@ This collection keeps AmeriFlux batches separate from the existing [ICOS multi-s
 | [AmeriFlux Batch 01](../AmeriFlux_MultiSite_10/) | 10 | See the batch-specific operational record and scripts |
 | **[AmeriFlux Batch 02](../AmeriFlux_MultiSite_10_Batch02/)** | 10 | Stages00–10 published. Operator Stage07: 5 numeric candidates; 5 sites blocked by 4,904 unresolved humidity pairs. Stage08 sensitivity and the follow-on Post-v5 gates/runner are ready for execution. |
 | **[AmeriFlux Batch 03](../AmeriFlux_MultiSite_10_Batch03/)** | 10 | Stages00–01 ready: single-connection WSL upload and recursive extraction; live transfer pending. |
+| **[AmeriFlux Batch 04](../AmeriFlux_MultiSite_10_Batch04/)** | 10 | Stage00 WSL upload + SHA256 checks and Stage01 extraction/structure inventory ready; **no transfer verified yet**. |
+
+Batch04 sites: US-Rpf, US-Seg, US-Ses, US-Slt, US-SP1, US-SRG, US-SRM, US-Syv, US-Ton and US-Uaf. Exact [release manifest](../AmeriFlux_MultiSite_10_Batch04/sites.tsv), [README and transfer command](../AmeriFlux_MultiSite_10_Batch04/README.md). These ten release labels are not by themselves a QC or model-approval record.
 
 Batch03 sites: US-Kon, US-Me2, US-Me6, US-MMS, US-MOz, US-Mpj, US-MtB, US-NC2, US-NR1 and US-NR3. See its [exact releases](../AmeriFlux_MultiSite_10_Batch03/sites.tsv) and [instructions](../AmeriFlux_MultiSite_10_Batch03/README.md). Later processing includes QCv5 and a separate Post-QCv5 audit before DATM or spin-up.
 
