@@ -246,6 +246,29 @@ def site_candidates(site, package, root):
     era = gather_era(era_path, requested)
     patches, holds = [], []
     reason_counter = Counter()
+    # Every hard invalid reading must have either a repair candidate or an
+    # explicit HOLD; never let an unbridged outlier disappear from the ledger.
+    for i, row in enumerate(rows):
+        for var, flagged in (
+            ("TA_F", row["TA_F"] is None or
+             (row["TA_F"] is not None and
+              (row["TA_F"] < -80 or row["TA_F"] > 65))),
+            ("PA_F", row["PA_F"] is None or
+             (row["PA_F"] is not None and
+              (row["PA_F"] < 65 or row["PA_F"] > 110)))
+        ):
+            if not flagged or (i, var) in corrections:
+                continue
+            reason = "UNBRIDGED_" + var + "_QCv5_MAX4_OR_BOUNDARIES"
+            holds.append({
+                "site": site, "TIMESTAMP_START": row["start"],
+                "TIMESTAMP_END": row["end"], "reason": reason,
+                "tower_TA_C": fmt(row["TA_F"]),
+                "tower_PA_kPa": fmt(row["PA_F"]),
+                "tower_VPD_hPa": fmt(row["VPD_F"]),
+                "raw_RH_pct": fmt(row["RH"]),
+                "ERA_TA_C": "", "ERA_VPD_hPa": "", "ERA_PA_kPa": ""})
+            reason_counter["HOLD_" + var] += 1
     for (i, var), (new, why) in corrections.items():
         row = rows[i]
         patches.append({
