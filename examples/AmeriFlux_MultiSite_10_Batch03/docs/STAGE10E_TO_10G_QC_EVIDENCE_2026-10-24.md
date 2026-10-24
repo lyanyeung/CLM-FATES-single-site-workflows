@@ -82,6 +82,38 @@ The other affected years and sites can have high annual QC0 coverage yet no QC0 
 
 Stage10h v1 [original script](../scripts/stage10/10h_original_qc_source_provenance.py) passed its pure self-test but **failed IRIDIS6 read-only input check** before producing a report: `Native source/ERA times differ, duplicate or truncated`. That failure came from v1's unsupported *position-by-position* equality assumption between two independently validated, exact-release source files. Stage09h had verified each file's own timestamp chronology and SHA but not required identical start/end range. **Do not infer that raw files were corrupted from this error**; which site's overlap differs and why remains to be established by the replacement run.
 
-A non-destructive v2 [timestamp-keyed source provenance script](../scripts/stage10/10h_v2_timestamp_keyed_qc_provenance.py) is now committed but **awaits actual IRIDIS6 verification**. It SHA-verifies both source files, checks native cadence independently, joins only exactly matching `TIMESTAMP_START` keys, reports primary-only and ERA-only timestamps, carries unmatched companion ERA evidence as missing (never a row-number substitution or inferred clock shift), and tests these cases with synthetic clock regressions. It will count original TA/VPD QC0/1/2 for all 1,924 source-timestamp-matched blockers over all 32 affected site-years, compare original VPD_F to exact-release companion VPD_ERA at QC2 timestamps, and explicitly show US-NR3 2017/2018/2023 source classes. The script will not repair meteorology or approve DATM/spinup.
+The non-destructive v2 [timestamp-keyed source provenance script](../scripts/stage10/10h_v2_timestamp_keyed_qc_provenance.py) has now **passed IRIDIS6 self-test, read-only check and full audit** on 2026-10-24. It SHA-verifies both source files, checks native cadence independently, joins only exactly matching `TIMESTAMP_START` keys, reports primary-only and ERA-only timestamps, carries unmatched companion ERA evidence as missing (never a row-number substitution or inferred clock shift), and tests these cases with synthetic clock regressions. It will count original TA/VPD QC0/1/2 for all 1,924 source-timestamp-matched blockers over all 32 affected site-years, compare original VPD_F to exact-release companion VPD_ERA at QC2 timestamps, and explicitly show US-NR3 2017/2018/2023 source classes. The script will not repair meteorology or approve DATM/spinup.
 
 **All source/QC reports remain science evidence only. Approval status: 0 replacements, 0 verified clock approvals, Post-v5 not accepted, no CLM-FATES model jobs authorized.**
+
+## Stage10h-v2 verified result (2026-10-24)
+
+A raw-data audit across 7 stations and 32 site-years matched all `1,924/1,924` Stage10d blocker identities to exactly matching primary FLUXMET/FULLSET and companion ERA5 `TIMESTAMP_START` values. **100% of every primary source's native timestamps** occur in the larger companion ERA5 temporal coverage. The original Stage10h-v1 failure reflected its unsupported demand for identical whole-file row counts and spans, **not** corrupted source chronology.
+
+**Original `VPD_F_QC` provenance at the 1,924 events:**
+
+| Site | Events | QC0 measured | QC1 gap-filled | QC2 downscaled ERA |
+| --- | ---: | ---: | ---: | ---: |
+| US-Kon | 229 | 0 | 25 | 204 |
+| US-MMS | 18 | 0 | 0 | 18 |
+| US-Me2 | 4 | 0 | 4 | 0 |
+| US-Me6 | 1 | 0 | 0 | 1 |
+| US-MtB | 15 | 0 | 4 | 11 |
+| US-NR1 | 173 | 0 | 25 | 148 |
+| US-NR3 | 1,484 | 0 | 0 | 1,484 |
+| **Total** | **1,924** | **0** | **58** | **1,866** |
+
+Each of the 1,866 original QC2 VPD values matched the exact-time companion `VPD_ERA` to within 0.01 hPa. No QC0 VPD was found among the selected residual humidity events. The 58 QC1 records are gap-filled, **not** native VPD measurement confirmations.
+
+US-NR3 in **2017, 2018 and 2023**: for each year, all 17,520 native half-hours of `TA_F` and `VPD_F` were source-labeled QC2 (ERA-downscaled); zero were QC0 or QC1. This does not establish the root algorithmic cause or prove independent atmospheric observations were entirely unavailable.
+
+Stage10h-v2 exact result report (not stored in GitHub):
+
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage10h_original_source_provenance_20261024T054425Z_faf342a8/`
+
+Latest run: `event_join=1924/1924 affected_site_years=32/32 VPD_QC2_at_blockers=1866/1924 exact_companion_ERA_event_matches=1924/1924 missing_exact_ERA_events=0/1924 all_offsets_approved=0 repairs_approved=0`.
+
+**Scientifically important preexisting result:** Stage08c calculated `ERA_RH_pct` from the *paired* `TA_ERA_C` and `VPD_ERA_hPa` using liquid-water saturation. All 1,924 residuals were classified as `ERA_RH_BELOW_MINUS2_PCT`, so the inconsistency is already present under the paired companion ERA-derived quantities: this is not necessarily an artefact of mixing ERA VPD with tower retained air temperature. This algebraic result does **not** identify the faulty stage of source generation or justify RH/VPD clipping.
+
+Next code committed but **not executed on IRIDIS**:
+[Stage10i source ERA VPD vs saturation audit](../scripts/stage10/10i_source_ERA_vpd_saturation_audit.py), a SHA-pinned independent recalculation and year/month inventory of the implied nonphysical negative water vapour pressure. It remains evidence-only; no humidity/clock/forcing changes, and the QC-v5 scientific hold stays in force.
