@@ -147,8 +147,11 @@ def row_context(event,raw):
     res["neighbors_30min_difference_C"]=(
         float(abs(next_-prev)) if res["tower_both_30min_neighbors_valid"]
         else np.nan)
-    res["isolated_tower_spike_candidate"]=bool(
+    res["neighbor_QC0_or_QC1"]=bool(
         res["tower_both_30min_neighbors_valid"] and
+        res["QC_m30"] in (0,1) and res["QC_p30"] in (0,1))
+    res["isolated_tower_spike_candidate"]=bool(
+        res["neighbor_QC0_or_QC1"] and
         abs(res["tower_minus_30min_neighbor_mean_C"])>5 and
         res["neighbors_30min_difference_C"]<=3)
     res["neighbor_continuity_with_tower_within3C"]=bool(
@@ -252,7 +255,8 @@ def main():
         print("SITE",summary)
     print("=== ALL 63 ORIGINAL TOWER VS INDEPENDENT ERA5: MANUAL-REVIEW EVIDENCE ===")
     view=["site","local","TA_F_C","ERA5_T2M_C","TA_minus_ERA5_C",
-          "TA_F_QC","TA_m30_C","TA_p30_C","tower_minus_30min_neighbor_mean_C",
+          "TA_F_QC","TA_m30_C","QC_m30","TA_p30_C","QC_p30",
+          "tower_minus_30min_neighbor_mean_C",
           "isolated_tower_spike_candidate","neighbor_continuity_with_tower_within3C",
           "cluster_id"]
     print(evidence[view].round(2).to_string(index=False))
