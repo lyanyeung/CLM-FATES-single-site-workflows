@@ -198,6 +198,10 @@ def main():
         p.error("Unknown/duplicate site ID")
     flagged, unflagged, failed = [], [], []
     print("BATCH04 STAGE03 READ-ONLY SOURCE ANOMALIES AND ERA5 REFERENCE DIAGNOSTIC")
+    print("PROVENANCE WARNING: packaged TA_ERA/PA_ERA are calibrated/downscaled")
+    print("FLUXNET-derived ERA columns, NOT independent raw ECMWF ERA5 validation.")
+    print("TA_F/PA_F may consolidate these columns where *_F_QC=2.")
+    print("ERA5_SAME_LABEL is a raw timestamp match only; no source substitution.")
     for site in requested:
         try:
             has_issues = audit_site(site, manifest[site]["package"], args.sites_root)
