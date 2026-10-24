@@ -1093,11 +1093,23 @@ scientific validation of those selected meteorological values.
 and [machine-readable 62 native event choices (CSV)](docs/STAGE11F_ALL62_USER_DECISIONS_2026-10-24.csv)
 are committed. The separate
 [Stage11g ERA5 provenance/physical-method feasibility audit](scripts/stage11/11g_user62_ERA5_source_method_audit.py)
-is **committed but not yet executed on IRIDIS6**. It compares direct
-source companion `VPD_ERA` and source companion `TA_ERA/VPD_ERA`
-relative-humidity transfer at the existing tower/site TA/PSRF/QBOT,
-and explicitly leaves separate ERA5-Land grid dewpoint source
-**NOT VERIFIED**. A physical success is not independent tower validation.
+has **PASSED IRIDIS6 --self-test, --check and --run** on 2026-10-24.
+Of 53 user-directed source-companion ERA humidity events, simply copying
+companion `VPD_ERA` at Stage07 site TA passed numeric physics **46/53**,
+whereas transferring source-companion ERA **RH** to retained Stage07 site
+TA and recomputing VPD/QBOT passed **53/53**. Exact source/native
+timestamps, three site SHA receipts and all 62 human decisions were
+verified. **Independent ERA5-Land data were not evaluated**.
+
+The [Stage11g verified interpretation and Stage11h shadow trial protocol](docs/STAGE11G_VERIFIED_AND_STAGE11H_SHADOW_TRIAL_2026-10-24.md)
+is now documented. [Stage11h](scripts/stage11/11h_isolated_ERA_RH_three_site_science_trial.py)
+is **committed but not yet executed on IRIDIS6**. It has an initial
+fully read-only `--check` and a separate `--run` which will build new
+isolated three-site research-only shadow forcing CSVs, retaining 6 Stage07
+TA and 3 Stage07 VPD choices and recomputing only the other 53 selected
+VPD/QBOT. This trial carries its own permanent INCOMPLETE marker and
+cannot be used for model production.
+Physical feasibility is not independent tower validation.
 
 The existing IRIDIS `62_human_review_WORKING_COPY.csv` and SHA-sealed
 original Stage11f report have NOT been updated by GitHub commits.
