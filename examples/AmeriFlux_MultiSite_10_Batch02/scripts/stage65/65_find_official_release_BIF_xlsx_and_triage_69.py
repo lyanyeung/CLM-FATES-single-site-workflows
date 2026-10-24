@@ -35,6 +35,7 @@ T_FILE="69_nonHo1_source_temperature_cases_HOLD.csv"
 A_FILE="BZS_Ho1_original_archive_BIF_discovery.json"
 SITES=("US-BZS","US-Ho1")
 MAX_CANDIDATES_PER_SITE=2500
+MAX_VISITED_DIRECTORIES=400
 MAX_BIF_BYTES=32*1024*1024
 MAX_ARCHIVE_MEMBER_BYTES=32*1024*1024
 SOURCE=("site","source_csv_row","timestamp_start","original_TA_C",
@@ -124,10 +125,10 @@ def xlsx_tables(data):
                     break
     return result
 
-def decode_bif(data,filename):
+def decode_bif(data,filename,site):
     suffix=Path(filename).suffix.lower()
-    if suffix==".csv":return extract_meta(read_csv_bif(data),site=ACTIVE_SITE[0])
-    if suffix==".xlsx":return extract_meta(xlsx_tables(data),site=ACTIVE_SITE[0])
+    if suffix==".csv":return extract_meta(read_csv_bif(data),site=site)
+    if suffix==".xlsx":return extract_meta(xlsx_tables(data),site=site)
     raise ValueError("Not a CSV/XLSX BIF")
 
 def source_context():
@@ -180,7 +181,8 @@ def search_paths(site,primary):
         # site-scoped paths only: maximum 3 subdirectory levels
         stack=[(root,0)]
         visited=set()
-        while stack and len(candidates)<MAX_CANDIDATES_PER_SITE:
+        while (stack and len(candidates)<MAX_CANDIDATES_PER_SITE and
+               len(visited)<MAX_VISITED_DIRECTORIES):
             parent,depth=stack.pop()
             if parent in visited:continue
             visited.add(parent)
@@ -209,8 +211,7 @@ def probe(site,path,primary,original_sha):
             payload=path.read_bytes()
             if len(payload)>MAX_BIF_BYTES:
                 raise ValueError("BIF larger than maximum safe parse")
-            ACTIVE_SITE[0]=site
-            m=decode_bif(payload,path.name)
+            m=decode_bif(payload,path.name,site)
             result["candidate_bif"].append({"name":path.name,
                 "meta":m,"release_assurance":"STANDALONE_BIF_NOT_SAME_RELEASE_PROVED"})
         except Exception as e:
@@ -238,9 +239,8 @@ def probe(site,path,primary,original_sha):
                     or Path(name).suffix.lower() not in (".xlsx",".csv")):
                     continue
                 try:
-                    ACTIVE_SITE[0]=site
                     with z.open(member) as stream:
-                        m=decode_bif(stream.read(),name)
+                        m=decode_bif(stream.read(),name,site)
                     ok=(same and m["physically_valid"] and not m["saw_duplicates"])
                     result["candidate_bif"].append({"name":member.filename,
                         "meta":m,"release_assurance":"EXACT_ORIGINAL_SHA256_SAME_ZIP"
