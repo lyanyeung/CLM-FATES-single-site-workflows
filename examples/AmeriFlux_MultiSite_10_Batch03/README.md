@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **Latest scientific status (2026-10-24):** Stage10k completed on IRIDIS6 for 1,924/1,924 residual cold-humidity events, including the two US-NR3 exceptions. There are **0 approved humidity repairs, 0 approved UTC offsets, and no Post-v5/DATM/spinup approval**. See [Stage10k science decision gate](docs/STAGE10K_SCIENTIFIC_DECISION_GATE_2026-10-24.md). Full SHA-pinned event reports remain on IRIDIS6; GitHub has scripts and operator-verified summaries.
+
+
 This separate batch follows [Batch02](../AmeriFlux_MultiSite_10_Batch02/) for
 the ten exact operator-supplied releases in [sites.tsv](sites.tsv).
 The operator has completed and verified Stage00–10d diagnostic execution on IRIDIS6 as of 2026-10-24. All 10 packages were transferred and extracted; 3/10 Stage07 numeric QC-v5 trials completed, 7/10 remain humidity-blocked; all 32 required ERA5-Land year-site products are present; 1,924 residual humidity records passed Stage10d evidence triage. These are **scientific investigations, not approved forcing repairs**. No Post-v5 acceptance, DATM or CLM-FATES spin-up is authorized. Refer to the **[Stage00–10d scientific status and decision ledger](docs/SCIENTIFIC_REVIEW_STATUS_2026-10-24.md)** for verified operator results and limitations.
@@ -926,8 +929,13 @@ in 1,922 events (99.90%), versus 188 under a temperature-only swap. The 2
 VPD-only exceptions were both US-NR3. The swap is **not** a scientifically
 approved correction and does not constitute independent validation.
 
-[Stage10k — new diagnostic code, not yet run on IRIDIS6](scripts/stage10/10k_exception_provenance_science_gate.py)
-will independently check those two records, QC2/other source provenance,
-and the 1,924 source/grid comparison classes. Exact logs/report path and
-interpretation are in the [Stage10e–10j evidence ledger](docs/STAGE10E_TO_10G_QC_EVIDENCE_2026-10-24.md).
+[Stage10k — VERIFIED on IRIDIS6](scripts/stage10/10k_exception_provenance_science_gate.py)
+passed self-test, read-only check and full report generation: the two US-NR3
+exceptions are 2018-02-21 09:30/10:00 local native time, source rows
+195333 and 195334, both VPD QC2. The audited Stage10j reconciliation remains
+1,922/1,924 VPD-only algebraic sign changes and 188/1,924 temperature-only;
+**these are not approved forcing replacements**. Full evidence and the formal
+[Stage10k scientific decision gate](docs/STAGE10K_SCIENTIFIC_DECISION_GATE_2026-10-24.md)
+are recorded with exact IRIDIS report location and proposed source/physics
+acceptance criteria.
 **All humidity and clock approvals remain zero; no Post-v5 or model runs.**
