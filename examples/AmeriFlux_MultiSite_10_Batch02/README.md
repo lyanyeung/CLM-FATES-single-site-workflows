@@ -1142,8 +1142,7 @@ pins the existing Stage48 Git blob, checks the source inventory and hashes
 before/after scanning, classifies original hard-humidity and raw RH<1%
 records with conservative manual science routes, and produces fresh
 CSV/JSON reports without modifying source or prior candidates.
-A failed run leaves INCOMPLETE_DO_NOT_USE; live IRIDIS6 Stage49 execution
-has **not yet been verified**.
+Stage49 was subsequently executed successfully on IRIDIS6, generating 26,432 unique original RH physics / extreme-dry review rows. The original source inputs remain unchanged.
 
 **Science HOLD unchanged:** Stage08 cohort 4,884 rows; 0 approved
 replacement/forcing/model jobs. Avoid making automatic ERA substitutions
@@ -1175,6 +1174,9 @@ The scheme interpolates ERA5 **water RH** hourly to native local-standard
 tower timestamps, then derives candidate VPD and QBOT using the retained
 tower T and P. Original T QC2, T discrepancy >8 C or unverified source
 prevents unconditional humidity-only application. The >100% original
-RH group also carries phase/supersaturation review. **Stage50 live
-execution is pending operator's IRIDIS6 plan/fetch/build output;
-no replacements are approved for model forcing.**
+RH group also carries phase/supersaturation review. **Stage50 has now
+completed its IRIDIS6 build**: 10/10 verified external CDS ERA5 grid-years,
+444 candidate RH values, 12 original-RH-zero retained-T proposals,
+405 RH>100 phase-review proposals, and 27 joint-T/RH manual reviews.
+All remain unapproved for model forcing. See the Stage50 operator log
+summary and [Stage51 read-only joint-temperature review](docs/stage50_operator_success_and_stage51_review_20261024.md).
