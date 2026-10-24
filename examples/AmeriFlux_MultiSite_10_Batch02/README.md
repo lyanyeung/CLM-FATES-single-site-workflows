@@ -1149,3 +1149,32 @@ has **not yet been verified**.
 replacement/forcing/model jobs. Avoid making automatic ERA substitutions
 from the in-package FLUXNET companions or from RH>100 near saturation;
 external CDS ERA5/ERA5-Land and site time/temperature must first be validated.
+
+
+### Stage50 external CDS ERA5 RH=0/>100 unified candidate policy (24 October 2026)
+
+Operator Stage49 self-test, check, and audit **PASSED** on IRIDIS6,
+with 3,462,624 immutable primary source rows and 26,432 unique original
+hard-humidity/positive-RH<1 review rows. Original RH=0: **39** records;
+original RH>100: **405** records, across exactly four sites:
+US-Ha1 398, US-Ho2 7, US-ICh 9, US-ICt 30. These **444** candidate
+replacements are a narrow subset of the raw original-source science task,
+not the Stage08 4,884 held-cohort.
+
+[Stage50 source-pinned script](scripts/stage50/50_prepare_unified_CDS_ERA5_RH_zero_gt100.py)
+and [full methodology and IRIDIS6 commands](docs/stage50_unified_CDS_ERA5_RH_zero_gt100_20261024.md)
+use one independent CDS **reanalysis-era5-single-levels-timeseries**
+(t2m/d2m/sp) product. They verify native BIF site coordinates and
+UTC offsets, reuse checksum-verified Stage15/18 grid-years if equivalent,
+and plan/fetch only missing ERA5 grid-years before creating separate
+timestamp-exact candidate RH/VPD/QBOT. They never use
+in-package FLUXNET *_ERA as independently retrieved CDS, never mix
+ERA5-Land, and never overwrite original, Stage07/08, DATM or Slurm files.
+
+The scheme interpolates ERA5 **water RH** hourly to native local-standard
+tower timestamps, then derives candidate VPD and QBOT using the retained
+tower T and P. Original T QC2, T discrepancy >8 C or unverified source
+prevents unconditional humidity-only application. The >100% original
+RH group also carries phase/supersaturation review. **Stage50 live
+execution is pending operator's IRIDIS6 plan/fetch/build output;
+no replacements are approved for model forcing.**
