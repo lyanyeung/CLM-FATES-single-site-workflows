@@ -174,9 +174,19 @@ def verify_event_keys(df, record_source, mds):
         if v.site.value_counts().to_dict() != COUNTS:
             raise ValueError("Unexpected event counts for site")
     upstream_keys = set(map(tuple, record_source[KEYS].to_numpy()))
-    if (set(map(tuple, df[KEYS].to_numpy())) != upstream_keys
-            or set(map(tuple, mds[KEYS].to_numpy())) != upstream_keys):
-        raise ValueError("Stage08c/08f and Stage10b 1,924 event identities differ")
+    joined_keys = set(map(tuple, df[KEYS].to_numpy()))
+    mds_keys = set(map(tuple, mds[KEYS].to_numpy()))
+    if joined_keys != upstream_keys or mds_keys != upstream_keys:
+        a_missing = sorted(upstream_keys - joined_keys)[:3]
+        a_extra = sorted(joined_keys - upstream_keys)[:3]
+        m_missing = sorted(upstream_keys - mds_keys)[:3]
+        m_extra = sorted(mds_keys - upstream_keys)[:3]
+        raise ValueError(
+            "Stage08c/08f/Stage10b event identities differ after literal string-key read; "
+            f"Stage10b missing={a_missing} extra={a_extra}; "
+            f"Stage08f missing={m_missing} extra={m_extra}. "
+            "No automatic normalization or record substitution is permitted."
+        )
     if not set(df["review_class_stage10b"]) <= {
         "REVIEW_BOTH_PHYSICAL", "REVIEW_RELATIVE_ONLY_PHYSICAL",
         "REVIEW_ABSOLUTE_ONLY_PHYSICAL", "HOLD_INVALID_SITE_T_OR_P",
@@ -307,8 +317,6 @@ def independent_science(df, mds):
     flags["scientific_hold_required"] = True
     flags["ice_rh_is_conditional_on_water_dewpoint_interpretation"] = True
 
-    # Check time-scoped external evidence receipt consistency.
-    ledger = load_json(DEFAULT_10B / "provenance_and_science_hold.json") if False else None
     print("INDEPENDENT THERMODYNAMIC AUDIT: PASS; UTC midpoints and original MDS event keys: PASS")
     if "absolute_minus_mds_vpd_hPa" in df.columns:
         old = numbers(df, "absolute_minus_mds_vpd_hPa")
@@ -355,7 +363,14 @@ def main():
     provenance = verify_provenance(report)
     src = pd.read_csv(regular(STAGE08C / "era_humidity_residual_details.csv"), dtype=str, keep_default_na=False)
     mds = pd.read_csv(regular(STAGE08F / "mds_pair_at_1924_blockers.csv"), dtype=str, keep_default_na=False)
-    df = pd.read_csv(regular(report / "humidity_external_sensitivity_1924.csv"), low_memory=False)
+    # Preserve event identity: pandas numeric inference converts source_csv_row
+    # to integer while Stage08c/08f read their source-row keys as strings.
+    # String dtype only for identifier fields; scientific numeric data remain numeric.
+    df = pd.read_csv(
+        regular(report / "humidity_external_sensitivity_1924.csv"),
+        dtype={key: str for key in KEYS}, low_memory=False,
+        keep_default_na=False,
+    )
     verify_event_keys(df, src, mds)
     if len(provenance["external_product_SHA256"]) != 32:
         raise ValueError("Not all 32 external original products accounted for")
