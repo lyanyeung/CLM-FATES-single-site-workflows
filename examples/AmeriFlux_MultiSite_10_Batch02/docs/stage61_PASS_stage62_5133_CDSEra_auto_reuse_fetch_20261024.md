@@ -86,7 +86,7 @@ Stage50 same-CDS methods (Git blob
 ### Pinned IRIDIS6 command
 
 Stage62 GitHub commit: `70aadc8831a0abd7a8cdfc6f03722fbe5a2ee216`.
-Stage62 Git blob: **TO_BE_FILLED**.
+Stage62 Git blob: **7f0c32b619247333658db15f5e74abfa3b18ba24**.
 
 ```bash
 (
@@ -98,8 +98,7 @@ Stage62 Git blob: **TO_BE_FILLED**.
   S50="$BASE/scripts/stage50/50_prepare_unified_CDS_ERA5_RH_zero_gt100.py"
   S62="$BASE/scripts/stage62/62_reuse_or_fetch_CDS_ERA5_for_5133_nonHo1_hard_humidity.py"
   COMMIT62="70aadc8831a0abd7a8cdfc6f03722fbe5a2ee216"
-  EXPECTED62="TO_BE_FILLED"
-  COMMIT50="RETRIEVE_PINNED_STAGE50_COMMIT"
+  EXPECTED62="7f0c32b619247333658db15f5e74abfa3b18ba24"
   mkdir -p "$(dirname "$S50")" "$(dirname "$S62")"
   TMP="$(mktemp)"
   trap 'rm -f "$TMP"' EXIT
@@ -108,6 +107,11 @@ Stage62 Git blob: **TO_BE_FILLED**.
     -o "$TMP"
   test "$(git hash-object "$TMP")" = "$EXPECTED62"
   cp "$TMP" "$S62"
+  if [ ! -f "$S50" ]; then
+    curl -fLsS --retry 3 \
+      "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/$REL/scripts/stage50/50_prepare_unified_CDS_ERA5_RH_zero_gt100.py" \
+      -o "$S50"
+  fi
   test "$(git hash-object "$S50")" = "757452798582dc0aaf6d2c78f23999e653247469"
   "$PY" -m py_compile "$S62"
   "$PY" -B "$S62" --self-test
@@ -119,7 +123,7 @@ Stage62 Git blob: **TO_BE_FILLED**.
 
 When the printed verified independent grid-year census shows
 missing CDS products, retrieve the needed subset with
-`python -B SCRIPT --fetch --max-new 8`
+`"$PY" -B "$S62" --fetch --max-new 8`
 and re-run `--stage`. Unverified station BIF
 and US-Ho1 source metadata are hard provenance gates. Continue
 the other sites independently.
