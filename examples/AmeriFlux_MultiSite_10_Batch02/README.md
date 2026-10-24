@@ -1119,3 +1119,33 @@ Stage46 successfully validated all original source/ZIP/AUXMETEO hashes and the 3
 ### Stage47 completed; Stage48 ten-site VPD-negative / low-RH external-ERA policy
 
 Stage47 successfully reconfirmed that all 274,148 original Ho1 consolidated measured-coded QC0 T equal their MDS measured-coded QC0 source exactly, and the 319 held Ho1 original QC2 T records all have poor-quality MDS QC=3 (MDS-vs-ERA temperature differences ~18.97°C in 1998, ~17.38°C in 1999 and ~2.53°C in 2001). Ho1 original QC0 versus site-downscaled ERA empirical RMSE is 7.7346°C, with >=10°C differences making up 64.159% of squared error. Stage48 adds new negative-VPD/negative-RH physical screens and a **conditional independently retrieved CDS ERA5/ERA5-Land humidity candidate** rule for the full 10-site batch; very low positive RH <1% is high-priority manual review rather than mandatory substitution. An exact source/UTC/elevation/air-T-QC gate prevents using in-package FLUXNET ERA and prevents humidity-only replacement at suspect Ho1 QC2 temperature. See [ten-site audit and rule policy](docs/batch02_ten_site_qc_and_era_repair_policy_20261024.md) and [Stage48 read-only scanner](scripts/stage48/48_audit_ten_site_vpd_rh_era_repair_rule.py). All 4,884 original held records remain unapproved, and five numeric Stage07 site candidates still need review. No model forcing files were changed.
+
+
+### Stage48 IRIDIS6 verified and Stage49 original-source review ledger (24 October 2026)
+
+Stage48 was executed on IRIDIS6 and its self-test, inventory preflight and
+full ten-site read-only audit completed with the original SHA256 inputs
+unchanged. Original source rows: **3,462,624** (3,460,200 future NO_LEAP);
+**26,332** unique hard humidity screens, of which **25,890** have
+nonpositive derived water RH; **39** raw RH=0, **405** raw RH>100,
+**102** raw positive RH<1%; no negative raw VPD and no negative raw RH.
+**21,551** hard-screen rows carry original TA_QC0 coding, which does not
+prove T physical validity. Ho1 dominates (16,788 hard rows); EML 4,311
+and ICt 2,570 also require priority review. These are NOT the 4,884 Stage08
+scientific HOLD cohort, and no model repair has been approved.
+
+The exact operator-reported per-site table, physical caveats, new Stage49
+code link, and complete IRIDIS6 instructions are archived in
+[Stage48 verified results and Stage49 instructions](docs/stage48_operator_result_and_stage49_20261024.md).
+The new read-only [Stage49 row-level science ledger](scripts/stage49/49_build_ten_site_original_humidity_review_ledger.py)
+pins the existing Stage48 Git blob, checks the source inventory and hashes
+before/after scanning, classifies original hard-humidity and raw RH<1%
+records with conservative manual science routes, and produces fresh
+CSV/JSON reports without modifying source or prior candidates.
+A failed run leaves INCOMPLETE_DO_NOT_USE; live IRIDIS6 Stage49 execution
+has **not yet been verified**.
+
+**Science HOLD unchanged:** Stage08 cohort 4,884 rows; 0 approved
+replacement/forcing/model jobs. Avoid making automatic ERA substitutions
+from the in-package FLUXNET companions or from RH>100 near saturation;
+external CDS ERA5/ERA5-Land and site time/temperature must first be validated.
