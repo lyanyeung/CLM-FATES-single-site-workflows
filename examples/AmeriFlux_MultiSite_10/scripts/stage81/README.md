@@ -6,6 +6,26 @@
 
 All ten original forcing files preserved. User approved retaining 17 RH/T boundary warnings from the 18 precise corrections. No further RH repair is needed.
 
+## Actual SUCCESSFUL execution: IRIDIS6 24 October 2026
+
+**User-confirmed HPC log**: `SOURCE PASS | SYNTAX PASS`, Stage81 NOLEAP/7-variable `SELF-TEST PASS`, ten-site SHA-pinned Stage80 source and existing-point-surface `CHECK PASS`, all ten `NETCDF BUILD PASS` lines, followed by `STAGE81 DATM NETCDF TECHNICAL PREVIEW COMPLETE`. Actual output root:
+
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10/reports/stage81_DATM_technical_20261024T162235Z/`
+
+| Site | Time span | NetCDF annual files |
+|---|---|---:|
+| BR-Ma2 | 1999–2016 | 18 |
+| CA-Ca3 | 2001–2024 | 24 |
+| CA-Cbo | 1996–2024 | 29 |
+| CA-LP1 | 2007–2024 | 18 |
+| CA-Man | 1994–2008 | 15 |
+| CA-TP1 / CA-TP3 / CA-TP4 | 2002–2023 each | 22 each |
+| US-Aud | 2002–2024 | 23 |
+| US-Bar | 2004–2023 | 20 |
+| **TOTAL** | **10 sites** | **213** |
+
+A **per-file SHA-256 `manifest.json`** and **10 XML stream TEMPLATES, NOT ACTIVATED** were saved. The script did its designed annual NetCDF readback checks. GitHub contains scripts and provenance, **not** these raw NetCDF bytes; success here is evidenced by the operator's IRIDIS6 log. **Stage81 technical NetCDF creation is COMPLETE**, but neither the stream templates nor scientific spin-up are approved until the actual domain, DATM vs CDEPS stream format, sensor `ZBOT`, timestamp-support and site-model tests are verified. All printouts from Stage81 show `ZBOT=UNRESOLVED`, not validated tower height.
+
 ## What Stage81 actually builds
 
 **[81_build_DATM_from_Stage80.py](81_build_DATM_from_Stage80.py)** consumes **only the completed Stage80 ten-site pointer manifest**. It SHA-verifies the source manifest and all 10 complete forcing CSVs before doing anything, and derives point-grid coordinates only from the *existing* site `subset_data/surfdata*.nc` files. It does NOT infer, guess, or silently inject station GPS coordinates or sensor heights.
