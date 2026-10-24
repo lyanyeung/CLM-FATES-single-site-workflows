@@ -242,8 +242,6 @@ def compute(high,groups,oldsummary,original):
             start=pd.Timestamp(r.start_local)
             end=pd.Timestamp(r.end_local)
             group_events=events.loc[events.event_cluster_id.eq(r.cluster)]
-            if group_events.empty or len(group_events)!=int(r.records) and len(group_events)<int(r.P0_events)+int(r.P1_events) if False else False:
-                pass
             if group_events.empty:
                 raise ValueError("No high priority records within selected cluster")
             if not (group_events.native_time.between(start,end)).all():
