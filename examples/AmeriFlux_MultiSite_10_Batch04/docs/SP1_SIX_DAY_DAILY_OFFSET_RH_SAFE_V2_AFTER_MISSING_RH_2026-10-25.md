@@ -1,3 +1,5 @@
+**Final operator script revision:** use **RH-safe v3**, not the v2 file named in this historical report title. V3 also preserves existing Stage14 **VPD-only** repairs already present in the pinned three-point parent: its 2007 VPD values can legitimately differ from original FLUXMET. The RH-missing fallback retains **the parent's valid VPD/QC**, not an older superseded VPD from original raw FLUXMET. All measured source TA and ERA must still match originals exactly. Script at [RH-safe v3](../scripts/manual_review/apply_sp1_six_oct2007_daily_era_offset_rh_safe_v3.py), commit `4ca2346496cd166ba5805f5f9b381eebf3dd22f4`.
+
 # Batch04 SP1 October 2007 six-day manual temperature replacement — missing Stage14 RH resolved by conservative humidity provenance logic
 
 **2026-10-25 operator failure report:** Original six-day/288-row source and all six mean residual calibrations **PASS** on IRIDIS6; first v1 `--apply` **stopped before creating the new candidate**, with `ValueError: Stage14 RH missing/out of 0..100 for 200710150630`. This is **not** a failure of six daily source temperature bias estimates; it's the v1 assumption that valid RH is present at all 137 target records. **No original/parent research case or model data were changed** in that failed run.
@@ -30,9 +32,9 @@ The output provenance ledger explicitly records per-HH `humidity_method`, `origi
 
 The earlier separate **3-point** source-pinned parent is preserved unchanged with original US-SP1 SHA `96d8c6ad2a082bb243160ee91c2aee0d2fcd3dc0a862515519c34dab2fa664d3` and US-SRG SHA `d65523022718819d7013d79f1015fe419958078a8d1fde4f062fa8470929933f`. The Stage14 original FLUXMET and all other 9 selected site input sources retain their original references. The new candidate is intended for research sensitivity only.
 
-## Run RH-safe v2 on IRIDIS6
+## Run RH-safe v3 on IRIDIS6
 
-[RH-safe v2 script](../scripts/manual_review/apply_sp1_six_oct2007_daily_era_offset_rh_safe_v2.py) pinned GitHub commit **`cce12e0e6279f1d0acb1914dd309672573beec2b`**.
+[RH-safe v3 script](../scripts/manual_review/apply_sp1_six_oct2007_daily_era_offset_rh_safe_v3.py) pinned GitHub commit **`4ca2346496cd166ba5805f5f9b381eebf3dd22f4`**.
 
 ```bash
 conda activate clm_fates_env
@@ -40,11 +42,11 @@ conda activate clm_fates_env
   set -euo pipefail
   BASE="$HOME/ameriflux_batch04_manual_review"
   RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows"
-  COMMIT="cce12e0e6279f1d0acb1914dd309672573beec2b"
+  COMMIT="4ca2346496cd166ba5805f5f9b381eebf3dd22f4"
   REL="examples/AmeriFlux_MultiSite_10_Batch04/scripts/manual_review"
   mkdir -p "$BASE"
-  SCRIPT="$BASE/apply_sp1_six_oct2007_daily_era_offset_rh_safe_v2.py"
-  curl -fLsS --retry 3 "$RAW/$COMMIT/$REL/apply_sp1_six_oct2007_daily_era_offset_rh_safe_v2.py" -o "$SCRIPT"
+  SCRIPT="$BASE/apply_sp1_six_oct2007_daily_era_offset_rh_safe_v3.py"
+  curl -fLsS --retry 3 "$RAW/$COMMIT/$REL/apply_sp1_six_oct2007_daily_era_offset_rh_safe_v3.py" -o "$SCRIPT"
   python3 -B -m py_compile "$SCRIPT"
   python3 -u -B "$SCRIPT" --apply 2>&1 | tee "$BASE/SP1_six_day_RH_safe_v2_apply.log"
 )
