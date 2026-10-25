@@ -150,7 +150,7 @@ def summary(frame,fields):
 def evaluate():
     mod,src,spec,catalog,held,original_results=prior()
     wanted=set(held.native_key)
-    complete=[];profiles=[];episodes=[]
+    complete=[];profiles=[];episodes=[];dispositions=[]
     for year in YEARS:
         print("STAGE12K SOURCE YEAR:",year,flush=True)
         names=["TIMESTAMP_START","TA_F","PA_F","VPD_F","VPD_F_QC","TA_F_QC"]
@@ -188,6 +188,18 @@ def evaluate():
         phys=mod.physical(originalT,siteP,candidate_e)&original_good
         terrain=np.isfinite(temp_norm)&(np.abs(originalT-temp_norm)<=5)
         eligible=phys&terrain
+        dispositions.append({
+           "year":year,
+           "measured_QC0_cold_N":int(cold.sum()),
+           "original_year_grid_source_physics_valid_N":int((cold&original_good).sum()),
+           "GRID_RH_vapour_water_ice_QBOT_physics_valid_N":int((cold&phys).sum()),
+           "pressure_height_normalized_T_within5C_N":int((cold&terrain).sum()),
+           "both_candidate_physics_and_terrain_pass_N":int((cold&eligible).sum()),
+           "GRID_RH_physics_failed_N":int((cold&~phys).sum()),
+           "pressure_height_normalized_T_failed_N":int((cold&~terrain).sum()),
+           "all_rejected_unique_N":int((cold&~eligible).sum()),
+           "scientific_release":False
+        })
         candidate_v=mod.esw(originalT)-candidate_e
         err=candidate_v-observed
         if int(cold.sum())<50:
@@ -268,7 +280,7 @@ def evaluate():
     if int(joined.held_target_N.sum())!=1035:
         raise ValueError("Stage12k target source-year month/temperature count differs")
     rows_without20=int(joined.loc[joined.QC0_cold_analogue_N.lt(20),"held_target_N"].sum())
-    return summary_year,observed_month,obs_temp,obs_vpd,episodes_df,joined,rows_without20
+    return summary_year,observed_month,obs_temp,obs_vpd,episodes_df,joined,pd.DataFrame(dispositions),rows_without20
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     mode=p.add_mutually_exclusive_group(required=True)
@@ -279,9 +291,11 @@ def main():
     print("STAGE12K — US-MtB GRID_RH MEASURED QC0 ERROR-TAIL SOURCES | "+VERSION,flush=True)
     self_test()
     if args.self_test:return
-    yearly,monthly,temp,vpd,episodes,coverage,without20=evaluate()
+    yearly,monthly,temp,vpd,episodes,coverage,physregimes,without20=evaluate()
     print("\n========== SIGNED STAGE12J GRID_RH QC0 REPRODUCED ==========",flush=True)
     print(yearly.to_string(index=False),flush=True)
+    print("\n========== COLD MEASURED QC0 CANDIDATE PHYSICS VS TERRAIN DISPOSITIONS ==========",flush=True)
+    print(physregimes.to_string(index=False),flush=True)
     print("\n========== COLD T-BIN QC0 ERROR REGIMES ==========",flush=True)
     print(temp.to_string(index=False),flush=True)
     print("\n========== COLD VPD-BIN QC0 ERROR REGIMES ==========",flush=True)
@@ -309,7 +323,7 @@ def main():
        "cold_QC0_observed_error_by_original_VPD.csv":vpd,
        "QC0_HIGH2_contiguous_native_halfhour_episodes.csv":episodes,
        "held_1035_tower_temperature_and_month_analogue_coverage.csv":coverage,
-       "three_year_QC0_cold_physics_disposition.csv":yearly
+       "three_year_QC0_cold_physics_disposition.csv":physregimes
     }
     for name,data in reports.items():
         data.to_csv(path/name,index=False)
