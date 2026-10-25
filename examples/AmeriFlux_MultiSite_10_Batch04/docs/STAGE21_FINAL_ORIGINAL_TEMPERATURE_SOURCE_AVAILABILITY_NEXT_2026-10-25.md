@@ -1,6 +1,6 @@
 # Batch04 Stage21 — FINAL internal original release temperature source availability check
 
-**Status (2026-10-25): Stage20 operator-VERIFIED PASS (3/3 BIF sources, 6/6 target contracts), no original tower-temperature sensor identified. Stage21 read-only script COMMITTED; IRIDIS6 operator run/results PENDING.**
+**Status (2026-10-25): Stage20 VERIFIED PASS; Stage21 OPERATOR-VERIFIED IRIDIS6 PASS, 3/3 original FLUXNET station releases, 48/48 CSV headers and all 6 event contracts audited.** No separately named instrument-level TA channel detected in these FLUXNET packages, **8/8 original tower-temperature scientific HOLDs remain**. See [complete verified Stage21 results](STAGE21_VERIFIED_ORIGINAL_TEMPERATURE_SOURCE_COVERAGE_2026-10-25.md) and [verified site contact and source-request pack](STAGE21_SITE_OPERATOR_TEMPERATURE_REQUESTS_2026-10-25.md). Original code/command is retained here solely for reproducibility.
 
 **Why not automatically repair?** Stage20 only found one BIF temperature-related group per site, and in every case that matching row was ERA_VARIABLE=TA. That denotes an ERA-related variable rather than raw TA sensor instrumentation. Stage19 already documented recurring US-SP1 daytime and winter sub-periods versus TA_ERA, a single US-SRG QC0 outlier, and continuous original US-Seg cooling. QC2 substituted temperatures and TA_F=TA_F_MDS equality are NOT independent tower sensor confirmations.
 
@@ -54,4 +54,4 @@ Stage21 also checks any BIF FLUX_MEASUREMENTS variable/method/start metadata gro
 
 **All eight** original tower-temperature science HOLDs remain pending, including the two historical US-SP1 Stage15 trial times. US-Syv **606 inherited science HOLDs** plus **10 skipped Stage07 ERA endpoints** remain deferred. **Post-v5/DATM/CIME/SLURM/spinup NOT APPROVED.**
 
-**Next user action:** send full IRIDIS6 output of $HOME/ameriflux_batch04_stage21/stage21_original_temperature_source_coverage_readonly.log. Stage21 may reveal whether additional original measurement channels actually exist. If they do not, next step is an **external provenance request**, not another unexplained automatic ERA replacement.
+**Operator provided the actual Stage21 log; the source scan PASSED and found no separate raw TA sensor columns in the original FLUXNET release headers.** This completes the planned internal-only source-availability gate. Do **not** start Stage22 for the same six points without genuinely new independent data. [Proceed to independent source requests](STAGE21_SITE_OPERATOR_TEMPERATURE_REQUESTS_2026-10-25.md) and consider the distinct AmeriFlux BASE products under source-side QC/height/clock checks. No outreach has been sent and no BASE file has been verified in this workflow.
