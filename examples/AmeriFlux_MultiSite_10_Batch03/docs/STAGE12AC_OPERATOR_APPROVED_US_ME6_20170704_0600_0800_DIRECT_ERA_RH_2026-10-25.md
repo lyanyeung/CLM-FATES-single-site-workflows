@@ -19,7 +19,7 @@ The source-verified original tower `TA_F_QC=0`; VPD `VPD_F_QC=1` and its `VPD_F_
 
 ## Scope and execution
 
-The pinned source script is [12ac_apply_USER_APPROVED_Me6_20170704_0600_0800_ERA_RH.py](../scripts/stage12/12ac_apply_USER_APPROVED_Me6_20170704_0600_0800_ERA_RH.py), Git commit `53e5b336286d8102096c05a4d84b3442086fd7be`, initial Git blob `b65c1f5c029c27393a0f45fd1c79daae037b0875`.
+The pinned source script is [12ac_apply_USER_APPROVED_Me6_20170704_0600_0800_ERA_RH.py](../scripts/stage12/12ac_apply_USER_APPROVED_Me6_20170704_0600_0800_ERA_RH.py), Git commit `5e1cf77238a3cbc1a21622930f2eb13f7a9ff8c1`, current Git blob `86251d3889fac98ec74a64d8ec31473e55e6feba`.
 
 `--self-test` verifies the five original native keys, humidity equations and single exception without writing files. `--check` verifies Stage12aa original latest 20261025T231228Z and Stage12g SHA sealed source, computes all five VPD/QBOT and exact native boundaries in memory and guarantees no changes off-target; **zero files written**. `--apply` creates an **independent user-approved corrected full US-Me6 NOLEAP derivative**, five-row before/after receipt, all boundary diagnostics and SHA manifest, stored under a new `science_trials/stage12ac_USER_APPROVED_...` folder. It does NOT overwrite original FLUXMET, the original Stage12g, any other Batch03 site or preexisting hold ledgers. The original 86 science-event and 233 old physics hold ledgers are kept as immutable historical records; two 07:00/07:30 records change only in the separately approved derivative. Other holds must remain.
 
