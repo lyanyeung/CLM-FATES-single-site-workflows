@@ -266,7 +266,7 @@ def main():
     print(records.to_string(index=False),flush=True)
     print("\n========== APPROVED SEGMENT PLUS BOTH NATIVE ADJACENT BOUNDARIES ==========",flush=True)
     print(edges.to_string(index=False),flush=True)
-    print("\nSTAGE12AC APPROVAL: 5 HH, exactly 2 source HOLUM gaps now filled "
+    print("\nSTAGE12AC APPROVAL: 5 HH, exactly 2 earlier Stage12g HOLD gaps now filled "
           "only in NEW derivative; 07:00->07:30 single >4hPa exception; "
           "original G/source unchanged; other holds preserved; "
           "Postv5=0 DATM=0 spinup=0",flush=True)
@@ -281,7 +281,7 @@ def main():
     outputs={
       "US-Me6_STAGE12AC_USER_APPROVED_OVERLAY_INCOMPLETE_NOLEAP.csv":trial,
       "five_operator_approved_original_native_ERA_RH_replacements.csv":records,
-      "seven_edges_user_approved_interval_plus_neighbors.csv":edges
+      "six_edges_user_approved_interval_plus_neighbors.csv":edges
     }
     for n,df in outputs.items():
         df.to_csv(dest/n,index=False)
