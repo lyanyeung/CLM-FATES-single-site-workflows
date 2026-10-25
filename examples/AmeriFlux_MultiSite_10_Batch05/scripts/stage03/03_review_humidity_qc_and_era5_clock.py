@@ -74,6 +74,7 @@ def original_events(stream, sample_max=12):
         raise ValueError("source TA/VPD column missing; no guessing allowed")
     counted, qc, years = Counter(), defaultdict(Counter), defaultdict(Counter)
     examples, anchors = [], []
+    n = 0
     for n, row in enumerate(reader, 1):
         if None in row or any(v is None for v in row.values()):
             raise ValueError("malformed native row " + str(n))
