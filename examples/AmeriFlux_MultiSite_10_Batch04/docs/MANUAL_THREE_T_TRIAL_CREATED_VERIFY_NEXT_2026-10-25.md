@@ -1,6 +1,6 @@
 # Batch04 — manual 3-T research alternative CREATED by operator, full-source read-only verification next
 
-**Date:** 2026-10-25. **Research-only output confirmed by exact operator stdout, not yet independently compared row by row on IRIDIS6.**
+**Date:** 2026-10-25. **Research-only output CREATED by operator; independent full-source audit NOW VERIFIED PASS** on IRIDIS6: 2 full site CSVs; 3 exact HH; 9 changed field cells only; original inputs/other eight site selections retained. Full original/derived science holds remain unresolved. See [operator-verified full-source audit and SHA values](MANUAL_THREE_T_FULL_SOURCE_AUDIT_VERIFIED_2026-10-25.md).
 
 ```text
 MANUAL TRIAL SELF-TEST PASS: 3 HH isolated, QC2 ERA-derived provenance, no original overwrite
@@ -17,9 +17,9 @@ NOT APPROVED FOR POST-v5, DATM, CIME, SLURM, SPINUP
 
 This is a **separate** independent research scenario from Stage15's 2000 US-SP1 two-point *tower-neighbor interpolation* scenario (13.1816667 and 15.3633333°C with trial QC1). It is **not** an update of instrument-observed temperature QC; in the Stage14 source the three source measurements remain QC0. In the research alternative, all three edited TA use trial QC2 due to ERA provenance; VPD is recomputed at retained Stage14 RH. US-SRG's neighbors were themselves **QC2 ERA-substituted**, so its interpolation is not independent measured tower truth.
 
-**Status distinction:** the generator reported `--trial` success, but **its output is not an independent full row-by-row audit**. Before considering this trial technically verified, compare the two full proposed site CSVs to both pinned Stage14 full CSVs, and check exact 3 native timestamps × only 3 altered columns (`TA_F,TA_F_QC,VPD_F`), timestamp and row preservation (368,208+315,600 HH), full output SHA256/receipt/provenance, the 10-site manifest and 8 other unchanged site entries, and thermodynamic VPD closure. The pinned **read-only verification script** below performs this independent check.
+**Status distinction:** independent full row-by-row audit is now **operator-VERIFIED PASS**, as recorded in the report linked above. Before considering this trial technically verified, compare the two full proposed site CSVs to both pinned Stage14 full CSVs, and check exact 3 native timestamps × only 3 altered columns (`TA_F,TA_F_QC,VPD_F`), timestamp and row preservation (368,208+315,600 HH), full output SHA256/receipt/provenance, the 10-site manifest and 8 other unchanged site entries, and thermodynamic VPD closure. The pinned **read-only verification script** below performs this independent check.
 
-## Next: independent full-source read-only audit (no new trial generation)
+## Reproduction: independent full-source read-only audit (COMPLETED PASS on IRIDIS6)
 
 Script: [verify_manual_three_T_trial_full_source_readonly.py](../scripts/manual_review/verify_manual_three_T_trial_full_source_readonly.py), committed as GitHub SHA `212ef265089c65c4854568e129da12b370085ab7`.
 
@@ -46,7 +46,7 @@ Run on IRIDIS6 with the existing `clm_fates_env`; this only uses Python standard
 )
 ```
 
-**Success gate:** `MANUAL AUDIT PASS 2/2 FULL-SOURCE CSV, 3/3 HALF-HOURS, EXACTLY 9 CELLS`; `8/8 OTHER-SITE MANIFEST ENTRIES IDENTICAL`; `ERA-ORIGIN QC2`, RH physical closure and SHA256 verification all PASS. Until the IRIDIS6 output is returned, audit remains **PENDING**, with no claim that a source-level repair is scientifically validated.
+**Success gate:** `MANUAL AUDIT PASS 2/2 FULL-SOURCE CSV, 3/3 HALF-HOURS, EXACTLY 9 CELLS`; `8/8 OTHER-SITE MANIFEST ENTRIES IDENTICAL`; `ERA-ORIGIN QC2`, RH physical closure and SHA256 verification all PASS. The operator returned the expected **PASS** for complete row, field, SHA256, VPD/RH, QC2 and unchanged other-eight-site checks. This establishes **technical research-file integrity, not scientific validation of an original-source repair**. No Post-v5/DATM/CIME/Slurm/spinup approval.
 
 **Original research science gates remain:** eight source-temperature science HOLDs; US-Syv 606 older holds and 10 ERA edge cases deferred. There is **no Post-v5/DATM/CIME/Slurm/spinup approval**.
 
