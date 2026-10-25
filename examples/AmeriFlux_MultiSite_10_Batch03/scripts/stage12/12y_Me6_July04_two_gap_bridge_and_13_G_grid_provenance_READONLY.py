@@ -29,7 +29,7 @@ import numpy as np
 import pandas as pd
 sys.dont_write_bytecode = True
 
-VERSION="batch03-stage12y-v1-20261025-July04-two-gap-and-13-G-grid-provenance"
+VERSION="batch03-stage12y-v2-20261025-two-gap-and-13-G-grid-ledger-locked"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 X=ROOT/"reports/stage12x_68missing_13historic_finite_stage12w_cross_candidate_20261025T193514Z_fc1729a4"
 W=ROOT/"reports/stage12w_355_original_MDS_VPD_companion_ERA_RH_physics_triage_20261025T192422Z_10358cc7"
@@ -83,7 +83,7 @@ def selftest():
     keys=pd.to_datetime(list(F),format="%Y%m%d%H%M")
     assert list(np.diff(keys.to_numpy()).astype("timedelta64[m]").astype(int))==[30,30,30]
     assert abs(edge(3.974495,5.154795)-1.1803)<1e-5
-    assert edge(np.nan,5)==edge(np.nan,5) if False else np.isnan(edge(np.nan,5))
+    assert np.isnan(edge(np.nan,5))
     assert flag("True") and not flag("False")
     assert datekey(pd.Series(["2017-07-04 07:00:00"])).iat[0]==CENTER
     print("STAGE12Y SELF-TEST PASS: original native 4-point 30min bridge, distinct ERA provenance, no writes",flush=True)
@@ -192,6 +192,13 @@ def audit():
          &missing.Stage12w_diagnostic_group_NOT_APPROVED.eq(SCIENCE_PASS)]
     if len(target)!=1:
         raise ValueError("Only Stage12x single 2017-07-04 07:00 diagnostic pass/missing expected")
+    # The intervening 07:30 is a second, separately HELD source-time,
+    # not a reliable immediate reference. Preserve its signed D/E/G reasons.
+    second=missing.loc[missing.site.eq("US-Me6")
+            &missing.native_key.eq("201707040730")]
+    if len(second)!=1:
+        raise ValueError("Original 07:30 second gap in the 07:00-08:00 source bridge changed")
+    heldmap=missing.loc[missing.site.eq("US-Me6")].set_index("native_key")
     gm=pd.read_csv(safe(G/G_SHADOW),usecols=[
         "time","TA_USE","PSRF","VPD_USE","QBOT"],
         dtype={"time":str},low_memory=False)
@@ -231,8 +238,7 @@ def audit():
             raise ValueError("Original native source and Stage12w candidate T/P mismatch "+key)
         joined.append({
           "site":"US-Me6","native_key":key,"source_time":str(row.time),
-          "relative_minutes_to_0700":int((pd.Timestamp(key)-pd.Timestamp(CENTER)).total_seconds()/60)
-            if False else int((pd.to_datetime(key,format="%Y%m%d%H%M")-
+          "relative_minutes_to_0700":int((pd.to_datetime(key,format="%Y%m%d%H%M")-
                 pd.to_datetime(CENTER,format="%Y%m%d%H%M")).total_seconds()/60),
           "original_TA_F_C":float(old.TA_F),
           "original_TA_F_QC":float(old.TA_F_QC),
@@ -249,6 +255,16 @@ def audit():
           "Stage12w_base_rh_t_pressure_ice_closure_and_5C_guard_pass":base,
           "Stage12w_diagnostic_class":str(wc.screen_group_NOT_MODEL_APPROVAL)
             if wc is not None else "NO_SIGNED_355_CANDIDATE",
+          "historical_G_missing":key in heldmap.index,
+          "historical_Stage12d_hold_reason":str(
+             heldmap.loc[key,"Stage12d_original_hold_reason"])
+             if key in heldmap.index else "NOT_AN_X_68_MISSING_SOURCE_KEY",
+          "historical_Stage12e_hold_reason":str(
+             heldmap.loc[key,"Stage12e_original_hold_reason"])
+             if key in heldmap.index else "NOT_AN_X_68_MISSING_SOURCE_KEY",
+          "historical_Stage12g_hold_reason":str(
+             heldmap.loc[key,"Stage12g_original_missing_year_hold_reason"])
+             if key in heldmap.index else "NOT_AN_X_68_MISSING_SOURCE_KEY",
           "four_point_bridge_segment":key in F,
           "no_imputation_or_release":True
         })
@@ -281,6 +297,7 @@ def audit():
         e.append({
           "site":"US-Me6","source_native_start":a.native_key,
           "source_native_end":b.native_key,"native_step_minutes":30,
+          "source_time_gap_checked_exact_native_30min":True,
           "stage12g_existing_VPD_from_hPa":float(a.signed_G_VPD_USE_hPa),
           "stage12g_existing_VPD_to_hPa":float(b.signed_G_VPD_USE_hPa),
           "hypothetical_source_from":a.hypothetical_hybrid_source,
@@ -297,6 +314,8 @@ def audit():
         })
     edges=pd.DataFrame(e)
     if (len(context)!=25 or len(bridge)!=4 or len(edges)!=3
+        or not bridge.loc[bridge.native_key.isin(("201707040700","201707040730")),
+                          "historical_G_missing"].all()
         or len(combined)!=13 or not edges.native_step_minutes.eq(30).all()
         or not close(bridge.iloc[0].signed_G_VPD_USE_hPa,3.974495)
         or not close(bridge.iloc[1].Stage12w_original_ERA_RH_trial_VPD_hPa,5.154795)
@@ -327,7 +346,8 @@ def main():
     print(bridge[["native_key","original_VPD_F_QC","original_VPD_F_hPa",
             "signed_G_VPD_USE_hPa","Stage12w_original_ERA_RH_trial_VPD_hPa",
             "Stage12w_base_rh_t_pressure_ice_closure_and_5C_guard_pass",
-            "Stage12w_diagnostic_class","hypothetical_hybrid_VPD_hPa",
+            "Stage12w_diagnostic_class","historical_Stage12g_hold_reason",
+            "hypothetical_hybrid_VPD_hPa",
             "hypothetical_hybrid_source"]].to_string(index=False),flush=True)
     print("\n========== EXACT THREE CONSECUTIVE ORIGINAL 30MIN TRIAL EDGES ==========",flush=True)
     print(edges.to_string(index=False),flush=True)
