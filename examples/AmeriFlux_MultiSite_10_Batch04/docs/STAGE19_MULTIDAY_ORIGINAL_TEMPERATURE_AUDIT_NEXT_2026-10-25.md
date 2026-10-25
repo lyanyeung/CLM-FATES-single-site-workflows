@@ -1,6 +1,6 @@
 # Batch04 Stage19 — multi-day ORIGINAL QC0 temperature regime audit (read-only)
 
-**Status (2026-10-25): Stage18 IRIDIS6 VERIFIED PASS 6/6; Stage19 code committed, IRIDIS6 execution NOT YET VERIFIED.**
+**Status (2026-10-25): Stage18 VERIFIED PASS 6/6; Stage19 operator-verified IRIDIS6 PASS 6/6.** The original pinned command is preserved below. See [Stage19 actual multi-day numbers, episodes, source hashes and scientific decisions](STAGE19_VERIFIED_MULTIDAY_TEMPERATURE_REGIMES_2026-10-25.md). Eight original temperature science HOLDs remain unresolved.
 
 [Stage18 actual measurements, SHA values and science assessments](STAGE18_VERIFIED_ORIGINAL_T_SOURCE_LINEAGE_2026-10-25.md). Stage19 code: [19_multipday_original_temperature_regime_audit.py](../scripts/stage19/19_multipday_original_temperature_regime_audit.py).
 
@@ -52,4 +52,4 @@ The audit checks original full-length SHA256 for US-SP1/US-SRG/US-Seg, Stage12 f
 
 **Science gates:** all eight original temperature disputes remain held until independently investigated. US-Syv's 606 old holds + 10 skipped Stage07 ERA endpoints remain deferred. No forcing/QC/CDS/Post-v5/DATM/CIME/Slurm/model/spinup modifications.
 
-**Return:** the IRIDIS6 output in ~/ameriflux_batch04_stage19/stage19_original_T_multiday_readonly.log. Only that log can establish whether Stage19 passed and what the multi-day distribution reveals.
+**Return:** the IRIDIS6 output in ~/ameriflux_batch04_stage19/stage19_original_T_multiday_readonly.log. The operator supplied Stage19 `--audit` PASS output with all six target events; the results are archived in [Stage19 verified report](STAGE19_VERIFIED_MULTIDAY_TEMPERATURE_REGIMES_2026-10-25.md). Re-execution is optional for reproducibility; the script is read-only.
