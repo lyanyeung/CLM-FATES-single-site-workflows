@@ -707,3 +707,45 @@ PY
 ```
 
 Next science gate: review original site sensor/RH/VPD formula for measured QC0 periods, and compare verified same-clock local meteorology with freshly acquired ERA5-Land 2m T and dewpoint **after site longitude/latitude/elevation and UTC conversion are verified**. These remain scientific checks not approvals to modify any forcing.
+
+
+## Stage18: original observed half-hour evidence pack for investigator decisions
+
+The operator completed Stage17, identifying **522** native contiguous low-RH episodes from **1,750** original anomalous half-hours, with **39 P1 episodes** (US-Vcm 37, US-Vcp 1, US-WCr 1). The investigator requested all the actual original source numeric data for a human **KEEP / HOLD / REPLACE** decision. **None of the original source meteorology has yet been changed.**
+
+[Stage18 read-only, SHA-pinned original met review exporter](scripts/stage18/18_export_p1_original_review_pack_readonly.py) reads the exact Stage16 selected anomaly ledger, Stage17 P1 episodes, and only the three original native source files needed for those P1 episodes. SHA256 is verified against the prior Stage12 originals. It exports:
+
+- `stage18_39_episode_index.csv`: all P1 event source dates, half-hour counts and provenance.
+- `stage18_all_p1_original_flagged_HH.csv`: all P1 anomalous original half-hours, exact original `TA_F`, `VPD_F`, `RH`, two quality codes, MDS and ERA companion values, and derived water RH.
+- `stage18_all_p1_original_6hour_context.csv`: native raw time series surrounding each P1 episode (±6 hours), marked context-only when outside the flagged half-hours.
+- `stage18_7_priority_review_cards.md`: seven concise native-time user decision tables (US-WCr August 2025, US-Vcm December 2007, January 2007, February 2008, November 2024, October 2025, US-Vcp January 2011), with all other P1 source abnormal HH at the end.
+- `stage18_summary.json`: exact hashes and counts and zero repair approvals.
+
+As with earlier stages, this does not invent a UTC offset, infer a source instrument or modify any source/forcing/CIME/Slurm settings.
+
+```bash
+(
+  set -euo pipefail
+  BASE="$HOME/ameriflux_batch05_stage18"
+  COMMIT="cf6fb9fe7a8c8ea9905757b0086a05c9a1d486ec"
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT"
+  SCRIPT="$BASE/18_export_p1_original_review_pack_readonly.py"
+  STAGE16="$HOME/ameriflux_batch05_stage16/source_pairs_20261025T225516Z_1291407"
+  STAGE17="$HOME/ameriflux_batch05_stage17/episode_manifest_20261025T230607Z_1291407"
+  mkdir -p "$BASE"
+  curl -fLsS --retry 3 \
+    "$RAW/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage18/18_export_p1_original_review_pack_readonly.py" \
+    -o "$SCRIPT"
+  test "$(git hash-object "$SCRIPT")" = "e58205016cda48d42d4732261ebc238fd7941ee7"
+  echo "STAGE18 SOURCE VERIFIED"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  OUT="$BASE/original_review_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+  python3 -B "$SCRIPT" --stage16-dir "$STAGE16" \
+    --stage17-dir "$STAGE17" --output-dir "$OUT" \
+    2>&1 | tee "$BASE/stage18.log"
+  echo "STAGE18_REPORTS=$OUT"
+)
+```
+
+After success, show the actual reviewer decision cards with `cat "$OUT/stage18_7_priority_review_cards.md"` **inside the same shell**, or upload that `.md` and the flagged HH CSV to ChatGPT to conduct an evidence-based KEEP/HOLD/REPLACE review. This script is committed and SHA-verified on GitHub but has **not been executed on IRIDIS6**. All proposals remain `HOLD_NOT_APPROVED`.
