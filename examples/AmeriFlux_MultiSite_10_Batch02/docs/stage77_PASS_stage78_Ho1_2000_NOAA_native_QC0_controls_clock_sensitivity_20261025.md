@@ -40,7 +40,7 @@ It compares the unchanged 505 native Ho1 events and same-month QC0 controls agai
 
 No Stage78 result is a historical official BADM/UTC offset certification, automatic temperature replacement, forcing approval or statistically independent sensor truth. The full 16,874 Ho1+BZS original hard source time HOLDS remain; Stage74 15,199 numeric-only humidity shadows and other Batch02 Stage64 9,389 candidates remain immutable. Stage77 and existing NOAA/CDS/FLUXNET source files are never rewritten.
 
-Stage78 commit: `2be8e8f2c13db953b9184e6d333ad30267eea3c3`; exact source blob: `3c6c2a62dc7c09e21ac293e0d6018ff1d8ed6960`.
+Stage78 commit: `bba8ac7b358550bcc34f40001266566f9e2f0c1f`; exact source blob: `002b6fb491b1d9dd6e570feed31a3c041f0aae2a`.
 
 ## IRIDIS6 exact source-pinned offline next step
 
@@ -51,8 +51,8 @@ Stage78 commit: `2be8e8f2c13db953b9184e6d333ad30267eea3c3`; exact source blob: `
   PY="$CONDA_PREFIX/bin/python"
   REL="examples/AmeriFlux_MultiSite_10_Batch02"
   SCRIPT="$HOME/CLM-FATES-single-site-workflows/$REL/scripts/stage78/78_Ho1_2000_NOAA_QC0_control_and_clock_sensitivity.py"
-  COMMIT="2be8e8f2c13db953b9184e6d333ad30267eea3c3"
-  EXPECTED="3c6c2a62dc7c09e21ac293e0d6018ff1d8ed6960"
+  COMMIT="bba8ac7b358550bcc34f40001266566f9e2f0c1f"
+  EXPECTED="002b6fb491b1d9dd6e570feed31a3c041f0aae2a"
   mkdir -p "$(dirname "$SCRIPT")"
   TMP="$(mktemp)"
   trap 'rm -f "$TMP"' EXIT
@@ -81,3 +81,5 @@ Stage78 commit: `2be8e8f2c13db953b9184e6d333ad30267eea3c3`; exact source blob: `
 Expected completion: `STAGE78 AUDIT PASS | Ho1 2000 505 original measured QC0 source-airport controls and clock sensitivity audited`.
 
 Stage78 is committed and source structure checked, but **has not been run on IRIDIS6**; first execution may reveal source-schema issues, in which case preserve upstream original and fix only Stage78. The `--check` mode accesses only source files and manifests, no Internet; `--audit` does not download NOAA or change original files. Data quality, local representativeness and original time/source scientific HOLDs remain unresolved.
+
+Stage78 was hardened to convert the pandas nullable string timestamp mask to an ordinary NumPy boolean array before retrieving physical primary-source CSV row numbers; its pinned self-test checks this. No Stage77 or input-file content changed.
