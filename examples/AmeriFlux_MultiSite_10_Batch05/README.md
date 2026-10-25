@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 05
 
-**Status (2026-10-25): Stage00 upload/checksum 10/10 verified; Stage01 extraction 10/10 verified; Stage02 complete original native time PASS 10/10, with metadata review US-UMB/US-Vcp and scientific review required for all ten. Stage03 read-only humidity QC / ERA5 clock scout executed successfully 10/10 (operator log); Stage04 full-event ERA provenance/paired-physics shadow executed 10/10, with 3,129 abnormal source timestamps fully matched to ERA printed labels; Stage05 original RH/QC/phase audit executed successfully 10/10 (3,541,632 HH; 47,267 RH differences >10pp; 503,174 RH missing); Stage06 RH disagreement episode/source-header audit completed 10/10 (6,782 continuous episodes, 47,267 severely discordant RH records); Stage07 QC/ERA/MDS inheritance audit complete 10/10 (50,287 event timestamps, 9,632/9,632 VPD-QC2 matches ERA, 9,018/9,018 TA-QC2 matches ERA); Stage08 all-row consolidated provenance and MDS alternatives PASS 10/10: 3,541,632 records, 0 inconsistent source-selection, 1,750 low-derived-RH screens (700 MDS-pair mathematically feasible, 1,050 nonphysical); Stage09 read-only low-RH triage completed 10/10 (1,750 records: 1,559 negative, 191 nonnegative <1%; 170 without ERA/tower-T physically feasible pairing); Stage10 SHA-verified report-only export DONE 10/10 (1,750 original humidity flags, 1,559 negative) at review_20261025T180413Z_682688; Stage11 existing Stage10 review ledger QA PASS 10/10 (229 mathematically feasible unapproved bracketed interpolation candidates, 1,510 lacking both QC0 anchors, 11 nonphysical interpolations, 170 overlapping ERA-pair holds, 27 negative measured-QC0/0 source events); Stage12 original native temporal context report COMPLETED 10/10 (382 unique priority records from 1,750 low RH flags, 4,966 original HH contextual rows, approved=0); Stage13 independent native-context QA DONE 10/10 (382 priority events/4,966 original HH, 229 bracketed interpolations reproduced, 27 measured negative RH discrepancies all <=0.2 percentage points, 0 forcing repairs); Stage14 science sensitivity report completed 10/10 (240 bracketed trials, 173 change >5 hPa; 27 source QC0/0 near-zero RH checked with Magnus/Buck/Tetens, only one nonnegative under Buck/Tetens; no forcing changes); Stage15 full 1750-event source-provenance/hold inventory PASS 10/10 (VPD QC0=119, QC1=965, QC2=666, negative=1559, original RH missing=1605, approved=0); Stage16 report-only source-pair study PASS 10/10 (MDS pair 700/1050 physical/nonphysical; ERA pair 1695/55; mixed TA_F+ERA VPD 1102/648; ERA vapor e+TA_F 1580/115 among 1695 valid ERA pairs; approved=0). Stage17 independent-evidence episode manifest script published, operator run pending. NO model-ready forcing has been approved.**
+**Status (2026-10-25): Stage00 upload/checksum 10/10 verified; Stage01 extraction 10/10 verified; Stage02 complete original native time PASS 10/10, with metadata review US-UMB/US-Vcp and scientific review required for all ten. Stage03 read-only humidity QC / ERA5 clock scout executed successfully 10/10 (operator log); Stage04 full-event ERA provenance/paired-physics shadow executed 10/10, with 3,129 abnormal source timestamps fully matched to ERA printed labels; Stage05 original RH/QC/phase audit executed successfully 10/10 (3,541,632 HH; 47,267 RH differences >10pp; 503,174 RH missing); Stage06 RH disagreement episode/source-header audit completed 10/10 (6,782 continuous episodes, 47,267 severely discordant RH records); Stage07 QC/ERA/MDS inheritance audit complete 10/10 (50,287 event timestamps, 9,632/9,632 VPD-QC2 matches ERA, 9,018/9,018 TA-QC2 matches ERA); Stage08 all-row consolidated provenance and MDS alternatives PASS 10/10: 3,541,632 records, 0 inconsistent source-selection, 1,750 low-derived-RH screens (700 MDS-pair mathematically feasible, 1,050 nonphysical); Stage09 read-only low-RH triage completed 10/10 (1,750 records: 1,559 negative, 191 nonnegative <1%; 170 without ERA/tower-T physically feasible pairing); Stage10 SHA-verified report-only export DONE 10/10 (1,750 original humidity flags, 1,559 negative) at review_20261025T180413Z_682688; Stage11 existing Stage10 review ledger QA PASS 10/10 (229 mathematically feasible unapproved bracketed interpolation candidates, 1,510 lacking both QC0 anchors, 11 nonphysical interpolations, 170 overlapping ERA-pair holds, 27 negative measured-QC0/0 source events); Stage12 original native temporal context report COMPLETED 10/10 (382 unique priority records from 1,750 low RH flags, 4,966 original HH contextual rows, approved=0); Stage13 independent native-context QA DONE 10/10 (382 priority events/4,966 original HH, 229 bracketed interpolations reproduced, 27 measured negative RH discrepancies all <=0.2 percentage points, 0 forcing repairs); Stage14 science sensitivity report completed 10/10 (240 bracketed trials, 173 change >5 hPa; 27 source QC0/0 near-zero RH checked with Magnus/Buck/Tetens, only one nonnegative under Buck/Tetens; no forcing changes); Stage15 full 1750-event source-provenance/hold inventory PASS 10/10 (VPD QC0=119, QC1=965, QC2=666, negative=1559, original RH missing=1605, approved=0); Stage16 report-only source-pair study PASS 10/10 (MDS pair 700/1050 physical/nonphysical; ERA pair 1695/55; mixed TA_F+ERA VPD 1102/648; ERA vapor e+TA_F 1580/115 among 1695 valid ERA pairs; approved=0). Stage17 original native 1,750-HH source anomaly episode manifest COMPLETED 10/10 (522 continuous native episodes: P1 human review 39, P2 meteorological evidence needed 89, P3 remaining source-reference check 394; approved 0). FORCING HAS NOT BEEN MODIFIED. NO model-ready forcing has been approved.**
 
 Fifth independent ten-site AmeriFlux campaign, following [Batch04](../AmeriFlux_MultiSite_10_Batch04/). Current scope is transfer, CSV extraction and structural inventory. Raw data are not committed to GitHub.
 
@@ -669,3 +669,41 @@ At 2026-10-25 the GitHub source file is committed and hash verified, but the ope
 ```
 
 **Pending**: operator Stage17 run; then manually investigate prioritized episodes and request independent source/evidence at verified native timestamps before deciding any scientifically approved forcing repairs.
+
+
+## Stage17 completed: 522 episodes, source-level human review is required before any data replacement
+
+[Stage17 actual operator human-review gate and P1 examples](docs/STAGE17_EPISODE_HUMAN_REVIEW_GATE_2026-10-25.md).
+
+```text
+STAGE17 SUMMARY sites=10/10 original_HH=1750 episodes=522 approved=0
+ONLY NEW EVIDENCE REQUEST CSV/JSON; NO ORIGINAL/OTHER_REPORTS/FORCING/MODEL/SLURM WRITES
+```
+
+Real IRIDIS6 reports:
+`$HOME/ameriflux_batch05_stage17/episode_manifest_20261025T230607Z_1291407`; source long-term total 1,750 anomalous half-hours grouped into **522** contiguous native source-time episodes:
+
+- **P1: 39 episodes** require priority human scrutiny (US-Vcm 37; US-Vcp 1; US-WCr 1). Includes original QC0 extreme-low observed RH, near-zero source RH and ERA source itself nonphysical. These should not be auto-overwritten.
+- **P2: 89 episodes** need physically independent weather evidence and source processing metadata before selecting a replacement; these are not safe just because the alternative source pair passes water-saturation formula.
+- **P3: 394 episodes** carry ordinary provenance and independent-reference checks. They are *not* automatically cleared or scientifically resolved.
+
+**A requested conditional automatic forcing edit is NOT triggered**: scientific human review is nonzero and source/clock/metadata evidence still incomplete. Do not overwrite original/production forcing, clip negative RH, use the same source ERA as independent confirmation, or substitute poor MDS QC2/3. Stage17 did not approve any repair.
+
+On IRIDIS6, print precisely the 39 P1 review episodes from the completed original manifest:
+
+```bash
+python3 - <<'PY'
+from pathlib import Path
+import csv
+f=Path.home()/"ameriflux_batch05_stage17/episode_manifest_20261025T230607Z_1291407/stage17_episodes_evidence_requests.csv"
+with f.open(newline="",encoding="utf-8") as fh:
+    rows=list(csv.DictReader(fh))
+p1=[r for r in rows if r["priority_tier"]=="P1_MEASURED_OR_ERA_INVALID"]
+assert len(rows)==522 and len(p1)==39
+for r in p1:
+    print(r["episode_id"],r["native_start"],r["native_end"],r["half_hours"],
+          "QC0="+r["qc0_measured_HH"],"ERA_INVALID="+r["ERA_internal_nonphysical_HH"])
+PY
+```
+
+Next science gate: review original site sensor/RH/VPD formula for measured QC0 periods, and compare verified same-clock local meteorology with freshly acquired ERA5-Land 2m T and dewpoint **after site longitude/latitude/elevation and UTC conversion are verified**. These remain scientific checks not approvals to modify any forcing.
