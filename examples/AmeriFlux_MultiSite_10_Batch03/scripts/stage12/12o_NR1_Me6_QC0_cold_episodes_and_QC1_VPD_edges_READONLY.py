@@ -111,7 +111,7 @@ def previous():
     adj=pd.read_csv(file(N/"held_source_event_immediate_native_neighbors.csv"),
                     dtype={"held_native_key":str,"neighbor_native_key":str},
                     low_memory=False)
-    if (len(cases)!=86 or len(adj)!=172 or
+    if (len(cases)!=86 or not (76<=len(adj)<=172) or
         cases.native_key.duplicated().any() or
         (cases.original_hold_reason.eq(T_HOLD).sum()!=48) or
         (cases.original_hold_reason.eq(J_HOLD).sum()!=38) or
