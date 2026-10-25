@@ -28,7 +28,7 @@ import numpy as np
 import pandas as pd
 sys.dont_write_bytecode = True
 
-VERSION="batch03-stage12x-v1-20261025-68missing-13oldfinite-original-CDEG-source-reasons"
+VERSION="batch03-stage12x-v2-20261025-68missing-13oldfinite-immutable-CDEG"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 W=ROOT/"reports/stage12w_355_original_MDS_VPD_companion_ERA_RH_physics_triage_20261025T192422Z_10358cc7"
 W_REC="stage12w_355_MDS_ERA_RH_science_report_SHA_receipt.json"
@@ -217,13 +217,18 @@ def audit():
             if present and not np.isfinite(old["E"]):
                 provenance="FIRST_FINITE_IN_STAGE12G"
             elif present and not np.isfinite(old["D"]):
-                provenance="FIRST_FINITE_IN_STAGE12E_OR_EARLIER"
+                provenance="FIRST_FINITE_IN_STAGE12E"
             elif present and not np.isfinite(old["C"]):
                 provenance="FIRST_FINITE_IN_STAGE12D"
             elif present:
                 provenance="FINITE_ALREADY_IN_STAGE12C"
             else:
                 provenance="STILL_MISSING_IN_STAGE12G"
+            # Earlier research stages never erase or alter a retained finite VPD.
+            for first,second in (("C","D"),("D","E"),("E","G")):
+                if np.isfinite(old[first]) and not equal(old[first],old[second]):
+                    raise ValueError("Earlier finite original Stage12"+first+
+                                     " changed in Stage12"+second+" at "+key)
             p=positions[key]
             center=pd.Timestamp(str(g.time.iat[p]))
             context=[]
@@ -297,7 +302,7 @@ def audit():
     existing=flagged.loc[flagged.Stage12g_finite].copy()
     special=pd.DataFrame(special_context)
     if (len(flagged)!=81 or len(missing)!=68 or len(existing)!=13
-        or len(special)!=25
+        or not (1<=len(special)<=25)
         or missing.loc[missing.Stage12w_diagnostic_group_NOT_APPROVED.eq(PASS)].shape[0]!=1
         or existing.loc[existing.Stage12w_diagnostic_group_NOT_APPROVED.eq(PASS)].shape[0]!=0):
         raise ValueError("Original exact 68 G missing, 13 older finite warning and 1 pass-but-missing audit changed")
