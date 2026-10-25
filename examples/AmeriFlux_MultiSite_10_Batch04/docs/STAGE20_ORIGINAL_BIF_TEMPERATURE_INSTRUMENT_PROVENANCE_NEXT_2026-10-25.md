@@ -1,6 +1,6 @@
 # Batch04 Stage20 — original air-temperature instrument/BIF provenance inventory (next IRIDIS6 run)
 
-**Status (2026-10-25): Stage19 IRIDIS6 OPERATOR-VERIFIED PASS (6/6, 8 temperature holds retained). Stage20 Python source is committed but the operator has NOT yet run the Stage20 \`--audit\` on IRIDIS6.**
+**Status (2026-10-25): Stage19 IRIDIS6 OPERATOR-VERIFIED PASS (6/6, 8 temperature holds retained). Stage20 \`--audit\` **VERIFIED PASS on IRIDIS6 (3/3 BIF files, 6/6 source event contracts, 0 cleared temperature HOLDs)**. See [verified findings](STAGE20_VERIFIED_BIF_TEMPERATURE_PROVENANCE_2026-10-25.md); the original runnable instructions are retained below.**
 
 Scientific rationale: [Stage19 exact multi-day results](STAGE19_VERIFIED_MULTIDAY_TEMPERATURE_REGIMES_2026-10-25.md). The original US-SP1 temperature differs from the processed ERA reference over multiple hours on several days; repeated numeric values alone do not prove a stuck sensor. US-SRG has exactly one source-QC0 temperature difference below −10°C, surrounded by QC2 ERA-downscaled substitutions rather than independently measured tower flanks. US-Seg shows original contiguous cooling and zero events below that screening threshold. Identifying the raw **instrument and measurement-height provenance**, if exposed in the BIF metadata, is preferable to automatically replacing tower temperatures with an ERA product.
 
@@ -48,4 +48,4 @@ The following command is intended for the user's IRIDIS6 login shell; the Bash \
 
 **Scientific next action:** after the IRIDIS6 output, decide whether the original BIF contains time-linked instrument provenance adequate for a site-specific review, or whether a site-specific data-holder inquiry is required. Retain all **8 original temperature science HOLDs**, US-Syv **606** deferred science HOLDs plus **10** skipped ERA endpoints, and prevent production Post-v5/DATM/CIME/spinup authorisation.
 
-**Return the complete Stage20 stdout** from \`$HOME/ameriflux_batch04_stage20/stage20_original_BIF_temperature_instrument_readonly.log\` to allow evidence-based progression and GitHub status update. No Stage20 PASS or sensor identification is claimed without that output.
+**Return the complete Stage20 stdout** from \`$HOME/ameriflux_batch04_stage20/stage20_original_BIF_temperature_instrument_readonly.log\` to allow evidence-based progression and GitHub status update. Stage20 is now **verified PASS on IRIDIS6** by the operator's actual output; however, **no original tower sensor identity has been independently established**. See [Stage20 verified report](STAGE20_VERIFIED_BIF_TEMPERATURE_PROVENANCE_2026-10-25.md).
