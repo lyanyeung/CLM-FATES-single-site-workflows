@@ -36,3 +36,20 @@ First Stage12k v1 execution on IRIDIS6 passed Python syntax and self-test and pr
 The [Stage12k corrected program](../scripts/stage12/12k_us_mtb_gridRH_QC0_error_regimes_READONLY.py) now uses exhaustive temperature bins `<=-15, -15:-10, -10:-5, -5:0, 0:5, >5, MISSING_OR_INVALID_T`, converting any nonfinite source temperature to an explicit last category. The measured-QC0 validation itself remains exclusively `source_T<=5°C` with the original >2hPa error threshold. It adds regression tests for warm, invalid and infinite source T values plus a full identity count, and prints the numbers of held targets **outside measured cold analogue validation**. Local synthetic regression of the binning logic passed; **the updated full script has not yet been executed on IRIDIS6**.
 
 No Stage12j source measurement, original 1,035 held source events, existing correct humidity, forcing, DATM/CIME/Slurm or Post-v5 permission changed. The failed IRIDIS6 `--check` performed **no writes**.
+
+## Stage12k v2 VERIFIED — source error regimes and analogue support
+
+**2026-10-25 07:08 UTC IRIDIS6**: corrected Stage12k v2 passed SHA-verified download, AST syntax, regression self-test, full `--check`, then `--run`; SHA-sealed new **READ-ONLY** report:
+
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage12k_US-MtB_GRID_RH_QC0_error_regime_20261025T070844Z_8ffe36dc/`
+
+- Original **1,035/1,035** Stage12g held source events preserved in target support groups; 15 have tower TA >5°C and were previously dropped by a cold-only aggregation bug. Exactly **323/1,035** have fewer than 20 eligible same-year/month/tower-TA-bin measured QC0 cold analogues; **712** have >=20 analogues, which is *representativeness*, not humidity-validation success.
+- The original 2020/2022/2024 measured-QC0 cold `GRID_RH` gate is reproduced numerically without changing it: 2,744/3,124/1,993 valid candidates, 420/322/295 with |VPD prediction error|>2hPa; 15.3061%/10.3073%/14.8018% exceeds the 10% cap.
+- Measured cold QC0 source with original VPD 0–0.25hPa shows particularly high error >2hPa rates (58.49%, 65.52%, 55.56% across three years). VPD >5hPa has 18.68%, 16.15%, 27.09% error >2hPa. Source temperature 0–5°C has 18.54%, 12.50%, 17.33% error >2hPa. The measured VPD bin **cannot** be used to repair a VPD-missing target because that value is unknown.
+- **313** contiguous original measured-QC0 half-hour episodes have prediction error exceeding 2hPa; longest observed 27 half-hours (13.5h) in December 2020. This is structured rather than exclusively isolated outliers.
+- At temperatures <=-15°C in 2022, 27 original QC0 cold observations had no physically admissible GRID_RH candidate; median source TA ~-39.29°C. These warrant original source/season plausibility auditing but are not a basis to delete or correct QC0.
+- Original Stage12j NO method accepted is reaffirmed. **Zero new humidity repairs**; old Stage12g site-time, site TA, site P, QC0 source observations and original 233 scientific holds unchanged. Post-v5, DATM, spinup remain **NOT AUTHORISED**.
+
+### Next priority: do not let US-MtB block five other sites
+
+Original Stage12g six-site remaining missing rows: US-NR3 **238**, US-Kon **488**, US-NR1 **238**, US-MMS **16**, US-MtB **2,840**, US-Me6 **81**. There are **1,061** remaining incomplete source-native rows across five **non-US-MtB** sites. Of these, **447** source RH records are categorized as `NO_VERIFIED_ERA5LAND_SOURCE_FOR_SITE_YEAR` in Stage12e (US-Kon 211, US-NR1 135, US-Me6 80, US-MMS 15, US-NR3 6). These are research evidence download candidates, not assured RH numerical repair successes. US-MtB's large 1,035 held T/ice source population should remain paused pending independent site humidity validation.
