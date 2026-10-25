@@ -71,7 +71,7 @@ def load():
        "source_sha256","source_csv_row"}
     if not core.issubset(a.columns):
         raise ValueError("Stage68 original source physics columns absent "+str(core-set(a.columns)))
-    if not a.flags.astype(str).str.contains("ACTUAL_VAPOR_NONPOSITIVE",regex=False).all():
+    if not a["flags"].fillna("").astype(str).str.contains("ACTUAL_VAPOR_NONPOSITIVE",regex=False).all():
         raise ValueError("Original 16874 no longer the Stage48 vapor nonpositive hard-event population")
     return a,m64,m68
 
@@ -178,8 +178,12 @@ def self_test():
     v=np.array([s[0]*1.1,s[1]*2])
     assert np.all(v>s)
     assert np.all(100*(s-v)/s<0)
+    # Regression: DataFrame.flags is a built-in pandas attribute, not the CSV column.
+    df=pd.DataFrame({"flags":["ACTUAL_VAPOR_NONPOSITIVE","RH_INFERRED_LT0"]})
+    assert df["flags"].str.contains("ACTUAL_VAPOR_NONPOSITIVE",regex=False).sum()==1
+    assert not hasattr(df.flags,"astype")
     assert sum(NAMES.values())==16874
-    print("STAGE69 SELF-TEST PASS | original es_water(T)-VPD negative vapor physics")
+    print("STAGE69 SELF-TEST PASS | original es_water(T)-VPD negative vapor physics; pandas flags column regression")
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
