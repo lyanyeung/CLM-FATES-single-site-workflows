@@ -40,8 +40,9 @@ JS=BASE/"scripts/stage12/12j_us_mtb_elevation_aware_QC0_humidity_crossvalidation
 JS_BLOB="92ac1fed33967d5a6af24cbd3bbab0e7b150c499"
 YEARS=(2020,2022,2024)
 N_TARGET={2020:300,2022:328,2024:407}
-T_BINS=(-100.,-15.,-10.,-5.,0.,5.000001)
-T_LABELS=("<-15","-15:-10","-10:-5","-5:0","0:5")
+T_BINS=(-np.inf,-15.,-10.,-5.,0.,5.,np.inf)
+T_LABELS=("<=-15","-15:-10","-10:-5","-5:0","0:5",">5")
+MISSING_T_LABEL="MISSING_OR_INVALID_T"
 V_BINS=(-.000001,.25,.5,1.,2.,5.,1000.)
 V_LABELS=("0:0.25","0.25:0.5","0.5:1","1:2","2:5",">5")
 REPORTS={
@@ -73,16 +74,30 @@ def numeric(x):
     a[(~np.isfinite(a))|(a<=-9990)]=np.nan
     return a
 def tbins(vals):
-    return pd.cut(vals,bins=T_BINS,labels=T_LABELS,
-                  include_lowest=True).astype("object")
+    """Exhaustive site-T bins, including WARM (>5C) and invalid targets.
+
+    The measured QC0 analogue-validation population remains COLD (T<=5C).
+    Never discard a held target just because its T is warm or unavailable.
+    """
+    raw=pd.Series(np.asarray(vals,dtype=float))
+    categorised=pd.cut(raw,bins=T_BINS,labels=T_LABELS,
+                       include_lowest=True)
+    return categorised.astype(object).fillna(MISSING_T_LABEL).to_numpy(dtype=object)
 def vbins(vals):
     return pd.cut(vals,bins=V_BINS,labels=V_LABELS,
                   include_lowest=True).astype("object")
 def self_test():
     assert sum(N_TARGET.values())==1035 and len(YEARS)==3
     assert len(T_LABELS)==len(T_BINS)-1 and len(V_LABELS)==len(V_BINS)-1
-    assert list(tbins(np.array([-20.,-12.,-7.,-2.,3.])))==list(T_LABELS)
+    assert list(tbins(np.array([-20.,-12.,-7.,-2.,3.,7.])))==list(T_LABELS)
+    assert list(tbins(np.array([np.nan,np.inf,-np.inf])))==[MISSING_T_LABEL]*3
     assert list(vbins(np.array([.1,.3,.7,1.4,3.,6.])))==list(V_LABELS)
+    # Regression: the original v1 dropped held warm (>5C) or invalid T
+    # observations at groupby, raising a false source-count error.
+    fake=pd.DataFrame({"year":[2024]*4,"month":[1]*4,
+         "temperature_bin":tbins(np.array([-8.,1.,12.,np.nan]))})
+    assert (fake.groupby(["year","month","temperature_bin"],
+        observed=True).size().sum()==4)
     print("STAGE12K SELF-TEST PASS: 3 original years, 1035 immutable holds, fixed QC0 temp/VPD bins, >2hPa error threshold unchanged, NO WRITES",flush=True)
 def prior():
     if not J.is_dir() or J.is_symlink():
@@ -277,8 +292,15 @@ def evaluate():
     joined["QC0_cold_analogue_support_at_least20"]=joined.QC0_cold_analogue_N.ge(20)
     if summary_year.measured_QC0_cold_N.sum()!=int(clean.shape[0]):
         raise ValueError("Stage12k cold QC0 source group count differs")
-    if int(joined.held_target_N.sum())!=1035:
-        raise ValueError("Stage12k target source-year month/temperature count differs")
+    summed_held=int(joined.held_target_N.sum())
+    if summed_held!=1035:
+        raise ValueError("Stage12k source year/month/temperature count differs: "
+                         f"grouped={summed_held}, expected=1035; "
+                         f"all_source_held={len(pending)}")
+    warm_or_missing=int(pending.temperature_bin.isin([">5",MISSING_T_LABEL]).sum())
+    print("STAGE12K TARGET TEMPERATURE DOMAIN: held_total=",len(pending),
+          "warm_or_invalid_outside_QC0_cold_domain=",warm_or_missing,
+          "grouped_target_total=",summed_held,flush=True)
     rows_without20=int(joined.loc[joined.QC0_cold_analogue_N.lt(20),"held_target_N"].sum())
     return summary_year,observed_month,obs_temp,obs_vpd,episodes_df,joined,pd.DataFrame(dispositions),rows_without20
 def main():
@@ -304,6 +326,9 @@ def main():
     print(episodes.head(15).to_string(index=False),flush=True)
     print("\n========== 1035 HELD TARGETS VS MEASURED QC0 TEMPERATURE/MONTH SUPPORT ==========",flush=True)
     print(coverage.to_string(index=False),flush=True)
+    print("STAGE12K EXPLICIT WARM/INVALID TARGETS:")
+    print(coverage.loc[coverage.temperature_bin.isin([">5",MISSING_T_LABEL])]
+          .to_string(index=False),flush=True)
     print("\nSTAGE12K SUMMARY: prior_1035_original_Stage12g_HOLD=1035 "
           "original_Stage12j_safety_gate_failed=True "
           f"contiguous_QC0_error_gt2hPa_episodes={len(episodes)} "
