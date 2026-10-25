@@ -8,7 +8,7 @@ Each experiment has its own directory, site/release manifest, scripts and operat
 | **AmeriFlux Batch 02** | **[AmeriFlux_MultiSite_10_Batch02](AmeriFlux_MultiSite_10_Batch02/)** | Second ten-site batch; Stages00–10, exact manifests, native HH/HR candidates and Post-v5 gates |
 | **AmeriFlux Batch 03** | **[AmeriFlux_MultiSite_10_Batch03](AmeriFlux_MultiSite_10_Batch03/)** | Third ten-site batch; exact releases, single-connection upload and extraction/structure inventory; live execution pending |
 | **AmeriFlux Batch 04** | **[AmeriFlux_MultiSite_10_Batch04](AmeriFlux_MultiSite_10_Batch04/)** | Fourth ten-site batch; Stage00 SHA256 verified and Stage01 extraction/structure 10/10 PASS; Stage02/Stage02C 10/10 PASS; Stage04 3/3 source-lineage audit verified; Stage05 QCv5 sparse interpolation/ERA-RH candidates prepared |
-| **AmeriFlux Batch 05** | **[AmeriFlux_MultiSite_10_Batch05](AmeriFlux_MultiSite_10_Batch05/)** | Fifth ten-site batch; exact releases and Stage00 single-connection WSL upload/checksums ready; live transfer pending |
+| **AmeriFlux Batch 05** | **[AmeriFlux_MultiSite_10_Batch05](AmeriFlux_MultiSite_10_Batch05/)** | Fifth ten-site batch; Stage00 upload/checksums VERIFIED 10/10 from operator log; Stage01 mixed FULLSET/FLUXMET extraction and structure inventory ready, IRIDIS execution pending |
 | AmeriFlux single site | [AmeriFlux_US-Ha1](AmeriFlux_US-Ha1/) | Harvard Forest hourly-data workflow |
 | ICOS multi-site campaigns | [ICOS_sites](ICOS_sites/) | Existing 6-, 8-, 11- and 13-site campaigns |
 | ICOS single site | [ICOS_ES-LJu](ICOS_ES-LJu/) | ES-LJu workflow |
