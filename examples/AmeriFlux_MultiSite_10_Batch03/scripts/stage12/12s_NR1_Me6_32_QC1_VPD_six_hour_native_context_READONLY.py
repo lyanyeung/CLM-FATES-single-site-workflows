@@ -23,7 +23,7 @@ import numpy as np
 import pandas as pd
 sys.dont_write_bytecode = True
 
-VERSION = "batch03-stage12s-v1-20261025-QC1-VPD-32-sides-original-pm6h-context"
+VERSION = "batch03-stage12s-v2-20261025-QC1-VPD-C-T-raw-T-distinction-pm6h"
 ROOT = Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 R = ROOT / "reports/stage12r_32_QC1_native_VPD_source_physics_and_ERA_RH_20261025T094639Z_a770eeb8"
 Q = ROOT / "reports/stage12q_76_original_VPD_edge_CDEG_lineage_20261025T093514Z_044390c3"
@@ -240,6 +240,8 @@ def analyse():
                 "focal_source_VPD_F_hPa":src_v[i],
                 "focal_source_VPD_minus_es_hPa":src_v[i]-bound[i],
                 "focal_source_implied_RH_pct":derived_rh[i],
+                "focal_Stage12c_RAW_VPD_minus_es_at_TA_USE_hPa":
+                    event.original_RAW_VPD_minus_C_saturation_hPa,
                 "focal_paired_TA_ERA_C":era_t[i],
                 "focal_paired_VPD_ERA_hPa":era_v[i],
                 "focal_paired_water_RH_pct":era_rh[i],
@@ -280,8 +282,8 @@ def analyse():
         or not all(same(x,y) for x,y in zip(
             focal.focal_source_VPD_minus_es_hPa.values,
             focal.focal_source_VPD_F_hPa.values - es(focal.focal_source_TA_F_C.values)))
-        or not focal.focal_source_VPD_minus_es_hPa.ge(-1e-7).all()):
-        raise ValueError("32 source QC1 oversaturation cases or exact 25 rows/window changed")
+        or not focal.focal_Stage12c_RAW_VPD_minus_es_at_TA_USE_hPa.ge(-1e-7).all()):
+        raise ValueError("32 Stage12c source physics holds or exact 25 rows/window changed")
     summary = focal.groupby(["site","source_origin_class"],
                             as_index=False).agg(
         source_sides=("neighbor_native_key","size"),
