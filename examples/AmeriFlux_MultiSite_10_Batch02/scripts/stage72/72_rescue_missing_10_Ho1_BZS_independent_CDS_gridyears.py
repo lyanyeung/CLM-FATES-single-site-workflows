@@ -101,8 +101,8 @@ def source_report():
     for r in missing.itertuples(index=False):
         if int(r.n_original_hard)!=REQUIRED[r.site][int(r.original_tower_year)]:
             raise ValueError("Stage71 per-grid-year original hard counts changed")
-    if proof["source_SHA256"]["Stage50_reader_gitblob"]!=
-       "757452798582dc0aaf6d2c78f23999e653247469":
+    if (proof["source_SHA256"]["Stage50_reader_gitblob"] !=
+            "757452798582dc0aaf6d2c78f23999e653247469"):
         raise ValueError("Stage71 source algorithm dependency changed")
     return proof,plan,missing
 
@@ -142,15 +142,16 @@ def current(mod,mod71,missing):
           "new_cache_receipt":str(target),
           "source_replacements_approved":False,
           "historical_UTC_approved":False})
-    order={"SOURCE_REJECTION_ISOLATED_REDOWNLOAD":0,
-           "SOURCE_ABSENT_FRESH_DOWNLOAD":1,
-           "VERIFIED_IN_OLDER_SOURCE_AFTER_STAGE71":2,
-           "STAGE72_VERIFIED_REUSE":3}
-    return pd.DataFrame(plan).sort_values(
-        ["state","original_hard_events","site","original_tower_year"],
-        key=lambda col:col.map(order) if col.name=="state" else
-            -col if col.name=="original_hard_events" else col,
-        kind="stable").reset_index(drop=True)
+    priority={"SOURCE_REJECTION_ISOLATED_REDOWNLOAD":0,
+              "SOURCE_ABSENT_FRESH_DOWNLOAD":1,
+              "VERIFIED_IN_OLDER_SOURCE_AFTER_STAGE71":2,
+              "STAGE72_VERIFIED_REUSE":3}
+    df=pd.DataFrame(plan)
+    df["state_priority"]=df["state"].map(priority)
+    return df.sort_values(
+       ["state_priority","original_hard_events","site","original_tower_year"],
+       ascending=[True,False,True,True],
+       kind="stable").drop(columns=["state_priority"]).reset_index(drop=True)
 
 def request_one(mod,row):
     site=row["site"]
@@ -262,9 +263,6 @@ def audit(mod,mod71,source,baseline,missing):
     result,year,verified=mod71.build(original,sites,mod)
     if len(result)!=16874 or result["approved_for_DATM"].any():
         raise ValueError("Stage72 updated shadow cohort lost original source scope")
-    prior=baseline[["site","science_status"]].copy()
-    prior_group=prior.groupby(["site","science_status"]).size()
-    now=result.groupby(["site","science_status"]).size()
     if result["science_status"].eq(
          "SHADOW_NUMERIC_VALID_KEEP_ORIGINAL_T_PA_BIF_DATE_HOLD").sum()<7695:
         raise ValueError("Stage72 independent CDS new source changed earlier valid candidate count")
