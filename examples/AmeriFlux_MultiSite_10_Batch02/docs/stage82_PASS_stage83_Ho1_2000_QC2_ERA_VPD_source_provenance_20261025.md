@@ -24,7 +24,7 @@ Authoritative sources: https://fluxnet.org/data/fluxnet2015-dataset/fullset-data
 | Source Ho1 colder than Bangor NOAA by >8°C | **1,554** |
 | Source Ho1 warmer than Bangor NOAA by >8°C | **2,518** |
 | Source QC0 + NOAA difference within ±8°C | **13,068** |
-| Both source air T and NOAA usable but source not-paired/non-QC0 | **428** |
+| No valid combined original TA_F QC0 + NOAA pair (non-QC0 or missing screened NOAA) | **428** |
 
 The Stage82 original `TA_ERA` column had valid entries **17,568/17,568**; its ±3°C closeness to original tower TA_F or NOAA varies significantly and does not by itself identify true air temperature. Original NOAA−Ho1 temperature category transitions in 30 min: **521**, with **zero direct extreme warm↔cold switches** and **zero native T 30-minute jumps >8°C** among those category transitions. Slow or regional weather variation can produce large persistent differences; the transition screen does not prove original sensor good/bad.
 
