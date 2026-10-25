@@ -275,6 +275,28 @@ On IRIDIS6 first run `--check`, and then optionally `--run` for **new reports on
 
 Stage06 reports go into a new `reports/stage06_qcv5_candidate_effects_*` folder with SHA receipts and a boundary review list, without editing original or Stage05 files. **No production sparse-patch merge before the 754 HOLDs and boundary/physical QC have been resolved and seven remaining Batch04 sites have completed appropriate scientific screening.**
 
+## Stage15 read-only QA — latest 10 site sources and exact eight humidity cell changes
+
+[15_audit_stage14_latest_ten_repaired_candidates.py](scripts/stage15/15_audit_stage14_latest_ten_repaired_candidates.py) was added **after Stage14 operator success**; **not yet executed on IRIDIS6**. It verifies the full Stage14 `stage14_latest_ten_candidate_manifest.tsv` against all ten selected complete FLUXMET HH files and SHA256 receipts. It compares every one of the 1,016,928 source-length half-hour rows across US-SP1, US-SRG and US-Seg against their Stage12 baseline. Only `VPD_F` and `RH` at the **exact eight** original suspect half-hours may change; all source `TA_F`, `PA_F`, `*_QC` fields and all other timestamps must be exactly unchanged. Verifies `VPD_F=e_s(TA_F)×(1−RH/100)` for all eight and keeps the **eight unresolved original QC0 T science HOLDs** distinct from numerical VPD/RH corrections.
+
+Run on IRIDIS6:
+
+```bash
+(
+  set -euo pipefail
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/a4d0a696c2b93a52fcf981752a2ccb5fcde778a6"
+  BASE="$HOME/ameriflux_batch04_stage15"
+  SCRIPT="$BASE/15_audit_stage14_latest_ten_repaired_candidates.py"
+  mkdir -p "$BASE"
+  curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10_Batch04/scripts/stage15/15_audit_stage14_latest_ten_repaired_candidates.py" -o "$SCRIPT"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  python3 -B "$SCRIPT" --audit 2>&1 | tee "$BASE/stage15_readonly_audit.log"
+)
+```
+
+This Stage15 source verification performs **no writes**, CDS calls, Post-v5 approval, DATM setup or spinup. US-Syv 606 original science HOLDS plus 10 skipped Stage07 edge targets remain deferred.
+
 ## Stage14 actual operator result VERIFIED: 8/8 humidity closure candidates, 8 tower-temperature HOLDs unchanged
 
 Stage14 ran on IRIDIS6 with syntax and self-test PASS, 8 exact VPD/RH half-hours recalculated using independent ERA5-Land relative humidity while preserving all original native `TA_F`, `PA_F` and QC labels. **US-SP1 6, US-SRG 1, US-Seg 1**. Three full new derived source-length candidate files created at:
