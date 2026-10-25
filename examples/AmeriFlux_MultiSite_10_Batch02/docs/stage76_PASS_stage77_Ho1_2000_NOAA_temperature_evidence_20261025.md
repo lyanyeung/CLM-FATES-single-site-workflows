@@ -43,19 +43,35 @@ Stage77 source commit `0f6ee696539a3088e803afb5d1392736261116a9`; Git blob `0211
   conda activate clm_fates_env
   PY="$CONDA_PREFIX/bin/python"
   REL="examples/AmeriFlux_MultiSite_10_Batch02"
-  SCRIPT="$HOME/CLM-FATES-single-site-workflows/$REL/scripts/stage77/77_Ho1_2000_QC0_NOAA_Bangor_source_temperature_probe.py"
+  BASE="$HOME/CLM-FATES-single-site-workflows/$REL/scripts"
+  SCRIPT="$BASE/stage77/77_Ho1_2000_QC0_NOAA_Bangor_source_temperature_probe.py"
+  PRIOR="$BASE/stage40/40_compare_NOAA_Bangor_QC_with_Ho1_CDS.py"
   COMMIT="0f6ee696539a3088e803afb5d1392736261116a9"
   EXPECTED="0211de8a12aba54827fd55bdfbe9890c21c14734"
-  mkdir -p "$(dirname "$SCRIPT")"
+  EXPECTED_PRIOR="8767dbcad2c3c6cd431b37968e867838eac01d87"
+  mkdir -p "$(dirname "$SCRIPT")" "$(dirname "$PRIOR")"
   TMP="$(mktemp)"
   trap 'rm -f "$TMP"' EXIT
+
+  # Required Stage40 parser: Stage77 imports it in --self-test.
+  # No Stage39 download is needed for the Stage77 parser functions.
+  curl -fLsS --retry 3 \
+    "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/$REL/scripts/stage40/40_compare_NOAA_Bangor_QC_with_Ho1_CDS.py" \
+    -o "$TMP"
+  echo "EXPECTED STAGE40: $EXPECTED_PRIOR"
+  echo "ACTUAL   STAGE40: $(git hash-object "$TMP")"
+  test "$(git hash-object "$TMP")" = "$EXPECTED_PRIOR"
+  cp "$TMP" "$PRIOR"
+
+  # Pinned original Stage77 remains unchanged.
   curl -fLsS --retry 3 \
     "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL/scripts/stage77/77_Ho1_2000_QC0_NOAA_Bangor_source_temperature_probe.py" \
     -o "$TMP"
-  echo "EXPECTED: $EXPECTED"
-  echo "ACTUAL:   $(git hash-object "$TMP")"
+  echo "EXPECTED STAGE77: $EXPECTED"
+  echo "ACTUAL   STAGE77: $(git hash-object "$TMP")"
   test "$(git hash-object "$TMP")" = "$EXPECTED"
   cp "$TMP" "$SCRIPT"
+  "$PY" -m py_compile "$PRIOR"
   "$PY" -m py_compile "$SCRIPT"
   "$PY" -B "$SCRIPT" --self-test
   "$PY" -B "$SCRIPT" --check
@@ -68,3 +84,7 @@ Expected script-only completion (not yet independently run on IRIDIS6):
 `STAGE77 AUDIT PASS | immutable NOAA 2000 raw and exact 505 Ho1 QC0 T source context; no forcing approval`.
 
 NOAA network/source availability and QC coverage for **2000 have not yet been demonstrated**. The 2000 raw SHA is acquired at first operator run, not invented. `STAGE77 SELF-TEST PASS` and `STAGE77 CHECK PASS` are prerequisites, not proof of station measurement representativeness. No original EC, CDS, NetCDF forcing, DATM, CIME, Slurm or previous report is mutated.
+
+## Stage77 dependency recovery — original operator failure
+
+The operator's original Stage77 Git blob verified but `--self-test` stopped with `ValueError: Pinned Stage40 original QC parser absent/symlinked`. This is a **missing local prerequisite**, not a failed Stage76 source science audit or NOAA source failure. Exact upstream Stage40 file is `scripts/stage40/40_compare_NOAA_Bangor_QC_with_Ho1_CDS.py` with Git blob `8767dbcad2c3c6cd431b37968e867838eac01d87`, matching Stage77's `PRIOR_BLOB`. The command above installs this exact verified file before invoking Stage77 self-test/check/audit, without altering Stage40 science logic or Stage77's original pinned source. Stage40's NOAA parser `parse_psv` / `select` / `selftest` are self-contained for this use; its older Stage39 prereq is only used in a separate Stage40 analysis entrypoint, not Stage77. Do not assume Stage77 NOAA year-2000 download has succeeded yet.
