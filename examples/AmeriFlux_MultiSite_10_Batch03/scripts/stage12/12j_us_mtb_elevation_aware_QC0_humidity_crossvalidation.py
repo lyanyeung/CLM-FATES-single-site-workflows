@@ -207,8 +207,8 @@ def evaluate():
              np.isfinite(gt)&np.isfinite(gd)&np.isfinite(gp)&
              (siteP>45000)&(siteP<110000)&(gp>45000)&(gp<110000)&
              (gd<=gt+.1)&(np.abs(hyps)<4500))
-        source_qc0=(qcV==0)&(qcT==0)&(oldV>=0)&(oldV<esw(siteT))&
-            (physical(siteT,siteP,esw(siteT)-oldV))&original_good
+        source_qc0=((qcV==0)&(qcT==0)&(oldV>=0)&(oldV<esw(siteT))&
+            physical(siteT,siteP,esw(siteT)-oldV)&original_good)
         cold=source_qc0&(siteT<=5.)
         if cold.sum()<MIN_VALID_PER_YEAR:
             print("STAGE12J CAUTION: cold measured QC0 source analogues count",year,int(cold.sum()),flush=True)
@@ -286,11 +286,10 @@ def evaluate():
                  ["worst_year_MAE_hPa","method"])
     choice=str(allowed.iloc[0].method) if len(allowed) else None
     wanted=catalog.loc[catalog.method.eq(choice)].copy() if choice else catalog.iloc[:0].copy()
-    if len(wanted) and not wanted.original_source_VPD_F_QC.isin([1,2]).all():
-        # Targets must have original source gap-filled/downscaled VPD,
-        # not a QC0 observation, before any research candidate application.
-        choice=None
-        wanted=catalog.iloc[:0].copy()
+    # Strictly drop any selected original QC0/unknown event individually;
+    # never reject otherwise eligible source events due to one unknown QC.
+    if len(wanted):
+        wanted=wanted.loc[wanted.original_source_VPD_F_QC.isin([1,2])].copy()
     return stats,policy,catalog,wanted,choice,current,held
 
 def choose_shadow(current,wanted,choice,held):
