@@ -244,7 +244,7 @@ def self_test():
     assert c["TYPE_NONNEGATIVE_BELOW_1PCT"]==1
     assert c["VPD_F_QC2"]==2
     assert c["BOTH_MEASURED_QC0"]==1
-    assert c["ERA_ERA_INTERNAL_NONPHYSICAL"]==1
+    assert c["ERA_NONPHYSICAL"]==1 and c["ERA_INTERNAL_NONPHYSICAL"]==1
     assert c["MDS_NONPHYSICAL"]>=2
     assert r["low_RH_episode_count"]==2
     print("STAGE09 SELF-TEST PASS | zero/negative physical split;"
