@@ -260,8 +260,8 @@ def evaluate():
        median_consecutive_QC0_ERA_mismatch_halfhours=(
          "consecutive_QC0_tower_minus_paired_TA_ERA_le_minus5_halfhours","median"),
        median_native_QC0_T_jump_prev_C=("original_QC0_T_jump_from_PREV_C","median"),
-       median_native_QC0_T_jump_next_C=("original_QC0_T_jump_to_NEXT_C","median"),
-       hold_remains=True)
+       median_native_QC0_T_jump_next_C=("original_QC0_T_jump_to_NEXT_C","median"))
+    aggregate["hold_remains"]=True
     eaggregate=edges.groupby(
          ["site","original_FLUXMET_VPD_F_QC"],as_index=False).agg(
         adjacent_sides=("held_native_key","size"),
