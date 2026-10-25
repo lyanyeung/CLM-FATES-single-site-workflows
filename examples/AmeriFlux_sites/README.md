@@ -8,6 +8,9 @@ This collection keeps AmeriFlux batches separate from the existing [ICOS multi-s
 | **[AmeriFlux Batch 02](../AmeriFlux_MultiSite_10_Batch02/)** | 10 | Stages00–10 published. Operator Stage07: 5 numeric candidates; 5 sites blocked by 4,904 unresolved humidity pairs. Stage08 sensitivity and the follow-on Post-v5 gates/runner are ready for execution. |
 | **[AmeriFlux Batch 03](../AmeriFlux_MultiSite_10_Batch03/)** | 10 | Stages00–01 ready: single-connection WSL upload and recursive extraction; live transfer pending. |
 | **[AmeriFlux Batch 04](../AmeriFlux_MultiSite_10_Batch04/)** | 10 | **Stage00 transfer SHA256 10/10 and Stage01 extraction/structure 10/10 VERIFIED** from operator logs; Stage02 BIF1495 and HH time 10/10; Stage04 3/3 source-lineage verified; Stage05 QCv5 short-interpolation/ERA-RH candidate builder ready, Post-v5 HOLD. |
+| **[AmeriFlux Batch 05](../AmeriFlux_MultiSite_10_Batch05/)** | 10 | Stage00 exact manifest and single-connection WSL transfer/checksum script published; live transfer pending operator 10/10 verification. |
+
+Batch05 sites: US-UiD, US-UMB, US-UMd, US-Var, US-Vcm, US-Vcp, US-WCr, US-Whs, US-Wjs and US-Wkg. See the [exact release manifest](../AmeriFlux_MultiSite_10_Batch05/sites.tsv) and [transfer instructions](../AmeriFlux_MultiSite_10_Batch05/README.md). US-UMB retains its FULLSET release name; its schema has not yet been inspected.
 
 Batch04 sites: US-Rpf, US-Seg, US-Ses, US-Slt, US-SP1, US-SRG, US-SRM, US-Syv, US-Ton and US-Uaf. Exact [release manifest](../AmeriFlux_MultiSite_10_Batch04/sites.tsv), [README and transfer command](../AmeriFlux_MultiSite_10_Batch04/README.md). These ten release labels are not by themselves a QC or model-approval record.
 
