@@ -297,6 +297,36 @@ Run on IRIDIS6:
 
 This Stage15 source verification performs **no writes**, CDS calls, Post-v5 approval, DATM setup or spinup. US-Syv 606 original science HOLDS plus 10 skipped Stage07 edge targets remain deferred.
 
+## Stage15 IRIDIS6 VERIFIED: two US-SP1 temperature sensitivity candidates; Stage16 exact-diff audit next
+
+Operator actually completed Stage15 `--self-test`, read-only `--assess` and isolated `--trial` successfully. Only **US-SP1 2000-10-09 18:00 and 18:30** have alternative changes: **T −6.9/−7.1°C (original QC0) → trial 13.182/15.363°C (QC1)**; VPD is recalculated as **9.4362/10.4653 hPa** with the retained independently sourced ERA5-Land RH, compared with the primary Stage14 **2.2746/2.1569 hPa** calculated at unchanged original TA. The two trial temperatures approximate ERA5-Land temperatures **14.371/13.776°C**.
+
+**Actual immutable Stage15 alternative US-SP1 full CSV:**
+
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch04/qcv5_stage15_sp1_two_point_temperature_sensitivity/candidate_20261025T080658Z_cca73e0e/US-SP1_Stage15_alternative_two_TA_times_FLUXMET_HH.csv`.
+
+[Stage15 full verified execution record](docs/STAGE15_VERIFIED_TWO_POINT_ALTERNATIVE_2026-10-25.md). Its trial `stage15_receipt.json` contains the new full CSV SHA (not printed in operator output). The output also includes a ten-site alternative manifest that switches **only US-SP1** to the trial file and preserves the other nine Stage14 version pointers.
+
+**Next runnable read-only verification:** [Stage16 two-row exact difference audit](scripts/stage16/16_verify_sp1_stage14_vs_stage15_exact_two_cell_trial.py). It streams all **368208** US-SP1 half-hours across primary Stage14 and trial Stage15, checks the respective source SHA256 and evidence receipts, and must find **exactly two changed timestamps** with **only TA_F, VPD_F and TA_F_QC changed**. It verifies VPD/RH closure at both trial TA values, unchanged other nine site input selections and the immutable scientific decision ledger. No external downloads or source/model writes.
+
+Run on IRIDIS6:
+
+```bash
+(
+  set -euo pipefail
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/25722b041e0c74a8a0e9cfd690d193975313b4c4"
+  BASE="$HOME/ameriflux_batch04_stage16"
+  SCRIPT="$BASE/16_verify_sp1_stage14_vs_stage15_exact_two_cell_trial.py"
+  mkdir -p "$BASE"
+  curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10_Batch04/scripts/stage16/16_verify_sp1_stage14_vs_stage15_exact_two_cell_trial.py" -o "$SCRIPT"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  python3 -B "$SCRIPT" --audit 2>&1 | tee "$BASE/stage16_audit.log"
+)
+```
+
+**Science status unchanged:** Stage15 is an alternative temperature sensitivity candidate, NOT a proof of original tower sensor failure. All 8 QC0-temperature scientific HOLDs remain; US-Syv 606 + 10 earlier skipped edge targets are deferred. No Post-v5/DATM/CIME approval.
+
 ## Stage15 focused alternative two-point US-SP1 temperature sensitivity (not yet run)
 
 The eight Stage14 humidity-only physical closure candidates succeeded, but none of the eight source QC0 tower-temperature disagreements was independently resolved. As the next bounded experiment, [Stage15](scripts/stage15/15_sp1_oct2000_two_point_temperature_sensitivity.py) examines **just two US-SP1 tower TA anomalies on 2000-10-09 at native 18:00 and 18:30**. Original T −6.9/−7.1 °C conflicts sharply with the unbroken warmer tower flanks (17:30=11.0°C QC0; 19:00=17.545°C QC1) and the independently downloaded grid T2m≈14.37/13.78°C. A two-half-hour flanking interpolation would yield **13.1817/15.3633°C**, within **2.5°C** of the grid reference at both timestamps.
