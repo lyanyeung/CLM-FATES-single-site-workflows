@@ -25,7 +25,7 @@ R=ROOT/"reports"
 S64=R/"stage64_9389_unique_ERA5_humidity_candidates_20261024T232045Z_c8678d94"
 S67=R/"stage67_BIF_actual_source_forensic_and_official_staging_20261025T064647Z_d9f88c35"
 GITHUB_BIF=Path.home()/"CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Batch02/data/official_BIF_20261025/official_two_site_BIF_time_evidence.json"
-EXPECTED_GIT_BLOB="REPLACE_WITH_PINNED_BLOB"
+EXPECTED_GIT_BLOB="444889041c37cdaa6b79d149053e5299756fdb8c"
 SITES={"US-Ho1":(16788,-5,"1996","2023"),"US-BZS":(86,-9,"2010","2024")}
 EXPECTED_SHA={
  "US-Ho1":"24fd0a35cf5f39e49cb70fa63af6fb962cfc1bd71652aec51bd29843593ba6f1",
@@ -104,7 +104,9 @@ def compute_clock(held,source):
     rows=[];year_rows=[];critical=Counter()
     for site,(expected,offset,first,last) in SITES.items():
         g=held.loc[held.site.eq(site)].copy()
-        if len(g)!=expected or (g.repair_status!="HOLD_HO1_SOURCE_RELEASE_UTC_NOT_VERIFIED").any() if site=="US-Ho1" else False:
+        if len(g)!=expected:
+            raise ValueError("Original held source count mismatch "+site)
+        if site=="US-Ho1" and not g.repair_status.eq("HOLD_HO1_SOURCE_RELEASE_UTC_NOT_VERIFIED").all():
             raise ValueError("Original source count/route mismatch "+site)
         if site=="US-BZS" and not g.repair_status.eq("HOLD_BZS_SOURCE_RELEASE_BIF_NOT_VERIFIED").all():
             raise ValueError("BZS original offset-HOLD route changed")
@@ -128,7 +130,7 @@ def compute_clock(held,source):
         g["independent_ERA5_time_join_approved"]=False
         g["DATM_forcing_approved"]=False
         rows.append(g)
-        flags=Counter(flag for s in g.flags.fillna("").astype(str)
+        flags=Counter(flag for s in g["flags"].fillna("").astype(str)
                       for flag in s.split("|") if flag)
         critical[site]=dict(flags)
         for year,sub in g.groupby(clock.dt.year,sort=True):
