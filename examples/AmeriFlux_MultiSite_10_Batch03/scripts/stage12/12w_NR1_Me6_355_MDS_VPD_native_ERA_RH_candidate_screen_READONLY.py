@@ -28,7 +28,7 @@ import numpy as np
 import pandas as pd
 sys.dont_write_bytecode = True
 
-VERSION="batch03-stage12w-v1-20261025-355-MDS-bad-VPD-original-native-ERA-RH-screen"
+VERSION="batch03-stage12w-v2-20261025-355-MDS-bad-VPD-ERA-RH-guarded-diagnostics"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 V=ROOT/"reports/stage12v_MDS_VPD_temperature_and_QC_source_forensics_20261025T184859Z_bb353075"
 V_RECEIPT="stage12v_MDS_source_quality_SHA_receipt.json"
@@ -117,7 +117,10 @@ def selftest():
     assert c["site_T_physical"].all() and c["site_P_physical"].all()
     assert c["candidate_VPD_QBOT_closure"].all()
     assert float(es_ice(-8))<float(es_water(-8))
-    assert 25 not in (0,1)
+    assert (not bool(candidate([20.],[90000.],[30.],[2.])[
+        "ERA_T_within_5C_of_tower_T"][0]))
+    assert not bool(candidate([20.],[np.nan],[20.],[2.])[
+        "site_P_physical"][0])
     print("STAGE12W SELF-TEST PASS: original Stage12d ERA-RH physics, tower T/P, ice, basic candidate closure; NO WRITES",flush=True)
 
 def verify():
@@ -292,7 +295,7 @@ def audit():
                 "original_source_VPD_above_saturation_hPa":v[i]-bnd[i],
                 "paired_original_companion_TA_ERA_C":et,
                 "paired_original_companion_VPD_ERA_hPa":ev,
-                "retained_Stage12g_PSFR_Pa":p[i],
+                "retained_Stage12g_PSRF_Pa":p[i],
                 "retained_Stage12g_TA_USE_C":st[i],
                 "tower_minus_companion_ERA_T_C":t[i]-et,
                 **at,
