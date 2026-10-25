@@ -1,6 +1,6 @@
 # Batch04 Stage17 — remaining six QC0 temperature conflicts, read-only diagnostic
 
-**Status (2026-10-25): Stage16 VERIFIED PASS by IRIDIS6 operator. Stage17 CODE PUBLISHED; NOT YET RUN ON IRIDIS6.** This stage cannot release science HOLDs, approve Post-v5/DATM or submit model jobs.
+**Status (2026-10-25): Stage16 VERIFIED PASS. Stage17 VERIFIED PASS by IRIDIS6 operator (6/6, no official temperature science HOLDs cleared).** This file preserves the original reproducible command; actual findings are now archived in the [Stage17 verified results](STAGE17_VERIFIED_SIX_TEMPERATURE_CONTEXT_2026-10-25.md). This stage cannot release science HOLDs, approve Post-v5/DATM or submit model jobs.
 
 References: [Stage16 actual verified output](STAGE16_VERIFIED_FULL_SOURCE_AUDIT_2026-10-25.md) and [Stage17 Python source](../scripts/stage17/17_audit_remaining_six_native_temperature_conflicts.py).
 
@@ -34,4 +34,4 @@ Stage17 checks the final Stage12 148/156 and Stage14 8/8 receipts, all eight ori
 
 **Do not assume an ERA5-Land temperature mismatch proves an original QC0 sensor measurement is false.** Check stable original neighboring tower observations, sensor/instrument history, source clock and meteorological context before considering any isolated alternative. No automatic interpolation, mutation, Post-v5, DATM, CIME or Slurm work is permitted.
 
-After execution, provide the full file at ~/ameriflux_batch04_stage17/stage17_six_T_conflicts_readonly.log. Until actual IRIDIS6 results are provided, Stage17 remains **NOT VERIFIED**.
+**Operator returned the Stage17 output and it passed 6/6;** see [complete derived findings and per-site evidence](STAGE17_VERIFIED_SIX_TEMPERATURE_CONTEXT_2026-10-25.md). The six diagnosis successes do not clear any original-temperature science HOLD.
