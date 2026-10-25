@@ -29,7 +29,7 @@ import numpy as np
 import pandas as pd
 sys.dont_write_bytecode = True
 
-VERSION = "batch03-stage12r-v1-20261025-32-QC1-edge-Stage12c-12d-native-source-physics"
+VERSION = "batch03-stage12r-v1-20261025-32-QC1-sides-reused-native-Stage12c-12d-source-physics"
 ROOT = Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 Q = ROOT / "reports/stage12q_76_original_VPD_edge_CDEG_lineage_20261025T093514Z_044390c3"
 S07 = ROOT / "qcv5_native_trial_20261022T024559Z_36c46e58"
@@ -202,7 +202,8 @@ def classify():
     q = pd.read_csv(file(Q / "32_QC1_nonmatch_source_values_and_repair_stage.csv"),
                     dtype={"held_native_key": str,
                            "neighbor_native_key": str}, low_memory=False)
-    if (len(q) != 32 or q.duplicated(KEY).any()
+    if (len(q) != 32 or q.duplicated(
+            ["site", "held_native_key", "neighbor_native_key", "neighbor_side"]).any()
         or not q.site.isin(SITES).all()
         or not q.original_FLUXMET_VPD_F_QC.eq("QC1").all()
         or q.source_origin_class.eq("BOTH_FINITE_DIFFER").sum() != 24
