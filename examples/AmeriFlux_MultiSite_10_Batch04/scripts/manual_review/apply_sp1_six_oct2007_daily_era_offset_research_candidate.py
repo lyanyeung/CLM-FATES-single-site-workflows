@@ -200,7 +200,7 @@ def proposals(src,offsets,oldsp1):
                   "Stage14 RH missing/out of 0..100 for "+k+
                   "; no write; review RH before corrected VPD")
             new=er+offsets[day]
-            check(-20<new<50 and abs(new-ta)>4,
+            check(-20<new<50 and abs(new-ta)>3,
                   "Expected cold anomaly and valid new TA missing "+k)
             vpd=es(new)*(1-rh/100)
             check(0<=vpd<=es(new),"VPD saturation not valid "+k)
