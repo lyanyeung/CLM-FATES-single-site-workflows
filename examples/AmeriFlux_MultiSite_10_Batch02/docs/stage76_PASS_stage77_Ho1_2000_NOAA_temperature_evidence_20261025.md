@@ -61,7 +61,16 @@ Stage77 source commit `0f6ee696539a3088e803afb5d1392736261116a9`; Git blob `0211
   echo "EXPECTED STAGE40: $EXPECTED_PRIOR"
   echo "ACTUAL   STAGE40: $(git hash-object "$TMP")"
   test "$(git hash-object "$TMP")" = "$EXPECTED_PRIOR"
-  cp "$TMP" "$PRIOR"
+  if test -L "$PRIOR"; then
+    echo "REFUSE: Stage40 destination is a symlink: $PRIOR" >&2; exit 1
+  fi
+  if test -e "$PRIOR"; then
+    test -f "$PRIOR" && test "$(git hash-object "$PRIOR")" = "$EXPECTED_PRIOR" || {
+      echo "REFUSE: Stage40 exists with different content; no overwrite" >&2; exit 1;
+    }
+  else
+    cp "$TMP" "$PRIOR"
+  fi
 
   # Pinned original Stage77 remains unchanged.
   curl -fLsS --retry 3 \
@@ -70,7 +79,16 @@ Stage77 source commit `0f6ee696539a3088e803afb5d1392736261116a9`; Git blob `0211
   echo "EXPECTED STAGE77: $EXPECTED"
   echo "ACTUAL   STAGE77: $(git hash-object "$TMP")"
   test "$(git hash-object "$TMP")" = "$EXPECTED"
-  cp "$TMP" "$SCRIPT"
+  if test -L "$SCRIPT"; then
+    echo "REFUSE: Stage77 destination is a symlink: $SCRIPT" >&2; exit 1
+  fi
+  if test -e "$SCRIPT"; then
+    test -f "$SCRIPT" && test "$(git hash-object "$SCRIPT")" = "$EXPECTED" || {
+      echo "REFUSE: Stage77 existing content differs; no overwrite" >&2; exit 1;
+    }
+  else
+    cp "$TMP" "$SCRIPT"
+  fi
   "$PY" -m py_compile "$PRIOR"
   "$PY" -m py_compile "$SCRIPT"
   "$PY" -B "$SCRIPT" --self-test
