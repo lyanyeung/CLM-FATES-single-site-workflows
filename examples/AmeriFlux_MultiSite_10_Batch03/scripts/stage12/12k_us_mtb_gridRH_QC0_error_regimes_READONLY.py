@@ -80,6 +80,7 @@ def tbins(vals):
     Never discard a held target just because its T is warm or unavailable.
     """
     raw=pd.Series(np.asarray(vals,dtype=float))
+    raw=raw.where(np.isfinite(raw),np.nan)
     categorised=pd.cut(raw,bins=T_BINS,labels=T_LABELS,
                        include_lowest=True)
     return categorised.astype(object).fillna(MISSING_T_LABEL).to_numpy(dtype=object)
