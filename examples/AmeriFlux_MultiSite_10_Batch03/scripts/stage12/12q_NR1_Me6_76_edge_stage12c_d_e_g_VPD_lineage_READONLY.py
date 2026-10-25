@@ -30,7 +30,7 @@ import numpy as np
 import pandas as pd
 sys.dont_write_bytecode = True
 
-VERSION = "batch03-stage12q-v1-20261025-76-edge-CDEG-native-VPD-source-lineage"
+VERSION = "batch03-stage12q-v2-20261025-preserve-upstream-merge-CDEG-VPD-lineage"
 ROOT = Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 P = ROOT / "reports/stage12p_NR1_Me6_QC1_VPD_neighbor_origin_and_jump_sensitivity_20261025T091906Z_d349135a"
 P_RECEIPT = "stage12p_QC1_source_provenance_SHA_receipt.json"
@@ -94,7 +94,39 @@ def lineage(c, d, e, is_b, is_d, is_e):
     return ("STAGE12B_GRID_RH_IMPORTED_IN_12C" if is_b
             else "STAGE12C_RAW_OR_COMPANION_BASELINE")
 
+def join_verified_stage(left, right, stage):
+    """Preserve Stage12p's existing _merge provenance without indicator collision."""
+    marker = "__stage12q_stage_join_status__"
+    if marker in left.columns or marker in right.columns:
+        raise ValueError("Stage12q join marker collision for " + stage)
+    joined = left.merge(
+        right, on=["site", "neighbor_native_key"],
+        how="left", validate="many_to_one", indicator=marker)
+    if not joined.pop(marker).eq("both").all():
+        raise ValueError("Source-native original neighbor not in " + stage + " snapshot")
+    return joined
+
 def selftest():
+    # Regression for Stage12p signed files retaining a pre-existing _merge.
+    left = pd.DataFrame({"site": ["US-Me6", "US-Me6"],
+                         "neighbor_native_key": ["201506030430", "201506030500"],
+                         "_merge": ["both", "both"]})
+    for stage in "CDEG":
+        right = pd.DataFrame({"site": ["US-Me6", "US-Me6"],
+                              "neighbor_native_key": ["201506030430", "201506030500"],
+                              stage + "_VPD_hPa": [1., 2.]})
+        left = join_verified_stage(left, right, stage)
+    assert left["_merge"].tolist() == ["both", "both"]
+    assert all(stage + "_VPD_hPa" in left for stage in "CDEG")
+    try:
+        join_verified_stage(left,
+                            pd.DataFrame({"site": ["US-Me6"],
+                              "neighbor_native_key": ["201506030430"], "EVIDENCE": [1.]}),
+                            "missing")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Incomplete native-stage join allowed")
     assert origin_class(5, 5) == "BOTH_FINITE_MATCH"
     assert origin_class(5, 4) == "BOTH_FINITE_DIFFER"
     assert origin_class(5, np.nan) == "RAW_ONLY_FINITE"
@@ -195,10 +227,7 @@ def analyse():
                 "neighbor_native_key": keys,
                 stage + "_VPD_hPa": pd.to_numeric(full.VPD_USE, errors="coerce")}))
         stageframes[stage] = pd.concat(pieces, ignore_index=True)
-        frame = frame.merge(stageframes[stage], on=["site", "neighbor_native_key"],
-                            how="left", validate="many_to_one", indicator=True)
-        if not frame.pop("_merge").eq("both").all():
-            raise ValueError("Source-native original neighbor not in " + stage + " snapshot")
+        frame = join_verified_stage(frame, stageframes[stage], stage)
 
     raw = pd.to_numeric(frame.original_FLUXMET_VPD_F_hPa, errors="coerce")
     e = pd.to_numeric(frame.E_VPD_hPa, errors="coerce")
