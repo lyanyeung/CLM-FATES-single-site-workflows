@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 05
 
-**Status (2026-10-25): Stage00 upload/checksum 10/10 verified; Stage01 extraction 10/10 verified; Stage02 complete original native time PASS 10/10, with metadata review US-UMB/US-Vcp and scientific review required for all ten. Stage03 read-only humidity QC / ERA5 clock scout executed successfully 10/10 (operator log); Stage04 full-event ERA provenance/paired-physics shadow executed 10/10, with 3,129 abnormal source timestamps fully matched to ERA printed labels; Stage05 original RH/QC/phase audit executed successfully 10/10 (3,541,632 HH; 47,267 RH differences >10pp; 503,174 RH missing); Stage06 RH disagreement episode/source-header audit completed 10/10 (6,782 continuous episodes, 47,267 severely discordant RH records); Stage07 QC/ERA/MDS inheritance audit complete 10/10 (50,287 event timestamps, 9,632/9,632 VPD-QC2 matches ERA, 9,018/9,018 TA-QC2 matches ERA); Stage08 all-row consolidated provenance and MDS alternatives PASS 10/10: 3,541,632 records, 0 inconsistent source-selection, 1,750 low-derived-RH screens (700 MDS-pair mathematically feasible, 1,050 nonphysical); Stage09 read-only low-RH triage completed 10/10 (1,750 records: 1,559 negative, 191 nonnegative <1%; 170 without ERA/tower-T physically feasible pairing); Stage10 SHA-verified report-only human review CSV exporter published, operator execution pending. NO model-ready forcing has been approved.**
+**Status (2026-10-25): Stage00 upload/checksum 10/10 verified; Stage01 extraction 10/10 verified; Stage02 complete original native time PASS 10/10, with metadata review US-UMB/US-Vcp and scientific review required for all ten. Stage03 read-only humidity QC / ERA5 clock scout executed successfully 10/10 (operator log); Stage04 full-event ERA provenance/paired-physics shadow executed 10/10, with 3,129 abnormal source timestamps fully matched to ERA printed labels; Stage05 original RH/QC/phase audit executed successfully 10/10 (3,541,632 HH; 47,267 RH differences >10pp; 503,174 RH missing); Stage06 RH disagreement episode/source-header audit completed 10/10 (6,782 continuous episodes, 47,267 severely discordant RH records); Stage07 QC/ERA/MDS inheritance audit complete 10/10 (50,287 event timestamps, 9,632/9,632 VPD-QC2 matches ERA, 9,018/9,018 TA-QC2 matches ERA); Stage08 all-row consolidated provenance and MDS alternatives PASS 10/10: 3,541,632 records, 0 inconsistent source-selection, 1,750 low-derived-RH screens (700 MDS-pair mathematically feasible, 1,050 nonphysical); Stage09 read-only low-RH triage completed 10/10 (1,750 records: 1,559 negative, 191 nonnegative <1%; 170 without ERA/tower-T physically feasible pairing); Stage10 SHA-verified report-only export DONE 10/10 (1,750 original humidity flags, 1,559 negative) at review_20261025T180413Z_682688; Stage11 review-ledger QA and manual priority script published, operator run pending. NO model-ready forcing has been approved.**
 
 Fifth independent ten-site AmeriFlux campaign, following [Batch04](../AmeriFlux_MultiSite_10_Batch04/). Current scope is transfer, CSV extraction and structural inventory. Raw data are not committed to GitHub.
 
@@ -389,3 +389,42 @@ Using the hypothetical ERA vapour pressure (ERA water saturation minus ERA VPD) 
 ```
 
 On success the operator should observe `STAGE10 SUMMARY sites=10/10 events=1750 negative=1559`, plus 10 event CSVs and `audit_summary.json`. The script is published but still needs execution and its self-test on IRIDIS6. **Reports are diagnostic artefacts, NOT replacements or model-ready forcing.**
+
+
+## Stage10 actual operator run: 10/10 review CSVs generated (2026-10-25)
+
+[Stage10 original run log, exact 10-site row counts, and report semantics](docs/STAGE10_OPERATOR_MANUAL_REVIEW_REPORTS_2026-10-25.md). Operator output confirmed **SOURCE VERIFIED**, **SELF-TEST PASS**, and `STAGE10 SUMMARY sites=10/10 events=1750 negative=1559`. Report-only path:
+
+```text
+/home/ly3n24/ameriflux_batch05_stage10/review_20261025T180413Z_682688
+```
+
+The Python exporter printed the resolved path under `/iridisfs/home/ly3n24/...`; the shell path was `/home/ly3n24/...`. Use `realpath` locally to confirm these address the same files. Exactly 10 `<SITE>_low_RH_review.csv` reports and `audit_summary.json` are expected under that directory. The source logs do not provide the actual per-site interpolation candidate counts, so do **not** invent how many are bracketed, or claim any interpolation is approved. Original data/forcing remained unchanged, and no model runs or jobs were started.
+
+## Stage11 (READ ONLY): check report arithmetic and list human-review candidates
+
+[Stage11 review CSV/JSON validator](scripts/stage11/11_audit_stage10_review_ledgers_readonly.py) reads only the existing Stage10 report directory: verifies row counts (1,750), negative (1,559), nonnegative <1% (191), original per-site summaries, native physical formula, source QC0/0 cases, interpolation math and 3h anchor bounds. It prints per-site diagnostic categories and priority examples; writes NOTHING. It is **not an automatic forcing repair**.
+
+```bash
+(
+  set -euo pipefail
+  BASE="$HOME/ameriflux_batch05_stage11"
+  COMMIT="5025119232ff2f3a5f66b0d4bbead831c61a972d"
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT"
+  SCRIPT="$BASE/11_audit_stage10_review_ledgers_readonly.py"
+  REPORTS="$HOME/ameriflux_batch05_stage10/review_20261025T180413Z_682688"
+  mkdir -p "$BASE"
+  curl -fLsS --retry 3 \
+    "$RAW/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage11/11_audit_stage10_review_ledgers_readonly.py" \
+    -o "$SCRIPT"
+  test "$(git hash-object "$SCRIPT")" = "905ba71593569d0ba9451a008eef1bf1bd9f1d69"
+  echo "STAGE11 SOURCE VERIFIED"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  test -f "$REPORTS/audit_summary.json"
+  python3 -B "$SCRIPT" --report-dir "$REPORTS" \
+    2>&1 | tee "$BASE/stage11.log"
+)
+```
+
+When the IRIDIS6 run genuinely succeeds, expect `STAGE11 SUMMARY sites=10/10 events=1750 negative=1559 nonnegative_below1=191 files_valid=10`. Stage11's GitHub blob was verified, but it has **not** been executed on the private IRIDIS6 reports. No original data/forcing writes, no time changes, no model or Slurm activity.
