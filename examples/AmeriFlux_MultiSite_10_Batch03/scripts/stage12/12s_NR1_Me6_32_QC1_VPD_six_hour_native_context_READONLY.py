@@ -23,7 +23,7 @@ import numpy as np
 import pandas as pd
 sys.dont_write_bytecode = True
 
-VERSION = "batch03-stage12s-v2-20261025-QC1-VPD-C-T-raw-T-distinction-pm6h"
+VERSION = "batch03-stage12s-v3-20261025-QC1-VPD-QC0-physical-reference-pm6h"
 ROOT = Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 R = ROOT / "reports/stage12r_32_QC1_native_VPD_source_physics_and_ERA_RH_20261025T094639Z_a770eeb8"
 Q = ROOT / "reports/stage12q_76_original_VPD_edge_CDEG_lineage_20261025T093514Z_044390c3"
@@ -182,8 +182,10 @@ def analyse():
         era_v = a.VPD_ERA.to_numpy(dtype=float)
         native_times = a.dt.to_numpy()
         bound = es(src_t)
+        phys_valid = (np.isfinite(src_t) & np.isfinite(src_v) &
+                      np.isfinite(bound) & (src_v >= 0) & (src_v < bound))
         invalid = (np.isfinite(src_t) & np.isfinite(src_v) &
-                   np.isfinite(bound) & (src_v >= bound))
+                   np.isfinite(bound) & ~phys_valid)
         derived_rh = implied_rh(src_t, src_v)
         era_rh = implied_rh(era_t, era_v)
         for event in targets.loc[targets.site.eq(site)].itertuples(index=False):
@@ -206,7 +208,7 @@ def analyse():
                 np.diff(times).astype("timedelta64[m]").astype(int) == 30
             ).all():
                 raise ValueError("Original full +/-6h half-hour chronology irregular " + key)
-            near_qc0 = (src_vqc[idx] == 0) & np.isfinite(src_v[idx]) & ~invalid[idx]
+            near_qc0 = (src_vqc[idx] == 0) & phys_valid[idx]
             before = idx[(idx < i) & near_qc0]
             after = idx[(idx > i) & near_qc0]
             prev_i = int(before[-1]) if len(before) else None
