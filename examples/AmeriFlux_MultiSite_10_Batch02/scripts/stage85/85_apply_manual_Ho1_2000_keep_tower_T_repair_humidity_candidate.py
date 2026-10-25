@@ -96,7 +96,7 @@ def sources():
                        rtol=0,equal_nan=True).all()):
         raise ValueError("Native approved source identity/2000 QC/ERA VPD changed")
     signed=json.loads((S84/"stage84_source_science_manifest.json").read_text())
-    if (S84/"INCOMPLETE_DO_NOT_USE").exists() or
+    if ((S84/"INCOMPLETE_DO_NOT_USE").exists() or
         signed.get("schema")!="STAGE84_HO1_2000_32_ORIGINAL_ERA_VPD_T_SOURCE_INCONSISTENCIES_v1" or
         signed.get("separate_source_ERA_VPD_exceeds_eswater_source_TA_ERA")!=32 or
         signed.get("all_previous_1068_are_consistent_at_source_TA_ERA") is not True or
