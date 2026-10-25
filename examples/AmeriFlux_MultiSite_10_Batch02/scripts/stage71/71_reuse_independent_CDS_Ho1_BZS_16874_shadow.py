@@ -64,7 +64,7 @@ def load_era():
     spec.loader.exec_module(mod)
     return mod
 
-def original():
+def load_original():
     m=json.loads((S70/"stage70_original_VPD_source_manifest.json").read_text())
     if ((S70/"INCOMPLETE_DO_NOT_USE").exists() or
         m.get("schema")!="STAGE70_HO1_BZS_ORIGINAL_VPD_F_ERA_MDS_PRODUCT_PROVENANCE_v1" or
@@ -267,8 +267,8 @@ def main():
     a=p.parse_args()
     if a.self_test:return self_test()
     mod=load_era()
-    original,stations,m70=original()
-    rows,plan,receipts=build(original,stations,mod)
+    events,stations,m70=load_original()
+    rows,plan,receipts=build(events,stations,mod)
     if a.check:
         print("STAGE71 CHECK PASS | independently checksum+calendar verified ERA5 reuse; zero output/source writes")
         return
