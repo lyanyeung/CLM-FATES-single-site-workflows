@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 05
 
-**Status (2026-10-25): Stage00 upload/checksum 10/10 verified; Stage01 extraction 10/10 verified; Stage02 complete original native time PASS 10/10, with metadata review US-UMB/US-Vcp and scientific review required for all ten. Stage03 read-only humidity QC / ERA5 clock scout executed successfully 10/10 (operator log); Stage04 full-event ERA provenance/paired-physics shadow executed 10/10, with 3,129 abnormal source timestamps fully matched to ERA printed labels; Stage05 original RH/QC/phase audit executed successfully 10/10 (3,541,632 HH; 47,267 RH differences >10pp; 503,174 RH missing); Stage06 RH disagreement episode/source-header audit completed 10/10 (6,782 continuous episodes, 47,267 severely discordant RH records); Stage07 QC/ERA/MDS inheritance audit complete 10/10 (50,287 event timestamps, 9,632/9,632 VPD-QC2 matches ERA, 9,018/9,018 TA-QC2 matches ERA); Stage08 all-row consolidated provenance and MDS alternatives PASS 10/10: 3,541,632 records, 0 inconsistent source-selection, 1,750 low-derived-RH screens (700 MDS-pair mathematically feasible, 1,050 nonphysical); Stage09 read-only low-RH triage completed 10/10 (1,750 records: 1,559 negative, 191 nonnegative <1%; 170 without ERA/tower-T physically feasible pairing); Stage10 SHA-verified report-only export DONE 10/10 (1,750 original humidity flags, 1,559 negative) at review_20261025T180413Z_682688; Stage11 review-ledger QA and manual priority script published, operator run pending. NO model-ready forcing has been approved.**
+**Status (2026-10-25): Stage00 upload/checksum 10/10 verified; Stage01 extraction 10/10 verified; Stage02 complete original native time PASS 10/10, with metadata review US-UMB/US-Vcp and scientific review required for all ten. Stage03 read-only humidity QC / ERA5 clock scout executed successfully 10/10 (operator log); Stage04 full-event ERA provenance/paired-physics shadow executed 10/10, with 3,129 abnormal source timestamps fully matched to ERA printed labels; Stage05 original RH/QC/phase audit executed successfully 10/10 (3,541,632 HH; 47,267 RH differences >10pp; 503,174 RH missing); Stage06 RH disagreement episode/source-header audit completed 10/10 (6,782 continuous episodes, 47,267 severely discordant RH records); Stage07 QC/ERA/MDS inheritance audit complete 10/10 (50,287 event timestamps, 9,632/9,632 VPD-QC2 matches ERA, 9,018/9,018 TA-QC2 matches ERA); Stage08 all-row consolidated provenance and MDS alternatives PASS 10/10: 3,541,632 records, 0 inconsistent source-selection, 1,750 low-derived-RH screens (700 MDS-pair mathematically feasible, 1,050 nonphysical); Stage09 read-only low-RH triage completed 10/10 (1,750 records: 1,559 negative, 191 nonnegative <1%; 170 without ERA/tower-T physically feasible pairing); Stage10 SHA-verified report-only export DONE 10/10 (1,750 original humidity flags, 1,559 negative) at review_20261025T180413Z_682688; Stage11 existing Stage10 review ledger QA PASS 10/10 (229 mathematically feasible unapproved bracketed interpolation candidates, 1,510 lacking both QC0 anchors, 11 nonphysical interpolations, 170 overlapping ERA-pair holds, 27 negative measured-QC0/0 source events); Stage12 read-only original native temporal context review script committed, operator pending. NO model-ready forcing has been approved.**
 
 Fifth independent ten-site AmeriFlux campaign, following [Batch04](../AmeriFlux_MultiSite_10_Batch04/). Current scope is transfer, CSV extraction and structural inventory. Raw data are not committed to GitHub.
 
@@ -428,3 +428,44 @@ The Python exporter printed the resolved path under `/iridisfs/home/ly3n24/...`;
 ```
 
 When the IRIDIS6 run genuinely succeeds, expect `STAGE11 SUMMARY sites=10/10 events=1750 negative=1559 nonnegative_below1=191 files_valid=10`. Stage11's GitHub blob was verified, but it has **not** been executed on the private IRIDIS6 reports. No original data/forcing writes, no time changes, no model or Slurm activity.
+
+
+## Stage11 actual operator result — 10/10 PASS (2026-10-25)
+
+[Stage11 source-grounded complete result](docs/STAGE11_REVIEW_LEDGER_VALIDATION_2026-10-25.md) confirms all ten Stage10 CSV ledgers agree with `audit_summary.json` and original math and bracket checks. The 1,750 cases split into:
+
+- 229 interpolations with verified +/-3-hour QC0/0 anchor times and **mathematically feasible, not approved** interpolated VPD
+- 1,510 without two qualifying QC0/0 observations within +/-3 h
+- 11 interpolations whose numeric VPD candidate remains nonphysical (4 US-Vcm; 7 US-Wkg)
+- 170 overlapping ERA-pair holds (115 hypothetical ERA implied vapor pressures inconsistent with tower TA, 55 ERA pair internally nonphysical under water formulation)
+- 27 negative computed-RH source cases with measured TA/VPD (26 US-WCr, 1 US-Vcm)
+
+**Do not equate formula-negative RH of around −0.1% in measured VPD with a defective tower sensor.** Original RH in 26 US-WCr measured-pair cases is 0%; this may be a saturation-equation / numerical-precision boundary issue. None of the event groups is model forcing ready.
+
+## Stage12 — full original FLUXMET/FULLSET +/-3-hour temporal context for priority cases (NO REPAIRS)
+
+[Stage12 original data context script](scripts/stage12/12_export_priority_low_RH_source_context_readonly.py) reads existing Stage10 event CSV, verifies source SHA256 again, and exports the native meteorology/QC/MDS/ERA values from 3 h before to 3 h after each unique priority event. Categories: 229 unapproved bracketed, 11 unphysical bracketed, 27 measured source negatives, and 170 ERA-pair holds (these overlap). Also validates source event-center values and both actual QC0 measured anchors for any bracketed case. Outputs **new** independent report CSV/JSON only — neither original sources, original Stage10 reports, forcing, model cases nor Slurm are touched.
+
+```bash
+(
+  set -euo pipefail
+  BASE="$HOME/ameriflux_batch05_stage12"
+  COMMIT="1afc927170d16919946982e7bfe2136d4d442960"
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT"
+  SCRIPT="$BASE/12_export_priority_low_RH_source_context_readonly.py"
+  REPORTS="$HOME/ameriflux_batch05_stage10/review_20261025T180413Z_682688"
+  mkdir -p "$BASE"
+  curl -fLsS --retry 3 \
+    "$RAW/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage12/12_export_priority_low_RH_source_context_readonly.py" \
+    -o "$SCRIPT"
+  test "$(git hash-object "$SCRIPT")" = "267753d59b23ee102bedeb2706c59cefb09b8b91"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  OUT="$BASE/context_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+  python3 -B "$SCRIPT" --report-dir "$REPORTS" --output-dir "$OUT" \
+    2>&1 | tee "$BASE/stage12.log"
+  echo "STAGE12_REPORTS=$OUT"
+)
+```
+
+Expected after actual IRIDIS6 success: `STAGE12 SUMMARY sites=10/10 original_events=1750 priority_unique=... context_rows=... approved=0 reports=...`. The number of **unique** priority events and rows of temporal context are not guessed from the overlapping categories and will be printed by the real run. Script created/pinned on GitHub, but user operator run and self-test are **pending**.
