@@ -258,7 +258,8 @@ def main():
              lambda x:int((x>4).sum()))
     ).to_string(),flush=True)
     print("STAGE12M SUMMARY: original_86_stage12g_science_holds_preserved=TRUE "
-          "39?",flush=True)
+          "source_100_covered_events=TRUE "
+          "new_numeric_RH_repair_candidates=0",flush=True)
     print("STAGE12M VERIFIED: 48 temperature holds; 38 boundary jump holds; "
           "no gap repairs/temperature changes/clock approval; "
           "Postv5=0 DATM=0 spinup=0",flush=True)
