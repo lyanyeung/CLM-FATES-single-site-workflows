@@ -297,6 +297,14 @@ Run on IRIDIS6:
 
 This Stage15 source verification performs **no writes**, CDS calls, Post-v5 approval, DATM setup or spinup. US-Syv 606 original science HOLDS plus 10 skipped Stage07 edge targets remain deferred.
 
+## Stage15 focused alternative two-point US-SP1 temperature sensitivity (not yet run)
+
+The eight Stage14 humidity-only physical closure candidates succeeded, but none of the eight source QC0 tower-temperature disagreements was independently resolved. As the next bounded experiment, [Stage15](scripts/stage15/15_sp1_oct2000_two_point_temperature_sensitivity.py) examines **just two US-SP1 tower TA anomalies on 2000-10-09 at native 18:00 and 18:30**. Original T −6.9/−7.1 °C conflicts sharply with the unbroken warmer tower flanks (17:30=11.0°C QC0; 19:00=17.545°C QC1) and the independently downloaded grid T2m≈14.37/13.78°C. A two-half-hour flanking interpolation would yield **13.1817/15.3633°C**, within **2.5°C** of the grid reference at both timestamps.
+
+Stage15 is an **alternative sensitivity candidate**, not a committed correction or model input. It enforces exact Stage14 SHA, recorded flank observations and existing CDS BIF-aligned 2000 grid evidence before producing one new full US-SP1 derived CSV; retains the Stage14 independent RH and recomputes VPD at proposed T; sets **trial TA_F_QC=1**, preserving original QC0 provenance in a separate ledger. Other nine Stage14 sites are not duplicated and the complete ten-site alternative manifest is separate. **All eight original temperature science HOLDs continue**, and US-Syv original 606 HOLDs remain deferred. [Stage15 method, source evidence and runnable command](docs/STAGE15_SP1_OCT2000_TWO_POINT_SENSITIVITY_TRIAL_2026-10-25.md).
+
+Run the current Stage15 pinned source (`f8e83e08dc60c1843b12964a4441b508b4705173`) after fetching it to the Stage10 helper directory; `--assess` is read-only and `--trial` writes a new isolated candidate. No original/Stage14/production inputs overwritten.
+
 ## Stage14 actual operator result VERIFIED: 8/8 humidity closure candidates, 8 tower-temperature HOLDs unchanged
 
 Stage14 ran on IRIDIS6 with syntax and self-test PASS, 8 exact VPD/RH half-hours recalculated using independent ERA5-Land relative humidity while preserving all original native `TA_F`, `PA_F` and QC labels. **US-SP1 6, US-SRG 1, US-Seg 1**. Three full new derived source-length candidate files created at:
