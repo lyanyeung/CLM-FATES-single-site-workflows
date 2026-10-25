@@ -7,7 +7,7 @@ Stage79 verified report:
 
 ## Original-source year-2000 findings
 
-All **505** Ho1 original measured T QC0 / independent CDS ERA5 T difference >8°C cases are organized into **35 native 30-minute-consecutive episodes**, of which **498** have a source-QC-screened NOAA Bangor comparison, **306** distinct NOAA physical reports. Original source case months: **Jan 300 (59.4%); Feb 73; Mar 115; Nov 8; Dec 9** — 488/505 (96.6%) in Jan–Mar. Stage79 kept native `TA_F_QC=0`, source timestamps and source lineages; the 505-case selection does not independently prove bad native sensor data.
+All **505** Ho1 original measured T QC0 / independent CDS ERA5 T difference >8°C cases are organized into **36 native 30-minute-consecutive episodes** (Stage79 console shows only the longest 35), of which **498** have a source-QC-screened NOAA Bangor comparison, **306** distinct NOAA physical reports. Original source case months: **Jan 300 (59.4%); Feb 73; Mar 115; Nov 8; Dec 9** — 488/505 (96.6%) in Jan–Mar. Stage79 kept native `TA_F_QC=0`, source timestamps and source lineages; the 505-case selection does not independently prove bad native sensor data.
 
 All **505/505** event timestamps have at least one same-month original T QC0 non-hard-VPD control within **±7 days, ±1 hour same local clock**. Of these 505, only the previously confirmed **498** had a matched NOAA original station report at the event time; across them the signed event-minus-nearby-control median (NOAA−Ho1) is **+13.894°C**, with IQR **+10.241 to +17.906°C**. The background controls are not randomized and may reflect very different weather, canopy exposure and source selection, so these statistics remain descriptive.
 
@@ -44,11 +44,11 @@ Interpretation: the original reported source T appears to enter discrete, often 
 
 ## Stage80: inspect each episode's true original leading and trailing edges
 
-[Stage80 source script](../scripts/stage80/80_Ho1_2000_original_T_QC0_episode_boundary_and_NOAA_transition_audit.py) reads and SHA-checks the whole Stage79 result and original Stage78 Git code; imports Stage78's original Stage49 primary Ho1 FLUXNET file hash verifier and original 505 source row/temperature comparison. For all **35 episodes**, it builds per-native-HH windows covering **6 hours before + episode + 6 hours after** the flagged source-QC0 run, directly reading original `TA_F`/`TA_F_QC` and `VPD_F`/`VPD_F_QC` (and `TA_ERA` only if originally present). It matches exactly the original NOAA 2000 archival file with the pinned Stage40 source-QC selector at nominal shadow UTC−5, keeping historical effective-date approvals FALSE.
+[Stage80 source script](../scripts/stage80/80_Ho1_2000_original_T_QC0_episode_boundary_and_NOAA_transition_audit.py) reads and SHA-checks the whole Stage79 result and original Stage78 Git code; imports Stage78's original Stage49 primary Ho1 FLUXNET file hash verifier and original 505 source row/temperature comparison. For all **36 episodes**, it builds per-native-HH windows covering **6 hours before + episode + 6 hours after** the flagged source-QC0 run, directly reading original `TA_F`/`TA_F_QC` and `VPD_F`/`VPD_F_QC` (and `TA_ERA` only if originally present). It matches exactly the original NOAA 2000 archival file with the pinned Stage40 source-QC selector at nominal shadow UTC−5, keeping historical effective-date approvals FALSE.
 
 The episode summary prints original 30-minute temperature changes at entry/exit, plus previous 2h / first 2h / last 2h / next 2h original source T-QC0 and NOAA−Ho1 signed medians and NOAA independent report counts. Large ±8°C changes are **diagnostic threshold flags only, not scientifically approved sensor-failure criteria**. Windows can overlap, and repeated original HH/NOAA station reports are not independent. No historical site time offset validity is claimed from nominal BIF.
 
-Stage80 fixed Git commit `8eee43821b14a67edf8bed30bd9a179a8c7a7e92`; Git blob `0aac181f03c20f4039b3031f28c41211fb67eca7`.
+Stage80 corrected Git commit `e1c7e53c777ee457ed722691fb0b1a0e43819d69`; Git blob `945ca08b393d15fd8f710619d60a001dd9a1e9ad`.
 
 ### One-paste IRIDIS6 command
 
@@ -59,8 +59,9 @@ Stage80 fixed Git commit `8eee43821b14a67edf8bed30bd9a179a8c7a7e92`; Git blob `0
   PY="$CONDA_PREFIX/bin/python"
   REL="examples/AmeriFlux_MultiSite_10_Batch02"
   SCRIPT="$HOME/CLM-FATES-single-site-workflows/$REL/scripts/stage80/80_Ho1_2000_original_T_QC0_episode_boundary_and_NOAA_transition_audit.py"
-  COMMIT="8eee43821b14a67edf8bed30bd9a179a8c7a7e92"
-  EXPECTED="0aac181f03c20f4039b3031f28c41211fb67eca7"
+  COMMIT="e1c7e53c777ee457ed722691fb0b1a0e43819d69"
+  EXPECTED="945ca08b393d15fd8f710619d60a001dd9a1e9ad"
+  OLD_EXPECTED="0aac181f03c20f4039b3031f28c41211fb67eca7"
   mkdir -p "$(dirname "$SCRIPT")"
   TMP="$(mktemp)"
   trap 'rm -f "$TMP"' EXIT
@@ -72,12 +73,19 @@ Stage80 fixed Git commit `8eee43821b14a67edf8bed30bd9a179a8c7a7e92`; Git blob `0
   test "$(git hash-object "$TMP")" = "$EXPECTED"
   test ! -L "$SCRIPT"
   if test -e "$SCRIPT"; then
-    test -f "$SCRIPT" && test "$(git hash-object "$SCRIPT")" = "$EXPECTED" || {
-      echo "STOP: Stage80 destination differs, no overwrite" >&2; exit 1;
-    }
+    test -f "$SCRIPT" || { echo "STOP: nonregular Stage80 destination" >&2; exit 1; }
+    ACTUAL_LOCAL="$(git hash-object "$SCRIPT")"
+    if test "$ACTUAL_LOCAL" = "$OLD_EXPECTED"; then
+      cp "$TMP" "$SCRIPT"
+    else
+      test "$ACTUAL_LOCAL" = "$EXPECTED" || {
+        echo "STOP: unexpected Stage80 destination blob; no overwrite" >&2; exit 1;
+      }
+    fi
   else
     cp "$TMP" "$SCRIPT"
   fi
+  test "$(git hash-object "$SCRIPT")" = "$EXPECTED"
   "$PY" -m py_compile "$SCRIPT"
   "$PY" -B "$SCRIPT" --self-test
   "$PY" -B "$SCRIPT" --check
@@ -86,6 +94,12 @@ Stage80 fixed Git commit `8eee43821b14a67edf8bed30bd9a179a8c7a7e92`; Git blob `0
 )
 ```
 
-Expected operator success after actual HPC run: `STAGE80 AUDIT PASS | 35 Ho1 2000 measured QC0 episode boundaries with SHA-verified original NOAA, no forcing approval`.
+Expected operator success after actual HPC run: `STAGE80 AUDIT PASS | 36 Ho1 2000 measured QC0 episode boundaries with SHA-verified original NOAA, no forcing approval`.
 
 Stage80 has been committed and code structure/Git blob SHA validated, **not yet tested against IRIDIS6 Stage79 source files**. All 15,199 independent CDS humidity numeric shadow candidates, 1,675 temp science HOLDs, full 16,874 original humidity source HOLDs and unrelated Stage64 9,389 candidates remain unmodified. Original FLUXNET, NOAA, ERA5, forcing NetCDF, DATM, CIME and Slurm are never changed.
+
+## Stage80 35-versus-36 regression correction (operator failure)
+
+The original Stage80 `--self-test` passed but `--check` failed at `old_report()` with `Stage79 original 35 episode/505 HH source census changed`. This does **not** implicate corruption in Stage79. The published Stage79 Python code uses `out.head(35)` when printing episode rows; those 35 rows contain **504** original half-hours, while its actual immutable CSV includes a **36th singleton**, closing exactly **505**. The original Stage80 error came from `EXPECTED_EPISODES=35`, a mistaken interpretation of *displayed* rows as *all* rows.
+
+Fixed only the Stage80 script: expected **36 full episodes**, preserve original source SHA and exact 505 timestamp check, strengthen self-test with the 35 displayed durations (sum 504) + one unprinted singleton. Nothing in the Stage79 CSV, original FLUXNET, NOAA, CDS or formal forcing was changed. Run the **corrected pinned command above**: it only overwrites local Stage80 if its blob is precisely the previous `0aac181f...` or reuses the new blob, refusing any unexpected operator modification. The corrected Stage80 has not yet passed IRIDIS6 `--check`/`--audit`.
