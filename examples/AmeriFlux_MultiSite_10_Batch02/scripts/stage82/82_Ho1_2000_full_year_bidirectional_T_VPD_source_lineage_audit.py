@@ -238,8 +238,10 @@ def classify(x):
         y["original_VPD_F_QC"].eq(1),
         y["original_VPD_F_QC"].eq(2)],
        ["QC0","QC1","QC2"],default="OTHER_MISSING")
-    y["native_VPD_hPa"]=y["original_VPD_F"].where(
-        y["original_VPD_F"].between(-500,500))
+    # Preserve the full native source VPD magnitude, even values outside
+    # plausible physical bounds; screening must never silently discard the
+    # most problematic extremes. Source missing sentinel was masked above.
+    y["native_VPD_hPa"]=y["original_VPD_F"]
     t=y["TA_C"].where(y["original_measured_T_QC0"])
     y["source_water_es_from_native_Ho1_T_hPa"]=(
          6.112*np.exp(17.67*t/(t+243.5)))
