@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Stage80: original Ho1 2000 measured-QC0 cold episodes' true source boundaries.
 
-Stage79 had 505 selected original measured TA_F QC0 Ho1-2000 events in 35
-30-minute-consecutive blocks. Jan 300, Feb 73, Mar 115, Nov 8, Dec 9.
-Inspect each full episode and 6 hours of original source HH on both sides:
+Stage79 had 505 selected original measured TA_F QC0 Ho1-2000 events in 36
+30-minute-consecutive blocks (its printed stdout showed only the 35 longest). Jan 300, Feb 73, Mar 115, Nov 8, Dec 9.
+Inspect all 36 full episodes and 6 hours of original source HH on both sides:
 native TA_F/QC, VPD_F/QC, native FLUXNET reanalysis TA_ERA if available,
 precisely archived NOAA Bangor airport original QC-screened temperatures.
 Summarize 2h BEFORE, first 2h INSIDE, last 2h INSIDE and 2h AFTER every
@@ -38,7 +38,7 @@ ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10
 REPORT=ROOT/"reports"
 UPSTREAM=REPORT/"stage79_Ho1_2000_505_QC0_source_month_hour_episode_control_triage_20261025T181238Z_2b6cbd1f"
 EPISODES="Ho1_2000_505_QC0_source_contiguous_episodes.csv"
-EXPECTED_EPISODES=35
+EXPECTED_EPISODES=36
 WINDOW_HH=12
 BOUNDARY_HH=4
 EXPECTED_MONTHLY={1:300,2:73,3:115,11:8,12:9}
@@ -90,7 +90,7 @@ def old_report():
     if (len(d)!=EXPECTED_EPISODES or
         int(d["native_QC0_temperature_source_HH"].sum())!=505 or
         d["episode_id"].duplicated().any()):
-        raise ValueError("Stage79 original 35 episode/505 HH source census changed")
+        raise ValueError("Stage79 original 36 episode/505 HH source census changed")
     for col in ("native_local_start","native_local_end"):
         if not d[col].str.fullmatch(r"\d{12}").all():
             raise ValueError("Stage79 native episode timestamps malformed")
@@ -173,7 +173,7 @@ def checked_input():
             raise ValueError("Original Stage79 continuous 30-min measured QC0 episode differs")
         episode_set.update(within["tower_local_start"])
     if episode_set!=case_at:
-        raise ValueError("Stage79 episodes do not partition exact original 505 QC0 source rows")
+        raise ValueError("Stage79 complete 36 episodes do not partition exact original 505 QC0 source rows")
     return mod78,eps,m79,native
 
 def nearest_noaa(mod78,source):
@@ -293,7 +293,7 @@ def summarise(mod78,eps,native):
                           ascending=[False,True],inplace=True)
     print("STAGE80 ORIGINAL 2000 QC0 SOURCE EPISODES",len(episodes),
           "TOTAL SELECTED HARD-HH",int(episodes.source_HH.sum()))
-    print("STAGE80 2h SOURCE T/NOAA BOUNDARY REVIEW TOP 20")
+    print("STAGE80 2h SOURCE T/NOAA BOUNDARY REVIEW TOP 20 OF 36")
     relevant=["episode_id","native_local_start","native_local_end",
         "source_HH","start_30min_source_T_jump_C",
         "end_30min_source_T_jump_C",
@@ -307,17 +307,24 @@ def summarise(mod78,eps,native):
     print("STAGE80 NOAA SOURCE BOUNDARY STRONGLY SHIFTED >8C:",
           "START",int(episodes.start_boundary_GT8C_diagnostic_only.sum()),
           "END",int(episodes.end_boundary_GT8C_diagnostic_only.sum()))
-    print("STAGE80 ALL 35 ORIGINAL EPISODES AND +/-6H ORIGINAL HH SAVED; NO SOURCE TIME/T MODIFICATION")
+    print("STAGE80 ALL 36 ORIGINAL EPISODES AND +/-6H ORIGINAL HH SAVED; NO SOURCE TIME/T MODIFICATION")
     return timeline,episodes
 
 def self_test():
     assert EXPECTED_MONTHLY=={1:300,2:73,3:115,11:8,12:9}
     assert sum(EXPECTED_MONTHLY.values())==505
+    # Stage79 prints out.head(35) ONLY. Those 35 reported block lengths
+    # sum to 504, leaving the 36th one-half-hour singleton unprinted.
+    published_top35=(70,48,44,43,37,36,33,20,17,17,16,13,12,
+                     12,10,9,9,8,7,6,6,6,5,4,2,2,2,2,2,1,1,1,1,1,1)
+    assert len(published_top35)==35 and sum(published_top35)==504
+    assert EXPECTED_EPISODES==len(published_top35)+1
+    assert sum(published_top35)+1==505
     assert WINDOW_HH==12 and BOUNDARY_HH==4
     t=pd.Timestamp("2000-03-06 04:00")
     assert (t-pd.Timedelta(minutes=WINDOW_HH*30)).strftime("%Y%m%d%H%M")=="200003052200"
     assert (t+pd.Timedelta(hours=5)).strftime("%Y%m%d%H%M")=="200003060900"
-    print("STAGE80 SELF-TEST PASS | 35 original measured QC0 continuous cold episodes, +/-6h, native NOAA source provenance")
+    print("STAGE80 SELF-TEST PASS | 36 original measured QC0 continuous cold episodes, +/-6h, native NOAA source provenance")
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
@@ -369,7 +376,7 @@ def main():
     (dest/"stage80_source_science_manifest.json").write_text(
         json.dumps(manifest,indent=2,sort_keys=True)+"\n")
     flag.unlink()
-    print("STAGE80 AUDIT PASS | 35 Ho1 2000 measured QC0 episode boundaries with SHA-verified original NOAA, no forcing approval")
+    print("STAGE80 AUDIT PASS | 36 Ho1 2000 measured QC0 episode boundaries with SHA-verified original NOAA, no forcing approval")
     print("REPORT",dest)
     print("NO ORIGINAL FLUXNET, NOAA, CDS, STAGE49-79, FORCING, DATM, CIME OR SLURM WRITES")
 if __name__=="__main__":
