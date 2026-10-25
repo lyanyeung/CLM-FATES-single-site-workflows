@@ -1,6 +1,6 @@
 # AmeriFlux MultiSite 10 — Batch 05
 
-**Status (2026-10-25): Stage00 upload/checksum 10/10 verified; Stage01 extraction 10/10 verified; Stage02 complete original native time PASS 10/10, with metadata review US-UMB/US-Vcp and scientific review required for all ten. Stage03 read-only humidity QC / ERA5 clock scout executed successfully 10/10 (operator log); Stage04 full-event ERA provenance/paired-physics shadow executed 10/10, with 3,129 abnormal source timestamps fully matched to ERA printed labels; Stage05 original RH/QC/phase audit executed successfully 10/10 (3,541,632 HH; 47,267 RH differences >10pp; 503,174 RH missing); Stage06 RH disagreement episode/source-header audit completed 10/10 (6,782 continuous episodes, 47,267 severely discordant RH records); Stage07 QC/ERA/MDS inheritance audit complete 10/10 (50,287 event timestamps, 9,632/9,632 VPD-QC2 matches ERA, 9,018/9,018 TA-QC2 matches ERA); Stage08 all-row consolidated provenance and MDS alternatives PASS 10/10: 3,541,632 records, 0 inconsistent source-selection, 1,750 low-derived-RH screens (700 MDS-pair mathematically feasible, 1,050 nonphysical); Stage09 read-only low-RH triage completed 10/10 (1,750 records: 1,559 negative, 191 nonnegative <1%; 170 without ERA/tower-T physically feasible pairing); Stage10 SHA-verified report-only export DONE 10/10 (1,750 original humidity flags, 1,559 negative) at review_20261025T180413Z_682688; Stage11 existing Stage10 review ledger QA PASS 10/10 (229 mathematically feasible unapproved bracketed interpolation candidates, 1,510 lacking both QC0 anchors, 11 nonphysical interpolations, 170 overlapping ERA-pair holds, 27 negative measured-QC0/0 source events); Stage12 original native temporal context report COMPLETED 10/10 (382 unique priority records from 1,750 low RH flags, 4,966 original HH contextual rows, approved=0); Stage13 independent native-context QA DONE 10/10 (382 priority events/4,966 original HH, 229 bracketed interpolations reproduced, 27 measured negative RH discrepancies all <=0.2 percentage points, 0 forcing repairs); Stage14 science sensitivity report completed 10/10 (240 bracketed trials, 173 change >5 hPa; 27 source QC0/0 near-zero RH checked with Magnus/Buck/Tetens, only one nonnegative under Buck/Tetens; no forcing changes); Stage15 full 1750-event source-provenance/hold inventory script published, IRIDIS6 run pending. NO model-ready forcing has been approved.**
+**Status (2026-10-25): Stage00 upload/checksum 10/10 verified; Stage01 extraction 10/10 verified; Stage02 complete original native time PASS 10/10, with metadata review US-UMB/US-Vcp and scientific review required for all ten. Stage03 read-only humidity QC / ERA5 clock scout executed successfully 10/10 (operator log); Stage04 full-event ERA provenance/paired-physics shadow executed 10/10, with 3,129 abnormal source timestamps fully matched to ERA printed labels; Stage05 original RH/QC/phase audit executed successfully 10/10 (3,541,632 HH; 47,267 RH differences >10pp; 503,174 RH missing); Stage06 RH disagreement episode/source-header audit completed 10/10 (6,782 continuous episodes, 47,267 severely discordant RH records); Stage07 QC/ERA/MDS inheritance audit complete 10/10 (50,287 event timestamps, 9,632/9,632 VPD-QC2 matches ERA, 9,018/9,018 TA-QC2 matches ERA); Stage08 all-row consolidated provenance and MDS alternatives PASS 10/10: 3,541,632 records, 0 inconsistent source-selection, 1,750 low-derived-RH screens (700 MDS-pair mathematically feasible, 1,050 nonphysical); Stage09 read-only low-RH triage completed 10/10 (1,750 records: 1,559 negative, 191 nonnegative <1%; 170 without ERA/tower-T physically feasible pairing); Stage10 SHA-verified report-only export DONE 10/10 (1,750 original humidity flags, 1,559 negative) at review_20261025T180413Z_682688; Stage11 existing Stage10 review ledger QA PASS 10/10 (229 mathematically feasible unapproved bracketed interpolation candidates, 1,510 lacking both QC0 anchors, 11 nonphysical interpolations, 170 overlapping ERA-pair holds, 27 negative measured-QC0/0 source events); Stage12 original native temporal context report COMPLETED 10/10 (382 unique priority records from 1,750 low RH flags, 4,966 original HH contextual rows, approved=0); Stage13 independent native-context QA DONE 10/10 (382 priority events/4,966 original HH, 229 bracketed interpolations reproduced, 27 measured negative RH discrepancies all <=0.2 percentage points, 0 forcing repairs); Stage14 science sensitivity report completed 10/10 (240 bracketed trials, 173 change >5 hPa; 27 source QC0/0 near-zero RH checked with Magnus/Buck/Tetens, only one nonnegative under Buck/Tetens; no forcing changes); Stage15 full 1750-event source-provenance/hold inventory PASS 10/10 (VPD QC0=119, QC1=965, QC2=666, negative=1559, original RH missing=1605, approved=0); Stage16 all-1750 original/mixed tower–MDS–ERA paired-physics source review script published, IRIDIS6 run pending. NO model-ready forcing has been approved.**
 
 Fifth independent ten-site AmeriFlux campaign, following [Batch04](../AmeriFlux_MultiSite_10_Batch04/). Current scope is transfer, CSV extraction and structural inventory. Raw data are not committed to GitHub.
 
@@ -588,3 +588,53 @@ Original Stage14 report directory:
 ```
 
 Only if actual IRIDIS6 reports pass all validations will it print `STAGE15 SUMMARY sites=10/10 reviewed=1750 negative=1559 measured=119 good_MDS=965 ERA=666 approved=0`. The script generates **only a new review CSV and JSON**, never changes native data, existing Stage10/14 reports, forcing or model jobs. Stage15 is currently **published but NOT executed** against the IRIDIS6 reports.
+
+
+## Stage15 operator PASS 10/10 — original source provenance consolidated (2026-10-25 22:42 UTC)
+
+[Stage15 actual operator audit and ten-site evidence](docs/STAGE15_ALL_1750_SOURCE_PROVENANCE_2026-10-25.md). All 1,750 low-RH source records were cross-checked against the Stage10 source-ledger and Stage14 science trials; 1,559 are strictly water-formula-negative, 191 nonnegative under 1%. Selected VPD source provenance: QC0 measured 119, QC1 good MDS 965, QC2 ERA 666. Original RH missing 1,605. Stage12 exact priority native temporal contexts cover 382 events, leaving 1,368 without that special context review. All `science_status=HOLD_NOT_APPROVED`.
+
+The mutually exclusive Stage15 priority ranks were: measured QC0/0 negative 27, original ERA pair internally nonphysical 55, measured QC0/0 extreme low RH 92, interpolated change >10 hPa 51, ERA implied vapor pressure incompatible with tower TA 94, MDS good-QC1 humidity followup 822, ERA-QC2 humidity followup 609. These rank counts sum to 1,750 and are not independent physical event category counts. Original forcing unchanged, no Slurm.
+
+Original Stage15 report folder on IRIDIS6:
+`$HOME/ameriflux_batch05_stage15/triage_20261025T224213Z_1292191` (which resolves to `/iridisfs/home/ly3n24/...`).
+
+## Stage16: scientifically distinguish tower/MDS/ERA source pairs across all 1,750 (report-only)
+
+[Stage16 Python source-pair diagnostic](scripts/stage16/16_audit_all_1750_source_pairs_readonly.py) uses only the **existing Stage10 and Stage15 reports**. It joins every original timestamp from both sources, re-verifies all selected QC0/QC1/QC2 provenance and original values, and independently assesses:
+
+- `(TA_F,VPD_F)`: originally selected, already flagged;
+- `(TA_F_MDS,VPD_F_MDS)`: alternative native MDS source pair, with its QC0/1/2/3 retained;
+- `(TA_ERA,VPD_ERA)`: internally paired original downscaled ERA variables;
+- `(TA_F,VPD_ERA)`: **direct VPD mix**, which differs from conserving ERA-specific actual vapor pressure;
+- ERA-implied `e_ERA=e_sat(TA_ERA)-VPD_ERA` paired with `TA_F`: an **independent hypothetical shadow**, not a validated replacement.
+
+It reports site-level QC and physics counts, estimates selected TA vs ERA TA and VPD vs ERA VPD differences, and exports all 1,750 events to a **new** CSV/JSON folder. **No inference of scientific validity from a physical bound alone. No source/forcing writes.**
+
+```bash
+(
+  set -euo pipefail
+  BASE="$HOME/ameriflux_batch05_stage16"
+  COMMIT="c3057bfbf6c2aa4a3556de857bc9e9d0faa527f7"
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT"
+  SCRIPT="$BASE/16_audit_all_1750_source_pairs_readonly.py"
+  STAGE10="$HOME/ameriflux_batch05_stage10/review_20261025T180413Z_682688"
+  STAGE15="$HOME/ameriflux_batch05_stage15/triage_20261025T224213Z_1292191"
+  mkdir -p "$BASE"
+  curl -fLsS --retry 3 \
+    "$RAW/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage16/16_audit_all_1750_source_pairs_readonly.py" \
+    -o "$SCRIPT"
+  test "$(git hash-object "$SCRIPT")" = "e7c1eeca9021a1d900516c0bb3db523d1d72ec83"
+  echo "STAGE16 SOURCE VERIFIED"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  OUT="$BASE/source_pairs_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+  python3 -B "$SCRIPT" --stage10-dir "$STAGE10" --stage15-dir "$STAGE15" \
+    --output-dir "$OUT" 2>&1 | tee "$BASE/stage16.log"
+  echo "STAGE16_REPORTS=$OUT"
+)
+```
+
+A successful IRIDIS6 full report should end with `STAGE16 SUMMARY sites=10/10 events=1750 measured=119 MDS=965 ERA=666 approved=0`. The previously verified original source-pair physical bound counts expected for Stage16 are MDS feasible=700/nonphysical=1,050; internal ERA feasible=1,695/nonphysical=55; original ERA implied actual water vapor pressure paired with tower TA feasible=1,580/nonphysical=115. These are **shadow tests**: no original source changes or scientifically approved replacement follows merely from passing.
+
+At 2026-10-25 the GitHub source file is committed and hash verified, but the operator Stage16 run/self-test on IRIDIS6 has not yet occurred.
