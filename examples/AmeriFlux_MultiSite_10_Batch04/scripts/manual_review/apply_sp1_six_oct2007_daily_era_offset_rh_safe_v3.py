@@ -200,7 +200,9 @@ def proposals(src,offsets,oldsp1):
         check(set(trial)==set(original),"Previous trial day timestamp alignment invalid "+day)
         for k,row in sorted(trial.items()):
             o=original[k]
-            # In 2007 previous 3-point research scenario must be source-identical.
+            # The Stage14-derived parent can have legitimate VPD-only edits.
+            # Compare only original measured temperature/QC and TA_ERA;
+            # retain the SHA-pinned parent's VPD/QC if RH is missing.
             for col in ("TA_F","TA_F_QC","TA_ERA"):
                 check(row[col]==o[col],"Previous trial unexpectedly altered original 2007 "+k+" "+col)
             if not istarget(k):continue
@@ -249,7 +251,7 @@ def proposals(src,offsets,oldsp1):
     check(source_vpd_qc1==EXPECTED_QC1_VPD,"Expected 40 original VPD QC1 event provenance")
     check(vpd_recalculated+vpd_retained==EXPECTED_NEW_HH,
           "All 137 HH require an explicit VPD treatment")
-    check(vpdqc_changed<=source_vpd_qc1,
+    check(vpdqc_changed<=sum(r["original_VPD_F_QC"]=="1" for r in changes.values()),
           "Unexpected VPD QC provenance rewrite")
     for day,(start,_) in DAYS.items():
         for hh in (start,"1730"):
