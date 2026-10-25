@@ -98,7 +98,8 @@ def compute():
         era=pd.read_csv(f(spec["era"]),usecols=["TIMESTAMP_START","PA_ERA"],dtype={"TIMESTAMP_START":str})
         for df in (vpd,era):
             dt=pd.to_datetime(df.TIMESTAMP_START,format="%Y%m%d%H%M",errors="raise")
-            df.drop(index=df.index[dt.dt.year.ne(year)],inplace=True)
+            retain=dt.dt.year.eq(year)&~((dt.dt.month==2)&(dt.dt.day==29))
+            df.drop(index=df.index[~retain],inplace=True)
             df.reset_index(drop=True,inplace=True)
         shadow=original.loc[years.eq(year)].reset_index(drop=True)
         times=pd.to_datetime(raw.TIMESTAMP_START,format="%Y%m%d%H%M",errors="raise")
