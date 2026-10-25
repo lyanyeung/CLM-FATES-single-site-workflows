@@ -61,7 +61,7 @@ The immutable raw source file SHA256 was verified by the operator's run; ten sta
   curl -fLsS --retry 3 \
     "$RAW/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage11/11_audit_stage10_review_ledgers_readonly.py" \
     -o "$SCRIPT"
-  # Validate blob SHA against value displayed in README/terminal command.
+  test "$(git hash-object "$SCRIPT")" = "905ba71593569d0ba9451a008eef1bf1bd9f1d69"
   python3 -B -m py_compile "$SCRIPT"
   python3 -B "$SCRIPT" --self-test
   test -f "$REPORTS/audit_summary.json"
