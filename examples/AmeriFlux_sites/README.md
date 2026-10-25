@@ -8,7 +8,7 @@ This collection keeps AmeriFlux batches separate from the existing [ICOS multi-s
 | **[AmeriFlux Batch 02](../AmeriFlux_MultiSite_10_Batch02/)** | 10 | Stages00–10 published. Operator Stage07: 5 numeric candidates; 5 sites blocked by 4,904 unresolved humidity pairs. Stage08 sensitivity and the follow-on Post-v5 gates/runner are ready for execution. |
 | **[AmeriFlux Batch 03](../AmeriFlux_MultiSite_10_Batch03/)** | 10 | Stages00–01 ready: single-connection WSL upload and recursive extraction; live transfer pending. |
 | **[AmeriFlux Batch 04](../AmeriFlux_MultiSite_10_Batch04/)** | 10 | **Stage00 transfer SHA256 10/10 and Stage01 extraction/structure 10/10 VERIFIED** from operator logs; Stage02 BIF1495 and HH time 10/10; Stage04 3/3 source-lineage verified; Stage05 QCv5 short-interpolation/ERA-RH candidate builder ready, Post-v5 HOLD. |
-| **[AmeriFlux Batch 05](../AmeriFlux_MultiSite_10_Batch05/)** | 10 | Stage00 upload/checksums VERIFIED 10/10 from operator log; Stage01 nested ZIP and FULLSET/FLUXMET extraction script self-tested and ready; actual extraction pending. |
+| **[AmeriFlux Batch 05](../AmeriFlux_MultiSite_10_Batch05/)** | 10 | Stage00 upload/checksums VERIFIED 10/10 from operator log; Stage01 extraction/structure VERIFIED 10/10; Stage02 original metadata, full native HH/HR time and basic meteorology screen ready; actual Stage02 pending. |
 
 Batch05 sites: US-UiD, US-UMB, US-UMd, US-Var, US-Vcm, US-Vcp, US-WCr, US-Whs, US-Wjs and US-Wkg. See the [exact release manifest](../AmeriFlux_MultiSite_10_Batch05/sites.tsv) and [transfer instructions](../AmeriFlux_MultiSite_10_Batch05/README.md). US-UMB retains its FULLSET release name; its schema has not yet been inspected.
 
