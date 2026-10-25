@@ -152,11 +152,11 @@ def read_original_year(spec):
     rows=[];index=0
     for chunk in pd.read_csv(f,usecols=cols,dtype="string",chunksize=120000):
         clock=chunk["TIMESTAMP_START"].str.strip()
-        subset=chunk.loc[clock.str.startswith("2000",na=False)].copy()
+        selected=clock.str.startswith("2000",na=False).to_numpy(dtype=bool)
+        subset=chunk.loc[selected].copy()
         if len(subset):
             subset["tower_local_start"]=clock.loc[subset.index].astype(str)
-            subset["source_csv_row"]=np.arange(index+2,index+2+len(chunk))[
-                clock.str.startswith("2000",na=False).to_numpy()]
+            subset["source_csv_row"]=np.arange(index+2,index+2+len(chunk))[selected]
             subset["TA_C"]=pd.to_numeric(subset[ta],errors="coerce")
             subset["TA_QC"]=pd.to_numeric(subset[qc],errors="coerce")
             rows.append(subset[["tower_local_start","source_csv_row","TA_C","TA_QC"]])
@@ -325,6 +325,11 @@ def self_test():
     assert OFFSETS==(-7,-6,-5,-4,-3)
     assert TARGET==505 and NOAA_SHA.startswith("2d5756c1")
     assert datetime(2000,3,1,0,0)-timedelta(hours=-5)==datetime(2000,3,1,5,0)
+    # Pandas nullable string masks must be converted to plain bool before
+    # indexing a NumPy array of physical source CSV row numbers.
+    mask=pd.Series(["200001010000","199912312330"],dtype="string").str.startswith(
+        "2000",na=False).to_numpy(dtype=bool)
+    assert np.arange(2,4)[mask].tolist()==[2]
     # Optimized nearest selection rejects equidistant disagreement.
     a=(datetime(2000,1,1,0),-3.0,"223","1","ICAO-KBGR","",True)
     b=(datetime(2000,1,1,1),3.0,"223","1","ICAO-KBGR","",True)
