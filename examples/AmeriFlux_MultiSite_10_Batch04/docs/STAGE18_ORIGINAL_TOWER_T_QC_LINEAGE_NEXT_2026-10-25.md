@@ -1,6 +1,6 @@
 # Batch04 Stage18 — pin six original temperature source/QC windows (next run)
 
-**Status:** Stage17 **IRIDIS6 VERIFIED 6/6, 0 science holds cleared** ([actual findings](STAGE17_VERIFIED_SIX_TEMPERATURE_CONTEXT_2026-10-25.md)). Stage18 source has been committed to GitHub; **Stage18 `--audit` has NOT been run and has no operator results**.
+**Status:** Stage17 **IRIDIS6 VERIFIED 6/6, 0 science holds cleared** ([actual findings](STAGE17_VERIFIED_SIX_TEMPERATURE_CONTEXT_2026-10-25.md)). Stage18 source was committed and **Stage18 `--audit` has now PASSED (6/6) on IRIDIS6**. See [actual verified original tower/source data](STAGE18_VERIFIED_ORIGINAL_T_SOURCE_LINEAGE_2026-10-25.md). The original runnable command below is retained for reproducibility.
 
 **Purpose:** Before inventing a temperature correction, inspect the **original native FLUXMET** for temperature-related columns, especially `TA_F`, `TA_F_QC`, and `TA_ERA` *if present*; print exact original native half-hour readings within ±2 h of each of the 6 held timestamps, adjacent-event temperature slopes/QC, and same-clock readings ±1/±2 days. The script SHA-pins all original 3 site FLUXMET files and Stage14 candidate files and verifies Stage12/14 receipts, eight known temperature HOLDs and original BIF location/time offset. `TA_ERA` is optional; a missing field is reported as NA rather than invented. **No external temperature is treated as verified tower truth** and `QC2` neighbours are never assumed independent raw measurements.
 
@@ -48,4 +48,4 @@
 
 This stage is a deterministic read-only original-product audit. It **does not** change the original, Stage14 baseline, Stage15 two-point alternative, or any other source, nor download CDS data, apply Post-v5, prepare CIME/DATM or submit SLURM jobs. All eight original temperature scientific HOLDs and the US-Syv 606 old HOLDs + 10 skipped edges stay unchanged.
 
-**Next operator response:** the output at `~/ameriflux_batch04_stage18/stage18_original_T_QC_lineage_readonly.log`. Mark Stage18 PASS only after seeing its actual result; if any SHA or source-contract gate fails, retain the exception and do not bypass it.
+**Next operator response:** the output at `~/ameriflux_batch04_stage18/stage18_original_T_QC_lineage_readonly.log`. **Operator has returned full PASS output (6/6)**, archived in [Stage18 verified results](STAGE18_VERIFIED_ORIGINAL_T_SOURCE_LINEAGE_2026-10-25.md). No science HOLD was cleared. If any later rerun encounters a SHA/source-contract failure, retain the exception and do not bypass it.
