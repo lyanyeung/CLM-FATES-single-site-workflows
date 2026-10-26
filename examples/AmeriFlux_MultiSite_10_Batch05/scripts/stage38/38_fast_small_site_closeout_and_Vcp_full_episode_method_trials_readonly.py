@@ -97,33 +97,121 @@ def wcsv(path,fields,rows):
  with path.open("x",newline="",encoding="utf-8") as f:
   wr=csv.DictWriter(f,fieldnames=fields,extrasaction="raise")
   wr.writeheader();wr.writerows(rows)
-def raw_data(root,site,times):
- if not times:return {},None
- packages=root/site/"forcing"/"packages"
- candidates=sorted(packages.glob("AMF_"+site+"_FLUXNET_*_v1.3_r1.zip"))
- if len(candidates)!=1 or not candidates[0].is_file() or candidates[0].is_symlink():
-  raise ValueError("expect exactly 1 original site FLUXNET v1.3 r1 package: "+str(packages))
- path=candidates[0];sha=digest(path)
- if site=="US-Vcp" and sha!=VCP_ZIP_SHA:
-  raise ValueError("Stage29/36 US-Vcp original ZIP SHA differs")
+class OriginalSourceUnavailable(Exception):
+ """Original site data cannot safely be selected; leave this site HOLD."""
+ pass
+
+def _read_original_hh(fh,site,needed):
+ rr=csv.DictReader(io.TextIOWrapper(fh,encoding="utf-8-sig",newline=""))
+ if not SOURCE_FIELDS.issubset(rr.fieldnames or []):
+  raise ValueError("original FLUXMET_HH missing TA/VPD or original QC")
  found={}
- with zipfile.ZipFile(path) as z:
-  matches=[m for m in z.infolist() if re.fullmatch(
-   "AMF_"+re.escape(site)+r"_FLUXNET_FLUXMET_HH_.+[.]csv",
-   Path(m.filename).name,re.I)]
-  if len(matches)!=1 or matches[0].file_size>900*1024*1024:
-   raise ValueError("original zip CSV source missing/ambiguous/oversized")
-  with z.open(matches[0]) as b:
-   rows=csv.DictReader(io.TextIOWrapper(b,encoding="utf-8-sig",newline=""))
-   if not SOURCE_FIELDS.issubset(rows.fieldnames or []):
-    raise ValueError("original FLUXMET HH lacks T/VPD/QC fields")
-   for r in rows:
-    t=r["TIMESTAMP_START"]
-    if t in times:
-     if t in found:raise ValueError("duplicate source-native half-hour "+site+" "+t)
-     found[t]=dict(T=num(r["TA_F"]),V=num(r["VPD_F"]),
-                   QC_T=r["TA_F_QC"],QC_V=r["VPD_F_QC"])
- return found,sha
+ for r in rr:
+  if None in r:raise ValueError("malformed original FLUXMET_HH CSV")
+  t=r["TIMESTAMP_START"]
+  if t not in needed:continue
+  if t in found:raise ValueError("duplicate native original time "+site+" "+t)
+  found[t]=dict(T=num(r["TA_F"]),V=num(r["VPD_F"]),
+     QC_T=r["TA_F_QC"],QC_V=r["VPD_F_QC"])
+ return found
+
+def _matching_original_source(original,reference):
+ # A candidate source MUST reproduce every original Stage27 selected anomaly
+ # T, VPD, and QC before its archive can be considered as provenance.
+ for time,r in reference.items():
+  v=original.get(time)
+  if v is None or v["T"] is None or v["V"] is None: return False
+  T=num(r["TA_F_C"]); V=num(r["VPD_F_hPa"])
+  if T is None or V is None: return False
+  if (abs(v["T"]-T)>0.002 or abs(v["V"]-V)>0.002 or
+      v["QC_T"]!=r["TA_F_QC"] or v["QC_V"]!=r["VPD_F_QC"]):
+   return False
+ return True
+
+def raw_data(root,site,times,reference):
+ if not times:return {}, "NO_P2P3_SOURCE_NOT_NEEDED", "NO_P2P3_SOURCE_NOT_NEEDED"
+ site_root=root/site
+ if not site_root.is_dir():
+  raise OriginalSourceUnavailable("SITE_DIRECTORY_ABSENT "+str(site_root))
+ # Do not assume forcing/packages, exact archive filename, or release year.
+ # Restrict to this site's original forcing tree; inspect original ZIP contents
+ # and extracted FLUXMET_HH source. Never pick an arbitrary wrong release.
+ dirs=[site_root/"forcing",site_root]
+ files=[]
+ for base in dirs:
+  if base.is_dir():
+   for ext in ("*.zip","*.ZIP","*.csv","*.CSV"):
+    files.extend(p for p in base.rglob(ext)
+      if p.is_file() and not p.is_symlink())
+ if not files:
+  raise OriginalSourceUnavailable("NO_ZIP_OR_CSV_UNDER_SITE "+str(site_root))
+ files=sorted(set(files))
+ if len(files)>2500:
+  raise OriginalSourceUnavailable("TOO_MANY_SOURCE_CANDIDATE_FILES "+str(len(files)))
+ source_re=re.compile("AMF_"+re.escape(site)+r"_FLUXNET_FLUXMET_HH_.+[.]csv",re.I)
+ valid=[]
+ evidence=[]
+ for p in files:
+  if p.suffix.lower()==".csv":
+   if not source_re.fullmatch(p.name):continue
+   if p.stat().st_size>900*1024*1024:
+    evidence.append("CSV_TOO_LARGE:"+p.name);continue
+   try:
+    with p.open("rb") as ff:
+     raw=_read_original_hh(ff,site,times)
+   except (OSError,UnicodeError,ValueError) as e:
+    evidence.append("CSV_BAD:"+p.name+":"+str(e)[:100]);continue
+   member=p.name
+  elif p.suffix.lower()==".zip":
+   if site.lower() not in p.name.lower():continue
+   try:
+    with zipfile.ZipFile(p) as z:
+     matches=[m for m in z.infolist()
+       if source_re.fullmatch(Path(m.filename).name)]
+     if len(matches)!=1:
+      if matches:evidence.append("ZIP_MULTIPLE_HH:"+p.name)
+      continue
+     m=matches[0]
+     if m.file_size>900*1024*1024:
+      evidence.append("ZIP_HH_OVERSIZE:"+p.name);continue
+     member=m.filename
+     with z.open(m) as ff:raw=_read_original_hh(ff,site,times)
+   except (OSError,zipfile.BadZipFile,UnicodeError,ValueError) as e:
+    evidence.append("ZIP_UNREADABLE:"+p.name+":"+str(e)[:100]);continue
+  else:continue
+  if not _matching_original_source(raw,reference):
+   evidence.append("NATIVE_STAGE27_T_VPD_QC_MISMATCH:"+p.name)
+   continue
+  # Entire matched source HH (plus needed pre/post neighbors) hashes remain
+  # distinguishable even when multiple archive filenames exist.
+  if site=="US-Vcp" and p.suffix.lower()==".zip" and digest(p)!=VCP_ZIP_SHA:
+   evidence.append("VCP_ORIGINAL_ZIP_SHA_MISMATCH:"+p.name)
+   continue
+  valid.append((p,member,raw))
+ if not valid:
+  detail=";".join(evidence[:12]) if evidence else "NO_MATCHING_FLUXMET_HH_FILENAME"
+  raise OriginalSourceUnavailable(
+    "NO_VERIFIED_ORIGINAL_HH site="+site+" searched="+str(site_root)+
+    " candidates="+str(len(files))+" evidence="+detail)
+ # If several source copies reproduce Stage27, ensure no conflicting native
+ # neighbors. Never merge different releases silently; abort site if conflict.
+ first=valid[0][2]
+ for _,_,candidate in valid[1:]:
+  if candidate!=first:
+   raise OriginalSourceUnavailable(
+    "MULTIPLE_DISCORDANT_ORIGINAL_SOURCES site="+site+
+    " paths="+",".join(str(x[0]) for x in valid[:8]))
+ # Prefer source ZIP over extracted file when both EXACTLY agree.
+ valid.sort(key=lambda x:(0 if x[0].suffix.lower()==".zip" else 1,
+   0 if "v1.3_r1" in x[0].name else 1,len(x[0].parts),str(x[0])))
+ p,member,source=valid[0]
+ source_sha=digest(p)
+ provenance=str(p)+("::"+member if p.suffix.lower()==".zip" else "")
+ print("STAGE38 VERIFIED_ORIGINAL_HH",site,"SOURCE",provenance,
+   "SHA256",source_sha,"NATIVE_MATCHED",len(reference),
+   "MATCHING_COPIES",len(valid),flush=True)
+ return source,source_sha,provenance
+
 def evaluate(site,eid,ep,rr,method,raw,allP2,approved,sparse=None,fresh=None):
  dates=sorted(r["native_time"] for r in rr)
  if len(dates)!=len(set(dates)):raise ValueError("duplicate episode half hours")
