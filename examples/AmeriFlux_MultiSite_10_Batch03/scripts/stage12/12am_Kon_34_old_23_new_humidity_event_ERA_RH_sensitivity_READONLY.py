@@ -26,7 +26,7 @@ from uuid import uuid4
 import numpy as np
 import pandas as pd
 sys.dont_write_bytecode=True
-V="batch03-stage12am-v1-20261026-Kon-34-plus-23-native-ERA-RH-event-review"
+V="batch03-stage12am-v2-20261026-Kon-34-plus-23-with-sep29-QC1-T-exception"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 AK=ROOT/"science_trials/stage12ak_7_nonhumidity_source_interpolation_PROPOSALS_ONLY_20261026T031747Z_61471fd7"
 AH=ROOT/"science_trials/stage12ah_USER_APPROVED_Kon_23_T_one_QC0_VPD_20261026T024732Z_8075bed8"
@@ -62,6 +62,9 @@ def selftest():
     assert abs(qbot(4.444,96500,2.0)-qbot(4.444,96500,2.0))<1e-12
     assert adjacent("201103241300",-1)=="201103241230"
     assert adjacent("201103241300",1)=="201103241330"
+    # An original VPD_F_QC=2 science hold has TA_F_QC=1, unlike the
+    # other expected 33 observed-temperature centers.
+    assert "201109291830" not in ("201103241300","201103241330")
     assert float(sat(5.465))>5.
     print("STAGE12AM SELF-TEST PASS: 34 old + 23 new distinct humidity HOLDs, paired ERA-RH, 30min source context; NO WRITES",flush=True)
 def upstream():
@@ -179,9 +182,20 @@ def audit():
     for k in sorted(target):
         center=rows.loc[k]
         if k in old:
-            if not(center.source_tower_TA_F_QC==0 and
-                    center.original_VPD_F_QC in (1,2)):
-                raise ValueError("Original 34 protected Kon source observed T+QC1/QC2 humidity center altered "+k)
+            # Original source lineage, not a new replacement authorization:
+            # 2011-09-29 18:30 has source TA_F_QC=1 (gapfilled) and
+            # VPD_F_QC=2 (ERA), and is one of the TEN unapproved QC1-T
+            # audit records. It must stay a science HOLD, not be
+            # misclassified as observed tower temperature.
+            if k=="201109291830":
+                if not(center.source_tower_TA_F_QC==1 and
+                       center.original_VPD_F_QC==2):
+                    raise ValueError("Protected 201109291830 Kon QC1 tower T + QC2 VPD source provenance changed")
+            elif not(center.source_tower_TA_F_QC==0 and
+                     center.original_VPD_F_QC in (1,2)):
+                raise ValueError("Original Kon old VPD hold has unexpected QC provenance "+k+
+                                 ": TA_F_QC="+str(center.source_tower_TA_F_QC)+
+                                 ", VPD_F_QC="+str(center.original_VPD_F_QC))
         else:
             if not(center.source_tower_TA_F_QC==1 and
                     abs(float(center.original_tower_TA_F_C)-float(center.selected_TA_USE_C))>=5):
@@ -232,6 +246,7 @@ def audit():
            "ERA_T_within5C":center.ERA_T_within5C,
            "water_RH_physics":center.RH_water_0_to100,
            "VPD_QBOT_physics":center.VPD_QBOT_physical,
+           "temperature_QC1_unapproved_separate_science_HOLD":k=="201109291830",
            "adjacent_as_is_center_only_problem_reasons":";".join(sorted(set(triggers))) or "NONE",
            "requires_connected_episode_science_review":len(triggers)>0,
            "humidity_approved":False
@@ -239,7 +254,10 @@ def audit():
     summary=pd.DataFrame(centers)
     sides=pd.DataFrame(edges)
     if not(len(summary)==57 and len(sides)==114 and
-           summary.kind.value_counts().to_dict()=={"original_34":34,"new_T_23":23}):
+           summary.kind.value_counts().to_dict()=={"original_34":34,"new_T_23":23}
+           and summary.temperature_QC1_unapproved_separate_science_HOLD.sum()==1
+           and summary.loc[summary.temperature_QC1_unapproved_separate_science_HOLD,
+                           "native_key"].tolist()==["201109291830"]):
         raise ValueError("Exactly 57 center events and 114 original native neighbor sides required")
     return summary,sides,rows.reset_index(drop=True)
 def main():
@@ -256,8 +274,10 @@ def main():
       "retained_or_corrected_T_C","original_ERA_T_C",
       "paired_source_ERA_RH_pct","paired_source_research_VPD_hPa",
       "paired_source_research_QBOT_kgkg","ERA_T_within5C","VPD_QBOT_physics",
-      "adjacent_as_is_center_only_problem_reasons"]
+      "adjacent_as_is_center_only_problem_reasons",
+      "temperature_QC1_unapproved_separate_science_HOLD"]
     print(c[cols].round(6).to_string(index=False),flush=True)
+    print("STAGE12AM EXACT QC EXCEPTION: Kon 201109291830 original TA_F_QC=1, VPD_F_QC=2; temperature source not operator-approved; candidate diagnostic ONLY; HOLD intact.",flush=True)
     print("\n===== SCIENCE TRIAGE BY GROUP =====",flush=True)
     for k,group in c.groupby("kind"):
         print(k,"centers",len(group),
@@ -290,6 +310,7 @@ def main():
     receipt={
        "version":V,"old_Stage12g_Kon_center_holds":34,"new_Stage12ah_temperature_related_holds":23,
        "event_center_total":57,"adjacent_halfhour_sides":114,
+       "original_Kon_201109291830_QC1_temperature_special_HOLD":True,
        "humidity_ERA_replacements_operator_approved":False,
        "original_Stage12ak_SHA256":sha(AK/"stage12ak_research_proposal_SHA_receipt.json"),
        "original_Stage12ah_SHA256":sha(AH/"stage12ah_approved_23T_QC0_SHA_receipt.json"),
