@@ -870,3 +870,18 @@ Run the pinned one-call command in the Stage22 decision documentation; after che
 [Stage25 exact 1750/522 original source-to-overlay crosswalk](scripts/stage25/25_crosswalk_1750_source_anomalies_with_166_approved_readonly.py) and [Stage24 operator completion, Stage25 pinned execution instructions and science cautions](docs/STAGE25_ORIGINAL_1750_EXACT_CROSSWALK_AND_P2P3_QC_2026-10-26.md).
 
 **Stage25 script already published to GitHub, operator still needs to run it.** Do not assume all 1574 original P2/P3 abnormal HH remain unapproved: Stage24's 166 approved overlay half-hours include 36 outside the original P1 tier and an **exact site+native-HH join** is needed to establish which coincide with original P2/P3 flags versus unflagged transition/edge rows. Stage25 reports per-original-event approved/HOLD/unapproved counts and per-episode/workstream evidence strategies. NO new automatic P2/P3 changes, no independent reanalysis downloaded, no final forcing or model jobs.
+
+
+## Stage26 P2/P3 per-native-HH science candidate feasibility (2026-10-26)
+
+Stage25 **successfully executed by IRIDIS6 operator** (not merely published):
+- Original 1,750 abnormal native half-hours / 522 events exactly mapped.
+- Current Stage24 **166 approved versioned overlay HH** consist of original anomaly P1 **130** and **36 out-of-original-screen transition/edge HH**.
+- Original P1=176 consists of **130 candidate-approved** and **46 unchanged manual HOLD**.
+- All **1,574 P2/P3 native flagged HH are still unapproved**; none overlaps the 166 approved overlay.
+- Site breakdown remaining: US-Vcp 626, US-Wjs 401, US-Vcm 362, US-Var 62, US-WCr 62, US-UMB 23, US-Wkg 22, US-UMd 15, US-Whs 1, US-UiD 0.
+- Stage25 first-match evidence groups **924 unresolved provenance**, **607 source processed ERA pair physically valid**, **38 MDS pair physically valid**, **5 original RH present**. These four groups are strictly mutually exclusive as implemented in Stage25, but they do *not* exhaust possible overlap of physically feasible source alternatives.
+
+[Stage26 1,574 native-hour MDS/ERA/ERA-e/native-RH research-only candidates](scripts/stage26/26_reconstruct_p2p3_physics_candidates_research_only.py) and [operator command / scientific decision guide](docs/STAGE26_ALL1574_P2P3_SCIENCE_OPTIONS_2026-10-26.md).
+
+Stage26 **pending operator execution**. It generates four mathematically distinct candidate hypotheses, records original source QC and source-vs-tower TA discrepancies, and partitions all 1,574 P2/P3 HH into *scientific evidence* subgroups. **No P2/P3 changes are approved by this step**; original FLUXMET, Stage24 approved 166, P1 HOLD 46, DATM and Slurm remain unmodified. This is intended to reduce human review to data-source/physics method decisions instead of 1,574 independent timestamps. Independent T/dewpoint meteorology is needed for unsupportable source alternatives and scientific corroboration. No actual full forcing or Post-v5 yet.
