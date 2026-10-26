@@ -8,7 +8,12 @@ collects, with provenance:
   REESH      site-measured texture from the AmeriFlux ReESH (Regional Ecosystem
              Soil Hydraulics) project, Zenodo "ReESH_<SITE>" records,
              <SITE>_SoilCharacteristics.csv (MD5 verified on download)
-  BADM       SOIL_TEX_* rows in the site's AmeriFlux/FLUXNET BIF file
+  BADM       SOIL_TEX_* groups in the site's BIF: the FLUXNET-package BIF and,
+             with --badm-dir, the full AmeriFlux BADM download
+             AMF_<SITE>_BIF_<YYYYMMDD>.xlsx (the full file supersedes the subset).
+             Depth from SOIL_TEX_PROFILE_MIN/MAX, else the same horizon in
+             another soil group, else data/badm_manual_depth_assignments;
+             a group without depth is reported but never used.
   LIT        tower-specific numeric literature values from
              data/literature_soil_evidence_20261026.csv (use_numeric=YES)
   SSURGO     USDA NRCS Soil Data Access, dominant component of the map unit at
@@ -45,6 +50,7 @@ AMF = SOIL.parent
 MANIFEST = AMF / "Ameriflux_PFT/metadata/sites_50_manifest.csv"
 LIT_CSV = SOIL / "data/literature_soil_evidence_20261026.csv"
 REESH_KNOWN = SOIL / "data/reesh_records_found_20261026.csv"
+BADM_MANUAL = SOIL / "data/badm_manual_depth_assignments_20261026.csv"
 NODES_M = [0.025 * (math.exp(0.5 * (j - 0.5)) - 1.0) for j in range(1, 11)]   # CLM nlevsoifl=10
 NODES_CM = [100.0 * z for z in NODES_M]
 DEFAULT_PRIORITY = ("REESH", "BADM", "LIT", "SSURGO", "SOILGRIDS")
@@ -237,37 +243,138 @@ def find_bif(sites_root, site, package):
     return pick, ("ONE" if len(hits) == 1 else f"{len(hits)}_FOUND_USED_{'PACKAGE' if pref else 'FIRST'}")
 
 
-def parse_bif(path):
+def read_xlsx_rows(path):
+    """Minimal first-sheet .xlsx reader (zip + XML), so openpyxl is not required."""
+    import zipfile
+    import xml.etree.ElementTree as ET
+    ns = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
+    with zipfile.ZipFile(path) as z:
+        shared = []
+        if "xl/sharedStrings.xml" in z.namelist():
+            for si in ET.fromstring(z.read("xl/sharedStrings.xml")).findall("m:si", ns):
+                shared.append("".join(t.text or "" for t in si.iter("{%s}t" % ns["m"])))
+        sheets = sorted(n for n in z.namelist() if re.match(r"xl/worksheets/sheet\d+\.xml$", n))
+        root = ET.fromstring(z.read(sheets[0]))
+    def col(ref):
+        k = 0
+        for ch in re.match(r"[A-Z]+", ref).group(0):
+            k = k * 26 + ord(ch) - 64
+        return k - 1
+    table = []
+    for row in root.iter("{%s}row" % ns["m"]):
+        vals = {}
+        for c in row.findall("m:c", ns):
+            t, v = c.get("t"), c.find("m:v", ns)
+            if t == "s" and v is not None:
+                x = shared[int(v.text)]
+            elif t == "inlineStr":
+                x = "".join(e.text or "" for e in c.iter("{%s}t" % ns["m"]))
+            else:
+                x = v.text if v is not None else ""
+            vals[col(c.get("r"))] = x
+        if vals:
+            table.append([vals.get(i, "") for i in range(max(vals) + 1)])
+    head = [h.strip().upper() for h in table[0]]
+    return [dict(zip(head, r + [""] * (len(head) - len(r)))) for r in table[1:]]
+
+
+def read_bif_rows(path):
+    if path.suffix.lower() == ".xlsx":
+        rows = read_xlsx_rows(path)
+    else:
+        with path.open(encoding="latin-1", newline="") as f:
+            rows = [{k.strip().upper(): v for k, v in r.items() if k} for r in csv.DictReader(f)]
+    need = ("GROUP_ID", "VARIABLE_GROUP", "VARIABLE", "DATAVALUE")
+    if rows and not all(k in rows[0] for k in need):
+        raise ValueError(f"{path.name}: BIF columns {list(rows[0])}")
+    return rows
+
+
+BAD_STATS = ("min", "max", "minimum", "maximum", "standard deviation", "sd", "standard error", "range")
+
+
+def parse_bif(path, site=None, manual=None):
+    """Returns lat, lon, soil_rows, BADM texture profile, texture-group decisions.
+    Depth: SOIL_TEX_PROFILE_MIN/MAX; else the depth of another soil group with
+    the same *_HORIZON; else data/badm_manual_depth_assignments_*.csv; else the
+    group is recorded but NOT used (no depth is ever assumed)."""
+    manual = manual or {}
     groups = {}
-    with path.open(encoding="latin-1", newline="") as f:
-        rd = csv.DictReader(f)
-        cols = {c.upper(): c for c in rd.fieldnames or []}
-        need = ("GROUP_ID", "VARIABLE_GROUP", "VARIABLE", "DATAVALUE")
-        if not all(k in cols for k in need):
-            raise ValueError(f"{path.name}: BIF columns {rd.fieldnames}")
-        for r in rd:
-            g = groups.setdefault(r[cols["GROUP_ID"]], {"_group": r[cols["VARIABLE_GROUP"]]})
-            g.setdefault(r[cols["VARIABLE"]], r[cols["DATAVALUE"]])
+    for r in read_bif_rows(path):
+        if site and r.get("SITE_ID") and r["SITE_ID"].strip().upper() != site.upper():
+            continue
+        g = groups.setdefault(str(r["GROUP_ID"]).strip(), {"_group": r["VARIABLE_GROUP"].strip()})
+        g.setdefault(r["VARIABLE"].strip(), str(r["DATAVALUE"]).strip())
     lat = lon = None
-    soil_rows, tex = [], []
+    soil_rows, tex, decisions = [], [], []
+    horizon_depth = {}
+    for gid, g in groups.items():
+        grp = g["_group"].upper()
+        if grp.startswith("GRP_SOIL"):
+            pre = grp.replace("GRP_", "")
+            hz = g.get(pre + "_HORIZON", "").strip().upper()
+            t, b = num(g.get(pre + "_PROFILE_MIN")), num(g.get(pre + "_PROFILE_MAX"))
+            if hz and t is not None and b is not None and b > t:
+                horizon_depth.setdefault(hz, (t, b))
     for gid, g in groups.items():
         if "LOCATION_LAT" in g and lat is None:
             lat, lon = num(g.get("LOCATION_LAT")), num(g.get("LOCATION_LONG"))
-        if str(g["_group"]).upper().startswith("GRP_SOIL"):
-            for k, v in g.items():
-                if k != "_group":
-                    soil_rows.append({"group_id": gid, "variable_group": g["_group"], "variable": k, "value": v})
-            if "SOIL_TEX_SAND" in g and "SOIL_TEX_CLAY" in g:
-                stat = str(g.get("SOIL_TEX_SAND_STATISTIC", "Mean")).lower()
-                if stat and stat not in ("mean", "median", ""):
-                    continue
-                top, bot = num(g.get("SOIL_TEX_PROFILE_MIN")), num(g.get("SOIL_TEX_PROFILE_MAX"))
-                note = "BADM depth given"
-                if top is None or bot is None or bot <= top:
-                    top, bot, note = 0.0, 30.0, "BADM depth missing; 0-30 cm ASSUMED"
-                tex.append({"top": top, "bot": bot, "sand": num(g["SOIL_TEX_SAND"]), "clay": num(g["SOIL_TEX_CLAY"]),
-                            "note": note})
-    return lat, lon, soil_rows, interval_profile(tex, "BADM")
+        if not g["_group"].upper().startswith("GRP_SOIL"):
+            continue
+        for k, v in g.items():
+            if k != "_group":
+                soil_rows.append({"group_id": gid, "variable_group": g["_group"], "variable": k, "value": v, "bif_file": path.name})
+        if g["_group"].upper() != "GRP_SOIL_TEX":
+            continue
+        sand, clay, silt = num(g.get("SOIL_TEX_SAND")), num(g.get("SOIL_TEX_CLAY")), num(g.get("SOIL_TEX_SILT"))
+        if sand is None and clay is None:
+            continue
+        d = {"group_id": gid, "sand": sand, "silt": silt, "clay": clay, "horizon": g.get("SOIL_TEX_HORIZON", ""),
+             "comment": g.get("SOIL_TEX_COMMENT", "")[:300], "bif_file": path.name}
+        stat = g.get("SOIL_TEX_SAND_STATISTIC", g.get("SOIL_TEX_CLAY_STATISTIC", "")).strip().lower()
+        top, bot = num(g.get("SOIL_TEX_PROFILE_MIN")), num(g.get("SOIL_TEX_PROFILE_MAX"))
+        how = "BADM_PROFILE_MIN_MAX"
+        if (top is None or bot is None or bot <= top) and d["horizon"].strip().upper() in horizon_depth:
+            top, bot = horizon_depth[d["horizon"].strip().upper()]; how = f"DEPTH_FROM_HORIZON_{d['horizon'].strip().upper()}"
+        man = manual.get((site, gid))
+        if man:
+            if man["decision"].upper().startswith("USE"):
+                top, bot = num(man["depth_top_cm"]), num(man["depth_bottom_cm"])
+                sand = num(man["sand_pct"]) if num(man["sand_pct"]) is not None else sand
+                clay = num(man["clay_pct"]) if num(man["clay_pct"]) is not None else clay
+                how = "MANUAL_ASSIGNMENT"
+            else:
+                top = bot = None; how = "MANUAL_" + man["decision"].upper()
+            d["manual_rationale"] = man["rationale"]
+        if stat in BAD_STATS:
+            d.update(decision="NOT_USED_STATISTIC_" + stat.upper().replace(" ", "_"))
+        elif sand is None or clay is None:
+            d.update(decision="NOT_USED_SAND_OR_CLAY_MISSING" if not how.startswith("MANUAL_") else how)
+        elif top is None or bot is None or bot <= top:
+            d.update(decision="NOT_USED_NO_DEPTH" if not how.startswith("MANUAL_") else how)
+        elif bot <= 0:
+            d.update(decision="NOT_USED_ORGANIC_LAYER_ABOVE_MINERAL_ZERO")
+        else:
+            d.update(decision="USED", depth_top_cm=max(top, 0.0), depth_bottom_cm=bot, depth_source=how)
+            tex.append({"top": max(top, 0.0), "bot": bot, "sand": sand, "clay": clay, "note": f"BADM group {gid} {how}"})
+        decisions.append(d)
+    return lat, lon, soil_rows, interval_profile(tex, "BADM"), decisions
+
+
+def find_full_badm(badm_dir, site):
+    if not badm_dir:
+        return None
+    hits = [p for p in badm_dir.rglob("*") if p.is_file() and p.suffix.lower() in (".xlsx", ".csv")
+            and re.search(r"AMF_" + re.escape(site) + r"_BIF_(\d{8})", p.name, re.I)]
+    return max(hits, key=lambda p: re.search(r"_BIF_(\d{8})", p.name).group(1)) if hits else None
+
+
+def read_manual():
+    by = {}
+    if BADM_MANUAL.is_file():
+        for r in csv.DictReader(BADM_MANUAL.open(encoding="utf-8")):
+            by[(r["site"], str(r["group_id"]).strip())] = r
+    return by
 
 
 def reesh(net, site, cache, known):
@@ -490,7 +597,7 @@ def run(a):
     for x in a.coords:
         s, la, lo = x.split(":"); coords_override[s] = (float(la), float(lo))
     surf_override = dict(x.split("=", 1) for x in a.surface)
-    T = {k: [] for k in ("coords", "bif", "reesh", "ssurgo", "soilgrids", "surface", "cand", "rec", "summary", "wide")}
+    T = {k: [] for k in ("coords", "bif", "badm", "reesh", "ssurgo", "soilgrids", "surface", "cand", "rec", "summary", "wide")}
     meta_all = {"generated_utc": utc(), "priority": a.priority, "nodes_m": NODES_M, "network": not a.no_network, "sites": {}}
     for m in read_manifest(a.sites):
         print(f"=== {m['site']}", flush=True)
@@ -507,15 +614,31 @@ def one_site(a, m, net, cache, known, lit, coords_override, surf_override, T, me
         s = m["site"]; info = {"batch": m["batch"], "package": m["package"]}
         profiles, notes = {}, []
         lat = lon = None; csrc = ""
+        manual = read_manual()
         try:
             bif, how = find_bif(a.sites_root, s, m["package"]); info["bif"] = str(bif) if bif else how
             if bif:
-                lat, lon, rows, prof = parse_bif(bif); csrc = "BIF"
-                T["bif"] += [{"site": s, **r, "bif_file": bif.name} for r in rows]
+                lat, lon, rows, prof, dec = parse_bif(bif, s, manual); csrc = "BIF"
+                T["bif"] += [{"site": s, **r} for r in rows]
+                T["badm"] += [{"site": s, "badm_kind": "FLUXNET_PACKAGE_BIF", **d} for d in dec]
                 if prof: profiles["BADM"] = prof
                 info["bif_soil_rows"] = len(rows)
         except Exception as e:
             notes.append(f"BIF error: {e}")
+        full = find_full_badm(a.badm_dir, s)
+        info["full_badm"] = str(full) if full else ("NOT_FOUND" if a.badm_dir else "NOT_SUPPLIED")
+        if full:
+            try:
+                la2, lo2, rows, prof, dec = parse_bif(full, s, manual)
+                T["bif"] += [{"site": s, **r} for r in rows]
+                T["badm"] += [{"site": s, "badm_kind": "FULL_BADM", **d} for d in dec]
+                if prof:
+                    profiles["BADM"] = prof          # full BADM supersedes the package BIF subset
+                if lat is None and la2 is not None:
+                    lat, lon, csrc = la2, lo2, "FULL_BADM"
+                info["full_badm_soil_rows"] = len(rows)
+            except Exception as e:
+                notes.append(f"full BADM error: {e}")
         if s in coords_override:
             lat, lon = coords_override[s]; csrc = "OVERRIDE"
         if s in lit:
@@ -619,7 +742,8 @@ def finish(out, T, meta_all):
     names = {"coords": "01_site_coordinates.csv", "bif": "02_bif_soil_badm_rows.csv", "reesh": "03_reesh_samples.csv",
              "ssurgo": "04_ssurgo_horizons.csv", "soilgrids": "05_soilgrids_profiles.csv", "surface": "06_current_surface_layers.csv",
              "cand": "07_clm10_candidates_by_source.csv", "rec": "08_RECOMMENDED_CLM10_SOIL_TEXTURE_LONG.csv",
-             "wide": "09_RECOMMENDED_CLM10_PCT_SAND_PCT_CLAY_WIDE.csv", "summary": "10_RECOMMENDED_SITE_SUMMARY.csv"}
+             "wide": "09_RECOMMENDED_CLM10_PCT_SAND_PCT_CLAY_WIDE.csv", "summary": "10_RECOMMENDED_SITE_SUMMARY.csv",
+             "badm": "11_badm_soil_tex_groups_and_decisions.csv"}
     for k, fn in names.items():
         if T[k]:
             write_csv(out / fn, T[k])
@@ -653,6 +777,20 @@ def self_test():
     lay = recommend({"SURFACE": surf, "SOILGRIDS": interval_profile([{"top": 30, "bot": 200, "sand": 50, "clay": 10}], "S")},
                     DEFAULT_PRIORITY)
     assert [l["source"] for l in lay] == ["SURFACE"] * 5 + ["SOILGRIDS"] * 5, lay
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        f = Path(td) / "AMF_XX-Tst_BIF_20260101.csv"
+        f.write_text("SITE_ID,GROUP_ID,VARIABLE_GROUP,VARIABLE,DATAVALUE\n"
+                     "XX-Tst,1,GRP_SOIL_TEX,SOIL_TEX_SAND,98\nXX-Tst,1,GRP_SOIL_TEX,SOIL_TEX_CLAY,0\n"
+                     "XX-Tst,2,GRP_SOIL_TEX,SOIL_TEX_SAND,3\nXX-Tst,2,GRP_SOIL_TEX,SOIL_TEX_CLAY,87\n"
+                     "XX-Tst,2,GRP_SOIL_TEX,SOIL_TEX_HORIZON,A\nXX-Tst,3,GRP_SOIL_CHEM,SOIL_CHEM_HORIZON,A\n"
+                     "XX-Tst,3,GRP_SOIL_CHEM,SOIL_CHEM_PROFILE_MIN,0\nXX-Tst,3,GRP_SOIL_CHEM,SOIL_CHEM_PROFILE_MAX,11\n")
+        _, _, _, prof, dec = parse_bif(f, "XX-Tst", {})
+        d = {x["group_id"]: x["decision"] for x in dec}
+        assert d == {"1": "NOT_USED_NO_DEPTH", "2": "USED"} and prof[0]["bot"] == 11, (d, prof)
+        _, _, _, prof, dec = parse_bif(f, "XX-Tst", {("XX-Tst", "1"): {"decision": "USE", "depth_top_cm": "0", "depth_bottom_cm": "300",
+                                                                      "sand_pct": "", "clay_pct": "", "rationale": "t"}})
+        assert len(prof) == 2 and find_full_badm(Path(td), "XX-Tst") == f
     rows = [r for r in csv.DictReader(MANIFEST.open(encoding="utf-8"))]
     assert len(rows) == 50 and len({r["site"] for r in rows}) == 50
     lit = read_lit(); assert set(lit) <= {r["site"] for r in rows}, set(lit) - {r["site"] for r in rows}
@@ -669,6 +807,7 @@ def main():
     ap.add_argument("--output-root", type=Path)
     ap.add_argument("--priority", nargs="+", default=list(DEFAULT_PRIORITY), choices=DEFAULT_PRIORITY)
     ap.add_argument("--no-network", action="store_true", help="use BIF, literature and cache only")
+    ap.add_argument("--badm-dir", type=Path, help="folder with full AmeriFlux BADM downloads AMF_<SITE>_BIF_<YYYYMMDD>.xlsx")
     ap.add_argument("--coords", nargs="*", default=[], metavar="SITE:LAT:LON")
     ap.add_argument("--surface", nargs="*", default=[], metavar="SITE=/abs/surfdata.nc")
     a = ap.parse_args()

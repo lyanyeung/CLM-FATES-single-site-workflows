@@ -1,0 +1,6 @@
+site,group_id,depth_top_cm,depth_bottom_cm,sand_pct,clay_pct,decision,rationale
+CA-TP1,27561,0,300,,,USE,"BADM 98/2/0 (sieving) has no depth; same BADM gives SOIL_DEPTH 300 cm and classification comment '>3m' (deep sandy Brunisolic Grey Brown Luvisol); applied to full profile"
+CA-TP3,27921,0,300,,,USE,"BADM 98/2/0 has no depth; SOIL_DEPTH 300 cm, '>3m'; consistent with McMaster site page 98/1/<1; applied to full profile"
+CA-TP4,26636,0,300,,,USE,"BADM 98/2/0 has no depth; SOIL_DEPTH 300 cm, '>3m'; same deposit as CA-TP3 (0.8 km); applied to full profile"
+US-Bar,23724,40,200,,,USE,"BADM comment: Bartlett EF but outside tower footprint, shallow C-layer material; NEON BART megapit BC/C horizons (40-200 cm) are loamy sand; applied below 40 cm only"
+BR-Ma2,23788,,,,65,REVIEW,"BADM clay 65% at 0-10 cm A horizon (Luizao et al. 2004 GBC) but no sand/silt; not used until a sand value is chosen"

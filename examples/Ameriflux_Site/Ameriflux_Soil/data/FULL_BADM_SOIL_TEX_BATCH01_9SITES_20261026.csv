@@ -1,0 +1,15 @@
+site,badm_kind,bif_file,clay,comment,decision,depth_bottom_cm,depth_source,depth_top_cm,group_id,horizon,manual_rationale,sand,silt
+BR-Ma2,FULL_BADM,AMF_BR-Ma2_BIF_20260527.xlsx,65.0,Luziao et al GBC 10 2004:,MANUAL_REVIEW,,,,23788,A,BADM clay 65% at 0-10 cm A horizon (Luizao et al. 2004 GBC) but no sand/silt; not used until a sand value is chosen,,
+CA-Ca3,FULL_BADM,AMF_CA-Ca3_BIF_20260527.xlsx,16.5,"Loam; contact Jassal, P. of UBC biomet",USED,60.0,BADM_PROFILE_MIN_MAX,50.0,27900,,,39.8,43.7
+CA-Ca3,FULL_BADM,AMF_CA-Ca3_BIF_20260527.xlsx,20.2,"Loam; contact Jassal, P. of UBC biomet",USED,10.0,BADM_PROFILE_MIN_MAX,0.0,29457,,,39.9,39.9
+CA-Ca3,FULL_BADM,AMF_CA-Ca3_BIF_20260527.xlsx,19.0,"Loam; contact Jassal, P. of UBC biomet",USED,50.0,BADM_PROFILE_MIN_MAX,40.0,28269,,,40.3,40.7
+CA-Ca3,FULL_BADM,AMF_CA-Ca3_BIF_20260527.xlsx,16.3,"Loam; contact Jassal, P. of UBC biomet",USED,40.0,BADM_PROFILE_MIN_MAX,30.0,29103,,,42.2,41.5
+CA-Ca3,FULL_BADM,AMF_CA-Ca3_BIF_20260527.xlsx,19.1,"Loam; contact Jassal, P. of UBC biomet",USED,20.0,BADM_PROFILE_MIN_MAX,10.0,28991,,,42.5,38.4
+CA-Ca3,FULL_BADM,AMF_CA-Ca3_BIF_20260527.xlsx,18.7,"Loam; contact Jassal, P. of UBC biomet",USED,30.0,BADM_PROFILE_MIN_MAX,20.0,26701,,,44.6,36.7
+CA-Man,FULL_BADM,AMF_CA-Man_BIF_20250731.xlsx,95.13636364,measured by BOREAS,USED,37.73,DEPTH_FROM_HORIZON_B,11.0,26374,B,,0.627272727,4.372727273
+CA-Man,FULL_BADM,AMF_CA-Man_BIF_20250731.xlsx,75.84285714,measured by BOREAS,USED,74.43,DEPTH_FROM_HORIZON_C,37.73,25641,C,,1.742857143,22.54285714
+CA-Man,FULL_BADM,AMF_CA-Man_BIF_20250731.xlsx,86.94166667,measured by BOREAS,USED,11.0,DEPTH_FROM_HORIZON_A,0.0,26515,A,,2.516666667,10.66666667
+CA-TP1,FULL_BADM,AMF_CA-TP1_BIF_20251017.xlsx,0.0,sieving method,USED,300.0,MANUAL_ASSIGNMENT,0.0,27561,,BADM 98/2/0 (sieving) has no depth; same BADM gives SOIL_DEPTH 300 cm and classification comment '>3m' (deep sandy Brunisolic Grey Brown Luvisol); applied to full profile,98.0,2.0
+CA-TP3,FULL_BADM,AMF_CA-TP3_BIF_20260129.xlsx,0.0,,USED,300.0,MANUAL_ASSIGNMENT,0.0,27921,,"BADM 98/2/0 has no depth; SOIL_DEPTH 300 cm, '>3m'; consistent with McMaster site page 98/1/<1; applied to full profile",98.0,2.0
+CA-TP4,FULL_BADM,AMF_CA-TP4_BIF_20260715.xlsx,0.0,,USED,300.0,MANUAL_ASSIGNMENT,0.0,26636,,"BADM 98/2/0 has no depth; SOIL_DEPTH 300 cm, '>3m'; same deposit as CA-TP3 (0.8 km); applied to full profile",98.0,2.0
+US-Bar,FULL_BADM,AMF_US-Bar_BIF_20241204.xlsx,4.0,"data from Bartlett Experimental Forest, but not within tower footprint. Texture is for shallow-C layer material.",USED,200.0,MANUAL_ASSIGNMENT,40.0,23724,,"BADM comment: Bartlett EF but outside tower footprint, shallow C-layer material; NEON BART megapit BC/C horizons (40-200 cm) are loamy sand; applied below 40 cm only",74.0,23.0
