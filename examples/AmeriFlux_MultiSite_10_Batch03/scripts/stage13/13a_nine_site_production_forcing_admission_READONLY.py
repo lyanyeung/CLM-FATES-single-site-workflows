@@ -129,7 +129,7 @@ def numeric_candidate(site,p,entry):
         finite=np.isfinite(np.vstack([t,v,p,q,rh,calcq])).all(axis=0)
         paired=np.isclose(q,calcq,rtol=1e-6,atol=1e-10,equal_nan=False)
         bad=(~finite)|(rh<=0)|(rh>100.05)|(q<0)|(q>.08)|(~paired)
-        old_gate_bad=(~finite)|(v<=0)|(rh<=0)|(rh>100.05)|
+        old_gate_bad=((~finite)|(v<=0)|(rh<=0)|(rh>100.05)|
                       (q<=0)|(q>=.08)|(~paired))
         saturation_caution=(v<=0)|(rh>100.0)|(q<=0)
     report["candidate_physically_invalid_HH"]=int(np.count_nonzero(bad))
