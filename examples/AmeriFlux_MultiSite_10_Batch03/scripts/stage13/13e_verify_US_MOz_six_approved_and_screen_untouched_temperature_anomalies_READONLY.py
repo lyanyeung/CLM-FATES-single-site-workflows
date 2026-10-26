@@ -233,7 +233,8 @@ def main():
     print("\n=== FULL RELEASE AUTOMATIC SCREEN OF OTHER UNCHANGED LARGE TA SPIKES ===",flush=True)
     if len(flagged):
         print("CANDIDATE SCREEN COUNT",len(flagged),flush=True)
-        print(flagged.to_string(index=False,float_format=lambda x:f"{x:.3f}"),flush=True)
+        print(flagged.head(40).to_string(index=False,float_format=lambda x:f"{x:.3f}"),flush=True)
+        if len(flagged)>40:print("ADDITIONAL",len(flagged)-40,"FLAGGED: full untruncated CSV written only with --run",flush=True)
     else:print("ZERO matched conservative 8C two-sided centered isolated-spike screen",flush=True)
     print("\n=== TOWER VS ERA EXACTLY IDENTICAL TEMPERATURE FRACTION (2004/2005) ===",flush=True)
     print(eq.loc[eq.year.isin([2004,2005])].to_string(index=False),flush=True)
