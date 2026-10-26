@@ -1,0 +1,59 @@
+{
+  "status": "LOCAL_SOURCE_CLOCK_VERIFIED",
+  "site": "US-Me2",
+  "release": "AMF_US-Me2_FLUXNET_FULLSET_2002-2022_4-6",
+  "metadata_gate": "RESOLVED_WITH_SITE_BADM_SUPPLEMENT",
+  "UTC_OFFSET_hours": -8,
+  "time_basis": "LOCAL_STANDARD_TIME",
+  "daylight_saving": false,
+  "utc_rule": "UTC=LST+8h; midpoint=(TIMESTAMP_START+TIMESTAMP_END)/2+8h",
+  "bif_evidence": {
+    "filename": "AMF_US-Me2_BIF_20260527.xlsx",
+    "sha256": "adcd983cca9c9c8392e0581a43414c8c4382c10ffaba431022a7656c59ba4cd4",
+    "sheet": "AMF-BIF",
+    "range": "A767:E767",
+    "SITE_ID": "US-Me2",
+    "GROUP_ID": 12976,
+    "VARIABLE_GROUP": "GRP_UTC_OFFSET",
+    "VARIABLE": "UTC_OFFSET",
+    "DATAVALUE": "-8",
+    "date_scope": "No date fields or alternative UTC_OFFSET records in this site BIF.",
+    "relationship": "Separate site BADM supplement, not a member of the 4-6 release ZIP."
+  },
+  "official_conventions": [
+    "https://ameriflux.lbl.gov/data/tips-ameriflux-flux-met-data-processing-pipeline/",
+    "https://fluxnet.org/data/fluxnet2015-dataset/",
+    "https://fluxnet.org/data/fluxnet2015-dataset/fullset-data-product/"
+  ],
+  "sources": {
+    "primary": {
+      "rows": 368160,
+      "first_start": "2002-01-01 00:00:00",
+      "last_end": "2023-01-01 00:00:00",
+      "leap_day_rows": 240,
+      "invalid_intervals": 0,
+      "cadence_discontinuities": 0,
+      "name": "AMF_US-Me2_FLUXNET_FULLSET_HH_2002-2022_4-6.csv",
+      "sha256": "5b29b04da37960a1640c19b75fc2a8ffbffd703ada89ba6c36689d86f834ae3e",
+      "bytes": 576695188
+    },
+    "era": {
+      "rows": 753840,
+      "first_start": "1981-01-01 00:00:00",
+      "last_end": "2024-01-01 00:00:00",
+      "leap_day_rows": 480,
+      "invalid_intervals": 0,
+      "cadence_discontinuities": 0,
+      "name": "AMF_US-Me2_FLUXNET_ERA5_HH_1981-2023_4-6.csv",
+      "sha256": "ad0ce6a1d934bb965d939375c1c8588ed643f3513c3ac7e31afed6ca993d3115",
+      "bytes": 51455118
+    }
+  },
+  "legacy_events": [],
+  "input_receipts": {},
+  "humidity_repair_approvals": 0,
+  "post_v5_approval": false,
+  "DATM_ready": false,
+  "source_timestamps_modified": false,
+  "model_jobs_submitted": 0
+}
