@@ -187,8 +187,8 @@ def build_requests(original,episodes):
  x=wjs[0]
  # Stage29 BIF Wjs UTC_OFFSET -7, native timestamps LST no DST,
  # original group has DATE_START, DATE_END absent => provisional.
- a=dt(x["original_native_start"])-timedelta(hours=-(-7))-timedelta(days=1)
- b=dt(x["original_native_end"])-timedelta(hours=-(-7))+timedelta(days=1)
+ a=dt(x["original_native_start"])-timedelta(hours=-7)-timedelta(days=1)
+ b=dt(x["original_native_end"])-timedelta(hours=-7)+timedelta(days=1)
  date=a.date().isoformat()+"/"+b.date().isoformat()
  request={"variable":list(VARS),"date":date,
           "location":{"longitude":WJS_LON,"latitude":WJS_LAT},"data_format":"netcdf"}
@@ -256,6 +256,7 @@ def selftest():
  assert (dt("200712152030")+timedelta(minutes=30))==a
  assert (b+timedelta(minutes=30))==dt("200712160630")
  assert abs(100*(1-2.581/sat(-11.7)))<20
+ assert (dt("200805241500")-timedelta(hours=-7)).strftime("%Y%m%d%H%M")=="200805242200"
  print("STAGE33 SELF-TEST PASS | 19 H01 and native neighbor QC, source site-month 9+Wjs new, no auto forcing writes")
 
 def main():
