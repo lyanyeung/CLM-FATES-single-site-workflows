@@ -22,7 +22,7 @@ The 15 event / 21 half-hour previous negative-RH or original extremely-low-RH fu
 
 Pinned code commit `6233a57b3e82d1b2ca9ad42523aedef70fab0368`, blob `5f68fdbe658470841da30a449f7143deb2bd8421`.
 
-[One-click IRIDIS6 launcher](../scripts/stage42/run_stage42_iridis6.sh), commit `7530fd5232de6116a1198a0083a2471a088d947c`, blob SHA `PLACEHOLDER_VERIFY_WITH_FETCH`.
+[One-click IRIDIS6 launcher](../scripts/stage42/run_stage42_iridis6.sh), commit `7530fd5232de6116a1198a0083a2471a088d947c`, blob SHA `8713574a9f6152d66751326d9132a4dcb7dc37d9`.
 
 **Tracks:**
 
@@ -41,7 +41,7 @@ The study is an **original meteorology QC preflight**, not full forcing/DATM mod
 
 ```bash
 curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/7530fd5232de6116a1198a0083a2471a088d947c/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage42/run_stage42_iridis6.sh" -o "$HOME/run_stage42.sh"
-test "$(git hash-object "$HOME/run_stage42.sh")" = "PLACEHOLDER_VERIFY_WITH_FETCH"
+test "$(git hash-object "$HOME/run_stage42.sh")" = "8713574a9f6152d66751326d9132a4dcb7dc37d9"
 bash "$HOME/run_stage42.sh"
 ```
 
