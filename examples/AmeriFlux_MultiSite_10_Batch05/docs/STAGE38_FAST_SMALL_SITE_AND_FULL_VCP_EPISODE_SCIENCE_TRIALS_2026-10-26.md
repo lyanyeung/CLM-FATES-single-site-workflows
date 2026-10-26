@@ -100,3 +100,29 @@ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-sing
 test "$(git hash-object "$HOME/run_stage38.sh")" = "39589e8b0ef66b135ae7fdd97fe5702242726cf9"
 bash "$HOME/run_stage38.sh"
 ```
+
+
+## Stage38 US-UMB original-source archive discovery failure and repair (26 October 2026)
+
+**Actual initial Stage38 operator attempt stopped before science calculation**:
+
+```text
+STAGE38 SOURCE VERIFIED
+STAGE38 SELF-TEST PASS
+ValueError: expect exactly 1 original site FLUXNET v1.3 r1 package:
+ /iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/US-UMB/forcing/packages
+```
+
+This is a **too-strict filename/location assumption**, not proof the US-UMB data are corrupt. Original 166 Stage24 approved, P1 HOLD 46 and P2/P3 1574 remain unchanged.
+
+**Final repaired one-click launcher**: GitHub commit `790dfb27b5a6c1c95fa73a552d5bd555a02a3d55`, blob SHA `2071292ce74b426bc2c6f25228931bcf98efae3d` at [run_stage38_iridis6.sh](../scripts/stage38/run_stage38_iridis6.sh). It pins Stage38 Python commit `60cbc5520441e90105f94c7c0843cdb477186ba5`, blob SHA `d6884f53b3a7f3eae46860862a2c3ea023a585bf`. The Python code now searches source ZIPs and extracted CSVs under each site root, inspects archive embedded original FLUXMET_HH member names rather than guessing the ZIP filename or version, and checks **every original Stage27 T/VPD/QC source half-hour** before accepting any candidate. Multiple distinct matching original source populations block that site instead of choosing arbitrarily. Missing source gives an explicit **per-site ORIGINAL_SOURCE_SITE_HOLD** and continues others; the site is never falsely reported passed. Source file and archive SHA256/path are recorded. No approved overlay or production forcing writes.
+
+Use this **three-line retry**, not the earlier Stage38 launcher:
+
+```bash
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/790dfb27b5a6c1c95fa73a552d5bd555a02a3d55/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage38/run_stage38_iridis6.sh" -o "$HOME/run_stage38.sh"
+test "$(git hash-object "$HOME/run_stage38.sh")" = "2071292ce74b426bc2c6f25228931bcf98efae3d"
+bash "$HOME/run_stage38.sh"
+```
+
+**Repair code published; operator rerun pending.** Report `STAGE38 ORIGINAL_SOURCE_SITE_HOLDS` identifies still-missing original sources without misclassifying them as passes; `STAGE38 SITE` and `STAGE38 GATES` report completed science evaluations. No new human-approved forcing repairs.
