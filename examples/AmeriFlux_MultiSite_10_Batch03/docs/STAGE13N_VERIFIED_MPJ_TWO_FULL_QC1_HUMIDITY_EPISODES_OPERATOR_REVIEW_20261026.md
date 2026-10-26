@@ -1,5 +1,7 @@
 # Stage13n IRIDIS6 PASS — US-Mpj two 2014 continuous QC1 humidity episodes, grouped Stage13o operator decision
 
+> **2026-10-26 OPERATOR STAGE13O APPROVAL NOW GRANTED:** The user subsequently explicitly approved **both complete original 10HH QC1 source-native runs**, 20 original source-native timestamps total including the 3 previously conditionally approved Stage13m centers and **17 additionally approved QC1 neighbors**. The prior proposal-only JSON remains a historical proposal and does **not** itself grant authority; instead see the new [Stage13o exact signed operator approval](../decisions/STAGE13O_OPERATOR_APPROVED_US_MPJ_TWO_2014_QC1_SEGMENTS_20HH_20261026.json), [strict two-run source-gated 17 paired VPD/QBOT repair script](../scripts/stage13/13o_US_Mpj_apply_two_10HH_operator_approved_ERA_RH_SHADOW.py) and [approved Stage13o scientific method/runbook](STAGE13O_OPERATOR_APPROVED_US_MPJ_TWO_10HH_ERA_RH_RESEARCH_SHADOW_20261026.md). All original-source/QC0/continuity/physics gates still must **PASS on IRIDIS6** before any successor forcing; no Stage13o `--apply` result has yet been seen. Two original 2018 Feb VPD and 2020 Feb TA remain unchanged. No model jobs.
+
 ## Actual source results
 
 On `login6003`, Stage13n pinned `a474f5b1124199096eed82f6b1abb689e67800bd`, `--self-test`, `--check`, `--run` all **PASS**. Confirmed exact full source-native original 5h QC1 runs, **not** isolated 3 spikes:
