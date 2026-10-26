@@ -6,6 +6,10 @@ This is the central **Ameriflux_Site** collection requested alongside [ICOS site
 
 [**50-site CLM-FATES recommended inputs v1**](Ameriflux_PFT/RECOMMENDED_INPUT_PFT_50_SITES_20261026.md) provides concrete percentages summing100 for every station, with35 sensitivity/period alternatives and explicit source-to-input assumptions. [Input CSV](Ameriflux_PFT/RECOMMENDED_50_SITE_CLM_FATES_INPUT_PFT_20261026.csv), [CLM `PCT_NAT_PFT` matrix](Ameriflux_PFT/RECOMMENDED_50_SITE_CLM_PCT_NAT_PFT_20261026.csv), and [FATES matrices](Ameriflux_PFT/RECOMMENDED_50_SITE_FATES_PFT_PERCENT_20261026.csv) are intended for FIXNC cold-start design. Model recommendations are separate from measured evidence. Arctic and hydrodeciduous-shrub profiles require the specified private HLM mapping; competition mode does not preserve these fractions.
 
+## Soil texture — 26 October 2026
+
+[**Ameriflux_Soil**](Ameriflux_Soil/) recommends which `PCT_SAND`/`PCT_CLAY` to use on the 10 CLM surface layers, layer by layer. Sources in order: site-measured texture (AmeriFlux ReESH Zenodo records, BADM `SOIL_TEX`, tower literature), then USDA SSURGO at the tower point, then ISRIC SoilGrids 250 m. The current grid surface is kept only when nothing else exists. Measured ReESH data were found for 13 sites, plus 3 PI-page summaries. Preliminary layer values are given for 8 sites. The [Stage01 script](Ameriflux_Soil/scripts/01_collect_soil_texture_evidence.py) collects and maps all 50 sites on IRIDIS6 and compares them with each case's current `fsurdat`. Organic and permafrost sites are flagged so that `ORGANIC` can be reviewed.
+
 ## Vegetation and PFT composition
 
 [**Ameriflux_PFT — 50-site composition index, master table and source report**](Ameriflux_PFT/) consolidates all five batches, with **33 numerical composition/cover leads** and **17 sites whose reviewed evidence is qualitative composition, LAI/density or published model assumptions**. A numerical lead may be a partial tree inventory, a historical transect, basal area, tree counts or canopy cover. It does not by itself establish a complete PFT fraction of tower ground area.
