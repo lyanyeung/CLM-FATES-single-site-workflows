@@ -1867,3 +1867,11 @@ Stage89 actual operator evidence: 24 Stage07 changed-variable source QC0 records
 
 Next [Stage90 original-source diagnostic script](scripts/stage90/90_focus_Ha1_VPD_and_Ho1_Dec_boundary_readonly.py) inspects exact raw source neighbors for each of the 24 events, independently contextualizes the two Ha1 VPD changes, diagnoses December Ho1 original-vs-ERA temperature gap and searches the **2001 native source** for the first actual QC0 temperature (not visible in the year-2000-only Stage89 report). It creates only small SHA-tracked review CSV/JSON in isolated reports, never active DATM/forcing or Slurm. The script is pinned to commit `6dda1d9c5bebf207855fdd357d55051bdb778599`, blob `73668051df6d871920efe4a99bb164ff57b8920d`. [Stage89 result and IRIDIS6 one-paste Stage90 command](docs/stage89_operator_PASS_stage90_targeted_source_context_20261026.md).
 
+
+
+### Stage90 PASS → Stage91 98 missing-year NetCDF source integration worklist (26 Oct 2026)
+
+Actual Stage90 source audit **PASS**: all 24 original QC0 modifications have exact native neighbors; original US-Ho1 2000 nonQC0 April 52 HH and December 222 HH, with one December 27 09:00 QC1 T `-15.4 C` vs ERA T `3.444 C`, followed at 09:30 by ERA-coded QC2 T `3.346 C` (18.746 C source transition), and first later original measured-QC0 source T not until **2007-12-31 23:30**. Do not infer that intervening ERA T is a measured tower record. Ho1 already-approved 17,294 original QC0 T, 1,068 humidity-only adjustments and 32 source VPD retains are untouched.
+
+**DATM construction is NOT completed:** five sites **117/215** annual NOLEAP technical-preview NetCDF (BZS 15, CMW 21, Ha1 35, Ho2 27, Ho3 19) exist with templates **not activated**. EML 16, GLE 16, Ho1 28, ICh 19 and ICt 19 years (**98 remaining**) still require complete numeric forcing, source provenance/science review and Post-v5. [Stage91 98-year SHA-verified source integration worklist](scripts/stage91/91_missing_five_site_forcing_integration_worklist.py) prepares a site/year reconciliation of archived Stage64, Stage74 and Stage85 candidate records, avoiding overlap and leaving ALL original / active forcing / NetCDF / CIME / Slurm untouched. Stage91 does **not** produce the missing NC. [Operator evidence and pinned direct IRIDIS6 command](docs/stage90_PASS_stage91_missing_98_NC_source_integration_20261026.md).
+
