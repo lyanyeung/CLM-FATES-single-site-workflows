@@ -1,0 +1,60 @@
+{
+  "schema": "batch03-stage13j-operator-conditional-two-QC1-episodes-v1",
+  "decision_date": "2026-10-26",
+  "operator_exact_statement": "批准 Stage13j：US-MOz 2005-01-05 20:00 至 01-06 09:00，以及 2005-01-06 14:00 至 01-07 09:30 两段 QC1 异常，仅在时间对齐、独立 ERA5-Land 交叉验证、QC0 边界连续性和温湿度物理检查全部通过后，才可在新独立 forcing 候选中同时修复 TA/VPD 并重算 TBOT/QBOT。不通过的继续 HOLD。2005-01-09 负偏差和其他 QC1 记录暂不批准。保留原始数据、Stage07 和 Stage13g，不提交模型作业。请直接推进代码、GitHub 与 IRIDIS6 下一步指令。",
+  "target_site": "US-MOz",
+  "scoped_events": [
+    {
+      "id": "JAN05_20_TO_JAN06_09",
+      "native_start": "2005-01-05T20:00:00",
+      "native_end": "2005-01-06T09:00:00",
+      "half_hours": 27,
+      "original_source_QC_required": {
+        "TA_F_QC": 1,
+        "VPD_F_QC": 1
+      },
+      "original_abs_tower_minus_companion_ERA_T_C_min": 5
+    },
+    {
+      "id": "JAN06_14_TO_JAN07_0930",
+      "native_start": "2005-01-06T14:00:00",
+      "native_end": "2005-01-07T09:30:00",
+      "half_hours": 40,
+      "original_source_QC_required": {
+        "TA_F_QC": 1,
+        "VPD_F_QC": 1
+      },
+      "original_abs_tower_minus_companion_ERA_T_C_min": 5
+    }
+  ],
+  "required_scientific_gates": [
+    "original tower, paired FLUXNET ERA5 and existing Stage13g signed SHA / source-native time",
+    "source-authorized and explicitly validated BIF UTC offset, interval midpoint alignment and native QC0 analogues",
+    "distinct CDS-sourced ERA5-Land t2m, d2m, sp SHA-signed receipt, site coordinates and hourly UTC coverage",
+    "site-native independent cross-product temperature and water-vapor agreement with physically valid humidity",
+    "measured QC0 tower TA/VPD boundary anchors and VPD continuity for BOTH ends of EACH event",
+    "complete positive water vapor pressure, RH 0–100%, pressure and specific humidity after paired T/VPD edits",
+    "no other timestamps, 2005 Jan09 negative event, or earlier approved 2005 Jan06 10:00 repair changed"
+  ],
+  "note": "ERA5-Land is a distinct CDS-retrieved reanalysis product but is driven by ERA5; it is NOT independent meteorological ground truth. Separate download plus measured QC0 analogues required; physics-valid alone cannot approve.",
+  "outputs_if_and_only_if_all_gates_PASS": "New isolated Stage13j shadow NOLEAP forcing, paired TA_USE/VPD_USE and recalculated TBOT/QBOT only at 67 exact native halfhours; time/surface/source immutability differential and SHA receipt.",
+  "on_gate_failure": "No modification for rejected entire event; continue HOLD. Do not silently use ERA5-Land/companion ERA substitute, shift time, or modify model.",
+  "immutable": [
+    "original FLUXMET tower and QC",
+    "paired FLUXNET companion ERA source",
+    "Stage07 existing selected forcing",
+    "Stage13g 315360-row previous approved science shadow",
+    "Jan06 10:00 previously repaired TA/VPD",
+    "Jan09 negative temperature episode",
+    "any non-67 event/time/variable",
+    "PFT/surface",
+    "ZBOT",
+    "CIME/DATM/Slurm"
+  ],
+  "science_status": {
+    "meteorological_ERA_repairs_authorized_only_if_science_gates_pass": true,
+    "model_spinup_authorized": false,
+    "postv5_production_authorized": false,
+    "all_ten_sites_complete": false
+  }
+}
