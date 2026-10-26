@@ -1953,3 +1953,11 @@ Actual 26 Oct 2026 Stage99 GLE ZBOT build **16/16 PASS**, ZBOT=23.4m original TA
 
 **Correction:** Stage87 NC includes BOTH source aliases `QBOT` and `SHUM` and they must match exactly. The prior successful eight-site CIME stream generator contains `QBOT Sa_shum` and `ZBOT Sa_z`. No renaming of GLE humidity source files is needed. [Stage100](scripts/stage100/100_GLE_CIME_DATM_stream_contract_readonly.py) pinned commit `bb95f844c95ddc3a261e696fba103bb2eec41057` blob `d9153819ad3060b6609eb53d5d9a8c857d4bfc14`, verifies exact old stream source SHA and all 16 GLE 8-field/units/start-time/NC SHA, writes a new isolated **PROPOSED_NOT_APPLIED** `user_nl_datm_streams` text, and retains evidence that actual CIME model clock, -7h offset, 0.75m wind vs TA height, PFT site footprint and case acceptance are **science/engineering HOLD**. No case or job changes. [Actual Stage99 PASS and pinned Stage100 command](docs/stage99_PASS_stage100_GLE_CIME_DATM_field_clock_contract_20261026.md).
 
+
+
+### Stage100 actual CIME mapping 16/16 PASS → Stage101 FSDS solar-clock forensic
+
+Actual 26 Oct 2026 operator Stage100 `EXIT_CODE=0`, US-GLE 16/16 annual ZBOT NC × 8/8 CIME fields valid, prior GF-Guy source case has successful CaseStatus, and source `QBOT Sa_shum` / `ZBOT Sa_z` field maps are confirmed. **Local-standard-time START vs UTC/CIME phase (-7 h site UTC_OFFSET), unequal TA 23.4m/WS 22.65m, actual FATES tower PFT, and case smoke test remain HOLD.**
+
+[Stage101 evidence-grounded solar clock and real CIME CaseDocs read-only script](scripts/stage101/101_GLE_DATM_local_UTC_solar_phase_forensics_readonly.py), pinned commit `3fa1f9883661cde8db0ab95c9c1ede180c8f6954`, Git blob `a46ece5e94a89103113a6ac24f49cc931a6052e5`, measures how much sampled 2005/2010/2015/2020 US-GLE FSDS would occur at astronomical nighttime under original local-label-as-UTC vs official LST→UTC and 15-minute midpoint scenarios. Also reads original GF-Guy CaseDocs; no simulation case/NC/Slurm files changed. Daylight consistency is diagnostic only and does **not** authorize clock conversion. [Stage100 actual PASS, scientific rationale, and one-paste Stage101 IRIDIS6 command](docs/stage100_PASS_stage101_GLE_solar_LST_UTC_CIME_contract_20261026.md).
+
