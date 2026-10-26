@@ -508,7 +508,11 @@ def main():
   md.append("| {} | {} | {} | {} | {} | {} |".format(
    r["site"],r["source_original_P2P3_unapproved_HH"],
    r["source_original_P2P3_events"],
-   "YES" if r["original_FLUXMET_source_SHA256"]!="NOT_SCANNED" else "NOT_SCANNED",
+   "YES" if r["original_FLUXMET_source_SHA256"] not in
+       ("NOT_SCANNED","SOURCE_NOT_VERIFIED","NO_P2P3_SOURCE_NOT_NEEDED")
+       else "SOURCE_HOLD" if r["site_closeout_status"]=="ORIGINAL_SOURCE_UNVERIFIED_SITE_HOLD"
+       else "NOT_REQUIRED_ZERO_P2P3" if not r["source_original_P2P3_unapproved_HH"]
+       else "NOT_SCANNED",
    r["full_episode_ERA_review_candidates"],r["site_closeout_status"]))
  md+=["","## Site source discovery blockers (unverified, NOT PASSED)"]
  if site_source_holds:
@@ -531,7 +535,7 @@ def main():
   print("STAGE38 SITE",r["site"],"P2P3",r["source_original_P2P3_unapproved_HH"],
     "EVENTS",r["source_original_P2P3_events"],
     "ERA_NUMERIC_REVIEW",r["full_episode_ERA_review_candidates"],
-    "SOURCE_ZIP",r["original_FLUXMET_source_SHA256"][:12],
+    "SOURCE_SHA",r["original_FLUXMET_source_SHA256"][:12],
     "STATUS",r["site_closeout_status"])
  print("STAGE38 FULL_EPISODE_NATIVE_RESEARCH_CANDIDATE_ROWS",len(native_trial))
  print("STAGE38 ORIGINAL_SOURCE_SITE_HOLDS",json.dumps(site_source_holds,sort_keys=True))
