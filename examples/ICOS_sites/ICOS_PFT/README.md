@@ -1,5 +1,25 @@
 # ICOS_PFT: observed vegetation evidence for four FLUXNET multisite campaigns
 
+## Update 26 October 2026: ICOS ETC ancillary basal area for 14 sites
+
+**Current register: [FINAL_38_SITE_FIXNC_PFT_20261026_ICOS.csv](FINAL_38_SITE_FIXNC_PFT_20261026_ICOS.csv).** It supersedes `FINAL_38_SITE_FIXNC_PFT_20261025.csv` (kept as history in the column `previous_PCT_NAT_PFT_20261025`).
+
+The evidence is the tree basal area by species from the ICOS ETC ancillary reports, read from the report charts ([method and full table](../ICOS_ancillary/README.md)). Basal-area share is used as the proxy for the canopy-area share.
+
+| Site | 25 Oct value | 26 Oct value | ICOS evidence | Action |
+| --- | --- | --- | --- | --- |
+| DK-Sor | DBF 80 / ENF+DNF 20 (OPEN) | **DBF 100** | Fagus 98.9% (CP 2023), 100% (SP 2021) | Old cases deleted; new surface/case (Batch02 Stage44) |
+| BE-Bra | ENF 55 / DBF 23 / unresolved 22 (OPEN) | **ENF 84 / DBF 16** | Pinus sylvestris 85.2% (CP 2023), 82.1% (SP 2020) | Old cases deleted; new surface/case (Batch02 Stage44) |
+| FR-FBn | ENF 75 / EBF ≤25 (OPEN) | **ENF 70 / EBF 30** | P. halepensis 70.2 / Q. ilex 28.2 (CP 2023); 70.0 / 24.8 (SP 2020) | Running ENF 75 / EBF 25 case kept (inside the CP–SP range) |
+
+**Confirmed unchanged:** CH-Dav, CZ-BK1, FI-Hyy, FI-Sod, FR-Fon, FR-Hes, FR-Pue, IT-Ren, NL-Loo, and BE-Vie (inside the CP–SP range).
+
+**DE-Tha** (protected example) stays ENF 87 / DNF 10 / DBF 3. ICOS CP 2025 suggests ENF 74 / DNF 11 / DBF 15 as a sensitivity.
+
+The other 24 sites have no ICOS ancillary report. ICOS reports contain no soil texture.
+
+Host indices: ENF = HLM 1, DBF = HLM 7, EBF = HLM 5. So DK-Sor is `{7:100}`, BE-Bra `{1:84, 7:16}` and FR-FBn `{1:70, 5:30}`.
+
 ## Final 38-site PFT table for the FIXNC experiment — 25 October 2026
 
 This is the **current authoritative PFT assignment for all 38 stations** in the fixed-biogeography / no-competition (FIXNC) experiment ([Non-Competition-CLM-experiment](https://github.com/lyanyeung/Non-Competition-CLM-experiment)). Machine-readable copy: [FINAL_38_SITE_FIXNC_PFT_20261025.csv](FINAL_38_SITE_FIXNC_PFT_20261025.csv). It supersedes the PFT columns of the earlier inventories below, which remain as evidence history.
