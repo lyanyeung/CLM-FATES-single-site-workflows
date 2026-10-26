@@ -2,6 +2,14 @@
 
 [第三批总说明](../README.md) · [完整站点清单](../sites.tsv)
 
+## US-Me2 四条湿度记录：下一步 Stage14b
+
+原始四条实测温度（QC0）与 MDS VPD（QC1）组合产生约 **−10% 至 −14% RH**，原始 RH 全部缺失；配套原始 ERA 的 T/VPD 组合也无效。保留实测温度，进入四条湿度的来源与物理审核。[具体证据和 Stage14b 说明](US_ME2_FOUR_HUMIDITY_REVIEW_20261026.md) · [正式代码](../scripts/stage14/14b_US_Me2_four_humidity_REVIEW_ONLY.py) · [docs 内完整代码副本](code/14b_US_Me2_four_humidity_REVIEW_ONLY.py)。
+
+Stage14b 复核既有 Stage10b 封存候选和外部文件 SHA256，重算候选物理量，输出原始前后 ±24 小时上下文及边界警告。旧 2014 年 ERA5-Land 产品带跨年缓冲，覆盖到 2015-01-03，可供这四个 UTC 2015-01-01 中点检查。代码已经过本地回归测试，**Stage14b 集群执行与真实候选数值审核尚未完成；没有修改 forcing 或批准修复**。若 `--run` 成功，贴回四条候选和边界表继续审核。
+
+两份 Stage14b 代码 SHA256 均为 `d970de8a11672f6d73e86a2645934e776b6d4797ce89c57c9f2fa387c98560ba`。Stage14a 已完成，无需因开展湿度审核而重复运行。
+
 ## US-Me2 时钟问题：集群已核实
 
 **2026-10-26 19:35 UTC，Stage14a 已在 IRIDIS6 执行通过。** US-Me2 的时钟元数据阻塞已解除，采用全年固定 `UTC_OFFSET=-8`，不加夏令时。依据为独立站点 BIF 的 `AMF-BIF!A767:E767`、`GROUP_ID=12976`，以及官方当地标准时规范。该 BIF 是独立补充元数据，不是原始 4-6 ZIP 内文件。
