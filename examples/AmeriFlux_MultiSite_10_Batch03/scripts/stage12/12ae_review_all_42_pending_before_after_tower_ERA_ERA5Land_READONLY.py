@@ -130,6 +130,18 @@ def audit():
                          dtype={"site":str,"native_key":str},low_memory=False)
     events=original.loc[
        original.site.isin(SITE_COUNTS)&original.reason.isin(GROUPS)].copy()
+    # Two historical original Stage12g Me6 holds were explicitly released in
+    # the separately SHA-sealed Stage12ac approved derivative. They remain
+    # in the IMMUTABLE old G ledger, but must not count as pending events.
+    old_me6_approved={("US-Me6","201707040700"),("US-Me6","201707040730")}
+    historical=events.loc[[ (str(x.site),str(x.native_key)) in old_me6_approved
+       for x in events.itertuples(index=False)]]
+    if (len(historical)!=2 or
+        historical.reason.ne("HOLD_NEW_ADJACENT_VPD_JUMP_GT4HPA").any()):
+        raise ValueError("Original two explicitly approved Me6 holds missing or altered")
+    events=events.loc[[ (str(x.site),str(x.native_key)) not in old_me6_approved
+        for x in events.itertuples(index=False)]].copy()
+    print("STAGE12AE EXACT SOURCE HISTORY: 77 G old cases minus 2 approved Stage12ac holds = 75 remaining; 42 pending + 33 Me6 policy",flush=True)
     if (len(events)!=75 or events.duplicated(["site","native_key"]).any()
         or events.site.value_counts().to_dict()!=SITE_COUNTS
         or events.groupby(["site","reason"]).size().to_dict()!=
@@ -222,7 +234,10 @@ def audit():
                 raise ValueError("Grid source year SHA mismatch "+key)
             receiptfile=external.with_suffix(".receipt.json")
             sr=json.loads(safe(receiptfile).read_text())
-            if (sr.get("artifact_sha256")!=metadata["original_source_sha256"]
+            # Original Stage09f uses response_sha256, while newer Stage12f
+            # uses artifact_sha256. Both are SHA-verified original downloads.
+            receipt_sha=sr.get("artifact_sha256",sr.get("response_sha256"))
+            if (receipt_sha!=metadata["original_source_sha256"]
                 or sr.get("site")!=site or int(sr.get("year",-1))!=int(year)
                 or "request" not in sr):
                 raise ValueError("Grid site/year/position receipt changed "+key)
