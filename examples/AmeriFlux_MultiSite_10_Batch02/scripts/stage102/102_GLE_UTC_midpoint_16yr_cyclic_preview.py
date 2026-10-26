@@ -202,6 +202,10 @@ def build():
             t=ds.variables["time"]
             t[:]=(np.arange(HALF_HOURS_YEAR)+0.5)/48
             t.long_name="UTC midpoint of half-hour mean from station local-standard START labels plus 7h; cyclic seam first 14 records model year 2005 uses source local Dec31 2020"
+            # The historical Stage99 global attribute said clock unchanged;
+            # it is stale for these NEW remapped NC files and must be explicit.
+            ds.stage99_clock_offset_correction="SUPERSEDED_IN_STAGE102_UTC_PLUS7_AND_MIDPOINT"
+            ds.forcing_validation="STAGE95_POSTV5_NUMERIC_AND_SCIENCE_QC0_PASSED_STAGE102_CLOCK_CANDIDATE_ONLY"
             ds.historical_clock="STAGE102_LST_TO_UTC_PLUS7_MIDPOINT_CYCLIC_PREVIEW_UNAPPROVED"
             ds.stage102_time_conversion="US-GLE_BIF_UTC_OFFSET_minus7_hours_and_halfhour_midpoint"
             ds.stage102_periodic_wrap_first_14_records="local_2020_12_31_17_00_through_23_30_not_measured_2004"
