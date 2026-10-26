@@ -159,9 +159,12 @@ def raw_neighbors(item,qc0):
     if qc0.empty:return []
     p=Path(item["primary"])
     columns=set(pd.read_csv(p,nrows=0).columns)
-    use=["TIMESTAMP_START","TA_F","VPD_F","TA_F_QC","VPD_F_QC"]
-    add=[v for v in KEY_FIELDS if v in columns]
-    use=list(dict.fromkeys(k for k in use+add if k in columns))
+    required={"TIMESTAMP_START","TA_F","VPD_F"}
+    if not required.issubset(columns):
+        raise ValueError("Original source missing TA_F/VPD_F/timestamp")
+    use=["TIMESTAMP_START","TA_F","VPD_F"]
+    add=[v for v in ("TA_F_QC","VPD_F_QC",*KEY_FIELDS) if v in columns]
+    use=list(dict.fromkeys(use+add))
     raw=pd.read_csv(p,usecols=use,dtype={"TIMESTAMP_START":str},low_memory=False)
     raw["key"]=raw["TIMESTAMP_START"].str.strip().str.replace(r"\.0$","",regex=True)
     # Source raw chronology already source-audited at Stage07. Native prev/next
