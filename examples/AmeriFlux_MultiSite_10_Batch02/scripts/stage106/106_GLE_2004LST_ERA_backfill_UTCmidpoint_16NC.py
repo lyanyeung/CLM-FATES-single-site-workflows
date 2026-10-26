@@ -159,6 +159,9 @@ def read_seam_source(files,back):
             raise ValueError("GLE original BIF and NC coordinates DIFFER materially")
         old={n:np.ma.filled(ds[n][:REPLACE_N+1,0,0],np.nan).astype(float)
              for n in VARS}
+    lastfile=next(Path(x["new"]) for x in files if x["year"]==2020)
+    with nc.Dataset(lastfile) as ds:
+        lastcycle={n:float(ds[n][-1,0,0]) for n in VARS}
     result={}
     for name in VARS:
         newlast=back[-1][name]
@@ -170,6 +173,9 @@ def read_seam_source(files,back):
             old_abs_jump=abs(nextval-oldlast),new_abs_jump=abs(nextval-newlast),
             last_ERA_2004_local=back[-1][name],
             first_observed_2005_UTC_0715=nextval,
+            original_2020_to_2005_periodic_edge_jump=old[name][0]-lastcycle[name],
+            new_2020_to_2005_periodic_edge_jump=back[0][name]-lastcycle[name],
+            original_2020_cycle_UTC_last_sample=lastcycle[name],
             UTC_first_timestamp="2005-01-01 00:15",
             UTC_seam_timestamp="2005-01-01 07:15",
             source_BIF_lat_lon_normalized_match=True)
@@ -183,6 +189,11 @@ def source_review():
     for n,row in result.items():
         print("STAGE106 JOIN",n,"OLD_ABS",format(row["old_abs_jump"],".9g"),
               "ERA_BACKFILL_ABS",format(row["new_abs_jump"],".9g"),flush=True)
+    for n,row in result.items():
+        print("STAGE106 PERIODIC_EDGE",n,
+              "OLD_ABS",format(abs(row["original_2020_to_2005_periodic_edge_jump"]),".9g"),
+              "ERA_EDGE_ABS",format(abs(row["new_2020_to_2005_periodic_edge_jump"]),".9g"),
+              "CYCLE_WRAP_SCIENCE_HOLD",flush=True)
     print("STAGE106 SOURCE MATCH | 14/14 2004 local LST ERA records, original source SHA PASS",
           "longitude 253.7601E == -106.2399",flush=True)
     # New ERA transition need not be smaller for ALL variables; however a
@@ -246,7 +257,7 @@ def build():
         w=csv.DictWriter(f,cols);w.writeheader()
         for t,r in zip(SRC_TIMES,values):
             w.writerow({"original_ERA_source_timestamp_local":t,**r})
-    write(out/"2005_ERA_vs_2020_cyclic_internal_seam_changes.json",joins)
+    write(out/"2005_ERA_vs_2020_cyclic_internal_and_true_file_edge_seam_changes.json",joins)
     write(out/"16_year_independent_NC_receipts.json",output)
     manifest={"schema":VERSION,
         "stage102_manifest_SHA256":sha(S102/"manifest.json"),
