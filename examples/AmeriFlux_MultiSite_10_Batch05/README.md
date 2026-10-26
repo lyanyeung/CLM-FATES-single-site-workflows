@@ -789,3 +789,45 @@ User requested both the **before and after** meteorology and ERA5 data, by probl
 ```
 
 After success, `cat "$OUT/stage19_SEVEN_priority_original_before_after.md"` to copy into the chat, or transfer and attach the `.md`. **Stage19 has been committed to GitHub and hash checked, but operator has not yet executed it on IRIDIS6.** All 176 flagged original HH remain HOLD, nothing automatically approved.
+
+
+## Stage20 user-approved RH source reconstruction candidates (2026-10-26; operator run pending)
+
+[User source humidity decisions and exact evidence](docs/STAGE20_USER_HUMIDITY_DECISIONS_2026-10-26.md).
+[Stage20 report-only original 109-candidate decision overlay script](scripts/stage20/20_make_investigator_decision_candidate_overlay_readonly.py).
+
+The investigator decided:
+- G01 WCr 2025-08-25 13:00 to 2025-08-26 01:30: 26 original low-RH measured HH → use original *processed ERA-pair RH* with tower T unchanged, rederive VPD coherently.
+- G03 Vcm 2007-01-16 22:00 to 2007-01-17 14:30: all 34 original native RH values, **including transitions** (10 P1 + 24 surrounding) → rederive VPD coherently from each selected native T and original RH.
+- G05 Vcm 2024-11-21–22: 26 P1 source QC0 low-RH records use processed ERA-derived RH with unchanged original tower T and rederived coherent VPD; nearby unapproved non-P1 source RH<5% is untouched.
+- G06 Vcm 2025-10-13/14: 23 P1 measured low-RH records use processed ERA-derived RH with unchanged tower T and rederived coherent VPD. Another eight source-native RH≈0.3% appear during QC1/1 periods, but those original selected MDS VPD values already imply physical 66–83% RH, so hold separate source-RH-only field provenance and **do not rewrite good QC1 VPD without additional confirmation**.
+- G02 Vcm 2007-12-15/16 original RH is missing all 19 P1 and original processed ERA RH itself becomes negative (as low as -12.21%).
+- G04 Vcm 2008-02-06 original RH missing all 38 context HH; 11/12 P1 ERA RH negative.
+- G07 Vcp 2011-01-01 original RH missing all three P1; processed ERA RH -6.00% to -6.42%; original tower measured RH resumes at 09:30 68.05% and 11:00 49.83%, not at 07:00–08:00.
+
+At this stage **nothing has been written to forcing, original QC, CIME, or Slurm**. To create a **strictly NEW diagnostic candidate-only CSV/JSON** and examine exact proposed humidity/VPD values before preparing a production forcing update, run on IRIDIS6:
+
+```bash
+(
+  set -euo pipefail
+  BASE="$HOME/ameriflux_batch05_stage20"
+  COMMIT="5b21921cad1d0b0f7c89edb3c1cc5c62d5aa4358"
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT"
+  SCRIPT="$BASE/20_make_investigator_decision_candidate_overlay_readonly.py"
+  STAGE18="$HOME/ameriflux_batch05_stage18/original_review_20261025T235716Z_1394929"
+  mkdir -p "$BASE"
+  curl -fLsS --retry 3 \
+    "$RAW/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage20/20_make_investigator_decision_candidate_overlay_readonly.py" \
+    -o "$SCRIPT"
+  test "$(git hash-object "$SCRIPT")" = "0ec09ffe1581c49a04daa4a6cf0bd6e6f969a81a"
+  echo "SOURCE VERIFIED"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  OUT="$BASE/decision_candidates_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+  python3 -B "$SCRIPT" --stage18-dir "$STAGE18" --output-dir "$OUT" \
+    2>&1 | tee "$BASE/stage20.log"
+  echo "STAGE20_REPORTS=$OUT"
+)
+```
+
+Expected **G01 26 + G03 34 + G05 26 + G06 23 = 109 candidate half-hours**, G02 19 + G04 12 + G07 3 + G06 eight QC1 source-native low RH = **42 separate holds**. Two native source comparisons are essential: `RH_ERA` is diagnostic source-downscaled ERA RH, **not newly downloaded ERA5/ERA5-Land RH**; and the VPD must be `es(original TA_F)*(1 - chosen RH/100)`, never unmodified `VPD_ERA` combined with tower T. User has approved this candidate direction, but no source or production forcing changes have yet been run or verified.
