@@ -44,7 +44,15 @@ THREE={"US-SP1","US-Syv","US-Ton"}
 SEVEN=EXPECTED-THREE
 FIVE_CORRECTED={"US-SP1","US-Slt","US-Syv","US-Ton","US-Uaf"}
 SITE_FIELD_KEYS=("LOCATION_LAT","LOCATION_LONG","UTC_OFFSET")
-HEIGHThints=("HEIGHT","ZBOT","MEAS","SENSOR","SONIC","INSTRUMENT","HEIGHTC","TOWER")
+# The single approved Stage02 decision is separately fetched beside this
+# script. Original BIF conflicts remain in the raw immutable archive.
+APPROVED_COORDINATE_LEDGER=Path(__file__).resolve().with_name(
+    "Batch04_approved_coordinate_decisions.tsv")
+US_SEG_APPROVAL={"site":"US-Seg",
+    "package":"AMF_US-Seg_FLUXNET_2007-2025_v1.3_r1",
+    "group_id":"1495","latitude":"34.3623","longitude":"-106.7020",
+    "elevation_m":"1596","location_date_start":"200701010000",
+    "approval":"APPROVED_BY_USER"}
 VPD_ROUND_HH={("US-Rpf","200802060700"),
               ("US-Rpf","200802060900"),
               ("US-Syv","200803091300")}
@@ -74,6 +82,38 @@ def number(v):
         return r if math.isfinite(r) else None
     except (ValueError,TypeError):return None
 def normlong(x):return (x+180)%360-180
+def approved_seg_coords(original_bif_rows):
+    # Reuse the exact written human authorisation from Stage02, not a new
+    # assistant-invented coordinate or any arbitrarily selected BIF group.
+    approve=table(APPROVED_COORDINATE_LEDGER,tuple(US_SEG_APPROVAL))
+    ck(len(approve)==1 and approve[0]==US_SEG_APPROVAL,
+       "US-Seg Stage02 user-approved BIF group 1495 decision file absent/changed")
+    observed={k:set() for k in
+       ("LOCATION_LAT","LOCATION_LONG","LOCATION_ELEV","LOCATION_DATE_START")}
+    for r in original_bif_rows:
+        if (r.get("GROUP_ID") or "").strip()!=US_SEG_APPROVAL["group_id"]:
+            continue
+        k=(r.get("VARIABLE") or "").strip().upper()
+        if k in observed:
+            v=(r.get("DATAVALUE") or "").strip()
+            if v and v!="-9999":observed[k].add(v)
+    ck({number(v) for v in observed["LOCATION_LAT"]}=={34.3623} and
+       {number(v) for v in observed["LOCATION_LONG"]}=={-106.7020} and
+       {number(v) for v in observed["LOCATION_ELEV"]}=={1596.} and
+       observed["LOCATION_DATE_START"]=={"200701010000"},
+       "Original US-Seg BIF GROUP_ID=1495 lat/lon/elevation/date evidence changed: "+
+       repr(observed))
+    print("US-SEG VERIFIED EARLIER USER APPROVAL",
+          "GROUP_ID",1495,"LAT",34.3623,"LON",-106.7020,
+          "ELEVATION_M",1596,"LOCATION_DATE_START","200701010000",
+          "LEDGER_SHA256",hashfile(APPROVED_COORDINATE_LEDGER))
+    return (34.3623,-106.7020,
+            {"coordinate_source":"RELEASE_BIF_APPROVED_GROUP_1495",
+             "coordinate_decision":"APPROVED_BY_USER",
+             "coordinate_decision_file":str(APPROVED_COORDINATE_LEDGER),
+             "coordinate_decision_SHA256":hashfile(APPROVED_COORDINATE_LEDGER),
+             "elevation_m":1596.0,
+             "location_date_start":"200701010000"})
 def original_site_bif(spec,site):
     source=Path(spec["paths"]["native"])
     original=spec["source_provenance"]["native"]["sha256"]
@@ -85,28 +125,51 @@ def original_site_bif(spec,site):
     r=table(p,("VARIABLE","DATAVALUE","GROUP_ID"),sep=",")
     coords={x:set() for x in SITE_FIELD_KEYS};heights=[]
     for z in r:
-        ck(z.get("SITE_ID",site).strip() in ("",site),"BIF unrelated site "+site)
-        k=z["VARIABLE"].strip().upper()
+        ck((z.get("SITE_ID") or site).strip() in ("",site),
+           "BIF unrelated site "+site)
+        k=(z.get("VARIABLE") or "").strip().upper()
         if k in coords:
-            v=number(z["DATAVALUE"])
-            if v is not None:coords[k].add(v)
-        if any(h in k for h in HEIGHThints):
-            heights.append({"variable":z["VARIABLE"],
-                            "value":z["DATAVALUE"],
-                            "group_id":z["GROUP_ID"]})
-    ck(all(len(y)==1 for y in coords.values()),
-       "Nonunique actual native BIF station location/UTC offset "+site)
-    lat=next(iter(coords["LOCATION_LAT"]))
-    lon=next(iter(coords["LOCATION_LONG"]))
+            v=number(z.get("DATAVALUE"))
+            if v is not None and v!=-9999:coords[k].add(v)
+        # Only physically numeric heights qualify, never e.g.
+        # FLUX_MEASUREMENTS_METHOD, TOWER_POWER or HEIGHTC_DATE.
+        if ("HEIGHT" in k or k=="ZBOT"):
+            numeric=number(z.get("DATAVALUE"))
+            if numeric is not None and numeric!=-9999 and numeric>=0:
+                heights.append({"variable":z["VARIABLE"],
+                                "value":z["DATAVALUE"],
+                                "group_id":z["GROUP_ID"]})
+    ck(len(coords["UTC_OFFSET"])==1,
+       "Original BIF UTC_OFFSET independently missing/ambiguous "+site+
+       " "+repr(coords["UTC_OFFSET"]))
     offset=next(iter(coords["UTC_OFFSET"]))
+    approval_info={"coordinate_source":"UNAMBIGUOUS_ORIGINAL_BIF"}
+    if site=="US-Seg":
+        # Historical BIF contains GROUP_ID 1479 AND 1495. Preserve original
+        # alternative; select the already user-approved *paired* group 1495.
+        lat,lon,approval_info=approved_seg_coords(r)
+        ck(lat in coords["LOCATION_LAT"] and lon in coords["LOCATION_LONG"] and
+           offset==-7,
+           "Original US-Seg BIF approved coordinates or UTC_OFFSET -7 changed")
+    else:
+        ck(len(coords["LOCATION_LAT"])==1 and
+           len(coords["LOCATION_LONG"])==1,
+           "Nonunique original native BIF station coordinates "+site)
+        lat=next(iter(coords["LOCATION_LAT"]))
+        lon=next(iter(coords["LOCATION_LONG"]))
     ck(-90<=lat<=90 and -180<=lon<=180 and
        offset.is_integer() and -12<=offset<=14,
        "BIF station/clock values impossible "+site)
     return {"tower_lat":lat,"tower_lon":lon,"UTC_OFFSET_hours":int(offset),
             "BIF_path":str(p),"BIF_SHA256":hashfile(p),
+            "original_BIF_location_candidate_values":{
+                "LAT":sorted(coords["LOCATION_LAT"]),
+                "LON":sorted(coords["LOCATION_LONG"]),
+                "UTC_OFFSET":sorted(coords["UTC_OFFSET"])},
             "instrument_height_candidates_not_assigned_to_ZBOT":heights[:120],
             "height_candidate_count":len(heights),
-            "site_native_original_SHA256":original}
+            "site_native_original_SHA256":original,
+            **approval_info}
 def surface(site,point):
     folder=SITES_ROOT/site/"subset_data"
     sources=list(folder.glob("surfdata*.nc")) if folder.is_dir() else []
@@ -250,6 +313,8 @@ def main():
     a=p.parse_args()
     ck(len(EXPECTED)==10 and len(THREE)==3 and len(SEVEN)==7 and
        len(FIVE_CORRECTED)==5 and len(VPD_ROUND_HH)==3 and
+       US_SEG_APPROVAL["group_id"]=="1495" and
+       US_SEG_APPROVAL["approval"]=="APPROVED_BY_USER" and
        (datetime(2004,2,29)+timedelta(days=1)).date().isoformat()=="2004-03-01",
        "SYVH10 source roster, noleap or rounding self-test failed")
     print("SYVH10 SELF-TEST PASS exact ten site source provenance, 3+7, 5 corrected, 3 VPD rounding, NO WRITES")
