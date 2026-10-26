@@ -217,7 +217,7 @@ def audit():
     summary=pd.DataFrame(groups)
     if len(rows)!=31 or int(summary.proposed_finite_neighbors.sum())!=31 or \
             int(summary.loc[summary.episode.isin([15,17]),"proposed_finite_neighbors"].sum())!=24:
-        raise ValueError("32? Stage12aq 31 signed source-neighbor rows altered")
+        raise ValueError("Stage12aq exact 31 signed source-neighbor rows altered")
     return rows,summary
 
 def main():
