@@ -62,6 +62,11 @@ def target_and_context():
         b2=(datetime_key(b)+timedelta(hours=2)).strftime("%Y%m%d%H%M")
         allkeys.update(timekeys(a2,b2))
     ck(len(target)==98,"Expected exactly 98 science suspect native HH")
+    # Cover complete local calendar days, not just source-HOLD boundaries:
+    # some QC1 anomalies extend past the original science HOLD endpoint.
+    allkeys.update(timekeys("200702080000","200702132330"))
+    allkeys.update(timekeys("200304270000","200304272330"))
+    ck(len(allkeys)==336,"Expected complete Feb08-13 + Apr27 = 336 HH")
     return target,allkeys
 def table(p,cols,want,full_n=None):
     seen={};count=0
@@ -156,10 +161,28 @@ def human_report():
         ck(n==sum(a<=k<=b for k in timekeys(start,stop)),
            "Boundary event interval census mismatch")
         print("END",name)
+    full_days=[]
+    print("\n"+"="*120)
+    print("COMPLETE 2007 FEB08-13 + 2003 APR27 ALL 336 NATIVE HH (includes any abnormal continuation past a HOLD boundary)")
+    print("TIME STATUS ORIGINAL_TA_F_C ORIGINAL_TA_F_QC TA_F_MDS TA_F_MDS_QC TA_ERA_C ORIG_MINUS_ERA_C STAGE07_TA_C STAGE07_TA_QC ORIGINAL_VPD_F STAGE07_VPD_F STAGE07_VPD_QC STAGE05_HOLD_REASON")
+    for k in sorted(context):
+        o=original[k];q=latest[k];e=era_rows[k]
+        try:
+            dt=float(o["TA_F"]);de=float(e["TA_ERA"])
+            delta=f"{dt-de:.3f}" if all(math.isfinite(x) and x not in (-9999.,-6999.)
+                                     for x in (dt,de)) else "NA"
+        except (TypeError,ValueError):delta="NA"
+        row=[k,"SUSPECT" if k in targets else "OTHER",o["TA_F"],o["TA_F_QC"],
+             o["TA_F_MDS"],o["TA_F_MDS_QC"],e["TA_ERA"],delta,
+             q["TA_F"],q["TA_F_QC"],o["VPD_F"],q["VPD_F"],
+             q["VPD_F_QC"],reasons.get(k,"-")]
+        print(" ".join(row))
+        full_days.append(row)
+    ck(len(full_days)==336,"Not all six Feb days + Apr27 fully captured")
     print("\nUS-SYV SIX EPISODE FULL BEFORE/DURING/AFTER READOUT PASS; "
           "SOURCE TA, STAGE07, ERA, RH AND ALL MODEL FORCINGS UNCHANGED")
-    return output
-def write_report(rows):
+    return output,full_days
+def write_report(rows,full_days):
     base=Path.home()/"ameriflux_batch04_manual_review"
     base.mkdir(parents=True,exist_ok=True)
     out=base/("US-Syv_six_suspected_temperature_episodes_98HH_full_flanks_"+
@@ -172,10 +195,15 @@ def write_report(rows):
     with out.open("x",encoding="utf-8",newline="") as f:
         w=csv.writer(f);w.writerow(names);w.writerows(rows)
     print("NEW HUMAN REVIEW CSV",out,"sha256",sha(out))
-    print("ONLY NEW REPORT UNDER HOME WRITTEN; ORIGINAL/DERIVED FORCING READ-ONLY")
+    complete=base/("US-Syv_ALL_2007_Feb08-13_and_2003_Apr27_336HH_TA_ERA_QC_"+
+                    uuid4().hex[:8]+".csv")
+    with complete.open("x",encoding="utf-8",newline="") as f:
+        w=csv.writer(f);w.writerow(names[1:]);w.writerows(full_days)
+    print("ALL 336 FULL-DAY SOURCE/ERA/QC CSV",complete,"sha256",sha(complete))
+    print("ONLY NEW REPORTS UNDER HOME WRITTEN; ORIGINAL/DERIVED FORCING READ-ONLY")
 def selftest():
     x,y=target_and_context()
-    ck(len(x)==98 and len(y)>98,"Expected six exact abnormal intervals")
+    ck(len(x)==98 and len(y)==336,"Expected six exact abnormal intervals + 336 full-day native HH")
     ck(timekeys("200702101730","200702110700")[-1]=="200702110700",
        "Episode midnight crossing failed")
     print("US-SYV SIX T EPISODE SELF TEST PASS: 98 original hold HH, six episodes, ±2h, no science rewrites")
@@ -187,6 +215,6 @@ def main():
     g.add_argument("--report",action="store_true")
     p=a.parse_args();selftest()
     if p.self_test:return
-    report=human_report()
-    if p.report:write_report(report)
+    output,full_days=human_report()
+    if p.report:write_report(output,full_days)
 if __name__=="__main__":main()
