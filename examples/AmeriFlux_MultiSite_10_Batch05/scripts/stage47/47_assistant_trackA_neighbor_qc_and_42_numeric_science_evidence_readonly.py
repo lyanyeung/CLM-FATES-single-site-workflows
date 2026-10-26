@@ -171,6 +171,10 @@ def main():
  if (Counter(r["owner_lane"] for r in owned)!=Counter({
        OWNER_NEIGH:333, OWNER_LOW:42})):
   raise ValueError("Assistant track not exactly 333 neighbor and 42 low-numeric events")
+ ownkeys={(r["site"],r["episode_id"]) for r in owned}
+ claude_keys={(r["site"],r["episode_id"]) for r in other}
+ if len(ownkeys)!=375 or len(claude_keys)!=108 or ownkeys & claude_keys or ownkeys|claude_keys!=set(events):
+  raise ValueError("Assistant/Claude ownership overlaps or omits an original Stage45 event")
  eidx={}
  for r in edges:
   if r["context_kind"]!="ORIGINAL_STAGE27_EVENT":continue
@@ -303,7 +307,7 @@ def main():
     max_abs_original_vs_ERA_candidate_VPD_hPa=round(max_delta,6),
     source_before_trial_edge_untrusted=any(ed["neighbor_untrusted"]!="False" for ed in ee),
     alternative_reference_lane=lane,
-    required_independent_evidence="RAW_TOWER_MET_SENSOR_QC_OR_INDEPENDENT_ERA5LAND_GRID_AND_TIME_MATCH",
+    required_independent_evidence="ORIGINAL_TOWER_SENSOR_QC_AND_SEPARATE_ERA5LAND_REANALYSIS_GRID_TIME_MATCH",
     scientific_status="UNAPPROVED_EVENT_SCIENCE_REVIEW",
     production_DATM_authorized=False))
   else:raise ValueError("unexpected event owner")
