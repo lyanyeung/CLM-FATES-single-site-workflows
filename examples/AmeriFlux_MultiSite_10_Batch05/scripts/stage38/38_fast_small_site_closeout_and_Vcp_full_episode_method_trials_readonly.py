@@ -377,16 +377,30 @@ def main():
   rh=num(r["fresh_ERA5Land_grid_RH_pct"])
   if rh is not None and 0<=rh<=100.5:fresh[k]=rh
  trial_sites=list(SMALL)+["US-Vcp"]
- outputs=[];ziphash={}
+ outputs=[];ziphash={};source_location={};site_source_holds={}
  for site in trial_sites:
   ev={eid:rows for (s,eid),rows in group.items() if s==site}
   needed=set()
+  reference={}
   for rows in ev.values():
    for r in rows:
-    t=r["native_time"];needed.update((near(t,-30),t,near(t,30)))
-  raw,source_sha=raw_data(root,site,needed)
-  if needed and not raw:raise ValueError("no original ZIP data for "+site)
+    t=r["native_time"]
+    if t in reference:raise ValueError("duplicate original source time across events "+site+" "+t)
+    reference[t]=r
+    needed.update((near(t,-30),t,near(t,30)))
+  try:
+   raw,source_sha,provenance=raw_data(root,site,needed,reference)
+  except OriginalSourceUnavailable as exc:
+   # Recover other sites immediately: a site whose original cannot be
+   # independently matched remains HOLD, and produces ZERO site candidates.
+   site_source_holds[site]=str(exc)
+   ziphash[site]="SOURCE_NOT_VERIFIED"
+   source_location[site]="SOURCE_HOLD"
+   print("STAGE38 ORIGINAL_SOURCE_SITE_HOLD",site,str(exc),flush=True)
+   continue
+  if needed and not raw:raise ValueError("no ORIGINAL data for "+site)
   ziphash[site]=source_sha
+  source_location[site]=provenance
   for eid,rr in sorted(ev.items()):
    for method in ("SOURCE_ERA_ALL_EPISODE","SOURCE_MDS_ALL_EPISODE"):
     outputs.append(evaluate(site,eid,ep[site,eid],rr,method,raw,p2map,
@@ -431,6 +445,7 @@ def main():
   md=[r for r in rr if r["method"]=="SOURCE_MDS_ALL_EPISODE"]
   psite=[r for r in p2 if r["site"]==site]
   status=("P2P3_ZERO_ONLY_NOT_FULL_FORCING_PASS" if not psite else
+   "ORIGINAL_SOURCE_UNVERIFIED_SITE_HOLD" if site in site_source_holds else
    "SOURCE_TRIAL_NOT_RUN_HIGH_PRIORITY_SITE" if site in ("US-Vcm","US-Wjs") else
    "SOURCE_REPAIR_METHOD_REVIEW_REQUIRED")
   summary.append(dict(site=site,
@@ -438,7 +453,8 @@ def main():
    source_original_P2P3_events=len({r["episode_id"] for r in psite}),
    source_ZIP_archive_SHA256=ziphash.get(site,"NOT_SCANNED"),
    exact_native_HH_verified_against_original_ZIP=sum(
-     len(group[site,eid]) for eid in {r["episode_id"] for r in psite}) if site in trial_sites else 0,
+     len(group[site,eid]) for eid in {r["episode_id"] for r in psite})
+     if site in trial_sites and site not in site_source_holds else 0,
    number_of_full_episode_trials=len(rr),
    full_episode_ERA_review_candidates=sum(x["science_gate"]=="NUMERIC_CANDIDATE_REVIEW_NO_SCIENCE_APPROVAL" for x in er),
    full_episode_MDS_review_candidates=sum(x["science_gate"]=="NUMERIC_CANDIDATE_REVIEW_NO_SCIENCE_APPROVAL" for x in md),
@@ -457,6 +473,9 @@ def main():
   "Stage24_46_P1_HOLD":digest(fh),"Stage37_65_events":digest(f37),
   "Stage35_actual_429":digest(f35)},
   "original_zip_SHA256_by_site":ziphash,
+  "original_site_source_locations_verified":source_location,
+  "original_site_source_discovery_holds":site_source_holds,
+  "source_holds_are_not_site_passes":True,
   "all_sites":list(SITES),"original_P2P3_total":1574,
   "US_Vcp_original_65_episode_methods_evaluated":sum(x["site"]=="US-Vcp" for x in outputs),
   "num_original_site_method_records":len(outputs),
@@ -468,6 +487,8 @@ def main():
  (out/"stage38_manifest.json").write_text(json.dumps(report,indent=2,sort_keys=True)+"\n")
  md=["# Stage38 quick science closeout: seven smaller sites + full-episode US-Vcp alternatives","",
   "**Zero production forcing changes. All original 1574 P2/P3 remain unapproved.**",
+  "Find original FLUXMET_HH by validated archive/extracted CSV CONTENT, not an assumed filename.",
+  "If one site cannot be source-matched, mark that exact site SOURCE_HOLD and continue other sites.",
   "Read ORIGINAL AmeriFlux FLUXMET ZIP and exact source-native QC for smaller sites",
   "and all 65 Stage37 flagged original US-Vcp episodes.",
   "A separate native-row CSV contains all full-coverage, non-QC0 hypothetical RH/VPD candidates",
@@ -488,6 +509,11 @@ def main():
    r["source_original_P2P3_events"],
    "YES" if r["source_ZIP_archive_SHA256"]!="NOT_SCANNED" else "NOT_SCANNED",
    r["full_episode_ERA_review_candidates"],r["site_closeout_status"]))
+ md+=["","## Site source discovery blockers (unverified, NOT PASSED)"]
+ if site_source_holds:
+  for site,reason in sorted(site_source_holds.items()):
+   md.append("- **{}**: {}".format(site,reason))
+ else:md.append("- No original-source acquisition holds among the trialed sites")
  md+=["","## Candidate trial gate totals"]
  for label,count in sorted(Counter(r["science_gate"] for r in outputs).items()):
   md.append("- **{}**: {} method×episode research trials".format(label,count))
@@ -507,6 +533,7 @@ def main():
     "SOURCE_ZIP",r["source_ZIP_archive_SHA256"][:12],
     "STATUS",r["site_closeout_status"])
  print("STAGE38 FULL_EPISODE_NATIVE_RESEARCH_CANDIDATE_ROWS",len(native_trial))
+ print("STAGE38 ORIGINAL_SOURCE_SITE_HOLDS",json.dumps(site_source_holds,sort_keys=True))
  print("STAGE38 GATES",json.dumps(dict(Counter(r["science_gate"] for r in outputs)),sort_keys=True))
  print("STAGE38_REPORT="+str(out/"STAGE38_SMALL_SITE_AND_FULL_VCP_EVENT_CLOSURE.md"))
  print("STAGE38_OUT="+str(out))
