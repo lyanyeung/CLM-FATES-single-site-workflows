@@ -68,6 +68,25 @@ At 2016-04-11 13:00, using interpolated T 14.0675°C but retaining original VPD 
 
 **Operator decision remains pending on the 2016 two paired T+VPD replacements, pending for the wider 2014 event, and pending for the 2005-01-06 05:00–09:00 MDS/source mismatch.** Neither the original T/QC0, selected Stage07 candidates, PFT, or CIME/Slurm was edited.
 
+## 2026-10-26 Stage13G operator decision — 5 new native timestamps / 9 variable values
+
+**The operator explicitly approved implementing the prior two 2016 paired T+VPD repairs and expanded the 2014-04-02 event to interpolate the original 08:30 and 09:00 tower temperatures as well.** The scoped scientific implementation also interpolates the coincident 08:30/09:00 humidity spikes, while **retaining original 10:00 VPD=0.475 hPa** because the 10:30 VPD is similarly low (0.427 hPa). The signed decision and script are:
+
+- [Stage13G scoped five-time, nine-field operator decision](../decisions/STAGE13G_OPERATOR_APPROVED_MOz_FIVE_TIMESTAMPS_NINE_TA_VPD_CHANGES_20261026.json)
+- [Stage13G isolated versioned research shadow generator](../scripts/stage13/13g_apply_user_approved_US_MOz_five_times_nine_T_VPD_shadow.py).
+
+| Original source-native timestamp | Approved tower T from interpolation (°C) | Approved VPD from interpolation (hPa) |
+|---|---:|---:|
+| 2014-04-02 08:30 | 8.904666667 | 3.974666667 |
+| 2014-04-02 09:00 | 8.900333333 | 3.957333333 |
+| 2014-04-02 10:00 | 8.771500000 | **keep original** 0.475 |
+| 2016-04-11 13:00 | 14.067500000 | 9.828500000 |
+| 2016-04-14 06:30 | 9.035000000 | 4.217000000 |
+
+This represents 5 tower TA repairs and 4 VPD repairs (9 exact variable edits), with **TBOT and QBOT regenerated only on the five affected half-hours** from the Stage07 source saturation-vapour-pressure and specific-humidity equations. No pre-existing Stage07 repair, unrelated time/variable, original FLUXMET, standalone ERA companion, PFT/surface or Slurm job is changed.
+
+**Status:** GitHub operator decision recorded and isolated successor script committed; actual IRIDIS6 run/receipt not yet reported. It would be inaccurate to claim the new candidate has been generated already. In all cases, 2005-01-06 05:00–09:00 source QA episode retains independent HOLD, and Post-v5/DATM/Spinup admission is still **FALSE** pending its review and actual case height/PFT implementation evidence.
+
 ## Current scientific gate
 
 - US-MOz Stage07 numerical forcing: complete; 6 originally modified source events operator approved.
