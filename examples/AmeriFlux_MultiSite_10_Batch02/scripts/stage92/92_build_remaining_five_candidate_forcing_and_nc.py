@@ -45,7 +45,7 @@ def sha(p):
 
 def gitblob(p):
     data=Path(p).read_bytes()
-    return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\\0"+data).hexdigest()
+    return hashlib.sha1(b"blob "+str(len(data)).encode()+bytes([0])+data).hexdigest()
 
 def j(p):return json.loads(Path(p).read_text())
 def csvrows(p):
@@ -202,7 +202,7 @@ def build(specs,replacements,ho1,old,netcdf_path,no_nc=False):
     summaries=[]
     for site,n_years in FIVE.items():
         info=specs[site]
-        print("\\n=== STAGE92 ACTUAL BUILD",site,"YEARS",n_years,"===",flush=True)
+        print("\n=== STAGE92 ACTUAL BUILD",site,"YEARS",n_years,"===",flush=True)
         status={"site":site,"num_years":n_years,"native_minutes":info["native_minutes"],
                 "forcing_done":False,"netcdf_done":False,"status":"FAIL","error":""}
         try:
@@ -248,8 +248,8 @@ def build(specs,replacements,ho1,old,netcdf_path,no_nc=False):
             status["status"]="FAIL"
             print("STAGE92 SITE HOLD/FAIL",site,str(exc),flush=True)
         results.append(status)
-        (out/"site_build_summary.json").write_text(json.dumps(results,indent=2,default=str)+"\\n")
-    print("\\nSTAGE92 ORIGINAL SOURCE SHA RECHECK",flush=True)
+        (out/"site_build_summary.json").write_text(json.dumps(results,indent=2,default=str)+chr(10))
+    print("\nSTAGE92 ORIGINAL SOURCE SHA RECHECK",flush=True)
     changed=[k for k,digest in old["input_sha256"].items() if sha(Path(k))!=digest]
     if changed:raise ValueError("Original Stage07 sources changed during stage92 build: "+str(changed))
     complete=sum(x["forcing_done"] for x in results)
@@ -268,7 +268,7 @@ def build(specs,replacements,ho1,old,netcdf_path,no_nc=False):
         "stage91_manifest_sha256":sha(STAGE91/"manifest.json"),
         "engine_sha256":sha(EXT_ENGINE),
         "original_source_SHA_unchanged":not changed,"sites":results}
-    (out/"manifest.json").write_text(json.dumps(manifest,indent=2,default=str)+"\\n")
+    (out/"manifest.json").write_text(json.dumps(manifest,indent=2,default=str)+chr(10))
     if complete==5 and (no_nc or built==98):
         marker.unlink()
         print("STAGE92 FIVE SITE CANDIDATE PASS | five original-source audited forcing CSV; NC preview years",built)
