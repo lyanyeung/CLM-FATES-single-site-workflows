@@ -325,7 +325,7 @@ def apply(j,c,modified,summary,approval,old_decision):
     dest.mkdir(parents=True,exist_ok=False)
     incomplete=dest/"INCOMPLETE_EXPORT_NO_DATM_OR_SPINUP"
     incomplete.write_text("Stage13L isolated candidate export in progress. Do NOT use.\n")
-    result.reset_index(drop=True).to_csv(dest/CANON_NAME,index=False)
+    result.reset_index(drop=True).to_csv(dest/CANON_NAME,index=False,float_format="%.17g")
     # Reparse the entire 315360-row exported output; ensure every field/time.
     reopened=j.forcing(dest/CANON_NAME)
     if not reopened.index.equals(c.index):
@@ -337,8 +337,13 @@ def apply(j,c,modified,summary,approval,old_decision):
                  pd.to_numeric(result[col],errors="coerce").to_numpy(float),
                  atol=1e-9,rtol=0,equal_nan=True):
                 raise RuntimeError("Full source CSV exported field is not exactly expected "+col)
+        elif pd.api.types.is_numeric_dtype(c[col]):
+            old_vals=pd.to_numeric(c[col],errors="raise").to_numpy(dtype=float)
+            new_vals=pd.to_numeric(reopened[col],errors="raise").to_numpy(dtype=float)
+            if not np.allclose(old_vals,new_vals,rtol=1e-14,atol=1e-12,equal_nan=True):
+                raise RuntimeError("Export changed protected source values beyond 17-digit CSV roundtrip "+col)
         elif not c[col].equals(reopened[col]):
-            raise RuntimeError("Export altered an unapproved field "+col)
+            raise RuntimeError("Export altered an unapproved original source time/string field "+col)
     modified.to_csv(dest/"exact_40_operator_approved_native_ERA5Land_T_VPD_TBOT_QBOT_edits.csv",index=False)
     receipt_path=dest/"stage13l_science_summary.json"
     receipt_path.write_text(json.dumps({**summary,
