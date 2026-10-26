@@ -75,8 +75,8 @@ def display(x):
  return str(x)
 def phase(row,lo,hi):
  ts=row["time_native"]
- if ts<lo:return "BEFORE"
- if ts>hi:return "AFTER"
+ if ts<lo:return "P1_NEIGHBOR_BEFORE" if row["is_P1"]=="1" else "BEFORE"
+ if ts>hi:return "P1_NEIGHBOR_AFTER" if row["is_P1"]=="1" else "AFTER"
  if row["is_P1"]=="1":return "P1"
  return "BETWEEN"
 def emit_record(row,group,ph):
@@ -177,6 +177,10 @@ def main():
  epdir=dest/"all_39_episodes";epdir.mkdir()
  groupdir=dest/"seven_priority_groups";groupdir.mkdir()
  master=[]
+ combined_seven=["# Batch05 Stage19 — seven human review groups, before/during/after","",
+   "Only original Stage18 source observations and source-provided processed ERA columns are shown.",
+   "QC0=measured; QC1=MDS; QC2=processed ERA. These are NOT fresh independent ERA5 observations.",
+   "No corrections or source changes were made.",""]
  for ep in sorted(eps,key=lambda x:(x["site"],x["native_start"])):
   site=ep["site"];lo=ep["native_start"];hi=ep["native_end"]
   start=clock(parse(lo)-timedelta(hours=6))
@@ -198,16 +202,20 @@ def main():
   relevant=[r for r in part if r["is_P1"]=="1"]
   if not relevant:raise ValueError("Stage18 group has no P1 observations "+group)
   lo=relevant[0]["time_native"];hi=relevant[-1]["time_native"]
-  (groupdir/(group+".md")).write_text(markdown(group,site,lo,hi,part),encoding="utf-8")
+  group_text=markdown(group,site,lo,hi,part)
+  (groupdir/(group+".md")).write_text(group_text,encoding="utf-8")
+  combined_seven.append(group_text)
   counter=Counter(phase(r,lo,hi) for r in part)
   print("STAGE19_GROUP",group,"ROWS",len(part),"BEFORE",counter["BEFORE"],
        "P1",counter["P1"],"BETWEEN",counter["BETWEEN"],"AFTER",counter["AFTER"],flush=True)
   summary[group]={"rows":len(part),"flagged_HH":len(relevant),
                    "before":counter["BEFORE"],"after":counter["AFTER"]}
+ (dest/"stage19_SEVEN_priority_original_before_after.md").write_text(
+   "\n\n---\n\n".join(combined_seven)+"\n",encoding="utf-8")
  with (dest/"stage19_all_episode_before_during_after_long.csv").open("x",encoding="utf-8",newline="") as fh:
   w=csv.DictWriter(fh,fieldnames=EXTRA);w.writeheader();w.writerows(master)
  with (dest/"stage19_summary.json").open("x",encoding="utf-8") as fh:
   json.dump(summary,fh,indent=2,sort_keys=True)
- print("STAGE19 SUMMARY 39_episode_MD 7_group_MD original_Stage18_context=775 P1_HH=176 approved=0 reports="+str(dest),flush=True)
+ print("STAGE19 SUMMARY 39_episode_MD 7_group_MD combined_SEVEN_MD original_Stage18_context=775 P1_HH=176 approved=0 reports="+str(dest),flush=True)
  print("Only NEW CSV/MD/JSON created. NO ORIGINAL/STAGE18/FORCING/MODEL/SLURM WRITES.",flush=True)
 if __name__=="__main__":main()
