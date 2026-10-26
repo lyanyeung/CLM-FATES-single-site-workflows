@@ -159,7 +159,7 @@ def run(write):
         q=Counter(original[k]["TA_F_QC"] for k in g)
         first=g[0]
         v1=num(original[first]["TA_F"]);v2=num(packed[first]["TA_ERA"])
-        print(f"\n=== REVIEW {i}/30 FROM {g[0]} TO {g[-1]} | {len(g)} HH | SOURCE_QC {dict(q)} | FIRST_DELTA {v1-v2:+.3f}C ===")
+        print(f"\n=== REVIEW {i}/30 FROM {g[0]} TO {g[-1]} | {len(g)} HH | SOURCE_QC {dict(q)} | FIRST_DELTA {(f'{v1-v2:+.3f}C' if v1 is not None and v2 is not None else 'NA')} ===")
         print("TIME FLAG RAW_TA_C RAW_TA_QC RAW_T_MDS_C RAW_MDS_QC FLUXNET_TA_ERA_C RAW_MINUS_ERA_C STAGE07_T_C LATEST_106_T_C LATEST_T_QC LATEST_VPD_hPa LATEST_VPD_QC HOLD_REASON")
         for k in seq(before,after):
             a=original[k];b=prev[k];c=repaired[k];d=packed[k]
