@@ -163,7 +163,8 @@ def raw_data(root,site,times,reference):
     evidence.append("CSV_BAD:"+p.name+":"+str(e)[:100]);continue
    member=p.name
   elif p.suffix.lower()==".zip":
-   if site.lower() not in p.name.lower():continue
+   # The outer ZIP may have an archive name unrelated to the site or
+   # release. The embedded ORIGINAL FLUXMET_HH member identifies the site.
    try:
     with zipfile.ZipFile(p) as z:
      matches=[m for m in z.infolist()
