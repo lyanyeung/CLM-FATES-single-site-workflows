@@ -2,6 +2,10 @@
 
 This is the central **Ameriflux_Site** collection requested alongside [ICOS sites](../ICOS_sites/). It preserves all existing campaign directories and the earlier [AmeriFlux shared metadata collection](../AmeriFlux_sites/).
 
+## Recommended input PFT percentages — 26 October 2026
+
+[**50-site CLM-FATES recommended inputs v1**](Ameriflux_PFT/RECOMMENDED_INPUT_PFT_50_SITES_20261026.md) provides concrete percentages summing100 for every station, with35 sensitivity/period alternatives and explicit source-to-input assumptions. [Input CSV](Ameriflux_PFT/RECOMMENDED_50_SITE_CLM_FATES_INPUT_PFT_20261026.csv), [CLM `PCT_NAT_PFT` matrix](Ameriflux_PFT/RECOMMENDED_50_SITE_CLM_PCT_NAT_PFT_20261026.csv), and [FATES matrices](Ameriflux_PFT/RECOMMENDED_50_SITE_FATES_PFT_PERCENT_20261026.csv) are intended for FIXNC cold-start design. Model recommendations are separate from measured evidence. Arctic and hydrodeciduous-shrub profiles require the specified private HLM mapping; competition mode does not preserve these fractions.
+
 ## Vegetation and PFT composition
 
 [**Ameriflux_PFT — 50-site composition index, master table and source report**](Ameriflux_PFT/) consolidates all five batches, with **33 numerical composition/cover leads** and **17 sites whose reviewed evidence is qualitative composition, LAI/density or published model assumptions**. A numerical lead may be a partial tree inventory, a historical transect, basal area, tree counts or canopy cover. It does not by itself establish a complete PFT fraction of tower ground area.

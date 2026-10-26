@@ -1,5 +1,7 @@
 # PFT interpretation and experiment design
 
+**26 October2026 follow-up:** [Concrete recommended inputs for all50 sites](RECOMMENDED_INPUT_PFT_50_SITES_20261026.md), the host/FATES matrices and35 alternatives now implement explicitly labeled model hypotheses. They preserve the original observational inventory and do not change active inputs. Their applicability is FIXNC cold start, with recorded default14 and proposed site-private HLM mappings. The source-inventory guidance below still applies when interpreting observed percentages.
+
 This document accompanies the [50-site candidate table](FINAL_50_SITE_PFT_CANDIDATES_20261026.csv). It defines how the evidence can inform subsequent experiment configuration. It does not create a surface or initialize model cohorts.
 
 ## Four quantities that must retain their meaning
