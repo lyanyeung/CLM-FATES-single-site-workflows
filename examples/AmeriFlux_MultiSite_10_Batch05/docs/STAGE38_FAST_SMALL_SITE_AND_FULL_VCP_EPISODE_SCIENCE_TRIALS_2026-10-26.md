@@ -42,7 +42,7 @@ Stage27 code's exact ten: `US-UiD, US-UMB, US-UMd, US-Var, US-Vcm, US-Vcp, US-WC
 
 [Stage38 original ZIP source + full original episode method science trials](../scripts/stage38/38_fast_small_site_closeout_and_Vcp_full_episode_method_trials_readonly.py)
 
-Pinned first committed script at `a0cbf84bbfcef44bcc409dcc02adb3370efcd967`, Git blob SHA `b3693d062946ae376747e1bed190daec6cb0764b`.
+Pinned verified current script at `cd56aae11582d1369d8047a9dfad3aa65acc0ad4`, Git blob SHA `cc3fa3cfc3c4b8196dda6540c72da8c56e6a77f6`.
 
 Science workstreams:
 
@@ -59,13 +59,13 @@ set -euo pipefail
 BASE="$HOME/ameriflux_batch05_stage38"
 mkdir -p "$BASE"
 
-COMMIT="a0cbf84bbfcef44bcc409dcc02adb3370efcd967"
+COMMIT="cd56aae11582d1369d8047a9dfad3aa65acc0ad4"
 RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT"
 FILE="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage38/38_fast_small_site_closeout_and_Vcp_full_episode_method_trials_readonly.py"
 SCRIPT="$BASE/stage38.py"
 
 curl -fLsS --retry 3 "$RAW/$FILE" -o "$SCRIPT"
-test "$(git hash-object "$SCRIPT")" = "b3693d062946ae376747e1bed190daec6cb0764b"
+test "$(git hash-object "$SCRIPT")" = "cc3fa3cfc3c4b8196dda6540c72da8c56e6a77f6"
 echo "SOURCE VERIFIED"
 python3 -B -m py_compile "$SCRIPT"
 python3 -B "$SCRIPT" --self-test
@@ -86,3 +86,7 @@ cat "$OUT/STAGE38_SMALL_SITE_AND_FULL_VCP_EVENT_CLOSURE.md"
 Output `stage38_TEN_SITE_PROVENANCE_AND_REMAINING_REPAIR_GATES.csv`: exact ten-site current numbers, P2/P3 original source (do not double count separate P1/manual/plateau); `stage38_ALL_SMALL_SITE_AND_VCP_FULL_EPISODE_METHOD_TRIALS.csv` event-by-method source original science gates and VPD boundary/physical plausibility screens; `stage38_manifest.json` original input source hashes, original ZIP hashes, and no model edits.
 
 **The Stage38 code has been added to GitHub but has not yet run on IRIDIS6**. Test `--self-test` and original source SHA; if a source path or field differs, abort/report accurately rather than force a scientific fix.
+
+## Script safety self-test strengthened
+
+The pinned Stage38 revision runs synthetic original two-half-hour site episode source RH trial versus both original neighboring VPD records and checks that a source-original QC0 VPD makes the entire event a `QC0_SENSOR_PROTECTED` science gate, without any production write.
