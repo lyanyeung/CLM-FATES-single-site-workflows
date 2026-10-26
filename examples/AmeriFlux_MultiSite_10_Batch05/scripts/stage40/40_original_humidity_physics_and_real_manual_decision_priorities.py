@@ -200,8 +200,8 @@ def main():
    original_start_native=rrs[0]["native_time"],original_end_native=rrs[-1]["native_time"],
    original_HH=len(rrs),original_QC0_HH=qco,source_QC2_or_other_HH=nonqco,
    source_original_implied_RH_below0_HH=cat["ORIGINAL_RH_NEGATIVE_PHYSICALLY_IMPOSSIBLE"],
-   source_original_implied_RH_below5_HH=cat["ORIGINAL_RH_BELOW5_PERCENT_SUSPECT"],
-   source_original_implied_RH_below10_HH=cat["ORIGINAL_RH_BELOW10_PERCENT_EXTREME"],
+   source_original_implied_RH_below5_HH=cat["CUMULATIVE_RH_BELOW5"],
+   source_original_implied_RH_below10_HH=cat["CUMULATIVE_RH_BELOW10"],
    source_original_implied_RH_above100_HH=cat["ORIGINAL_RH_ABOVE100_PERCENT_PHYSICALLY_IMPOSSIBLE"],
    original_implied_RH_min_pct=round(min(implied),6),
    original_implied_RH_max_pct=round(max(implied),6),
@@ -218,8 +218,8 @@ def main():
    specific_investigator_decision=human,
    scientific_status="READ_ONLY_RESEARCH_NOT_APPROVED",
    production_forcing_authorized="NO"))
- if len(events)!=16:
-  raise ValueError("Expected exactly 16 original scientific candidate options")
+ if len(events)!=16 or len(by_event)!=15 or sum(n>1 for n in by_event.values())!=1:
+  raise ValueError("Expected exactly 16 original method choices, 15 events and one ambiguous event")
  inventory=[dict(original_source_file=x["relative_source_path"],kind=x["kind"],
   sha256=x["sha256"],
   exact_UMB_FLUXMET_HH_members=x["matching_FLUXMET_HH_members"],
