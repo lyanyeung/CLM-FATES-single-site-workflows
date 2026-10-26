@@ -1,0 +1,77 @@
+{
+  "schema": "batch03-stage13l-operator-approved-40HH-reanalysis-alternative-v1",
+  "site": "US-MOz",
+  "decision_date": "2026-10-26",
+  "operator_exact_instruction": "批准 US-MOz Stage13k 建议的替代验证方案：仅对 2005-01-06 14:00 至 2005-01-07 09:30 的40个半小时，允许用官方 BIF UTC−6、SHA核验的ERA5-Land与FLUXNET配对ERA及已通过的温湿度物理、压力、边界检查代替缺失的局部QC0证据，在新独立forcing候选中修复TA/VPD/TBOT/QBOT。第一段27条、1月9日及其他未经批准记录继续HOLD；原始数据和Stage07/Stage13g不变，不提交模型作业。请直接更新GitHub并给IRIDIS6执行指令。",
+  "selected_native_interval": {
+    "first": "2005-01-06T14:00:00",
+    "last": "2005-01-07T09:30:00",
+    "step_minutes": 30,
+    "half_hours": 40
+  },
+  "approved_input_substitutions": {
+    "TA_USE": "CDS reanalysis-era5-land-timeseries t2m (K converted to C), UTC native midpoint using original BIF UTC_OFFSET -6",
+    "VPD_USE": "CDS ERA5-Land T2m/dewpoint-derived VPD, hPa, same native midpoint",
+    "TBOT": "TA_USE + 273.15 K",
+    "QBOT": "0.622*ea_Pa/(PSRF_Pa-0.378*ea_Pa), where ea=(es(TA_USE)-VPD_USE)*100 Pa",
+    "PSRF": "preserve original Stage13g site pressure"
+  },
+  "original_source_requirements": {
+    "TA_F_QC": 1,
+    "VPD_F_QC": 1,
+    "original_site_TA_vs_FLUXNET_ERA_abs_difference_gt_C": 5
+  },
+  "evidence_pinned": {
+    "original_stage13g_selected_sha256": "f6b740491fd3b7d9b66fe9bc33c20586db6124442b93df72273410d761bd6b27",
+    "original_CDS_ERA5Land_binary_sha256": "5879ed81aca701d53b8b9674183556df7369861ce4a8cdca1ffd54126fb712ef",
+    "stage13k_report_dir": "/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13k_MOz_Jan2005_QC0_extended_and_CDS_comparison_20261026T192412Z_5fb1be73",
+    "bif_coordinate_lat": 38.7441,
+    "bif_coordinate_lon": -92.2,
+    "bif_utc_offset_hours": -6,
+    "stage13k_40_event_results": {
+      "CDS_pair_physics_pass": 40,
+      "CDS_vs_companion_T_gate_pass": 40,
+      "CDS_vs_companion_RH_gate_pass": 40,
+      "CDS_vs_current_model_pressure_gate_pass": 40,
+      "nearest_stage13g_T_external_boundary_abs_C": [
+        0.8946466064452898,
+        3.0703748168945086
+      ],
+      "nearest_stage13g_VPD_external_boundary_abs_hPa": [
+        1.5596448914627845,
+        0.8341602797455145
+      ],
+      "grid_vs_companion_ERA_T_mean_absolute_C": 0.8170150085449321,
+      "grid_vs_companion_ERA_RH_mean_absolute_percent_points": 4.335508972936405
+    }
+  },
+  "explicit_scientific_waiver": "For this 40-HH event only, the operator explicitly authorizes reanalysis-backed validation in place of missing original source-measured QC0 T+VPD ±6h anchors and the Stage13j >1°C superiority criterion for -6 UTC. This does NOT claim measured validation or ERA5-Land independence from ERA5.",
+  "science_gates_must_still_pass": [
+    "source-specific BIF -6 and official latitude/longitude",
+    "unchanged SHA original tower, paired companion ERA, Stage07 and Stage13g",
+    "unmodified original QC1 at all 40 exact timestamps",
+    "signed distinct ERA5-Land CDS binary and hourly UTC coverage",
+    "grid T versus native companion ERA T <=3.5 C at each selected halfhour",
+    "grid-derived RH versus companion ERA RH <=15 percentage points at each halfhour",
+    "positive water vapor; 0<RH<100%; 0<VPD<es; physically valid QBOT and pressure",
+    "grid pressure versus retained tower PSRF <=12000 Pa at each halfhour",
+    "both immediate boundaries <=4 C TA and <=4 hPa VPD against held Stage13g",
+    "the complete source forcing timeline, all nonscoped variables and all other halfhours byte/numeric content unchanged"
+  ],
+  "explicitly_not_approved": {
+    "first_event_27_HH": [
+      "2005-01-05T20:00:00",
+      "2005-01-06T09:00:00"
+    ],
+    "January_09_negative_bias_source_QC1": true,
+    "all_other_2005_and_all_year_source_QC1": true,
+    "original_2005Jan06_10_00_previous_approved_repair_must_remain": true,
+    "modify_original_tower_or_ERA": false,
+    "modify_Stage07": false,
+    "modify_Stage13g": false,
+    "modify_PFT_surface_ZBOT_or_clock": false,
+    "submit_Slurm_jobs": false,
+    "release_Postv5_or_DATM_or_AD400_or_Normal400": false
+  },
+  "result_state": "OPERATOR_APPROVED_REANALYSIS_BACKED_40_HH_SHADOW_ONLY_PENDING_IRIDIS6_EXECUTION"
+}
