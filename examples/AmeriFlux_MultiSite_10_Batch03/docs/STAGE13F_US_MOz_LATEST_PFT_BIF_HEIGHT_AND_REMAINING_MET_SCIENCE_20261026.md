@@ -89,6 +89,18 @@ This represents 5 tower TA repairs and 4 VPD repairs (9 exact variable edits), w
 
 **Status:** GitHub operator decision recorded and isolated successor script committed; actual IRIDIS6 run/receipt not yet reported. It would be inaccurate to claim the new candidate has been generated already. In all cases, 2005-01-06 05:00–09:00 source QA episode retains independent HOLD, and Post-v5/DATM/Spinup admission is still **FALSE** pending its review and actual case height/PFT implementation evidence.
 
+## 2026-10-26 18:20 UTC — Stage13H proven QC1 source pattern; Jan06 8-hour threshold NOT actual complete fault
+
+Stage13h \`--check\` and \`--run\` both completed on IRIDIS6. The source immutable and current signed Stage13g forcing SHA passed. Its isolated signed report is:
+\`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13h_MOz_Jan2005_full_source_run_20261026T182004Z_d47ac8e2\`.
+
+- From **01:30 to 09:00 2005-01-06** (16 halfhours, 8h), \`TA_F_QC=1\` all along, and tower source \`TA_F - TA_ERA\` between **+8.166 and +15.120°C**. Paired original standalone FLUXNET ERA5 \`TA_ERA/VPD_ERA\` reconstructs physically valid water-RH and QBOT for all 16; **16/16 is a physics test, not proof of independent ERA measurement validation**.
+- **The anomaly is demonstrably not confined to those 16 halfhours**: Jan06 00:00–01:00 tower QC1 is already +7.126 to +7.750°C higher than ERA, and **14:00–23:30** contains 20 more continuous \`TA_F_QC=1\` warm biases ~+9–15°C. Additional 10:00 QC1 spike was **already specifically approved and repaired in the original Stage07** and must not be double-modified.
+- The surrounding Jan06 **09:30**, **10:30–12:30** \`QC2\` source temperatures exactly equal companion ERA. This is a change in source gapfill/QC provenance, not independent cross-validation, and highlights the need to treat whole QC1 stretches separately from QC2.
+- Jan06 **13:00,13:30** are also \`QC1\` with ~+3.93 to +3.95°C tower vs ERA, below the arbitrary 8°C threshold. Do not silently treat them as verified valid or invalid.
+- Hence do **NOT** approve blind replacement just for 01:30–09:00. Investigate the native QC1 source blocks across adjacent days and the 2005 source ERA offset using [Stage13i full QC1 multiday source and boundary audit](../scripts/stage13/13i_MOz_2005_QC1_ERA_multi_day_episode_boundaries_READONLY.py). This makes no forcing changes.
+- \`2005_QC1_paired_ERA_replacement_approved=False\`, \`Postv5_approved=False\`, \`DATM_ready=False\`, \`spinup_authorized=False\`. The finished Stage13g 315360-row shadow remains immutable.
+
 ## Current scientific gate
 
 - US-MOz Stage07 numerical forcing: complete; 6 originally modified source events operator approved.
