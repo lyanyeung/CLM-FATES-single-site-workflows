@@ -749,3 +749,43 @@ As with earlier stages, this does not invent a UTC offset, infer a source instru
 ```
 
 After success, show the actual reviewer decision cards with `cat "$OUT/stage18_7_priority_review_cards.md"` **inside the same shell**, or upload that `.md` and the flagged HH CSV to ChatGPT to conduct an evidence-based KEEP/HOLD/REPLACE review. This script is committed and SHA-verified on GitHub but has **not been executed on IRIDIS6**. All proposals remain `HOLD_NOT_APPROVED`.
+
+
+## Stage19: P1 original-before-and-after user review tables
+
+The operator completed Stage18: original P1 met from three SHA256-pinned native sources, **39 P1 episodes = 176 flagged original HH, 775 unique HH context rows**, with original Stage18 evidence at `$HOME/ameriflux_batch05_stage18/original_review_20261025T235716Z_1394929`.
+
+User requested both the **before and after** meteorology and ERA5 data, by problem, so they can decide now. The Stage18 pasted terminal output showed P1-flagged hours but not all 775 surrounding HH values; Stage19 provides exact existing CSV data without fabricating missing rows.
+
+[Stage19 report-only before/during/after source tables](scripts/stage19/19_make_before_during_after_decision_tables_readonly.py) reads only Stage18 reports and writes:
+- `stage19_SEVEN_priority_original_before_after.md`, one full copy/paste-ready file combining the seven core review groups with original surrounding meteorology;
+- `seven_priority_groups/G01...G07.md`, individual full before/P1/between/after table per top group;
+- `all_39_episodes/US-...E....md`, individual exact original episode ±6h source context; neighboring abnormal P1 half-hours separately labeled;
+- `stage19_all_episode_before_during_after_long.csv`, machine-readable audit rows for all 39 P1 episodes including source value QC, MDS alternatives, processed ERA counterparts, source RH and water-Magnus RH;
+- `stage19_summary.json`.
+
+**Critical data provenance:** the original source columns `TA_F` and `VPD_F` are not necessarily measured *tower* values: QC0=measured, QC1=MDS, QC2=source-supplied processed ERA. `TA_ERA` and `VPD_ERA` are source supplied downscaled ERA/reference counterparts; their exact reanalysis version has not been independently verified as **ERA5/ERA5-Land**. This script does not independently download ERA5/ERA5-Land. No source meteorology, QC, DATM forcing, CIME or Slurm changes.
+
+```bash
+(
+ set -euo pipefail
+ BASE="$HOME/ameriflux_batch05_stage19"
+ COMMIT="b5081d1ebc18ab6d4622b1ac6d0ad4379072b92e"
+ RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT"
+ SCRIPT="$BASE/19_make_before_during_after_decision_tables_readonly.py"
+ STAGE18="$HOME/ameriflux_batch05_stage18/original_review_20261025T235716Z_1394929"
+ mkdir -p "$BASE"
+ curl -fLsS --retry 3 \
+    "$RAW/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage19/19_make_before_during_after_decision_tables_readonly.py" -o "$SCRIPT"
+ test "$(git hash-object "$SCRIPT")" = "47a9fb0e683ff32ba87993725856ab88998fe788"
+ echo "SOURCE VERIFIED"
+ python3 -B -m py_compile "$SCRIPT"
+ python3 -B "$SCRIPT" --self-test
+ OUT="$BASE/original_before_after_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+ python3 -B "$SCRIPT" --stage18-dir "$STAGE18" --output-dir "$OUT" \
+   2>&1 | tee "$BASE/stage19.log"
+ echo "HUMAN_REVIEW_FILE=$OUT/stage19_SEVEN_priority_original_before_after.md"
+)
+```
+
+After success, `cat "$OUT/stage19_SEVEN_priority_original_before_after.md"` to copy into the chat, or transfer and attach the `.md`. **Stage19 has been committed to GitHub and hash checked, but operator has not yet executed it on IRIDIS6.** All 176 flagged original HH remain HOLD, nothing automatically approved.
