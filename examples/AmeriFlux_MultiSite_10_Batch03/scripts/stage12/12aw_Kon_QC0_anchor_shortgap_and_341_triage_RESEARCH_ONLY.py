@@ -171,9 +171,28 @@ def assess():
         raise RuntimeError("Original Stage12av selected variables unavailable")
     if not np.array_equal(base.VPD_USE.isna().to_numpy(),base.QBOT.isna().to_numpy()):
         raise RuntimeError("VPD/QBOT selected missing masks differ")
-    for col in ("VPD_USE","QBOT"):
-        if not np.array_equal(base[col].to_numpy(),av_original[col].to_numpy(),equal_nan=True):
-            raise RuntimeError("Zero-patch Stage12av must equal signed Stage12an source "+col)
+    # A 280320-row CSV re-serialization may introduce float-roundtrip differences
+    # (~1e-15) even though Stage12av applied ZERO humidity changes. Verify
+    # unchanged missing masks and strict absolute tolerances, never silently
+    # waive substantive differences in either humidity source column.
+    for col,absolute_tol in (("VPD_USE",1e-10),("QBOT",1e-12)):
+        a=base[col].to_numpy(dtype=float)
+        b=av_original[col].to_numpy(dtype=float)
+        if not np.array_equal(np.isnan(a),np.isnan(b)):
+            raise RuntimeError("Zero-patch Stage12av changed source missing mask "+col)
+        same=np.isclose(a,b,rtol=0,atol=absolute_tol,equal_nan=True)
+        if not np.all(same):
+            bad=np.flatnonzero(~same)
+            j=int(bad[0])
+            raise RuntimeError(
+                f"Stage12av differs materially from signed Stage12an in {col}: "
+                f"{len(bad)} mismatched rows; first {keys[j]}, "
+                f"Stage12av={a[j]}, Stage12an={b[j]}, tolerance={absolute_tol}")
+        finite=np.isfinite(a)&np.isfinite(b)
+        maximum=float(np.max(np.abs(a[finite]-b[finite]))) if finite.any() else 0.0
+        print(f"STAGE12AW ZERO-PATCH SCIENCE SOURCE {col} PASS "
+              f"| max_float_roundtrip_delta={maximum:.3e} "
+              f"| atol={absolute_tol:.0e} | NaN_mask_identical",flush=True)
     raw=pd.read_csv(safe(spec["primary"]),
        usecols=["TIMESTAMP_START","TA_F","TA_F_QC","VPD_F","VPD_F_QC"],
        dtype={"TIMESTAMP_START":str},low_memory=False)
