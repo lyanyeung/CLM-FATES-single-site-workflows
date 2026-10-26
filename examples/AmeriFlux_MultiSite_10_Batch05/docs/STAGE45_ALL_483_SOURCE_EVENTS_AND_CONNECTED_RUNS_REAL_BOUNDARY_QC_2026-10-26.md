@@ -12,9 +12,9 @@
 
 ## Stage45 substantive next research task
 
-[Stage45 original 483 source event and true contiguous P2P3 run boundary science gate](../scripts/stage45/45_actual_483_event_full_native_era_boundaries_and_connected_runs.py), immutable GitHub commit `5307765b4865364ba5d41a2e1525edf5a12532bc`, Git blob `2369ec2a6abb1c6ef1df8d5d23f6b70b68f144ba`.
+[Stage45 original 483 source event and true contiguous P2P3 run boundary science gate](../scripts/stage45/45_actual_483_event_full_native_era_boundaries_and_connected_runs.py), immutable GitHub commit `8b1a5c9aa886517153b05e955ba97c092fa680ed`, Git blob `ace88da48f088c709487cac1d949ad80d54f454f`.
 
-[Stage45 one-click IRIDIS6 launcher](../scripts/stage45/run_stage45_iridis6.sh), immutable GitHub commit `000a856d9c20dd60c5a05ad69de4f742efda7e55`, Git blob `1cfa9269225d333d12679454ba46c63cab6056a7`.
+[Stage45 one-click IRIDIS6 launcher](../scripts/stage45/run_stage45_iridis6.sh), immutable GitHub commit `bb7b69e15c42d80fe7a29ea08c91465888b13f24`, Git blob `02d047dee26f20442e54dd0914d0350f5194142d`.
 
 Stage45 reads actual IRIDIS6 Stage44 first-pass output and exact Stage27 native P2/P3 source, Stage24 original approved/held records. For all nine sites with original P2/P3, source locator requires exact original native `TA_F, VPD_F, TA_F_QC, VPD_F_QC` equality to Stage27 (numeric tolerance 0.002). Six previously SHA-known FLUXMET ZIPs are pinned to actual immutable SHA256; other sites' original FLUXMET HH ZIP vs extracted copies must all agree on verified native records and ±30min neighbor rows. **US-UMB uses its actual verified 2007–2021 original FULLSET_HH product, whose 23/23 original T/VPD/QC were confirmed by Stage41**, not an imaginary FLUXMET_HH source. If a site lacks trustworthy source, it remains an explicit `STAGE45 ORIGINAL_SOURCE_SITE_HOLD`; the rest continue.
 
@@ -34,9 +34,11 @@ Generated output under `$HOME/ameriflux_batch05_stage45/all_native_event_edges_.
 ### Directly copy to IRIDIS6 (no git pull required)
 
 ```bash
-curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/000a856d9c20dd60c5a05ad69de4f742efda7e55/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage45/run_stage45_iridis6.sh" -o "$HOME/run_stage45.sh"
-test "$(git hash-object "$HOME/run_stage45.sh")" = "1cfa9269225d333d12679454ba46c63cab6056a7"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/bb7b69e15c42d80fe7a29ea08c91465888b13f24/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage45/run_stage45_iridis6.sh" -o "$HOME/run_stage45.sh"
+test "$(git hash-object "$HOME/run_stage45.sh")" = "02d047dee26f20442e54dd0914d0350f5194142d"
 bash "$HOME/run_stage45.sh"
 ```
 
 **Stage45 script committed and GitHub SHA-verified, user runtime still pending.** It reads and analyzes source data, writes new reports only, never changes source FLUXMET/FULLSET or operational DATM/CIME/Slurm and never approves new RH/VPD repairs.
+
+**Final Stage45 source audit robustness:** If an unrelated candidate ZIP/CSV is unreadable, skip only that candidate and continue scanning; require exact Stage27 original T/VPD/QC and all matched source copies to agree on actual native neighbor data. A site without any matched original still remains an explicit `STAGE45 ORIGINAL_SOURCE_SITE_HOLD`.
