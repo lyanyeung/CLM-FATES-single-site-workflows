@@ -43,7 +43,7 @@ CASE_FIELDS=("site","original_episode","method","original_event_HH",
  "source_rh_outside0_100_HH","trial_VPD_unphysical_HH",
  "max_abs_trial_VPD_change_hPa","max_trial_VPD_hPa",
  "internal_original_jump_gt2","internal_trial_jump_gt2",
- "internal_new_jump_gt2","internal_new_jump_gt4",
+ "internal_new_jump_gt2","internal_new_jump_gt4","source_native_gap_count",
  "external_old_jump_gt2","external_trial_jump_gt2",
  "external_new_jump_gt2","external_new_jump_gt4",
  "external_neighbor_nonQC0","external_neighbor_suspect_RH",
@@ -134,8 +134,10 @@ def evaluate(site,eid,method,rr,original,raw,approved,allP2,provenance):
  times=sorted(r["native_time"] for r in rr)
  if not times or len(set(times))!=len(times):
   raise ValueError("invalid original episode duplicate")
- if any(plus(a,30)!=b for a,b in zip(times,times[1:])):
-  raise ValueError("original candidate episode is not contiguous")
+ gaps=sum(plus(a,30)!=b for a,b in zip(times,times[1:]))
+ # Never invent/interpolate missing source-native half-hours. A noncontiguous
+ # original episode cannot be promoted as one replacement window.
+
  selected={}
  negative=nearzero=bad_rh=bad_V=source_qc0=0
  maxchange=maxnew=0.
@@ -170,7 +172,9 @@ def evaluate(site,eid,method,rr,original,raw,approved,allP2,provenance):
   maxchange=max(maxchange,abs(candidate-V))
   maxnew=max(maxnew,abs(candidate))
  # Actual replacement of an entire event must maintain all source-native times
- if len(selected)!=len(rr) or source_qc0 or bad_rh or bad_V:
+ if gaps:
+  gate="NONCONTIGUOUS_ORIGINAL_EPISODE_HOLD"
+ elif len(selected)!=len(rr) or source_qc0 or bad_rh or bad_V:
   gate="BLOCK_ORIGINAL_QC0_OR_UNCOVERED_HUMIDITY_SOURCE"
  else:gate="NEEDS_BOUNDARY_AND_SOURCE_PROVENANCE_REVIEW"
  internal_old2=internal_trial2=internal_new2=internal_new4=0
@@ -188,7 +192,8 @@ def evaluate(site,eid,method,rr,original,raw,approved,allP2,provenance):
    if obs is None:raise ValueError("original FLUXMET native ±30 neighbor missing "+site+" "+nt)
    key=(site,nt)
    nV=(num(approved[key]["modified_VPD_hPa"]) if key in approved else obs["V"])
-   nRH=(100*(1-obs["V"]/es(obs["T"])) if obs["T"] is not None and obs["V"] is not None else None)
+   nRH=(100*(1-obs["V"]/es(obs["T"])) if obs["T"] is not None and
+        -80<=obs["T"]<=60 and obs["V"] is not None else None)
    status=("ALREADY_APPROVED_STAGE24" if key in approved else
            "OTHER_P2P3_UNAPPROVED" if key in allP2 else
            "SOURCE_ORIGINAL_NEIGHBOR")
@@ -221,7 +226,7 @@ def evaluate(site,eid,method,rr,original,raw,approved,allP2,provenance):
     neighbor_RH_lt10_or_unphysical=nRH is None or nRH<10 or nRH>100,
     uncertain_neighbor=(obs["VQC"]!="0" or status=="OTHER_P2P3_UNAPPROVED"),
     edge_science_status="RESEARCH_ONLY_NOT_APPROVED"))
- if gate!="BLOCK_ORIGINAL_QC0_OR_UNCOVERED_HUMIDITY_SOURCE":
+ if gate=="NEEDS_BOUNDARY_AND_SOURCE_PROVENANCE_REVIEW":
   gate=("NEW_TRIAL_4HPA_DISCONTINUITY_HOLD" if new4 or internal_new4 else
         "NEW_TRIAL_2HPA_DISCONTINUITY_HOLD" if new2 or internal_new2 else
         "UNKNOWN_OR_UNAPPROVED_SOURCE_BOUNDARY_HOLD" if uncertain or neighbor_bad or uncomparable else
@@ -234,7 +239,7 @@ def evaluate(site,eid,method,rr,original,raw,approved,allP2,provenance):
   trial_VPD_unphysical_HH=bad_V,max_abs_trial_VPD_change_hPa=round(maxchange,6),
   max_trial_VPD_hPa=round(maxnew,6),internal_original_jump_gt2=internal_old2,
   internal_trial_jump_gt2=internal_trial2,internal_new_jump_gt2=internal_new2,
-  internal_new_jump_gt4=internal_new4,external_old_jump_gt2=o2,
+  internal_new_jump_gt4=internal_new4,source_native_gap_count=gaps,external_old_jump_gt2=o2,
   external_trial_jump_gt2=t2,external_new_jump_gt2=new2,external_new_jump_gt4=new4,
   external_neighbor_nonQC0=uncertain,external_neighbor_suspect_RH=neighbor_bad,
   external_boundary_not_comparable=uncomparable,source_provenance=provenance,
