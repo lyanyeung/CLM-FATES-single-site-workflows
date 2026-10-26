@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 sys.dont_write_bytecode=True
 
-VER="batch03-stage13j-v2-20261026-strict-per-event-CDS-native-QC0"
+VER="batch03-stage13j-v3-20261026-correct-CDS-UTC-coverage-gate"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 SITE="US-MOz"
 S07=ROOT/"qcv5_native_trial_20261022T024559Z_36c46e58"
@@ -206,6 +206,23 @@ def latlon_validate(ds,site_lat,site_lon):
         if len(vals)!=1 or not np.isfinite(vals).all() or abs(float(vals[0])-target)>0.3:
             raise RuntimeError("ERA5-Land gridpoint location mismatch/variable spatial grid "+key)
 
+def verify_utc_coverage(index):
+    """Coverage bounds mean earliest sample <= required start, latest >= end.
+    The original Stage13j v2 mistakenly reversed the earliest inequality and
+    rejected a perfectly valid CDS Jan03 start as 'not covering Jan04'.
+    """
+    if len(index)<2:
+        raise RuntimeError("CDS hourly UTC time axis empty/too short")
+    req_start=pd.Timestamp("2005-01-04 00:00:00")
+    req_end=pd.Timestamp("2005-01-10 23:00:00")
+    actual_start=pd.Timestamp(index.min())
+    actual_end=pd.Timestamp(index.max())
+    if not(actual_start<=req_start and actual_end>=req_end):
+        raise RuntimeError("CDS response incomplete for UTC Jan04-Jan10 inclusive:"
+            +" actual first="+str(actual_start)+" last="+str(actual_end)
+            +" required first<="+str(req_start)+" last>="+str(req_end))
+    return True
+
 def nc_data(raw,meta):
     from netCDF4 import Dataset,num2date
     obs={}
@@ -256,9 +273,9 @@ def nc_data(raw,meta):
     if not obs["t2m"].index.equals(obs["d2m"].index) or not obs["t2m"].index.equals(obs["sp"].index):
         raise RuntimeError("Different ERA variable UTC grids; no implied alignment")
     v=pd.DataFrame(obs).sort_index()
-    if not (pd.Timestamp("2005-01-04")<=v.index.min() and
-            v.index.max()>=pd.Timestamp("2005-01-10")):
-        raise RuntimeError("CDS response did not cover UTC 2005-01-04..10")
+    verify_utc_coverage(v.index)
+    print("STAGE13J VERIFIED CDS HOURLY UTC COVERAGE",
+          str(v.index.min()),"through",str(v.index.max()),"hours",len(v),flush=True)
     if not np.allclose(np.diff(v.index.values).astype("timedelta64[m]").astype(float),60):
         raise RuntimeError("Incomplete hourly ERA5-Land source timestamps")
     if (v.t2m<180).any() or (v.t2m>335).any() or (v.d2m>v.t2m+0.1).any() or \
@@ -518,7 +535,20 @@ def main():
     assert sum(x[2] for x in SCOPE)==67
     assert not (pd.Timestamp(SCOPE[0][1])>=pd.Timestamp(SCOPE[1][0]))
     assert pd.Timestamp("2005-01-09")>pd.Timestamp(SCOPE[1][1])
-    print("STAGE13J SELF-TEST PASS | 27+40=67, zero other native slots",flush=True)
+    # Regression guard for the actual CDS coverage failure: a correctly
+    # earlier Jan03 first timestamp MUST pass a Jan04-Jan10 coverage request.
+    synthetic_good=pd.date_range("2005-01-03 00:00","2005-01-11 23:00",freq="h")
+    assert verify_utc_coverage(synthetic_good)
+    for invalid in (
+         pd.date_range("2005-01-05 00:00","2005-01-11 23:00",freq="h"),
+         pd.date_range("2005-01-03 00:00","2005-01-10 22:00",freq="h")):
+        try:
+            verify_utc_coverage(invalid)
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError("Bad short CDS UTC source passed the regression test")
+    print("STAGE13J SELF-TEST PASS | 27+40=67; CDS earlier-start range regression PASS",flush=True)
     if a.self_test:return
     if not a.decision:p.error("Require signed operator Stage13j --decision JSON")
     if a.fetch:download(a.decision);return
