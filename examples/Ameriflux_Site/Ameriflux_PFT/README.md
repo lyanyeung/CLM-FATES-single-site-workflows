@@ -1,5 +1,16 @@
 # AmeriFlux PFT evidence — all 50 stations
 
+
+## Full BADM cross-check, 26 October 2026
+
+[BADM_PFT_CROSSCHECK_50_SITES_20261026.md](BADM_PFT_CROSSCHECK_50_SITES_20261026.md) compares the full AmeriFlux BADM vegetation records (IGBP and species cover, 50 of 50 sites) with the recommended inputs.
+
+- 42 sites are consistent.
+- 5 differ only in metric or year.
+- 3 need a decision: US-Ho3 (BADM gives 80/20 within 200 m), US-Syv (tower plots give ENF ≈13, against the 50/50 prior), and US-Wjs (BADM gives ~26% juniper cover, against ENF 15).
+
+No recommended value was changed.
+
 ## Recommended CLM-FATES inputs — 26 October 2026
 
 [**50-site recommended input percentages (v1)**](RECOMMENDED_INPUT_PFT_50_SITES_20261026.md) now gives a complete FIXNC prescription for each station, plus 35 sensitivity or period alternatives. [Full input CSV](RECOMMENDED_50_SITE_CLM_FATES_INPUT_PFT_20261026.csv), [CLM host matrix](RECOMMENDED_50_SITE_CLM_PCT_NAT_PFT_20261026.csv), and [FATES natural-landunit / vegetated-only matrices](RECOMMENDED_50_SITE_FATES_PFT_PERCENT_20261026.csv) distinguish proposed model fractions from the original observations below. Nine primary prescriptions require a site-private Arctic or hydrodeciduous-shrub HLM map; defaults do not reproduce those targets. No existing surface, parameter file or case was changed.

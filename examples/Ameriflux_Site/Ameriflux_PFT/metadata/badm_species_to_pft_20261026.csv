@@ -1,0 +1,74 @@
+key,scientific_name,growth_form,pft
+ABBA,Abies balsamea,tree,ENF
+ABLA,Abies lasiocarpa,tree,ENF
+PIBA2,Pinus banksiana,tree,ENF
+PICO,Pinus contorta,tree,ENF
+PIEC,Pinus echinata,tree,ENF
+PIELE2,Pinus elliottii var. elliottii,tree,ENF
+PIEN,Picea engelmannii,tree,ENF
+PIMA,Picea mariana,tree,ENF
+PIPA2,Pinus palustris,tree,ENF
+PIPO,Pinus ponderosa,tree,ENF
+PIRI,Pinus rigida,tree,ENF
+PIRU,Picea rubens,tree,ENF
+PIST,Pinus strobus,tree,ENF
+PSME,Pseudotsuga menziesii,tree,ENF
+TSCA,Tsuga canadensis,tree,ENF
+JUVI,Juniperus virginiana,tree,ENF
+Picea glauca,Picea glauca,tree,ENF
+Pinus ponderosa,Pinus ponderosa,tree,ENF
+Pinus resinosa,Pinus resinosa,tree,ENF
+Pinus strobus,Pinus strobus,tree,ENF
+Pinus taeda,Pinus taeda,tree,ENF
+Tsuga canadensis,Tsuga canadensis,tree,ENF
+ACPE,Acer pensylvanicum,tree,DBF
+ACRU,Acer rubrum,tree,DBF
+ACSA3,Acer saccharum,tree,DBF
+ACSAF,Acer saccharum (var.),tree,DBF
+ACSAS,Acer saccharum var. saccharum,tree,DBF
+BEAL2,Betula alleghaniensis,tree,DBF
+BEPA,Betula papyrifera,tree,DBF
+CAOV2,Carya ovata,tree,DBF
+FAGR,Fagus grandifolia,tree,DBF
+FRAM2,Fraxinus americana,tree,DBF
+FRPE,Fraxinus pennsylvanica,tree,DBF
+LITU,Liriodendron tulipifera,tree,DBF
+OSVI,Ostrya virginiana,tree,DBF
+EUSID,ironwood (Ostrya virginiana; per BADM comment),tree,DBF
+POGR4,Populus grandidentata,tree,DBF
+POTR5,Populus tremuloides,tree,DBF
+PRSE2,Prunus serotina,tree,DBF
+PRVE,Prosopis velutina,tree,DBF
+QUAL,Quercus alba,tree,DBF
+QUCO,Quercus coccinea,tree,DBF
+QUDO,Quercus douglasii,tree,DBF
+QUMU,Quercus muehlenbergii,tree,DBF
+QUPR,Quercus prinus,tree,DBF
+QURU,Quercus rubra,tree,DBF
+QUVE,Quercus velutina,tree,DBF
+TIAM,Tilia americana,tree,DBF
+Acer pennsylvanicum,Acer pensylvanicum,tree,DBF
+Acer pensylvanicum,Acer pensylvanicum,tree,DBF
+Acer rubra,Acer rubrum,tree,DBF
+Acer rubrum,Acer rubrum,tree,DBF
+Acer saccharum,Acer saccharum,tree,DBF
+Betula alleghaniensis,Betula alleghaniensis,tree,DBF
+Betula lenta,Betula lenta,tree,DBF
+Betula papyrifera,Betula papyrifera,tree,DBF
+Betula populifolia,Betula populifolia,tree,DBF
+Carya glabra,Carya glabra,tree,DBF
+Castanea dentata,Castanea dentata,tree,DBF
+Fagus grandifolia,Fagus grandifolia,tree,DBF
+Fraxinus americana,Fraxinus americana,tree,DBF
+Liriodendron tulipifera,Liriodendron tulipifera,tree,DBF
+Ostrya virginiana,Ostrya virginiana,tree,DBF
+Populus grandidentata,Populus grandidentata,tree,DBF
+Populus tremuloides,Populus tremuloides,tree,DBF
+Prunus pensylvanica,Prunus pensylvanica,tree,DBF
+Prunus serotina,Prunus serotina,tree,DBF
+Quercus alba,Quercus alba,tree,DBF
+Quercus rubra,Quercus rubra,tree,DBF
+Quercus velutina,Quercus velutina,tree,DBF
+Sassafras albidum,Sassafras albidum,tree,DBF
+Ulmus rubra,Ulmus rubra,tree,DBF
+other (5 species),unspecified,tree,UNKNOWN

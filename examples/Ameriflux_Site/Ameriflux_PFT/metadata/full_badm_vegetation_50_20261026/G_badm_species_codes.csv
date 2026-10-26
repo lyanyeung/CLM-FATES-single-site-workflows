@@ -1,0 +1,145 @@
+species_or_vegtype,is_vegtype,n_sites,sites,raw_examples
+ABBA,False,1,CA-TP4,ABBA (NRCS plant code)
+ABLA,False,1,US-NR1,ABLA (NRCS plant code)
+ACPE,False,1,US-Ha1,ACPE (NRCS plant code)
+ACRU,False,6,CA-TP4 US-Bar US-Ha1 US-Ho3 US-UMB US-WCr,ACRU (NRCS plant code)
+ACSA3,False,2,US-Syv US-WCr,ACSA3 (NRCS plant code)
+ACSAF,False,1,US-MOz,ACSAF (NRCS plant code)
+ACSAS,False,1,US-MMS,ACSAS (NRCS plant code)
+AETR,False,1,US-Ton,AETR (NRCS plant code)
+AICA,False,1,US-Ton,AICA (NRCS plant code)
+AMELA,False,1,US-UMB,AMELA (NRCS plant code)
+ARPA6,False,1,US-Me2,ARPA6 (NRCS plant code)
+ARST5,False,1,US-SP1,ARST5 (NRCS plant code)
+AVBA,False,1,US-Ton,AVBA (NRCS plant code)
+Acer pennsylvanicum,False,1,US-Ha1,Acer pennsylvanicum
+Acer pensylvanicum,False,3,US-Ha1 US-UMB US-UMd,Acer pensylvanicum
+Acer rubra,False,2,US-UMB US-UMd,Acer rubra
+Acer rubrum,False,2,US-Ha1 US-UMd,Acer rubrum
+Acer saccharum,False,3,US-MMS US-UMB US-UMd,Acer saccharum
+Amelanchier spp,False,1,US-UMd,Amelanchier spp
+Arctostaphylos patula,False,2,US-Me2 US-Me6,Arctostaphylos patula
+Asimina triloba,False,1,US-MMS,Asimina triloba
+B,False,1,US-Ton,B (NRCS plant code)
+BEAL2,False,3,US-Bar US-Ha1 US-Syv,BEAL2 (NRCS plant code)
+BEPA,False,3,US-Bar US-UMB US-WCr,BEPA (NRCS plant code)
+BOER4,False,1,US-SRM,BOER4 (NRCS plant code)
+BRDI,False,1,US-Ton,BRDI (NRCS plant code)
+BRDI2,False,1,US-Ton,BRDI2 (NRCS plant code)
+BREL,False,1,US-Ton,BREL (NRCS plant code)
+BRHO,False,1,US-Ton,BRHO (NRCS plant code)
+BRMA,False,1,US-Ton,BRMA (NRCS plant code)
+BRMI,False,1,US-Ton,BRMI (NRCS plant code)
+Betula alleghaniensis,False,1,US-Ha1,Betula alleghaniensis
+Betula lenta,False,1,US-Ha1,Betula lenta
+Betula papyrifera,False,3,US-Ha1 US-UMB US-UMd,Betula papyrifera
+Betula populifolia,False,1,US-Ha1,Betula populifolia
+"Bouteloua spp., Eragrostis lehmanniana",False,1,US-Wkg,"Bouteloua spp., Eragrostis lehmanniana"
+CALOCHOR,False,1,US-Ton,CALOCHOR (NRCS plant code)
+CAOV2,False,1,US-MOz,CAOV2 (NRCS plant code)
+CEME,False,1,US-Ton,CEME (NRCS plant code)
+CHANA2,False,1,CA-Ca3,CHANA2 (NRCS plant code)
+CHPO,False,1,US-Ton,CHPO (NRCS plant code)
+CONYZ,False,1,CA-TP1,CONYZ (NRCS plant code)
+CYEC,False,1,US-Ton,CYEC (NRCS plant code)
+Carya glabra,False,1,US-MMS,Carya glabra
+Castanea dentata,False,1,US-Ha1,Castanea dentata
+Crataegus spp.,False,1,US-Ha1,Crataegus spp.
+DICA8,False,1,US-SRM,DICA8 (NRCS plant code)
+DISA,False,1,CA-TP1,DISA (NRCS plant code)
+DIVO,False,1,US-Ton,DIVO (NRCS plant code)
+ERBO,False,1,US-Ton,ERBO (NRCS plant code)
+ERLE,False,1,US-SRM,ERLE (NRCS plant code)
+EUSID,False,1,US-Syv,EUSID (NRCS plant code)
+Ericameria nauseosa,False,1,US-Me6,Ericameria nauseosa
+FAGR,False,2,US-Bar US-UMB,FAGR (NRCS plant code)
+FRAM2,False,1,US-MOz,FRAM2 (NRCS plant code)
+FRPE,False,1,US-WCr,FRPE (NRCS plant code)
+Fagus grandifolia,False,4,US-Ha1 US-MMS US-UMB US-UMd,Fagus grandifolia
+Fraxinus americana,False,1,US-Ha1,Fraxinus americana
+GABA,False,1,US-Slt,GABA (NRCS plant code)
+GAVE,False,1,US-Ton,GAVE (NRCS plant code)
+HAVI4,False,1,US-Ha1,HAVI4 (NRCS plant code)
+HYGL,False,1,US-Ton,HYGL (NRCS plant code)
+HYLOC2,False,1,CA-Man,HYLOC2 (NRCS plant code)
+Hamamelis virginiana L.,False,1,US-Ha1,Hamamelis virginiana L.
+ILGL,False,1,US-SP1,ILGL (NRCS plant code)
+ISTE2,False,1,US-SRM,ISTE2 (NRCS plant code)
+JUBU,False,1,US-Ton,JUBU (NRCS plant code)
+JUVI,False,1,US-MOz,JUVI (NRCS plant code)
+L,False,1,US-Ton,L (NRCS plant code)
+LICI,False,1,US-Ton,LICI (NRCS plant code)
+LITU,False,1,US-MMS,LITU (NRCS plant code)
+Lindera benzoin,False,1,US-MMS,Lindera benzoin
+Liriodendron tulipifera,False,1,US-MMS,Liriodendron tulipifera
+MASU,False,1,US-Ton,MASU (NRCS plant code)
+MICA,False,1,US-Ton,MICA (NRCS plant code)
+MUPO2,False,1,US-SRM,MUPO2 (NRCS plant code)
+MYCE,False,1,US-SP1,MYCE (NRCS plant code)
+NAPU2,False,1,US-Ton,NAPU2 (NRCS plant code)
+OL,False,1,US-Ton,OL (NRCS plant code)
+OSVI,False,2,US-MOz US-WCr,OSVI (NRCS plant code)
+Ostrya virginiana,False,1,US-UMd,Ostrya virginiana
+PIBA2,False,1,CA-TP3,PIBA2 (NRCS plant code)
+PICO,False,1,US-NR1,PICO (NRCS plant code)
+PIEC,False,1,US-Slt,PIEC (NRCS plant code)
+PIELE2,False,1,US-SP1,PIELE2 (NRCS plant code)
+PIEN,False,1,US-NR1,PIEN (NRCS plant code)
+PIMA,False,1,CA-Man,PIMA (NRCS plant code)
+PIPA2,False,1,US-SP1,PIPA2 (NRCS plant code)
+PIPO,False,1,US-Me2,PIPO (NRCS plant code)
+PIRI,False,1,US-Slt,PIRI (NRCS plant code)
+PIRU,False,3,US-Ho1 US-Ho2 US-Ho3,PIRU (NRCS plant code)
+PIST,False,4,CA-TP1 CA-TP3 CA-TP4 US-UMB,PIST (NRCS plant code)
+PLER,False,1,US-Ton,PLER (NRCS plant code)
+PLEUR10,False,1,CA-Man,PLEUR10 (NRCS plant code)
+POGR4,False,2,US-Bar US-UMB,POGR4 (NRCS plant code)
+POMU,False,1,CA-Ca3,POMU (NRCS plant code)
+POTR5,False,2,US-UMB US-WCr,POTR5 (NRCS plant code)
+PRSE2,False,1,CA-TP4,PRSE2 (NRCS plant code)
+PRVE,False,1,US-SRM,PRVE (NRCS plant code)
+PSME,False,1,CA-Ca3,PSME (NRCS plant code)
+PTAQ,False,1,CA-Ca3,PTAQ (NRCS plant code)
+PUTR2,False,1,US-Me2,PUTR2 (NRCS plant code)
+Picea glauca,False,1,US-Ha1,Picea glauca
+Pinus ponderosa,False,2,US-Me2 US-Me6,Pinus ponderosa
+Pinus resinosa,False,2,US-Ha1 US-UMd,Pinus resinosa
+Pinus strobus,False,3,US-Ha1 US-UMB US-UMd,Pinus strobus
+Pinus taeda,False,1,US-NC2,Pinus taeda
+Populus grandidentata,False,2,US-UMB US-UMd,Populus grandidentata
+Populus tremuloides,False,2,US-UMB US-UMd,Populus tremuloides
+Prunus pensylvanica,False,1,US-Ha1,Prunus pensylvanica
+Prunus serotina,False,1,US-Ha1,Prunus serotina
+Purschia tridentata,False,1,US-Me6,Purschia tridentata
+Purshia tridentata,False,1,US-Me2,Purshia tridentata
+QUAL,False,3,US-MOz US-Slt US-WCr,QUAL (NRCS plant code)
+QUCO,False,1,US-Slt,QUCO (NRCS plant code)
+QUDO,False,2,US-Ton US-Var,QUDO (NRCS plant code)
+QUMU,False,1,US-MOz,QUMU (NRCS plant code)
+QUPR,False,1,US-Slt,QUPR (NRCS plant code)
+QURU,False,3,US-Ha1 US-UMB US-WCr,QURU (NRCS plant code)
+QUVE,False,4,CA-TP3 CA-TP4 US-MOz US-Slt,QUVE (NRCS plant code)
+Quercus alba,False,1,US-MMS,Quercus alba
+Quercus rubra,False,4,US-Ha1 US-MMS US-UMB US-UMd,Quercus rubra
+Quercus velutina,False,2,US-Ha1 US-MMS,Quercus velutina
+Rhus typhina,False,1,US-Ha1,Rhus typhina
+SABI,False,1,US-Ton,SABI (NRCS plant code)
+SERE2,False,1,US-SP1,SERE2 (NRCS plant code)
+SHAR,False,1,US-Ton,SHAR (NRCS plant code)
+Sassafras albidum,False,1,US-MMS,Sassafras albidum
+TIAM,False,2,US-Syv US-WCr,TIAM (NRCS plant code)
+TRDU,False,1,US-Ton,TRDU (NRCS plant code)
+TRHI,False,1,US-Ton,TRHI (NRCS plant code)
+TRIFO,False,1,CA-TP1,TRIFO (NRCS plant code)
+TSCA,False,6,US-Bar US-Ha1 US-Ho1 US-Ho2 US-Ho3 US-Syv,TSCA (NRCS plant code)
+Tsuga canadensis,False,2,US-Ha1 US-UMd,Tsuga canadensis
+UKF1,False,1,US-Ton,UKF1 (NRCS plant code)
+Ulmus rubra,False,1,US-MMS,Ulmus rubra
+VAVA,False,1,US-Slt,VAVA (NRCS plant code)
+VIAL3,False,1,US-Bar,VIAL3 (NRCS plant code)
+VUMY,False,1,US-Ton,VUMY (NRCS plant code)
+Vaccinium corymbosum L.,False,1,US-Ha1,Vaccinium corymbosum L.
+"Vegetation is old-growth closedcanopy terra firme (nonflooded) forest. Dinizia excelsa,. Attalea attaleoides Astrocaryum sciophilum. Oenocarpus bataua Mauritia flexuosa Attalea microcarpa",False,1,BR-Ma2,"Vegetation is old-growth closedcanopy terra firme (nonflooded) forest. Dinizia excelsa,. Attalea attaleoides Astrocaryum sciophilum. Oenocarpus bataua Mauritia flexuosa Attalea microcarpa"
+Viburnum cassinoides L.,False,1,US-Ha1,Viburnum cassinoides L.
+grass,False,1,US-Me6,grass
+other (5 species),False,1,US-UMd,other (5 species)

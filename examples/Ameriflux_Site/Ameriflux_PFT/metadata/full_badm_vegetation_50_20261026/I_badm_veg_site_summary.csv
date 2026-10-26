@@ -1,0 +1,51 @@
+site,batch,IGBP,n_overstory,n_understory,overstory_perc_sum,understory_perc_sum,perc_units,overstory,understory
+BR-Ma2,Batch01,EBF,1,0,,,NOT_GIVEN,"Vegetation is old-growth closedcanopy terra firme (nonflooded) forest. Dinizia excelsa,. Attalea attaleoides Astrocaryum sciophilum. Oenocarpus bataua Mauritia flexuosa Attalea microcarpa=?",
+CA-Ca3,Batch01,ENF,1,3,75.0,80.0,NOT_GIVEN,PSME=75,CHANA2=40; POMU=20; PTAQ=20
+CA-Cbo,Batch01,DBF,0,0,,,,,
+CA-LP1,Batch01,ENF,0,0,,,,,
+CA-Man,Batch01,ENF,1,2,90.0,,NOT_GIVEN,PIMA=90,HYLOC2=?; PLEUR10=?
+CA-TP1,Batch01,ENF,1,3,100.0,91.0,NOT_GIVEN,PIST=100,CONYZ=32; DISA=31; TRIFO=28
+CA-TP3,Batch01,ENF,1,2,94.0,6.0,NOT_GIVEN,PIST=94,PIBA2=5; QUVE=1
+CA-TP4,Batch01,ENF,1,4,82.0,18.0,NOT_GIVEN,PIST=82,ABBA=11; ACRU=2; PRSE2=1; QUVE=4
+US-Aud,Batch01,GRA,0,0,,,,,
+US-Bar,Batch01,DBF,6,1,61.0,,NOT_GIVEN,ACRU=28; BEAL2=5; BEPA=9; FAGR=2; POGR4=?; TSCA=17,VIAL3=?
+US-BZS,Batch02,ENF,0,0,,,,,
+US-CMW,Batch02,DBF,0,0,,,,,
+US-EML,Batch02,OSH,0,0,,,,,
+US-GLE,Batch02,ENF,0,0,,,,,
+US-Ha1,Batch02,DBF,18,24,100.0,100.01,NOT_GIVEN,Acer pennsylvanicum=0.03; Acer rubrum=20.37; ACRU=?; Betula alleghaniensis=3.41; Betula lenta=1.5; Betula papyrifera=1.11; Betula populifolia=0.66; Fagus grandifolia=0.91; Fraxinus americana=2.48; Picea glauca=0.74; Pinus resinosa=5.44; Pinus strobus=4.11; Prunus serotina=3.05; Quercus rubra=45.24; Quercus velutina=3.81; QURU=?; TSCA=?; Tsuga canadensis=7.14,Acer pensylvanicum=3.38; Acer rubrum=22.16; ACPE=?; ACRU=?; BEAL2=?; Betula alleghaniensis=13.27; Betula lenta=6.22; Betula papyrifera=0.27; Castanea dentata=4.36; Crataegus spp.=0.12; Fagus grandifolia=8.73; Fraxinus americana=0.38; Hamamelis virginiana L.=6.09; HAVI4=?; Picea glauca=1.66; Pinus strobus=2.47; Prunus pensylvanica=0.06; Prunus serotina=0.01; Quercus rubra=3.06; Rhus typhina=0.25; TSCA=?; Tsuga canadensis=23.99; Vaccinium corymbosum L.=3; Viburnum cassinoides L.=0.53
+US-Ho1,Batch02,ENF,2,0,66.0,,NOT_GIVEN,PIRU=41; TSCA=25,
+US-Ho2,Batch02,ENF,2,0,66.0,,NOT_GIVEN,PIRU=41; TSCA=25,
+US-Ho3,Batch02,ENF,3,0,64.0,,NOT_GIVEN,ACRU=?; PIRU=20; TSCA=44,
+US-ICh,Batch02,OSH,0,0,,,,,
+US-ICt,Batch02,OSH,0,0,,,,,
+US-Kon,Batch03,GRA,0,0,,,,,
+US-Me2,Batch03,ENF,2,4,100.0,80.0,NOT_GIVEN,Pinus ponderosa=100; PIPO=?,Arctostaphylos patula=40; ARPA6=?; Purshia tridentata=40; PUTR2=?
+US-Me6,Batch03,ENF,1,4,100.0,29.0,NOT_GIVEN,Pinus ponderosa=100,Arctostaphylos patula=1; Ericameria nauseosa=3; grass=13; Purschia tridentata=12
+US-MMS,Batch03,DBF,11,2,,,NOT_GIVEN,Acer saccharum=?; ACSAS=?; Carya glabra=?; Fagus grandifolia=?; Liriodendron tulipifera=?; LITU=?; Quercus alba=?; Quercus rubra=?; Quercus velutina=?; Sassafras albidum=?; Ulmus rubra=?,Asimina triloba=?; Lindera benzoin=?
+US-MOz,Batch03,DBF,6,5,79.42,77.49,NOT_GIVEN,ACSAF=14.49; CAOV2=9.42; JUVI=14.14; QUAL=24.87; QUMU=10.65; QUVE=5.85,ACSAF=34.11; FRAM2=15.3; JUVI=12.24; OSVI=11.7; QUVE=4.14
+US-Mpj,Batch03,OSH; ENF; WSA,0,0,,,,,
+US-MtB,Batch03,ENF,0,0,,,,,
+US-NC2,Batch03,ENF,1,0,,,NOT_GIVEN,Pinus taeda=?,
+US-NR1,Batch03,ENF,3,0,100.0,,NOT_GIVEN,ABLA=46; PICO=26; PIEN=28,
+US-NR3,Batch03,GRA,0,0,,,,,
+US-Rpf,Batch04,DBF,0,0,,,,,
+US-Seg,Batch04,GRA; GRA,0,0,,,,,
+US-Ses,Batch04,OSH; OSH,0,0,,,,,
+US-Slt,Batch04,DBF,6,2,100.0,0.0,NOT_GIVEN,PIEC=11.20; PIRI=15.40; QUAL=17.60; QUCO=0.10; QUPR=24.50; QUVE=31.20,GABA=0.00; VAVA=0.00
+US-SP1,Batch04,ENF,2,4,100.0,,NOT_GIVEN,PIELE2=27; PIPA2=73,ARST5=?; ILGL=?; MYCE=?; SERE2=?
+US-SRG,Batch04,GRA,0,0,,,,,
+US-SRM,Batch04,WSA,1,6,35.0,,NOT_GIVEN,PRVE=35,BOER4=?; DICA8=?; ERLE=?; ISTE2=?; ISTE2=?; MUPO2=?
+US-Syv,Batch04,MF,5,0,108.0,,NOT_GIVEN,ACSA3=71; BEAL2=7; EUSID=8; TIAM=8; TSCA=14,
+US-Ton,Batch04,WSA,1,33,,,NOT_GIVEN,QUDO=?,AETR=?; AICA=?; AVBA=?; B=?; BRDI=?; BRDI2=?; BREL=?; BRHO=?; BRMA=?; BRMI=?; CALOCHOR=?; CEME=?; CHPO=?; CYEC=?; DIVO=?; ERBO=?; GAVE=?; HYGL=?; JUBU=?; L=?; LICI=?; MASU=?; MICA=?; NAPU2=?; OL=?; PLER=?; QUDO=?; SABI=?; SHAR=?; TRDU=?; TRHI=?; UKF1=?; VUMY=?
+US-Uaf,Batch04,ENF,0,0,,,,,
+US-UiD,Batch05,GRA,0,0,,,,,
+US-UMB,Batch05,DBF,14,12,96.8,2.64,NOT_GIVEN,Acer rubra=14; Acer saccharum=2.3; ACRU=?; BEPA=?; Betula papyrifera=7.5; Fagus grandifolia=4.2; Pinus strobus=2.2; PIST=?; POGR4=?; Populus grandidentata=37.9; Populus tremuloides=12.5; POTR5=?; Quercus rubra=16.2; QURU=?,Acer pensylvanicum=0.21; Acer rubra=0.65; Acer saccharum=0.11; ACRU=?; AMELA=?; FAGR=?; Fagus grandifolia=0.65; Pinus strobus=0.42; PIST=?; Populus grandidentata=0.14; Quercus rubra=0.46; QURU=?
+US-UMd,Batch05,DBF,20,25,200.0,199.54,NOT_GIVEN,Acer rubrum=10.656671635; Acer rubrum=7.8; Acer saccharum=6.3089315023; Acer saccharum=4.2; Betula papyrifera=1.0173965089; Betula papyrifera=8.3; Fagus grandifolia=1.1; Fagus grandifolia=1.4147982447; other (5 species)=0.5; other (5 species)=0.72031555723; Pinus resinosa=3.1; Pinus resinosa=3.1174624397; Pinus strobus=8.6; Pinus strobus=10.90926692; Populus grandidentata=28.493429028; Populus grandidentata=32.1; Populus tremuloides=2.6786414259; Populus tremuloides=3.8; Quercus rubra=34.683086738; Quercus rubra=30.5,Acer pensylvanicum=2.3205346038; Acer pensylvanicum=1.9; Acer rubra=19.781166364; Acer rubra=20.6; Acer saccharum=14.9; Acer saccharum=12.860068694; Amelanchier spp=4; Amelanchier spp=3.5877230265; Betula papyrifera=1.7; Betula papyrifera=0.19433031435; Fagus grandifolia=19.3; Fagus grandifolia=21.720823751; Ostrya virginiana=0.97064448134; Ostrya virginiana=0.6; Pinus resinosa=3.3446855143; Pinus resinosa=3.2; Pinus strobus=23.6; Pinus strobus=25.040443426; Populus grandidentata=2; Populus grandidentata=0.24104425601; Populus tremuloides=0.1; Quercus rubra=7.3; Quercus rubra=9.6499108147; Tsuga canadensis=0.6; Tsuga canadensis=0.03
+US-Var,Batch05,GRA,1,0,,,NOT_GIVEN,QUDO=?,
+US-Vcm,Batch05,ENF; ENF,0,0,,,,,
+US-Vcp,Batch05,ENF; ENF,0,0,,,,,
+US-WCr,Batch05,DBF,9,0,105.0,,NOT_GIVEN,ACRU=2; ACSA3=43.2; BEPA=2; FRPE=13.1; OSVI=2; POTR5=2; QUAL=2; QURU=6.2; TIAM=32.5,
+US-Whs,Batch05,OSH,0,0,,,,,
+US-Wjs,Batch05,SAV,0,0,,,,,
+US-Wkg,Batch05,GRA,1,0,,,NOT_GIVEN,"Bouteloua spp., Eragrostis lehmanniana=?",

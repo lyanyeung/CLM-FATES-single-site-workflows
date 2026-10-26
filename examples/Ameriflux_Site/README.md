@@ -10,6 +10,14 @@ This is the central **Ameriflux_Site** collection requested alongside [ICOS site
 
 [**Ameriflux_Soil**](Ameriflux_Soil/) recommends which `PCT_SAND`/`PCT_CLAY` to use on the 10 CLM surface layers, layer by layer. Sources in order: site-measured texture (AmeriFlux ReESH Zenodo records, BADM `SOIL_TEX`, tower literature), then USDA SSURGO at the tower point, then ISRIC SoilGrids 250 m. The current grid surface is kept only when nothing else exists. **All 50 sites now have a recommendation, with evidence:** [FINAL_50_SITE_SOIL_TEXTURE_20261026.md](Ameriflux_Soil/FINAL_50_SITE_SOIL_TEXTURE_20261026.md). This now includes the full AmeriFlux BADM for all 50 sites. 27 sites are site-measured (21 ReESH, 6 BADM profiles), 2 use a measured neighbour, 12 come from SSURGO and 9 from SoilGrids. The [Stage01 script](Ameriflux_Soil/scripts/01_collect_soil_texture_evidence.py) collects and maps all 50 sites on IRIDIS6 and compares them with each case's current `fsurdat`. Organic and permafrost sites are flagged so that `ORGANIC` can be reviewed.
 
+## Full BADM PFT cross-check — 26 October 2026
+
+[Ameriflux_PFT/BADM_PFT_CROSSCHECK_50_SITES_20261026.md](Ameriflux_PFT/BADM_PFT_CROSSCHECK_50_SITES_20261026.md) checks the full AmeriFlux BADM vegetation records (IGBP and species cover, 50 of 50 sites) against the recommended PFT inputs.
+
+- 42 sites are consistent.
+- 5 differ only in metric or year (US-Bar, US-Ha1, US-Slt, US-UMB, US-UMd).
+- 3 need a decision: US-Ho3, US-Syv and US-Wjs.
+
 ## Vegetation and PFT composition
 
 [**Ameriflux_PFT — 50-site composition index, master table and source report**](Ameriflux_PFT/) consolidates all five batches, with **33 numerical composition/cover leads** and **17 sites whose reviewed evidence is qualitative composition, LAI/density or published model assumptions**. A numerical lead may be a partial tree inventory, a historical transect, basal area, tree counts or canopy cover. It does not by itself establish a complete PFT fraction of tower ground area.
