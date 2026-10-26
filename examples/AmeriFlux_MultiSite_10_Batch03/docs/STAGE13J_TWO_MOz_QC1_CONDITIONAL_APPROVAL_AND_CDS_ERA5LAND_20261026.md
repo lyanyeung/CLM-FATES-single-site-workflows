@@ -35,6 +35,18 @@ The prior Stage09 external ERA5-Land download inventory included **seven** humid
 
 These are cautious **automated screening gates**, not proof of true cause. If either segment is blocked, do not change that episode or broaden the approval without new source evidence / user science decision.
 
+## 2026-10-26 19:07 UTC IRIDIS6 actual CDS download verified; Stage13j v2 false coverage STOP fixed in v4
+
+Operator IRIDIS6 log confirms the **new CDS data request succeeded**: `reanalysis-era5-land-timeseries`, BIF coordinate 38.7441/-92.2, 2005-01-03–2005-01-11, request `082878d6-33ec-448d-a93e-618abe5b5091`. Signed receipt file:
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/external_evidence/era5land_timeseries/US-MOz/2005_stage13j/ERA5Land_US-MOz_Jan03_Jan11_2005_t2m_d2m_sp.receipt.json`.
+Underlying downloaded CDS response SHA256: `5879ed81aca701d53b8b9674183556df7369861ce4a8cdca1ffd54126fb712ef`.
+
+The subsequent Stage13j v2 `--check` stopped with `CDS response did not cover UTC 2005-01-04..10` at line 259. **Confirmed code defect:** the left coverage bound was reversed: it required `Jan04 <= earliest_UTC`, incorrectly excluding the valid earlier requested Jan03 starting timestamp. Correct bound is `earliest_UTC <= Jan04` and `latest_UTC >= Jan10 23:00`, followed by full hourly-interval checking. In [Stage13j v4 script](../scripts/stage13/13j_conditional_two_US_MOz_QC1_ERA5Land_SCOPED.py), `verify_utc_coverage` now prints actual min/max and has positive and negative synthetic date-range regressions in `--self-test`.
+
+**NO RE-DOWNLOAD:** The SHA-receipted original CDS response is already present. Run only the pinned v4 `--self-test`, `--check --decision`, and `--apply --decision` if the scientific gate returns eligible rows. **No `--fetch` retry**: the original command correctly refuses to overwrite existing signed evidence.
+
+**Anticipated conservative scientific HOLD:** Stage13i showed original 2005 Jan03–Jan06 and Jan06–Jan09 contiguous QC1 blocks; the operator explicitly required measured `TA_F_QC=0` **and** `VPD_F_QC=0` anchors on BOTH sides within 6h of each approved event. These may be absent. Stage13j v4 now always reports the exact native QC0 six-hour before/after counts for **both** scoped events, even when the broader time-alignment screen fails. If either condition fails, the event remains completely **HOLD**; do NOT relax QC0 to QC2 or increase window without a new operator science approval. No original or Stage13g forcing change from the observed failure.
+
 ## IRIDIS6 script and behavior
 
 [Stage13j pinned fail-closed conditional script](../scripts/stage13/13j_conditional_two_US_MOz_QC1_ERA5Land_SCOPED.py). Use exact Git blob hash in the supplied command, pin the Stage13j decision JSON in the same commit.
