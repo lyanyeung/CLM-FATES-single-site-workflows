@@ -44,12 +44,14 @@ class Tables(HTMLParser):
         self._stack, self._row, self._cell, self._script = [], None, None, None
         self.section, self._head = "", None
         self.table_sec, self.script_sec, self.images = [], [], {}
+        self.image_src = []  # (section, data-URI)
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
         if tag in ("h1", "h2", "h3", "h4"): self._head = []
         elif tag == "img" and (a.get("src") or "").startswith("data:image"):
             self.images[self.section] = self.images.get(self.section, 0) + 1
+            self.image_src.append((self.section, a["src"]))
         if tag == "table": self._stack.append([])
         elif tag == "tr" and self._stack: self._row = []
         elif tag in ("td", "th") and self._row is not None: self._cell = []
@@ -236,6 +238,31 @@ def from_raw(out):
     print(f"PLOTLY POINTS {len(traces)} | SECTIONS {len(struct)} -> {out}")
 
 
+IMG_SECTIONS = re.compile(r"GRP_TREE|GRP_AGB|GRP_SOIL|species|tree|understor|soil", re.I)
+
+
+def export_images(out, all_sections=False):
+    """Write chart PNGs of the species/understory/soil sections to <out>/images (no network)."""
+    import base64
+    out = Path(out).expanduser(); d = out / "images"; d.mkdir(exist_ok=True); idx = []
+    for f in sorted((out / "raw").glob("*.html")):
+        site, kind = f.stem.rsplit("_", 1)
+        p = parse(f.read_bytes(), full=True); n = 0
+        for i, (sec, src) in enumerate(p.image_src, 1):
+            if not all_sections and not IMG_SECTIONS.search(sec): continue
+            m = re.match(r"data:image/(\w+);base64,(.*)", src, re.S)
+            if not m: continue
+            ext = "jpg" if m.group(1) == "jpeg" else m.group(1)
+            tag = re.sub(r"[^A-Za-z0-9]+", "_", sec)[:40].strip("_") or "nosection"
+            name = f"{site}_{i:02d}_{tag}.{ext}"
+            (d / name).write_bytes(base64.b64decode(m.group(2))); n += 1
+            idx.append({"site": site, "report": kind, "image": name, "section": sec, "order_in_report": i})
+        print(f"{site:7} exported {n} images", flush=True)
+    with (out / "07_exported_images_index.csv").open("w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=["site", "report", "image", "section", "order_in_report"]); w.writeheader(); w.writerows(idx)
+    print(f"IMAGES {len(idx)} -> {d}")
+
+
 def self_test():
     page = ("<html><body><h2>GRP_TREE</h2><table><tr><th>SPP</th><th>YEAR</th><th>PLOT</th><th>SPP_PERC</th></tr>"
             "<tr><td>Picea abies (L.) H.Karst.</td><td>2022</td><td>CP</td><td>41.24</td></tr></table>"
@@ -254,7 +281,7 @@ def self_test():
           '"layout":{"title":{"text":"Species ratio"}}}}</script><h2>GRP_SOIL</h2>').encode()
     pp = parse(pg, full=True); tr = plotly_traces(pp.scripts, pp.script_sec)
     assert len(tr) == 2 and tr[1]["trace_name"] == "Fagus sylvatica" and tr[1]["y"] == "62.1" and tr[0]["section"] == "GRP_TREE"
-    assert pp.images == {"GRP_TREE": 1}
+    assert pp.images == {"GRP_TREE": 1} and pp.image_src[0][0] == "GRP_TREE"
     print("ICOS ANCILLARY FETCH SELF-TEST PASS (no network)")
 
 
@@ -265,7 +292,10 @@ if __name__ == "__main__":
     ap.add_argument("--pause", type=float, default=1.0, help="seconds between requests")
     ap.add_argument("--self-test", action="store_true")
     ap.add_argument("--from-raw", action="store_true", help="re-parse <out>/raw/*.html only (no network)")
+    ap.add_argument("--export-images", action="store_true", help="write species/understory/soil chart PNGs (no network)")
+    ap.add_argument("--all-sections", action="store_true", help="with --export-images: every section")
     a = ap.parse_args()
     if a.self_test: self_test(); sys.exit(0)
     if a.from_raw: from_raw(a.out); sys.exit(0)
+    if a.export_images: export_images(a.out, a.all_sections); sys.exit(0)
     run(a.out, a.sites, a.pause)

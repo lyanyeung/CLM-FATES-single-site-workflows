@@ -23,3 +23,7 @@ It outputs `01_report_inventory.csv`, `02_species_tables_long.csv`, `03_soil_tab
 - **14/38 sites have a summary report:** BE-Bra, BE-Vie, CH-Dav, CZ-BK1, DE-Tha, DK-Sor, FI-Hyy, FI-Sod, FR-FBn, FR-Fon, FR-Hes, FR-Pue, IT-Ren, NL-Loo. The other 24 return 404.
 - **Full reports:** HTTP 404 for all 38 sites.
 - **No HTML tables with species or soil:** the 3–7 MB summary reports carry their numbers inside chart widgets. `--from-raw` re-parses the downloaded `raw/*.html` without network. It exports every plotly trace point by report section (`05_plotly_traces_long.csv`) and a per-section count of tables, widgets and embedded images (`06_report_structure_by_section.csv`). Images cannot be read numerically.
+
+## Run 2 (`--from-raw`, 18:17 UK)
+
+All 14 reports contain **0 JSON widgets and 0 numeric tables**; every chart is an embedded PNG (12–22 per report, 103 sections in total). `--export-images` writes the charts from the GRP_TREE / GRP_AGB / GRP_SOIL / species / soil sections to `images/`, indexed in `07_exported_images_index.csv`, so species shares can be read from the charts. Values read from charts carry about ±2–3 percentage points of reading uncertainty.
