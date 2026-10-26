@@ -37,18 +37,33 @@ The user's original `AMF_US-Me2_FLUXNET_FULLSET_2002-2022_4-6.zip` was read with
 
 Both complete time axes exactly equal the expected Gregorian 30-minute grid. Every averaging interval is 1800 s, with zero missing, duplicate, reversed or off-grid timestamps. These checks support structural consistency, not proof of a correctly configured physical datalogger. Leap days are retained for this source audit. Later UTC/NOLEAP DATM preparation must treat leap-day removal and year-boundary coverage explicitly.
 
-## Four original event holds and next action
+## Stage14a cluster verification completed, 2026-10-26 19:35 UTC
 
-The historical **four** are four humidity-event records routed to `CLOCK_METADATA_HOLD`, **not four different missing metadata variables**. Their exact source row/time identities must be loaded from the sealed Stage11a report on IRIDIS6; they are not available in this local repository.
+The historical **four** are four humidity-event records routed to `CLOCK_METADATA_HOLD`, **not four different missing metadata variables**. The operator executed the pinned Stage14a script on `login6003` in `clm_fates_env` and supplied the successful terminal output. Source SHA256/time checks, original Stage07 identity and exactly four sealed Stage11a source row/time matches all passed. Script SHA256: `5ea8ee372c733edb123e6cc029be2442a090e9bed1d252757fb831eeca4cbc89`, from commit `88b75ed01e823cdf722aca4c5a846b39bb901e9b`.
+
+Actual new cluster report directory:
+
+```text
+/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage14a_US_Me2_documented_clock_20261026T193531Z_985d2919
+```
+
+| Original CSV row | Local standard-time interval | UTC interval | UTC midpoint |
+| ---: | --- | --- | --- |
+| 227899 | 2014-12-31 20:30–21:00 | 2015-01-01 04:30–05:00 | 2015-01-01 04:45 |
+| 227900 | 2014-12-31 21:00–21:30 | 2015-01-01 05:00–05:30 | 2015-01-01 05:15 |
+| 227901 | 2014-12-31 21:30–22:00 | 2015-01-01 05:30–06:00 | 2015-01-01 05:45 |
+| 227902 | 2014-12-31 22:00–22:30 | 2015-01-01 06:00–06:30 | 2015-01-01 06:15 |
+
+The year boundary matters: these are **2014 local-source rows but 2015 UTC external-evidence times**. Keep source-row/year identity while selecting external hourly evidence by UTC timestamps, including appropriate neighboring UTC hours. Do not join a 2014-only UTC product or silently clamp outside its time axis.
 
 [Stage14a](../scripts/stage14/14a_US_Me2_documented_clock_READONLY.py) checks the cluster CSV bytes against the above original ZIP-member hashes and against the original Stage07 manifest, checks both full time axes, verifies the Stage11a event-table receipt and maps exactly four source row/time matches to UTC start/end/midpoint. `--check` writes nothing. `--run` writes one new report under `reports/stage14a_US_Me2_documented_clock_*`; it leaves all original sources, forcing, previous sealed reports, hold markers, model cases and queues unchanged.
 
-Successful cluster output should end with:
+The actual operator-supplied summary was:
 
 ```text
 ME2 CLOCK SUMMARY CLUSTER_SOURCE_AND_FOUR_CLOCK_HOLDS_VERIFIED UTC_OFFSET=-8 DST=FALSE legacy_events=4 humidity_repairs=0 DATM=FALSE jobs=0
 ```
 
-This cluster result has **not yet been observed**. The local source scan and clock logic have been executed. The remaining operator step is to run Stage14a on the already extracted cluster sources and retain the four-event receipt. If more than one Stage11a directory exists, select the exact historical report explicitly with `--stage11a /absolute/path`, rather than choosing by modification time.
+The executed local source receipt and this cluster confirmation are separate evidence records. [Operator-reported cluster result](US_ME2_CLOCK_CLUSTER_OPERATOR_RESULT_20261026.json) transcribes the supplied output, not a direct download of the cluster report JSON. Its report-file SHA256 has not been supplied and is not invented. No repeat Stage14a run is required on the basis of this successful output.
 
-After that check, the missing-clock-metadata gate can move to `RESOLVED_WITH_SITE_BADM_SUPPLEMENT`, and the four events can proceed to humidity-source/physics/continuity review using the documented UTC midpoints. This does not establish valid replacement VPD/QBOT or a complete forcing candidate. The 2020 fire, vegetation history, PFT/surface choices, humidity review and production forcing acceptance remain separate work.
+The missing-clock-metadata gate is now `RESOLVED_WITH_SITE_BADM_SUPPLEMENT`. All four events have the new route `CLOCK_DOCUMENTED_HUMIDITY_SCIENCE_REVIEW_PENDING`; each printed `humidity_repair_approved=false`. Next inspect original tower TA/VPD/RH/pressure and QC, paired ERA and existing ERA5-Land coverage around UTC 2015-01-01 04:45–06:15, followed by physical consistency and adjacent-event continuity before proposing any humidity derivative. Clock resolution does not establish valid replacement VPD/QBOT or a complete forcing candidate. The 2020 fire, vegetation history, PFT/surface choices, humidity review and production forcing acceptance remain separate work. Stage14a changed no source timestamps or forcing, submitted no jobs, and reported `humidity_repairs=0 DATM=FALSE jobs=0`.

@@ -1,0 +1,101 @@
+{
+  "evidence_type": "OPERATOR_SUPPLIED_TERMINAL_OUTPUT",
+  "evidence_scope": "Transcribed from the operator message after successful execution, not directly downloaded cluster report JSON.",
+  "site": "US-Me2",
+  "release": "AMF_US-Me2_FLUXNET_FULLSET_2002-2022_4-6",
+  "execution_host": "login6003",
+  "environment": "clm_fates_env",
+  "source_commit": "88b75ed01e823cdf722aca4c5a846b39bb901e9b",
+  "script_sha256": "5ea8ee372c733edb123e6cc029be2442a090e9bed1d252757fb831eeca4cbc89",
+  "script_checksum_passed": true,
+  "self_test_passed": true,
+  "status": "CLUSTER_SOURCE_AND_FOUR_CLOCK_HOLDS_VERIFIED",
+  "metadata_gate": "RESOLVED_WITH_SITE_BADM_SUPPLEMENT",
+  "UTC_OFFSET_hours": -8,
+  "time_basis": "LOCAL_STANDARD_TIME",
+  "daylight_saving": false,
+  "sources": {
+    "primary": {
+      "rows": 368160,
+      "first_start": "2002-01-01 00:00:00",
+      "last_end": "2023-01-01 00:00:00",
+      "leap_day_rows": 240,
+      "invalid_intervals": 0,
+      "cadence_discontinuities": 0,
+      "name": "AMF_US-Me2_FLUXNET_FULLSET_HH_2002-2022_4-6.csv",
+      "sha256": "5b29b04da37960a1640c19b75fc2a8ffbffd703ada89ba6c36689d86f834ae3e",
+      "bytes": 576695188
+    },
+    "era": {
+      "rows": 753840,
+      "first_start": "1981-01-01 00:00:00",
+      "last_end": "2024-01-01 00:00:00",
+      "leap_day_rows": 480,
+      "invalid_intervals": 0,
+      "cadence_discontinuities": 0,
+      "name": "AMF_US-Me2_FLUXNET_ERA5_HH_1981-2023_4-6.csv",
+      "sha256": "ad0ce6a1d934bb965d939375c1c8588ed643f3513c3ac7e31afed6ca993d3115",
+      "bytes": 51455118
+    }
+  },
+  "legacy_events": [
+    {
+      "site": "US-Me2",
+      "source_csv_row": 227899,
+      "local_start": "2014-12-31 20:30:00",
+      "local_end": "2014-12-31 21:00:00",
+      "utc_start": "2015-01-01T04:30:00Z",
+      "utc_end": "2015-01-01T05:00:00Z",
+      "utc_midpoint": "2015-01-01T04:45:00Z",
+      "previous_route": "CLOCK_METADATA_HOLD",
+      "next_route": "CLOCK_DOCUMENTED_HUMIDITY_SCIENCE_REVIEW_PENDING",
+      "humidity_repair_approved": false
+    },
+    {
+      "site": "US-Me2",
+      "source_csv_row": 227900,
+      "local_start": "2014-12-31 21:00:00",
+      "local_end": "2014-12-31 21:30:00",
+      "utc_start": "2015-01-01T05:00:00Z",
+      "utc_end": "2015-01-01T05:30:00Z",
+      "utc_midpoint": "2015-01-01T05:15:00Z",
+      "previous_route": "CLOCK_METADATA_HOLD",
+      "next_route": "CLOCK_DOCUMENTED_HUMIDITY_SCIENCE_REVIEW_PENDING",
+      "humidity_repair_approved": false
+    },
+    {
+      "site": "US-Me2",
+      "source_csv_row": 227901,
+      "local_start": "2014-12-31 21:30:00",
+      "local_end": "2014-12-31 22:00:00",
+      "utc_start": "2015-01-01T05:30:00Z",
+      "utc_end": "2015-01-01T06:00:00Z",
+      "utc_midpoint": "2015-01-01T05:45:00Z",
+      "previous_route": "CLOCK_METADATA_HOLD",
+      "next_route": "CLOCK_DOCUMENTED_HUMIDITY_SCIENCE_REVIEW_PENDING",
+      "humidity_repair_approved": false
+    },
+    {
+      "site": "US-Me2",
+      "source_csv_row": 227902,
+      "local_start": "2014-12-31 22:00:00",
+      "local_end": "2014-12-31 22:30:00",
+      "utc_start": "2015-01-01T06:00:00Z",
+      "utc_end": "2015-01-01T06:30:00Z",
+      "utc_midpoint": "2015-01-01T06:15:00Z",
+      "previous_route": "CLOCK_METADATA_HOLD",
+      "next_route": "CLOCK_DOCUMENTED_HUMIDITY_SCIENCE_REVIEW_PENDING",
+      "humidity_repair_approved": false
+    }
+  ],
+  "cluster_report_directory": "/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage14a_US_Me2_documented_clock_20261026T193531Z_985d2919",
+  "cluster_report_file_sha256": null,
+  "cluster_report_sha256_status": "NOT_SUPPLIED",
+  "original_stage07_source_pins_verified": true,
+  "stage11a_receipt_and_four_row_time_matches_verified": true,
+  "humidity_repair_approvals": 0,
+  "DATM_ready": false,
+  "model_jobs_submitted": 0,
+  "actual_summary": "ME2 CLOCK SUMMARY CLUSTER_SOURCE_AND_FOUR_CLOCK_HOLDS_VERIFIED UTC_OFFSET=-8 DST=FALSE legacy_events=4 humidity_repairs=0 DATM=FALSE jobs=0",
+  "next_step": "Humidity source/QC, cold-air physics and continuity review at UTC 2015-01-01 04:45,05:15,05:45,06:15; retain local-2014 source identity."
+}
