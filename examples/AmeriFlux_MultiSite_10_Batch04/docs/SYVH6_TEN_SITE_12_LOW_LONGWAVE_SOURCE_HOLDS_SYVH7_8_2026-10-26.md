@@ -1,3 +1,5 @@
+> **CORRECTION (2026-10-26):** The first SYVH7 source check failed without writing because Stage05 has only three of the five sites. Corrected code pinned to `84c6c292ae8cda2064a8e349a80892f33328342f` uses Stage05 for SP1/Syv/Ton, and Stage08 for Slt/Uaf with original+ERA SHAs preserved. [Root-cause and corrected rerun](SYVH7_STAGE05_STAGE08_SOURCE_PROVENANCE_ROUTING_FIX_2026-10-26.md). The former GitHub pin must not be used.
+
 # Batch04 — SYVH6 actual operator output: five sites / twelve extreme low LW_IN_F points, proposed SYVH7 + independent SYVH8 research trial
 
 **Verified user-provided IRIDIS6 stdout 2026-10-26 04:34 UTC.** This report records actual SYVH6 checks, not an assertion that SYVH7/8 already ran.
@@ -25,7 +27,7 @@ The repeated two-half-hour plateaux across multiple sites, with offsets that may
 
 ## SYVH7 automatic source-safe repair gate — script published, NOT YET EXECUTED
 
-[SYVH7 twelve exact low-longwave source + ERA preflight and research candidate](../scripts/manual_review/stage_syvh7_repair_12_low_longwave_5sites_ERA_exacttime.py), source-pinned GitHub commit **`db7c834f72d071a7419f590238ecea4c8f31b185`**. Retains the latest **US-Syv SYVH3 SHA `9299193bc12b06e37211d84d31c333e299f99cb0ed96ebc6ed224ef9eaaf02aa`** and the unchanged site candidates as input.
+[SYVH7 twelve exact low-longwave source + ERA preflight and research candidate](../scripts/manual_review/stage_syvh7_repair_12_low_longwave_5sites_ERA_exacttime.py), source-pinned GitHub commit **`84c6c292ae8cda2064a8e349a80892f33328342f`**. Retains the latest **US-Syv SYVH3 SHA `9299193bc12b06e37211d84d31c333e299f99cb0ed96ebc6ed224ef9eaaf02aa`** and the unchanged site candidates as input.
 
 - `--self-test` checks exactly twelve specific HH and five sites without touching any source.
 - `--assess` checks full SHA of **original Stage05 FLUXNET native and paired processed ERA sources**, selected ten-site source inputs, exactly source-origin 12 low LW entries and original QC; prints before, during and after values (± 1 hour) for **both source longwave and packaged processed `LW_IN_ERA`**, and applies fail-closed bounds: ERA 60–800 W/m², no implausible new within-pair >100 W/m² jump or after-replacement before/after >160 W/m² discontinuity. If data aren't verified, NO WRITE.
@@ -46,7 +48,7 @@ conda activate clm_fates_env
   set -euo pipefail
   BASE="$HOME/ameriflux_batch04_manual_review"
   RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows"
-  SEVEN="db7c834f72d071a7419f590238ecea4c8f31b185"
+  SEVEN="84c6c292ae8cda2064a8e349a80892f33328342f"
   EIGHT="e4559ea4dafc35d4ee531eb900747ff70416d383"
   REL="examples/AmeriFlux_MultiSite_10_Batch04/scripts/manual_review"
   mkdir -p "$BASE"
