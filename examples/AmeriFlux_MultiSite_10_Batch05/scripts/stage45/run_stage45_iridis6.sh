@@ -3,8 +3,8 @@ set -euo pipefail
 
 BASE="$HOME/ameriflux_batch05_stage45"
 mkdir -p "$BASE"
-PY_COMMIT="5307765b4865364ba5d41a2e1525edf5a12532bc"
-PY_BLOB="2369ec2a6abb1c6ef1df8d5d23f6b70b68f144ba"
+PY_COMMIT="8b1a5c9aa886517153b05e955ba97c092fa680ed"
+PY_BLOB="ace88da48f088c709487cac1d949ad80d54f454f"
 REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage45/45_actual_483_event_full_native_era_boundaries_and_connected_runs.py"
 PY="$BASE/stage45.py"
 
