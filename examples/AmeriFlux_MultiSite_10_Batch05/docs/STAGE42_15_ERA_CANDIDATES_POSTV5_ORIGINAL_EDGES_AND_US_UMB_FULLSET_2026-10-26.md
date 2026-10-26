@@ -20,9 +20,9 @@ The 15 event / 21 half-hour previous negative-RH or original extremely-low-RH fu
 
 [Stage42 original SHA-verified native source and 15+US-UMB9×2 method-event science trial](../scripts/stage42/42_postv5_isolated_15_ERA_events_and_UMB23_fullset_source_trials.py)
 
-Pinned code commit `6233a57b3e82d1b2ca9ad42523aedef70fab0368`, blob `5f68fdbe658470841da30a449f7143deb2bd8421`.
+Pinned code commit `ca8f49a048dcbe1036c150f950d1cda2d523bfae`, blob `b80320d75bfb404de4b8345340306399488b0e11`.
 
-[One-click IRIDIS6 launcher](../scripts/stage42/run_stage42_iridis6.sh), commit `7530fd5232de6116a1198a0083a2471a088d947c`, blob SHA `8713574a9f6152d66751326d9132a4dcb7dc37d9`.
+[One-click IRIDIS6 launcher](../scripts/stage42/run_stage42_iridis6.sh), commit `916eed0d5770ce40b038ec42b796644f47ffd58c`, blob SHA `644e63018c457341981dcbf67f9abb0ca279c07e`.
 
 **Tracks:**
 
@@ -40,8 +40,8 @@ The study is an **original meteorology QC preflight**, not full forcing/DATM mod
 ### Three-line IRIDIS6
 
 ```bash
-curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/7530fd5232de6116a1198a0083a2471a088d947c/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage42/run_stage42_iridis6.sh" -o "$HOME/run_stage42.sh"
-test "$(git hash-object "$HOME/run_stage42.sh")" = "8713574a9f6152d66751326d9132a4dcb7dc37d9"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/916eed0d5770ce40b038ec42b796644f47ffd58c/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage42/run_stage42_iridis6.sh" -o "$HOME/run_stage42.sh"
+test "$(git hash-object "$HOME/run_stage42.sh")" = "644e63018c457341981dcbf67f9abb0ca279c07e"
 bash "$HOME/run_stage42.sh"
 ```
 
