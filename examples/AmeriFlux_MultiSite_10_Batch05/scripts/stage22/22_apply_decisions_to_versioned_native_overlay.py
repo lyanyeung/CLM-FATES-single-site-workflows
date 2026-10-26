@@ -145,6 +145,25 @@ def merge(context,p1,c20,h20,r21):
         ta=num(original["TA_F_C"])
         old_vpd=num(original["VPD_F_hPa"])
         if ta is None or old_vpd is None:raise ValueError("missing source TA/VPD "+str(k))
+        # Stage20 candidates were rounded to 7 decimal hPa and Stage21 to
+        # 6 decimals. At -15 C the latter can change inferred RH by
+        # 0.00002 percentage points: more than Stage22's strict identity
+        # threshold despite a physically correct source value.
+        #
+        # Verify the supplied rounded proposal against the authoritative
+        # original RH source. Then use FULL source RH precision to recompute
+        # VPD, rather than validating the CSV's rounded VPD as exact.
+        native_rh=(num(original["RH_original_pct"]) if src=="ORIGINAL_NATIVE_RH"
+                   else num(original["ERA_RH_Magnus_water_pct"]))
+        if native_rh is None or rh is None or vpd is None:
+            raise ValueError("missing source RH or original candidate "+str(k))
+        if abs(rh-native_rh)>1.2e-5:
+            raise ValueError("rounded candidate RH disagrees with original RH source "+str(k))
+        exact_vpd=saturation(ta)*(1-native_rh/100)
+        if abs(vpd-exact_vpd)>2.0e-6:
+            raise ValueError("rounded proposed VPD disagrees with source-derived VPD "+str(k))
+        rh=native_rh
+        vpd=exact_vpd
         check_source(original,ta,rh,vpd,src)
         chosen[k]=dict(site=k[0],native_time=k[1],source_cohort=cohort,
            decision_id=group,source_TA_C=original["TA_F_C"],
@@ -155,9 +174,9 @@ def merge(context,p1,c20,h20,r21):
            source_processed_ERA_VPD_hPa=original["VPD_ERA_hPa"],
            source_processed_ERA_RH_derived_pct=original["ERA_RH_Magnus_water_pct"],
            modified_TA_C=original["TA_F_C"],
-           modified_RH_pct=round(rh,7),
-           modified_VPD_hPa=round(vpd,7),
-           delta_VPD_hPa=round(vpd-old_vpd,7),
+           modified_RH_pct=round(rh,9),
+           modified_VPD_hPa=round(vpd,10),
+           delta_VPD_hPa=round(vpd-old_vpd,10),
            replacement_RH_provenance=src,
            new_VPD_derivation="MAGNUS_WATER_SOURCE_SELECTED_TA",
            source_QC_provenance_only="ORIGINAL_SOURCE_QC_UNCHANGED_IN_AUDIT_NOT_RENEWED_MEASUREMENT",
@@ -278,7 +297,18 @@ def selftest():
     assert round(rh_of(10,saturation(10)*(1-67/100)),8)==67.0
     assert round(rh_of(-15,saturation(-15)*(1-88/100)),8)==88.0
     assert len(BOUNDARIES)==3
-    print("STAGE22 SELF-TEST PASS | physical coherent RH/VPD, exact 3 held boundaries, no source writes")
+    # Actual Stage21 error reproduction, source US-Vcm 2008-01-16 21:00:
+    # saving VPD as 0.222795 (6 decimals) at -14.802 C makes the
+    # inferred RH differ from 88.56054 by ~2.34e-5 percentage points.
+    t=-14.802
+    source_rh=88.56054
+    exact_vpd=saturation(t)*(1-source_rh/100)
+    stage21_six_digits=round(exact_vpd,6)
+    assert abs(rh_of(t,stage21_six_digits)-source_rh)>1.1e-5
+    assert abs(stage21_six_digits-exact_vpd)<2.0e-6
+    check_source({"RH_original_pct":str(source_rh)},t,source_rh,
+                 exact_vpd,"ORIGINAL_NATIVE_RH")
+    print("STAGE22 SELF-TEST PASS | six-decimal Stage21 roundoff correctly reconstructed using source RH; physical constraints unchanged; no source writes")
 
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
