@@ -90,7 +90,7 @@ def from_vpd(t,p,v):
 
 def pair_consistent(t,p,v,q):
     x=from_vpd(t,p,v)
-    return x is not None and np.isfinite(q) and abs(x[1]-q)<=0.001
+    return x is not None and np.isfinite(q) and 0<q<0.08 and abs(x[1]-q)<=0.001
 
 def adjacent(a,b):
     return pd.to_datetime(b,format="%Y%m%d%H%M")-pd.to_datetime(
@@ -298,8 +298,8 @@ def assess():
     sites=pd.DataFrame([
         {"site":s,"current_source_provenance":("STAGE12AY_RESEARCH_ONLY_NOT_DATM"
             if s=="US-Kon" else "OTHER_NINE_NOT_VERIFIED_BY_THIS_KON_AUDIT"),
-         "production_forcing_approved":False,
-         "spinup_authorized":False}
+         "production_forcing_approved":False if s=="US-Kon" else None,
+         "spinup_authorized":False if s=="US-Kon" else None}
         for s in SITES
     ])
     return trial,event_df,patches,holds,sites
