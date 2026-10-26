@@ -1,5 +1,7 @@
 # Curated source ledgers and membership
 
+**Recommended-input extension:** `recommended_inputs_v1_20261026.json` records50 explicit model-area hypotheses and35 alternatives; `recommended_hlm_profiles_v1_20261026.json` records the reference14PFT map and proposed independent Arctic/hydrodeciduous-shrub profiles. These new files are recommendations, not additions to the measured-evidence ledgers. Use `python3 scripts/build_recommended_inputs.py --build` and `--check` from the parent PFT directory to regenerate/check the input tables.
+
 `sites_50_manifest.csv` copies the50 exact memberships from the five original campaign `sites.tsv` files. Package labels and years are provenance, not a new coverage/QC certification.
 
 `source_records_batch01.json` through `source_records_batch05.json` each contain10 manually curated research records. They are summaries with source links, not full-text paper reproductions. They retain measured composition, denominator, observation date/extent, source locator, verification basis, uncertainties and next evidence.

@@ -1,5 +1,11 @@
 # AmeriFlux PFT evidence — all 50 stations
 
+## Recommended CLM-FATES inputs — 26 October 2026
+
+[**50-site recommended input percentages (v1)**](RECOMMENDED_INPUT_PFT_50_SITES_20261026.md) now gives a complete FIXNC prescription for each station, plus 35 sensitivity or period alternatives. [Full input CSV](RECOMMENDED_50_SITE_CLM_FATES_INPUT_PFT_20261026.csv), [CLM host matrix](RECOMMENDED_50_SITE_CLM_PCT_NAT_PFT_20261026.csv), and [FATES natural-landunit / vegetated-only matrices](RECOMMENDED_50_SITE_FATES_PFT_PERCENT_20261026.csv) distinguish proposed model fractions from the original observations below. Nine primary prescriptions require a site-private Arctic or hydrodeciduous-shrub HLM map; defaults do not reproduce those targets. No existing surface, parameter file or case was changed.
+
+## Original observation inventory
+
 Updated 26 October 2026. The five experiment manifests contain **50 distinct stations, 10 per batch**. This collection follows the central-table/report structure of [ICOS_PFT](../../ICOS_sites/ICOS_PFT/).
 
 **Search result: 33 sites with numerical composition/cover leads; 17 with qualitative composition, LAI/density or model-only evidence.** Numbers below keep their measured denominators, period and sampling extent. None is automatically an approved full tower-area prescription.

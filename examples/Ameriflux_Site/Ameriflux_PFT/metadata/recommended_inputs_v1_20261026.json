@@ -1,0 +1,1208 @@
+{
+  "version": "RECOMMENDED_MODEL_INPUT_V1_20261026",
+  "status": "RECOMMENDATION_NOT_OBSERVATION_OR_EXECUTION",
+  "mode": "use_fates_fixed_biogeog=true; use_fates_nocomp=true; independent cold start",
+  "denominator": "Percent of the modeled NATVEG soil landunit, including host bare0. This is not automatically percent of the original whole grid.",
+  "landunit_policy": "For a new idealized single-tower scenario recommend NATVEG100/CROP0 and other landunits0 only as an explicit modeled-point scope; do not overwrite existing surfaces or apply to true water/wetland/crop fractions without review.",
+  "records": [
+    {
+      "site": "BR-Ma2",
+      "fates_natland_percent": {
+        "1": 100
+      },
+      "bare_percent": 0,
+      "target_state": "Idealized intact K34 evergreen forest",
+      "target_period": "Intact-forest reference; release1999-2016",
+      "basis": "PUBLISHED_MODEL_PRECEDENT",
+      "rationale": "Use tropical evergreen tree functional group, consistent with the existing BR-Ma2 technical forest-point pilot.",
+      "residual_policy": "Single-PFT forest hypothesis; botanical/footprint fractions remain unmeasured.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "CA-Ca3",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "target_state": "HDF88 conifer forest",
+      "target_period": "2002-era stand reference",
+      "basis": "STAND_FUNCTIONAL_PROXY",
+      "rationale": "The three reported tree species75/21/4 are all evergreen conifers.",
+      "residual_policy": "Treat sampled tree functional composition as a forest-point area proxy; exclude unquantified understory.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "CA-Cbo",
+      "fates_natland_percent": {
+        "2": 18.6,
+        "6": 81.4
+      },
+      "bare_percent": 0,
+      "target_state": "Borden mixed forest",
+      "target_period": "2006 census reference",
+      "basis": "EXPLICIT_NORMALIZED_STEM_PROXY",
+      "rationale": "Normalize reported DBF81.6 and ENF18.7 by their rounded sum100.3, then round to0.1 percentage point.",
+      "residual_policy": "The normalization is a new model prescription, not a correction of the unchanged original100.3 stem percentages.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "CA-LP1",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "target_state": "Lodgepole-pine tree-type experiment",
+      "target_period": "MPB-06 reference; beetle disturbance separate",
+      "basis": "DOMINANT_FOREST_PROXY",
+      "rationale": "Near-pure lodgepole description supports conifer eligibility; the juvenile table alone does not quantify canopy area.",
+      "residual_policy": "Use a conifer-only forest hypothesis, not a juvenile-census extrapolation presented as observation.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "CA-Man",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "target_state": "Old black-spruce tree-type experiment",
+      "target_period": "1999-2000 canopy reference",
+      "basis": "BASAL_AREA_PROXY_WITH_RESIDUAL_ASSUMPTION",
+      "rationale": "Black spruce accounts for99% of overstory basal area.",
+      "residual_policy": "Assign the unknown1% to the dominant ENF for baseline only; test ENF99/DNF1 separately. No claim the residual was observed larch.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "CA-TP1",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "target_state": "White-pine plantation functional type",
+      "target_period": "Post-establishment2002 plantation reference",
+      "basis": "CATEGORICAL_TREE_TYPE_PROXY",
+      "rationale": "All-white-pine tree-stand statement supports an ENF-only plantation scenario.",
+      "residual_policy": "Categorical tree composition converted to a forest-point hypothesis; age and planting structure remain separate.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "CA-TP3",
+      "fates_natland_percent": {
+        "2": 99,
+        "6": 1
+      },
+      "bare_percent": 0,
+      "target_state": "Mixed plantation tree-type proxy",
+      "target_period": "2019 stand reference",
+      "basis": "PUBLISHED_SPECIES_PROXY",
+      "rationale": "White pine94 plus jack pine5 become ENF99; oak1 becomes DBF1.",
+      "residual_policy": "Use reported stand percentages as prescribed patch-area proxy; do not claim ground-cover measurement.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "CA-TP4",
+      "fates_natland_percent": {
+        "2": 93,
+        "6": 7
+      },
+      "bare_percent": 0,
+      "target_state": "Existing idealized plantation forest scenario",
+      "target_period": "2019 species reference; existing pilot policy",
+      "basis": "EXISTING_PROJECT_INPUT_PROXY",
+      "rationale": "Retain the existing CA-TP4 idealized forest inputENF93/DBF7 in the noncompetition project.",
+      "residual_policy": "Tree species ratio is explicitly used as area proxy; former coarse-grid crop share is not tower evidence.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Aud",
+      "fates_natland_percent": {
+        "14": 70
+      },
+      "bare_percent": 30,
+      "target_state": "Audubon grass/bare modeling precedent",
+      "target_period": "Published2004-2009 reference",
+      "basis": "EXISTING_OPERATOR_SELECTED_MODEL_PRECEDENT",
+      "rationale": "Retain prior operator-selected C4grass70/bare30.",
+      "residual_policy": "C3/forb minority omitted in this published model simplification.",
+      "bare_policy": "Bare30 is the published model assumption already selected by the operator, not a verified footprint survey.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Bar",
+      "fates_natland_percent": {
+        "2": 17,
+        "6": 83
+      },
+      "bare_percent": 0,
+      "target_state": "Bartlett mixed-forest prescription",
+      "target_period": "Published2004-2016 characterization",
+      "basis": "SPECIES_PROXY_WITH_EXPLICIT_CONIFER_RESIDUAL",
+      "rationale": "Named deciduous species83, hemlock14, and prose mentions minor other conifers.",
+      "residual_policy": "Assign all remaining3 points to other ENF as the recommended hypothesis. Original83/14/unknown3 remains unchanged; normalized-known85.6/14.4 is an alternative.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-BZS",
+      "fates_natland_percent": {
+        "2": 20,
+        "10": 60,
+        "11": 10,
+        "12": 10
+      },
+      "bare_percent": 0,
+      "target_state": "Sparse spruce plus dwarf-shrub vascular projection",
+      "target_period": "Permafrost-forest reference; survey period uncertain",
+      "basis": "PARTIAL_TREE_COVER_PLUS_EXPLICIT_PRIOR",
+      "rationale": "Tree20 is loosely anchored to reported canopy cover;60/10/10 shrub/graminoid split is a chosen prior.",
+      "residual_policy": "All non-tree weights are model hypotheses, not a measured80% remainder.",
+      "bare_policy": "Bare0 is a vascular-projection convention, not an observed zero bare fraction.",
+      "mapping_profile": "ARCTIC_PURE",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Vascular-only functional projection; moss/lichen/biocrust have no separate PFT here and are NOT relabeled as bare or grass. No inference that vascular cover occupies100% of observed ground."
+    },
+    {
+      "site": "US-CMW",
+      "fates_natland_percent": {
+        "6": 74,
+        "14": 26
+      },
+      "bare_percent": 0,
+      "target_state": "Mesquite over grass one-layer projection",
+      "target_period": "2001-2003 crown-cover reference",
+      "basis": "CROWN_COVER_PLUS_UNDERSTORY_PRIOR",
+      "rationale": "Retain mesquite crown cover74 as area-allocation proxy; assign remaining26 to C4 sacaton/understory proxy.",
+      "residual_policy": "The26 is not independently measured; avoid combining unrelated80% total-cover description from another period.",
+      "bare_policy": "Bare0 is the baseline closed-point convention; a bare10 sensitivity is supplied.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-EML",
+      "fates_natland_percent": {
+        "10": 20,
+        "11": 30,
+        "12": 50
+      },
+      "bare_percent": 0,
+      "target_state": "Moist tundra vascular projection",
+      "target_period": "Eight Mile Lake reference, not a dated full-cover survey",
+      "basis": "EXPLICIT_VASCULAR_PRIOR",
+      "rationale": "Eriophorum/sedges and evergreen/deciduous dwarf shrubs justify three types, not exact percentages.",
+      "residual_policy": "All50/30/20 weights are explicit provisional priors.",
+      "bare_policy": "Bare0 is a projection convention, not measured.",
+      "mapping_profile": "ARCTIC_PURE",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Vascular-only functional projection; moss/lichen/biocrust have no separate PFT here and are NOT relabeled as bare or grass. No inference that vascular cover occupies100% of observed ground."
+    },
+    {
+      "site": "US-GLE",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "target_state": "Spruce-fir forest functional-type experiment",
+      "target_period": "Historical tree census; beetle mortality separate",
+      "basis": "TREE_FUNCTIONAL_PROXY",
+      "rationale": "Spruce84/fir16 by basal area both map to ENF.",
+      "residual_policy": "Do not convert85% beetle-killed basal area to85% bare ground; mortality/demography require a separate representation.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Ha1",
+      "fates_natland_percent": {
+        "2": 27.3,
+        "6": 72.7
+      },
+      "bare_percent": 0,
+      "target_state": "Harvard mixed forest",
+      "target_period": "Richardson2009 historical BA characterization",
+      "basis": "EXPLICIT_NORMALIZED_BASAL_AREA_PROXY",
+      "rationale": "Normalize DBF72 and ENF27 by99; round to0.1 point.",
+      "residual_policy": "Treat the missing1 point as rounding/unclassified and explicitly distribute pro rata for the model baseline; source data unchanged.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Ho1",
+      "fates_natland_percent": {
+        "2": 91.9,
+        "6": 8.1
+      },
+      "bare_percent": 0,
+      "target_state": "Howland main tower mixed conifer forest",
+      "target_period": "Richardson2009 historical BA characterization",
+      "basis": "EXPLICIT_NORMALIZED_BASAL_AREA_PROXY",
+      "rationale": "Normalize conifer91 and hardwood8 by99; map conifer group to ENF in this baseline.",
+      "residual_policy": "The unknown/rounded1 point is allocated pro rata, not to grass or bare.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Ho2",
+      "fates_natland_percent": {
+        "2": 90,
+        "6": 10
+      },
+      "bare_percent": 0,
+      "target_state": "Howland west tower mixture prior",
+      "target_period": "Historical pooled main/west inventory context",
+      "basis": "EXPLICIT_POOLED_INVENTORY_PRIOR",
+      "rationale": "Conifers dominate; choose90/10 as a west-tower hypothesis because the17% mixed-species group cannot be split exactly.",
+      "residual_policy": "Do not transfer the main-tower91.9/8.1 as a Ho2 observation.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Ho3",
+      "fates_natland_percent": {
+        "2": 90,
+        "6": 10
+      },
+      "bare_percent": 0,
+      "target_state": "Howland harvest-site forest-type prior",
+      "target_period": "Postharvest functional hypothesis, not age/biomass initialization",
+      "basis": "EXPLICIT_REGIONAL_FOREST_PRIOR",
+      "rationale": "Use conifer-dominant90/10 provisional mixture pending a tower-specific postharvest inventory.",
+      "residual_policy": "Neither composition nor fraction follows from the30% biomass removal; no bare30 prescription.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-ICh",
+      "fates_natland_percent": {
+        "10": 30,
+        "11": 20,
+        "12": 50
+      },
+      "bare_percent": 0,
+      "target_state": "Heath/tussock mosaic vascular projection",
+      "target_period": "Community mosaic in2017 paper",
+      "basis": "COMMUNITY_CONTEXT_PLUS_EXPLICIT_VASCULAR_PRIOR",
+      "rationale": "Published20% heath/72% tussock communities guide a graminoid-rich prior; they are not species fractions.",
+      "residual_policy": "Weights30/20/50 are model assumptions;8% sedge-meadow/bare combined is not assigned to bare8.",
+      "bare_policy": "Bare0 projection convention only.",
+      "mapping_profile": "ARCTIC_PURE",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Vascular-only functional projection; moss/lichen/biocrust have no separate PFT here and are NOT relabeled as bare or grass. No inference that vascular cover occupies100% of observed ground."
+    },
+    {
+      "site": "US-ICt",
+      "fates_natland_percent": {
+        "10": 15,
+        "11": 25,
+        "12": 60
+      },
+      "bare_percent": 0,
+      "target_state": "Tussock tundra vascular projection",
+      "target_period": "2017 community reference",
+      "basis": "COMMUNITY_CONTEXT_PLUS_EXPLICIT_VASCULAR_PRIOR",
+      "rationale": "Tussock-community dominance suggests a graminoid-majority functional prior.",
+      "residual_policy": "Do not set grass95 from95% tussock community;15/25/60 split is assumed.",
+      "bare_policy": "Bare0 projection convention only.",
+      "mapping_profile": "ARCTIC_PURE",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Vascular-only functional projection; moss/lichen/biocrust have no separate PFT here and are NOT relabeled as bare or grass. No inference that vascular cover occupies100% of observed ground."
+    },
+    {
+      "site": "US-Kon",
+      "fates_natland_percent": {
+        "13": 10,
+        "14": 90
+      },
+      "bare_percent": 0,
+      "target_state": "Annually burned tallgrass prairie",
+      "target_period": "Ungrazed watershed1D reference",
+      "basis": "EXPLICIT_C3_C4_PRIOR",
+      "rationale": "C4 grasses dominate species descriptions; choose90% C4 and10% C3/herb proxy.",
+      "residual_policy": "96% graminoid herbaceous biomass is not90% C4 area; C3/C4 split is assumed.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Me2",
+      "fates_natland_percent": {
+        "2": 90,
+        "7": 5,
+        "8": 5
+      },
+      "bare_percent": 0,
+      "target_state": "Prefire mature pine with shrub proxies",
+      "target_period": "Before20August2020 fire; postfire alternative separate",
+      "basis": "EXPLICIT_CANOPY_UNDERSTORY_PRIOR",
+      "rationale": "Evergreen conifer overstory plus Arctostaphylos and Purshia motivates90/5/5; all weights are assumptions.",
+      "residual_policy": "Do not derive cover from LAI2.1/0.2. Purshia drought-deciduous representation is a trait hypothesis.",
+      "bare_policy": "Bare0 forest-point convention only.",
+      "mapping_profile": "HYDRO_SHRUB",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Me6",
+      "fates_natland_percent": {
+        "2": 80,
+        "8": 5,
+        "13": 15
+      },
+      "bare_percent": 0,
+      "target_state": "Open regenerating pine/herbaceous projection",
+      "target_period": "2010-2011 young-stand reference",
+      "basis": "EXPLICIT_REGENERATION_PRIOR",
+      "rationale": "Use ENF80, drought-deciduous shrub5 and cool C3 grass15 to retain identified understory.",
+      "residual_policy": "All weights are assumed; neither LAI0.8/0.1 nor density162/ha supplies these area fractions.",
+      "bare_policy": "Bare0 baseline convention; open canopy need not be bare.",
+      "mapping_profile": "HYDRO_SHRUB",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-MMS",
+      "fates_natland_percent": {
+        "6": 100
+      },
+      "bare_percent": 0,
+      "target_state": "Deciduous tree-type forest proxy",
+      "target_period": "Published stand-characterization reference",
+      "basis": "DOMINANT_FOREST_PROXY",
+      "rationale": "Named genera account for75% BA and are all DBF; use DBF-only baseline.",
+      "residual_policy": "Assume unresolved25% tree BA is also DBF for this forest-type control; test5% ENF separately. No grass residual.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-MOz",
+      "fates_natland_percent": {
+        "2": 10,
+        "6": 90
+      },
+      "bare_percent": 0,
+      "target_state": "Oak-hickory-juniper forest proxy",
+      "target_period": "2004-2010 observational context",
+      "basis": "PARTIAL_BASAL_AREA_PLUS_RESIDUAL_ASSUMPTION",
+      "rationale": "Retain named Juniperus10 ENF and assign remaining area to DBF90.",
+      "residual_policy": "Named DBF62 plus unknown28 is explicitly completed as DBF; not a measured90/10 full vector.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Mpj",
+      "fates_natland_percent": {
+        "2": 60,
+        "14": 20
+      },
+      "bare_percent": 20,
+      "target_state": "Pinyon-juniper savanna precedent",
+      "target_period": "Published2008-2014 reference; mortality separate",
+      "basis": "PUBLISHED_MODEL_PRECEDENT",
+      "rationale": "Retain the published60ENF/20C4/20bare fCover; tree60 is consistent with official canopy description.",
+      "residual_policy": "Understory and bare shares are the published model design, not a new field extraction.",
+      "bare_policy": "Bare20 is a model precedent, not100 minus tree cover.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-MtB",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "target_state": "Mixed conifer tree-type forest proxy",
+      "target_period": "Mature stand reference",
+      "basis": "DOMINANT_FOREST_PROXY",
+      "rationale": "Three dominant named tree species are evergreen conifers.",
+      "residual_policy": "Treat the forest as ENF-only; unquantified minor herbs and shrubs omitted, not observed absent.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-NC2",
+      "fates_natland_percent": {
+        "2": 90,
+        "6": 10
+      },
+      "bare_percent": 0,
+      "target_state": "Pine plantation with deciduous understory prior",
+      "target_period": "2005-2009 pre/post-thinning reference",
+      "basis": "EXPLICIT_PLANTATION_UNDERSTORY_PRIOR",
+      "rationale": "Pinus taeda dominates; retain a10% DBF Acer/understory proxy.",
+      "residual_policy": "90/10 is a modeling prior, not inferred from summer/winter LAI or thinning percentage.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-NR1",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "target_state": "Subalpine evergreen tree-type forest",
+      "target_period": "Published tree-stem census reference",
+      "basis": "TREE_FUNCTIONAL_PROXY",
+      "rationale": "Fir46/spruce28/lodgepole26 all map to ENF.",
+      "residual_policy": "Stem composition collapsed to a forest-only area proxy; understory/ground fractions not inferred.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-NR3",
+      "fates_natland_percent": {
+        "12": 80
+      },
+      "bare_percent": 20,
+      "target_state": "Alpine herbaceous/fellfield projection",
+      "target_period": "T-Van West dry-meadow reference",
+      "basis": "EXPLICIT_ALPINE_COVER_PRIOR",
+      "rationale": "Use Arctic/alpine C3 herb proxy80 and nonvegetated substrate20 as a central sensitivity hypothesis.",
+      "residual_policy": "No tower-specific cover survey constrains80/20; forbs lumped with C3 grass and possible shrubs omitted.",
+      "bare_policy": "Bare20 is wholly assumed and lumps possible rock/nonvegetated substrate; alternatives0/40 supplied. It is not snow fraction.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Moss/lichen unrepresented; no measured nonvascular fraction converted to bare. Assumed20 substrate remains a separate modeling sensitivity."
+    },
+    {
+      "site": "US-Rpf",
+      "fates_natland_percent": {
+        "6": 80,
+        "9": 20
+      },
+      "bare_percent": 0,
+      "target_state": "Postfire aspen-birch/shrub mixture prior",
+      "target_period": "Young post2004-fire reference; not original spruce forest",
+      "basis": "EXPLICIT_POSTFIRE_VEGETATION_PRIOR",
+      "rationale": "Assign80% DBF and20% cold-deciduous extratropical shrubs to represent named young forest and shrub components.",
+      "residual_policy": "All percentages assumed; no reuse of intact US-Prr spruce composition.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Seg",
+      "fates_natland_percent": {
+        "14": 60
+      },
+      "bare_percent": 40,
+      "target_state": "Black-grama grass/bare precedent",
+      "target_period": "Published2007-2014 reference;2009 fire separate",
+      "basis": "PUBLISHED_MODEL_PRECEDENT",
+      "rationale": "Use published C4grass60/bare40 as explicit model baseline.",
+      "residual_policy": "A60% surface-cover description does not independently establish bare40 or a time-invariant postfire state.",
+      "bare_policy": "Bare40 from model precedent; older live-plus-litter survey has different scope.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Ses",
+      "fates_natland_percent": {
+        "7": 55,
+        "14": 25
+      },
+      "bare_percent": 20,
+      "target_state": "Creosote shrub/grass precedent",
+      "target_period": "Published2007-2014 model reference",
+      "basis": "PUBLISHED_MODEL_PRECEDENT_WITH_SHRUB_MAPPING",
+      "rationale": "Translate source TeBE55 to evergreen SHRUB FATES7, retain C4grass25 and bare20.",
+      "residual_policy": "This model fCover is not the historical nearby30% vegetation survey or current tower species cover.",
+      "bare_policy": "Bare20 from published model design; low-cover70 sensitivity provided.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Slt",
+      "fates_natland_percent": {
+        "2": 38,
+        "6": 62
+      },
+      "bare_percent": 0,
+      "target_state": "Postinfestation2018 oak-pine state",
+      "target_period": "2018 target; early2005 alternative separate",
+      "basis": "DATED_BASAL_AREA_PROXY",
+      "rationale": "Use measured pine38% live tree+sapling BA; non-pine62 interpreted as DBF for model input.",
+      "residual_policy": "62 is the non-pine complement with a functional classification assumption; not full measured ground cover.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-SP1",
+      "fates_natland_percent": {
+        "2": 85,
+        "7": 15
+      },
+      "bare_percent": 0,
+      "target_state": "Pine flatwoods with evergreen understory prior",
+      "target_period": "2000s-2018 functional reference; burns/thinning separate",
+      "basis": "EXPLICIT_OVERSTORY_UNDERSTORY_PRIOR",
+      "rationale": "All dominant pines share ENF; dense palmetto/gallberry/wax-myrtle motivates evergreen-shrub15.",
+      "residual_policy": "85/15 split is assumed; reported longleaf/slash ratios are within one ENF type and cannot supply the shrub share.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-SRG",
+      "fates_natland_percent": {
+        "6": 11,
+        "14": 44
+      },
+      "bare_percent": 45,
+      "target_state": "Mesquite grassland modeling precedent",
+      "target_period": "Published2009-2014 reference",
+      "basis": "PUBLISHED_MODEL_PRECEDENT_WITH_HERB_PROXY",
+      "rationale": "Retain source woody11, herb44 and modeled bare45; map woody mesquite to DBF tree and herbs to C4grass.",
+      "residual_policy": "44 includes forbs/succulents in field table; C4-only simplification and exclusive layer allocation are assumptions.",
+      "bare_policy": "Bare45 is the published model allocation; not a separately observed residual measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-SRM",
+      "fates_natland_percent": {
+        "6": 35,
+        "14": 20
+      },
+      "bare_percent": 45,
+      "target_state": "Mesquite savanna range-consistent prescription",
+      "target_period": "2004-2016 literature characterization",
+      "basis": "GROUND_COVER_RANGE_SCENARIO",
+      "rationale": "Tree35/grass20/bare45 falls within reported30-35/15-25/40-50 cover ranges and closes100.",
+      "residual_policy": "Joint vector chosen as scenario; independent ranges/layers are not a measured simplex. Minor C3/succulent groups lumped.",
+      "bare_policy": "Bare45 is chosen within explicitly reported40-50 range, not an arbitrary canopy complement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Syv",
+      "fates_natland_percent": {
+        "2": 50,
+        "6": 50
+      },
+      "bare_percent": 0,
+      "target_state": "Footprint-mixture prior for old-growth mosaic",
+      "target_period": "Undated wider-footprint functional reference",
+      "basis": "EXPLICIT_SPATIAL_MIXTURE_PRIOR",
+      "rationale": "Use neutral50/50 DBF/ENF as provisional footprint mixture because local1ha and wider1km2 dominance differ.",
+      "residual_policy": "Do not present50/50 as observed; local-stem86/14 and hemlock-rich30/70 are required sensitivity alternatives.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Ton",
+      "fates_natland_percent": {
+        "6": 43,
+        "13": 57
+      },
+      "bare_percent": 0,
+      "target_state": "Oak savanna one-layer canopy projection",
+      "target_period": "IKONOS-era1km2 canopy reference",
+      "basis": "CANOPY_COVER_PLUS_C3_UNDERSTORY_ASSUMPTION",
+      "rationale": "Use woodland canopy43 as DBF-oak patch proxy and assign57 to C3 herbaceous patch.",
+      "residual_policy": "Canopy-understory overlap is collapsed into exclusive model patches. Minor grey pine omitted;3trees/ha is not3% area.",
+      "bare_policy": "Bare0 convention;57 is not observed grass cover.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Uaf",
+      "fates_natland_percent": {
+        "2": 50,
+        "10": 20,
+        "11": 20,
+        "12": 10
+      },
+      "bare_percent": 0,
+      "target_state": "Spruce/shrub vascular projection",
+      "target_period": "Smith Lake reference; not North Campus surrogate",
+      "basis": "EXPLICIT_VASCULAR_PRIOR",
+      "rationale": "Retain black spruce, evergreen/deciduous dwarf shrubs and C3graminoid functional components.",
+      "residual_policy": "All50/20/20/10 weights are assumed;4500trees/ha and complete moss floor do not imply these percentages.",
+      "bare_policy": "Bare0 projection convention only.",
+      "mapping_profile": "ARCTIC_PURE",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Vascular-only functional projection; moss/lichen/biocrust have no separate PFT here and are NOT relabeled as bare or grass. No inference that vascular cover occupies100% of observed ground."
+    },
+    {
+      "site": "US-UiD",
+      "fates_natland_percent": {
+        "13": 20,
+        "14": 80
+      },
+      "bare_percent": 0,
+      "target_state": "Restored native prairie C3/C4 prior",
+      "target_period": "Established perennial prairie; harvest dynamics separate",
+      "basis": "EXPLICIT_C3_C4_PRIOR",
+      "rationale": "Use C4grass80 and C3grass/forb proxy20 for mixed restored prairie.",
+      "residual_policy": "Entire80/20 split is a model prior, not seed-mix or measured cover; UiA/UiB are different fields.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-UMB",
+      "fates_natland_percent": {
+        "2": 9,
+        "6": 91
+      },
+      "bare_percent": 0,
+      "target_state": "2010 control-tower mixed forest",
+      "target_period": "2010 census target",
+      "basis": "DATED_BASAL_AREA_PROXY",
+      "rationale": "Aggregate the2010 species BA table to DBF91/ENF9; retains a complete listed tree mixture.",
+      "residual_policy": "Use BA as an area-allocation proxy;2001 two-point residual and later forest change remain outside this target.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-UMd",
+      "fates_natland_percent": {
+        "2": 10,
+        "6": 90
+      },
+      "bare_percent": 0,
+      "target_state": "Pretreatment FASET forest mixture prior",
+      "target_period": "2007 before2008 girdling; mortality separate",
+      "basis": "EXPLICIT_PRETREATMENT_FOREST_PRIOR",
+      "rationale": "Use DBF90/ENF10 as nearby forest-type prior; it is not a measured US-UMd vector copied from US-UMB.",
+      "residual_policy": "39% aspen/birch BA affected by girdling is a structural mortality quantity, not bare39 or DBF39.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Var",
+      "fates_natland_percent": {
+        "13": 100
+      },
+      "bare_percent": 0,
+      "target_state": "Mediterranean annual C3 herbaceous proxy",
+      "target_period": "Vaira wet-season annual community",
+      "basis": "CATEGORICAL_HERBACEOUS_PROXY",
+      "rationale": "Map named C3 annual grasses and herbs into cool C3 grass in the baseline.",
+      "residual_policy": "Forbs/clover share is unmeasured; FATES grass physiology is an explicit herbaceous simplification.",
+      "bare_policy": "Bare0 is potential vegetation patch convention; dry-season senescence is not permanent bare ground.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Vcm",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "target_state": "Prefire mixed-conifer forest precedent",
+      "target_period": "2007-2012 ONLY; not whole2007-2025 historical record",
+      "basis": "PUBLISHED_PREFIRE_MODEL_PRECEDENT",
+      "rationale": "Use the published prefire ENF100 scenario as the forest-state main recommendation.",
+      "residual_policy": "2013 stand replacement and postfire elderberry/aspen require separate states; no prefire trees assumed to survive by this table.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Vcp",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "target_state": "Ponderosa tree-type forest precedent",
+      "target_period": "Published2007-2014 model reference",
+      "basis": "PUBLISHED_MODEL_PRECEDENT",
+      "rationale": "Retain published ENF100 as forest-state control; named Gambel oak is not observed absent.",
+      "residual_policy": "Minor oak/understory omitted in baseline; test ENF90/DBF10 separately.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-WCr",
+      "fates_natland_percent": {
+        "6": 100
+      },
+      "bare_percent": 0,
+      "target_state": "Willow Creek deciduous forest-type proxy",
+      "target_period": "Early inventory reference; later thinning separate",
+      "basis": "DOMINANT_BASAL_AREA_PROXY",
+      "rationale": "Major named BA species are DBF; use DBF-only forest baseline.",
+      "residual_policy": "Unlisted/rounded minor tree fraction assigned DBF as hypothesis; no regional WLEF30% conifer transfer.",
+      "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Whs",
+      "fates_natland_percent": {
+        "7": 20,
+        "8": 20,
+        "14": 3
+      },
+      "bare_percent": 57,
+      "target_state": "Mixed-phenology shrubland projection",
+      "target_period": "2012 woody40/herb3 reference",
+      "basis": "COVER_GROUPS_PLUS_PHENOLOGY_PRIOR",
+      "rationale": "Preserve woody total40; split evergreen20 and drought-deciduous20 as a trait uncertainty prior.",
+      "residual_policy": "20/20 is assumed, not species cover; herb3 lumped C4 and overlapping cover collapsed to exclusive patch areas.",
+      "bare_policy": "Bare57 follows published model allocation; not an independently verified survey residual.",
+      "mapping_profile": "HYDRO_SHRUB",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Wjs",
+      "fates_natland_percent": {
+        "2": 15,
+        "14": 85
+      },
+      "bare_percent": 0,
+      "target_state": "Juniper savanna published model baseline",
+      "target_period": "Published2008-2014 reference",
+      "basis": "PUBLISHED_MODEL_PRECEDENT",
+      "rationale": "Retain15ENF/85C4 exactly as published model fCover; do not invent a new bare estimate in the main row.",
+      "residual_policy": "85%grass and absence of prescribed bare are modeling choices, not field-cover measurements.",
+      "bare_policy": "Bare0 is published model convention; bare25 sensitivity is explicitly assumed.",
+      "mapping_profile": "DEFAULT14",
+      "uncertainty": "MEDIUM",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    },
+    {
+      "site": "US-Wkg",
+      "fates_natland_percent": {
+        "8": 3,
+        "14": 37
+      },
+      "bare_percent": 60,
+      "target_state": "C4grass with sparse dryland shrubs",
+      "target_period": "2017 woody3/herb37; historical model reference",
+      "basis": "COVER_GROUPS_WITH_SHRUB_PHYSIOLOGY_PROXY",
+      "rationale": "Use woody3 as drought-deciduous shrub proxy, herb37 as C4grass and model bare60.",
+      "residual_policy": "Woody species phenology is mixed and37 field group includes forbs; compare evergreen-shrub3 alternative.",
+      "bare_policy": "Bare60 from published model allocation, not proof all uncovered ground is bare.",
+      "mapping_profile": "HYDRO_SHRUB",
+      "uncertainty": "HIGH",
+      "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
+    }
+  ],
+  "sensitivity_scenarios": [
+    {
+      "site": "CA-Man",
+      "scenario": "minor_larch_hypothesis",
+      "fates_natland_percent": {
+        "2": 99,
+        "3": 1
+      },
+      "bare_percent": 0,
+      "interpretation": "Unknown1% assigned DNF as a larch sensitivity only; not observed residual identification."
+    },
+    {
+      "site": "US-Bar",
+      "scenario": "normalize_only_named97",
+      "fates_natland_percent": {
+        "2": 14.4,
+        "6": 85.6
+      },
+      "bare_percent": 0,
+      "interpretation": "Normalize named83DBF+14ENF by97; compare with assigning residual3 to ENF."
+    },
+    {
+      "site": "US-BZS",
+      "scenario": "vascular_shrub_split",
+      "fates_natland_percent": {
+        "2": 20,
+        "10": 40,
+        "11": 20,
+        "12": 20
+      },
+      "bare_percent": 0,
+      "interpretation": "All non-tree weights assumed; moss remains unrepresented."
+    },
+    {
+      "site": "US-CMW",
+      "scenario": "assumed_bare10",
+      "fates_natland_percent": {
+        "6": 74,
+        "14": 16
+      },
+      "bare_percent": 10,
+      "interpretation": "Unobserved exclusive-understory/bare split; avoid claiming source datasets jointly determine it."
+    },
+    {
+      "site": "US-EML",
+      "scenario": "more_deciduous_shrub",
+      "fates_natland_percent": {
+        "10": 20,
+        "11": 45,
+        "12": 35
+      },
+      "bare_percent": 0,
+      "interpretation": "All functional weights assumed, vascular-only projection."
+    },
+    {
+      "site": "US-Ho2",
+      "scenario": "hardwood_upper_group17",
+      "fates_natland_percent": {
+        "2": 83,
+        "6": 17
+      },
+      "bare_percent": 0,
+      "interpretation": "Assign entire mixed17 group to DBF and remainder to ENF; conservative group-bound scenario."
+    },
+    {
+      "site": "US-Ho3",
+      "scenario": "conifer_only_control",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "interpretation": "Dominant tree-type control; no observed postharvest fraction."
+    },
+    {
+      "site": "US-ICh",
+      "scenario": "heath_rich_prior",
+      "fates_natland_percent": {
+        "10": 50,
+        "11": 20,
+        "12": 30
+      },
+      "bare_percent": 0,
+      "interpretation": "Evergreen-shrub-rich vascular projection, not literal20%heath community conversion."
+    },
+    {
+      "site": "US-ICt",
+      "scenario": "shrub_rich_prior",
+      "fates_natland_percent": {
+        "10": 25,
+        "11": 35,
+        "12": 40
+      },
+      "bare_percent": 0,
+      "interpretation": "All functional weights assumed;95%community cover does not determine them."
+    },
+    {
+      "site": "US-Kon",
+      "scenario": "C4_only_control",
+      "fates_natland_percent": {
+        "14": 100
+      },
+      "bare_percent": 0,
+      "interpretation": "Dominant C4 grass simplification; compare with10%C3 prior."
+    },
+    {
+      "site": "US-Me2",
+      "scenario": "tree_only_prefire",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "interpretation": "Prefire forest functional-type control; shrubs omitted by choice."
+    },
+    {
+      "site": "US-Me2",
+      "scenario": "post_salvage_2022_hypothesis",
+      "fates_natland_percent": {
+        "2": 5,
+        "7": 5,
+        "8": 20,
+        "13": 30
+      },
+      "bare_percent": 40,
+      "interpretation": "All fractions assumed for a distinct postfire/logging/relocated footprint; not a historical reconstruction."
+    },
+    {
+      "site": "US-Me6",
+      "scenario": "tree_only_control",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "interpretation": "Conifer-only control for sensitivity to unmeasured understory area."
+    },
+    {
+      "site": "US-Me6",
+      "scenario": "more_herbaceous_regeneration",
+      "fates_natland_percent": {
+        "2": 60,
+        "8": 10,
+        "13": 30
+      },
+      "bare_percent": 0,
+      "interpretation": "All60/10/30 weights assumed; not derived from LAI."
+    },
+    {
+      "site": "US-MMS",
+      "scenario": "minor_conifer5",
+      "fates_natland_percent": {
+        "2": 5,
+        "6": 95
+      },
+      "bare_percent": 0,
+      "interpretation": "Unknown tree residual partially allocated to ENF as hypothesis; no observed5%."
+    },
+    {
+      "site": "US-MOz",
+      "scenario": "normalized_named72",
+      "fates_natland_percent": {
+        "2": 13.9,
+        "6": 86.1
+      },
+      "bare_percent": 0,
+      "interpretation": "Normalize named62DBF+10ENF by72; original unclassified28 remains in evidence."
+    },
+    {
+      "site": "US-NC2",
+      "scenario": "pine_only_control",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "interpretation": "Plantation overstory-only baseline; no measured absence of maple."
+    },
+    {
+      "site": "US-NR3",
+      "scenario": "alpine_potential_vegetation",
+      "fates_natland_percent": {
+        "12": 100
+      },
+      "bare_percent": 0,
+      "interpretation": "Bare0 potential-herbaceous control; no tower cover assertion."
+    },
+    {
+      "site": "US-NR3",
+      "scenario": "more_nonvegetated_substrate",
+      "fates_natland_percent": {
+        "12": 60
+      },
+      "bare_percent": 40,
+      "interpretation": "Wholly assumed bare/rock40 sensitivity; no regional cover transferred."
+    },
+    {
+      "site": "US-Rpf",
+      "scenario": "deciduous_tree_only",
+      "fates_natland_percent": {
+        "6": 100
+      },
+      "bare_percent": 0,
+      "interpretation": "Young forest-only control; shrub cover omitted by choice."
+    },
+    {
+      "site": "US-Ses",
+      "scenario": "low_cover_legacy_sensitivity",
+      "fates_natland_percent": {
+        "7": 10,
+        "14": 20
+      },
+      "bare_percent": 70,
+      "interpretation": "An explicit low-cover hypothesis; older nearby70bare is not verified current-tower cover."
+    },
+    {
+      "site": "US-Slt",
+      "scenario": "early_2005_woody_proxy",
+      "fates_natland_percent": {
+        "2": 8,
+        "6": 92
+      },
+      "bare_percent": 0,
+      "interpretation": "Rounded normalization of earlier87oak:8pine out of95; unresolved5 distributed pro rata as model assumption."
+    },
+    {
+      "site": "US-SP1",
+      "scenario": "pine_only_control",
+      "fates_natland_percent": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "interpretation": "Overstory tree-type control for assumed evergreen-shrub15%."
+    },
+    {
+      "site": "US-SRM",
+      "scenario": "published_older_model",
+      "fates_natland_percent": {
+        "6": 35,
+        "14": 15
+      },
+      "bare_percent": 50,
+      "interpretation": "Original Mahmud2021 model fCover; compare with range-consistent35/20/45."
+    },
+    {
+      "site": "US-Syv",
+      "scenario": "local_1ha_stem_proxy",
+      "fates_natland_percent": {
+        "2": 14,
+        "6": 86
+      },
+      "bare_percent": 0,
+      "interpretation": "Observed local stems, deliberately not presented as footprint-wide area."
+    },
+    {
+      "site": "US-Syv",
+      "scenario": "hemlock_rich_footprint_prior",
+      "fates_natland_percent": {
+        "2": 70,
+        "6": 30
+      },
+      "bare_percent": 0,
+      "interpretation": "Wider-forest hemlock dominance motivates70/30 prior, entirely unmeasured as area."
+    },
+    {
+      "site": "US-Ton",
+      "scenario": "minor_pine_hypothesis",
+      "fates_natland_percent": {
+        "2": 5,
+        "6": 40,
+        "13": 55
+      },
+      "bare_percent": 0,
+      "interpretation": "Pine5% is assumed; official3trees/ha is not converted to3%area."
+    },
+    {
+      "site": "US-Uaf",
+      "scenario": "more_shrub_less_tree",
+      "fates_natland_percent": {
+        "2": 30,
+        "10": 25,
+        "11": 25,
+        "12": 20
+      },
+      "bare_percent": 0,
+      "interpretation": "All weights assumed; no density-to-area conversion; moss unrepresented."
+    },
+    {
+      "site": "US-UiD",
+      "scenario": "more_C3_herbaceous",
+      "fates_natland_percent": {
+        "13": 40,
+        "14": 60
+      },
+      "bare_percent": 0,
+      "interpretation": "All weights assumed; explicitly tests uncertain prairie C3/C4/forb representation."
+    },
+    {
+      "site": "US-UMd",
+      "scenario": "hypothetical_BA_removal_projection",
+      "fates_natland_percent": {
+        "2": 16.4,
+        "6": 83.6
+      },
+      "bare_percent": 0,
+      "interpretation": "If39points of BA removed from assumed90DBF/10ENF, normalize51:10. Sensitivity arithmetic only, not measured postgirdling area."
+    },
+    {
+      "site": "US-Vcm",
+      "scenario": "postfire_herb_shrub_aspen_hypothesis",
+      "fates_natland_percent": {
+        "6": 15,
+        "9": 25,
+        "13": 50
+      },
+      "bare_percent": 10,
+      "interpretation": "All weights assumed for post2013 regeneration; excludes prefire conifers; does not establish observed bare10."
+    },
+    {
+      "site": "US-Vcp",
+      "scenario": "oak_understory10",
+      "fates_natland_percent": {
+        "2": 90,
+        "6": 10
+      },
+      "bare_percent": 0,
+      "interpretation": "Gambel oak10 is a functional prior, not measured area."
+    },
+    {
+      "site": "US-Whs",
+      "scenario": "published_evergreen_shrub_lump",
+      "fates_natland_percent": {
+        "7": 40,
+        "14": 3
+      },
+      "bare_percent": 57,
+      "interpretation": "All woody40 represented evergreen as earlier ORCHIDEE-type simplification; compare mixed shrub phenology."
+    },
+    {
+      "site": "US-Wjs",
+      "scenario": "assumed_bare25",
+      "fates_natland_percent": {
+        "2": 15,
+        "14": 60
+      },
+      "bare_percent": 25,
+      "interpretation": "Bare25 entirely assumed; tests source baseline15/85/0 without claiming measured bare."
+    },
+    {
+      "site": "US-Wkg",
+      "scenario": "evergreen_shrub_lump",
+      "fates_natland_percent": {
+        "7": 3,
+        "14": 37
+      },
+      "bare_percent": 60,
+      "interpretation": "Alternative evergreen representation for mixed woody3; not a new cover observation."
+    }
+  ]
+}
