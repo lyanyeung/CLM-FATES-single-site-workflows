@@ -60,7 +60,6 @@ def source_gate():
         m104.get("stage102_sha256")!=sha(S102/"manifest.json") or
         m104.get("production_DATM_approved") is not False or
         m105.get("Stage104_manifest_sha256")!=sha(S104/"manifest.json") or
-        m105.get("source_original_2004_local_missing_records")!=14 or
         m105.get("production_DATM_approved") is not False or
         m105.get("ERA_backfill_generated") is not False or
         not (S102/"SCIENCE_HOLD_NO_CIME_CASE_OR_DATM_ACTIVATION").exists()):
@@ -82,6 +81,12 @@ def source_gate():
         prov["sha256"]!=sha(src) or
         prov["original_missing_2004_local_halfhours"]!=[]):
         raise ValueError("Stage105 historical 2004 local 14/14 provenance changed")
+    # The immutable Stage105 MANIFEST unfortunately names its 14 expected
+    # source slots 'source_original_2004_local_missing_records'. That old
+    # count describes the expected 14 slots, NOT true missing rows.
+    # Only the exact independently checked missing-list [] proves 14/14.
+    if m105.get("source_original_2004_local_missing_records")!=14:
+        raise ValueError("Original Stage105 expected-slot count changed")
     files=sorted(js(S102/"16_year_UTC_midpoint_NC_source_manifest.json"),key=lambda x:x["year"])
     if len(files)!=16 or {x["year"] for x in files}!=set(YEARS):
         raise ValueError("Source 16 annual NC list changed")
