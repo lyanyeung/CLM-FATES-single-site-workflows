@@ -78,10 +78,13 @@ def full_timestamp_audit(site,info):
     step=int(info["native_minutes"])
     cols=set(pd.read_csv(p,nrows=0).columns)
     if not {"TIMESTAMP_START","TIMESTAMP_END"}.issubset(cols):
-        return {"status":"MISSING_START_END_PAIR","site":site,
-                "primary_sha256":sha(p),"records":0,"errors":[]}
-    expected=YEARS[site]*365*1440//step
-    periods=0;bad_start_end=0;gaps=0;dups=0;neg=0;dst_like=0
+        return {"raw_status":"SOURCE_INTERVAL_PAIR_ABSENT_HOLD","site":site,
+                "source":str(p),"source_sha256":sha(p),
+                "raw_records":0,"errors":["TIMESTAMP_START_OR_END_MISSING"]}
+    first_year,last_year=int(info["first_year"]),int(info["last_year"])
+    days=(datetime(last_year+1,1,1)-datetime(first_year,1,1)).days
+    expected=days*1440//step
+    periods=0;bad_start_end=0;gaps=0;dups=0
     first=None;last=None;prev_end=None
     samples=[]
     for part in pd.read_csv(p,usecols=["TIMESTAMP_START","TIMESTAMP_END"],
@@ -96,7 +99,6 @@ def full_timestamp_audit(site,info):
         within=(ai[1:]!=bi[:-1])
         gaps+=int(within.sum())
         dups+=int((ai[1:]<=ai[:-1]).sum())
-        dst_like+=int(((ai[1:]-bi[:-1])!=pd.Timedelta(0)).sum())
         if prev_end is not None:
             gaps+=int(a.iloc[0]!=prev_end)
             if a.iloc[0]<prev_end:dups+=1
@@ -106,12 +108,19 @@ def full_timestamp_audit(site,info):
         if len(samples)<3:
             samples.append({"first_start":str(a.iloc[0]),"first_end":str(b.iloc[0]),
                             "last_end":str(b.iloc[-1]),"chunk_rows":len(part)})
+    label_ok=(first==str(datetime(first_year,1,1)) and
+              last==str(datetime(last_year+1,1,1)))
+    count_ok=(periods==expected)
     raw_status=("SOURCE_INTERVALS_COMPLETE_NO_DST_ARTIFACT" if
-               bad_start_end==0 and gaps==0 and dups==0 else "SOURCE_INTERVAL_ANOMALIES_HOLD")
+               bad_start_end==0 and gaps==0 and dups==0 and count_ok and label_ok
+               else "SOURCE_INTERVAL_ANOMALIES_HOLD")
     # Leap days are present in ORIGINAL source and omitted from NOLEAP forcing,
     # so raw record count is NOT expected to equal 365 days/year.
     return {"site":site,"source":str(p),"source_sha256":sha(p),
         "native_minutes":step,"raw_records":periods,
+        "original_leap_inclusive_expected_records":expected,
+        "full_release_native_count_matches":bool(count_ok),
+        "full_release_year_boundaries_match":bool(label_ok),
         "source_first":first,"source_last_end":last,
         "wrong_interval_lengths":bad_start_end,
         "time_gaps_or_end_mismatch":gaps,"duplicate_or_reverse_source_intervals":dups,
