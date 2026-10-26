@@ -61,25 +61,28 @@ def numeric(src):
     x=pd.to_numeric(src,errors="coerce")
     return x.mask(x<=-9990)
 
-def reader(path,cols,clock_col):
+def reader(path,cols,clock_col,years=None):
     frame=pd.read_csv(valid_file(path),usecols=cols,
                       dtype={clock_col:str},low_memory=False)
     if clock_col=="TIMESTAMP_START":
         time=pd.to_datetime(frame[clock_col],format="%Y%m%d%H%M",errors="raise")
+        if years is None:
+            raise RuntimeError("Source year window required for native primary and ERA")
+        first,last=years
+        # Exactly as original Stage07: restrict native source to selected
+        # release years, then exclude Feb29, before checking timestamps.
+        keep=(time.dt.year.between(first,last) &
+              ~((time.dt.month==2)&(time.dt.day==29)))
+        frame=frame.loc[keep].copy()
+        time=time.loc[keep]
     else:
         time=pd.to_datetime(frame[clock_col],errors="raise")
     if time.isna().any() or time.duplicated().any():
-        raise RuntimeError("Original native time missing or duplicated: "+str(path))
+        raise RuntimeError("Selected-year native time missing or duplicated: "+str(path))
     frame=frame.drop(columns=[clock_col])
     for col in frame.columns:
         frame[col]=numeric(frame[col])
     frame.index=pd.DatetimeIndex(time,name="original_native_time")
-    # Stage07 explicitly excludes Feb 29 from the original tower and ERA5
-    # sources BEFORE creating its NO_LEAP forcing. Match that selection
-    # exactly; keep the raw input files untouched.
-    if clock_col=="TIMESTAMP_START":
-        feb29=(frame.index.month==2)&(frame.index.day==29)
-        frame=frame.loc[~feb29].copy()
     return frame
 
 def selftest():
@@ -165,10 +168,10 @@ def analyze():
             raise RuntimeError("Stage07 selected forcing SHA changed "+site)
         tower=reader(spec["primary"],
                      ["TIMESTAMP_START","TA_F","TA_F_QC","VPD_F","VPD_F_QC"],
-                     "TIMESTAMP_START")
+                     "TIMESTAMP_START",years=(start,end))
         era=reader(spec["era"],
                    ["TIMESTAMP_START","TA_ERA","VPD_ERA"],
-                   "TIMESTAMP_START")
+                   "TIMESTAMP_START",years=(start,end))
         chosen=reader(selected,["time","TA_USE","VPD_USE","QBOT","PSRF"],"time")
         # Source packages may have different temporal extents. Stage07
         # performs timestamp-keyed joins, not full-file index equality.
