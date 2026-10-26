@@ -19,6 +19,17 @@ Stage13k original evidence report: `/iridisfs/scratch/ly3n24/CLM_FATES/experimen
 - Original Stage13g source SHA256 `f6b740491fd3b7d9b66fe9bc33c20586db6124442b93df72273410d761bd6b27`.
 - Measured QC0 original T+VPD is absent within 6h of both event ends, but operator specifically approved this 40-only reanalysis-backed evidence policy. **This is a scientific model input choice, not a validation against local QC0 measurements.**
 
+## 2026-10-26 IRIDIS6 regression failure and Stage13l v2 fix
+
+Operator ran Stage13l v1 `--check`. Its source/CDS SHA, 216-h CDS UTC and previously signed Stage13k verification passed through the NumPy physical gate, but line 207 raised:
+`TypeError: ufunc 'bitwise_and' not supported for the input types...`
+
+**Root cause:** `physical` used chained `&` logical conjunction with final unparenthesised `np.abs(cdsp-psrf)<=12000`, allowing bitwise AND to bind to floating-point arrays before pressure comparison. This was a Python precedence bug, **not evidence of bad science, bad CDS, changed original input, or an actual repaired shadow**. Original sources and Stage13g remain unchanged.
+
+The [Stage13l v2 revised script](../scripts/stage13/13l_apply_MOz_40HH_approved_ERA5Land_reanalysis_shadow.py) extracts `physical_gate()` using `np.logical_and.reduce` of explicitly boolean masks with `(abs(pressure_difference)<=12000)`. Self-test verifies 40 valid float values, one pressure failure and one NaN-RH failure. The exact original operator-approved 40 source-native slots, all external source SHA pins and Stage13k previous science receipt checks remain unchanged. Do **not** change the first 27 held records, 2005 Jan09, other original source/case or submit model jobs.
+
+Stage13l v2 Git commit: `f01bf3817724b97fa3ee2d76e33047efd24e3966`, file Git blob `aa56cd8fc2989bce1aee6f4ece0ef25ec67c4a3f`. Run revised `--self-test`, `--check` then only after `READONLY CHECK PASS` run `--apply`; SHA-locked original Stage13j helper and both decision JSONs unchanged. At time of this note, user has **not yet reported** IRIDIS6 Stage13l v2 successful export.
+
 ## Repository artifacts and instructions
 
 - [Exact Stage13L operator waiver JSON](../decisions/STAGE13L_OPERATOR_APPROVED_US_MOz_2005JAN06_40HH_REANALYSIS_ALTERNATIVE_20261026.json)
