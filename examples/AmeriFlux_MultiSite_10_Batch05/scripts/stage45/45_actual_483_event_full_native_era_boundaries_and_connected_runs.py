@@ -144,17 +144,24 @@ def original_site(site,root,needed,reference):
  pattern=re.compile(r"AMF_"+re.escape(site)+r"_FLUXNET_FLUXMET_HH_.+[.]csv",re.I)
  verified=[]
  for p in paths:
-  if p.suffix.lower()==".csv":
-   if not pattern.fullmatch(p.name):continue
-   with p.open("rb") as fh:d=selected_original_stream(fh,needed,site)
-   member=p.name
-  else:
-   with zipfile.ZipFile(p) as z:
-    mh=[m for m in z.infolist() if pattern.fullmatch(Path(m.filename).name)]
-    if len(mh)!=1:continue
-    if mh[0].file_size>900*1024*1024:raise ValueError("oversize ZIP HH source")
-    member=mh[0].filename
-    with z.open(mh[0]) as fh:d=selected_original_stream(fh,needed,site)
+  try:
+   if p.suffix.lower()==".csv":
+    if not pattern.fullmatch(p.name):continue
+    with p.open("rb") as fh:d=selected_original_stream(fh,needed,site)
+    member=p.name
+   else:
+    with zipfile.ZipFile(p) as z:
+     mh=[m for m in z.infolist() if pattern.fullmatch(Path(m.filename).name)]
+     if len(mh)!=1:continue
+     if mh[0].file_size>900*1024*1024:
+      raise ValueError("oversize original HH member")
+     member=mh[0].filename
+     with z.open(mh[0]) as fh:d=selected_original_stream(fh,needed,site)
+  except (OSError,zipfile.BadZipFile,UnicodeError,ValueError):
+   # A nonmatching or unreadable alternative archive cannot prevent the
+   # site from using another EXACT original Stage27-matched source. Never
+   # use the damaged candidate itself.
+   continue
   if not matches_source(d,reference):continue
   h=sha(p)
   if site in PINNED_ARCHIVES and p.suffix.lower()==".zip" and h!=PINNED_ARCHIVES[site]:
