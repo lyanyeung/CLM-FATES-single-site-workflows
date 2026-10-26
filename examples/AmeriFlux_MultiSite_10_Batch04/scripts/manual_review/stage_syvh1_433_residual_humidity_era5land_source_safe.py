@@ -123,7 +123,7 @@ def sources():
     left=old-previous
     tsource={k for k,reason in h.items() if
              reason=="SITE_ERA_TA_DIFFERENCE_GT8C_OR_SITE_TA_INVALID"}
-    ck(len(tsource)==OLD_ERA_TEMP_SEEDS and not tsource-left,
+    ck(len(tsource)==OLD_ERA_TEMP_SEEDS and not (tsource & left),
        "All 183 T-vs-ERA science source HOLDs must be explicitly adjudicated")
     ck(len(left)==433,"Exactly 433 remaining historical non-T source science HOLD HH")
     m=stage5["sites"][SITE]
@@ -208,7 +208,7 @@ def science(ex,point,status,left,h,e,native,paired):
             gridrh=ex.rh_hour(grid,utc)
             if gridrh is not None and 0<=gridrh<=100:
                 newrh=gridrh;source="INDEPENDENT_ERA5LAND_D2M_T2M_SP"
-                sourceproof=sha_str=status[int(k[:4])]
+                sourceproof=str(status[int(k[:4])])
                 # URI/path SHA ledger below; do not cache external arrays in output.
         if newrh is None:
             gridt=val(paired[k]["TA_ERA"]);gridv=val(paired[k]["VPD_ERA"])
