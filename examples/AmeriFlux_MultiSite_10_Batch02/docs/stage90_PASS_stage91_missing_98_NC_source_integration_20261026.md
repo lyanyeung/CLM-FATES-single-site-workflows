@@ -15,7 +15,7 @@
 
 ## Stage91 worklist (not model forcing builder)
 
-[Source](../scripts/stage91/91_missing_five_site_forcing_integration_worklist.py) pinned commit `d36ddbe7079d670048d282bdeb7cf914fd30ad16`, Git blob `181a26e44c1abd073a4072a024a33c9aa4f05d4d`. This hashes Stage64/74 numerical-source manifests and exact csv, Stage85 manual 2000 CSV, Stage87 117 technical manifest and Stage90 report; joins distinct site/native-time correction/shadow scopes into a **98 site-year** build plan, preventing double counting. It creates only isolated source integration worklist reports. It **does not build the 98 NetCDF files**, activate DATM, repair the Ho1 18.746 C source transition, or approve older shadows.
+[Source](../scripts/stage91/91_missing_five_site_forcing_integration_worklist.py) pinned commit `bc11e17db4ed1b8e0a927c32305938490b0b4d9d`, Git blob `0a6ec7563265497e18b2d19810e3f871ec239271`. This hashes Stage64/74 numerical-source manifests and exact csv, Stage85 manual 2000 CSV, Stage87 117 technical manifest and Stage90 report; joins distinct site/native-time correction/shadow scopes into a **98 site-year** build plan, preventing double counting. It creates only isolated source integration worklist reports. It **does not build the 98 NetCDF files**, activate DATM, repair the Ho1 18.746 C source transition, or approve older shadows.
 
 ### Copy to IRIDIS6
 
@@ -24,8 +24,8 @@
  set -euo pipefail
  conda activate clm_fates_env
  REL="examples/AmeriFlux_MultiSite_10_Batch02"
- COMMIT="d36ddbe7079d670048d282bdeb7cf914fd30ad16"
- BLOB="181a26e44c1abd073a4072a024a33c9aa4f05d4d"
+ COMMIT="bc11e17db4ed1b8e0a927c32305938490b0b4d9d"
+ BLOB="0a6ec7563265497e18b2d19810e3f871ec239271"
  TMP="$(mktemp /tmp/batch02_stage91_XXXXXX.py)"
  trap 'rm -f "$TMP"' EXIT
  curl -fLsS --retry 3 \
@@ -39,3 +39,7 @@
 ```
 
 Expected: `STAGE91 SELF-TEST PASS`, `STAGE91 CHECK PASS`, `STAGE91 WORKLIST PASS | 98 missing NC source years...`. If a SHA, row schema or original count conflicts, stop; do not select by latest path or silently relax constraints. After worklist success, the actual next engineering stage must combine source-preserving annual meteorological candidates with Stage85 manual 2000 Ho1 override by identical original native timestamps, resolve the genuinely hard holds under a source-QC policy, rerun ten-site Post-v5, build all 98 year NC and verify CIME stream mapping. No production run from preliminary NetCDF.
+
+## Stage91 source-schema hotfix (2026-10-26)
+
+Operator reported `ValueError: Empty site in Stage85` immediately after Stage64/74/85 source SHA passed. Stage85's 1,068 approved humidity edit CSV is intentionally **US-Ho1-only** and has no `site` field; Stage91's generic multi-site indexing had incorrectly required it. Fixed source commit `bc11e17db4ed1b8e0a927c32305938490b0b4d9d` blob `0a6ec7563265497e18b2d19810e3f871ec239271` uses the pinned Stage85 *manifest* to supply the exact `US-Ho1` source identity, and rejects conflicting explicit sites. It also verifies all 1,068 Stage85 rows have original QC0 and are humidity edits, with original temperature unchanged. Additional isolated self-tests validate Stage85 missing-site acceptance and multi-site missing-site rejection. This does not change original data or previously generated NetCDF. Source is committed, actual repaired IRIDIS execution pending.
