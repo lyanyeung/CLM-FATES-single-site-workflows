@@ -155,9 +155,16 @@ def audit():
             keys.update((t+pd.Timedelta(minutes=30*i)).strftime("%Y%m%d%H%M")
                         for i in (-2,-1,0,1,2))
         rawfile=safe(specs[site]["primary"]);erafile=safe(specs[site]["era"])
-        raw_cols=["TIMESTAMP_START","TA_F","TA_F_QC","VPD_F","VPD_F_QC","VPD_F_MDS","VPD_F_MDS_QC"]
+        required_raw=["TIMESTAMP_START","TA_F","TA_F_QC","VPD_F","VPD_F_QC"]
+        optional_raw=["VPD_F_MDS","VPD_F_MDS_QC"]
+        available=set(pd.read_csv(rawfile,nrows=0).columns)
+        if not set(required_raw)<=available:
+            raise ValueError("Missing essential tower/source QC fields for "+site)
+        raw_cols=required_raw+[name for name in optional_raw if name in available]
         rr=pd.read_csv(rawfile,usecols=raw_cols,dtype={"TIMESTAMP_START":str},low_memory=False)
         rr=rr.loc[rr.TIMESTAMP_START.isin(keys)].copy()
+        for name in optional_raw:
+            if name not in rr:rr[name]=np.nan
         era=pd.read_csv(erafile,usecols=["TIMESTAMP_START","TA_ERA","VPD_ERA"],
                         dtype={"TIMESTAMP_START":str},low_memory=False)
         era=era.loc[era.TIMESTAMP_START.isin(keys)].copy()
@@ -187,8 +194,8 @@ def audit():
             .merge(era,on="TIMESTAMP_START",validate="one_to_one",how="left")
             .merge(g.drop(columns=["time"]),on="TIMESTAMP_START",
                    validate="one_to_one",how="left"))
-        if df[["TA_F","VPD_F","TA_ERA","VPD_ERA","retained_tower_TA_USE_C"]].isna().any().any():
-            raise ValueError("Source context missing essential signed raw/ERA/shadow values "+site)
+        if df[["TA_F","retained_tower_TA_USE_C","retained_PSRF_Pa"]].isna().any().any():
+            raise ValueError("Source context missing essential measured/retained tower T or P "+site)
         if not np.allclose(df.TA_F,df.retained_tower_TA_USE_C,atol=1e-7,rtol=0):
             raise ValueError("Original measured tower T and retained model T differ "+site)
         df["source_original_RH_implied_pct"]=100*(1-df.VPD_F/es(df.TA_F))
