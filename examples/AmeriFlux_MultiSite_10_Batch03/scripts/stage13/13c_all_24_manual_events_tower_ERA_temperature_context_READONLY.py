@@ -26,7 +26,7 @@ import numpy as np
 import pandas as pd
 sys.dont_write_bytecode = True
 
-VERSION="batch03-stage13c-v1-20261026-24-manual-native-TA-ERA-context"
+VERSION="batch03-stage13c-v2-20261026-timestamp-keyed-original-tower-ERA-context"
 R=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 S07=R/"qcv5_native_trial_20261022T024559Z_36c46e58"
 S13B=R/"reports/stage13b_THREE_NUMERIC_SITES_QC0_AND_MANUAL_DECISIONS_20261026T170134Z_06af8b8e"
@@ -95,6 +95,14 @@ def selftest():
     assert t[~mask].strftime("%Y-%m-%d").tolist()==["2016-02-28","2016-03-01"]
     one=pd.Series(["-9999","10.75"])
     assert pd.isna(numeric(one).iat[0]) and numeric(one).iat[1]==10.75
+    ref=pd.DatetimeIndex(pd.to_datetime(["2020-01-01 00:00","2020-01-01 00:30"]))
+    tower_test=pd.DataFrame({"TA_F":[3,4]},index=ref)
+    era_test=pd.DataFrame({"TA_ERA":[5,6,7]},index=pd.DatetimeIndex(
+        pd.to_datetime(["2019-12-31 23:30","2020-01-01 00:00","2020-01-01 00:30"])))
+    assert not tower_test.index.equals(era_test.index)
+    assert np.array_equal(era_test.reindex(ref).TA_ERA.to_numpy(),[6,7])
+    era_short=pd.DataFrame({"TA_ERA":[6]},index=ref[:1])
+    assert pd.isna(era_short.reindex(ref).TA_ERA.iat[1])
     print("STAGE13C SELF-TEST PASS | 6 QC0 +18 VPD; native 30m ±2h; NO WRITES",flush=True)
 
 def preflight():
@@ -162,15 +170,37 @@ def analyze():
                    ["TIMESTAMP_START","TA_ERA","VPD_ERA"],
                    "TIMESTAMP_START")
         chosen=reader(selected,["time","TA_USE","VPD_USE","QBOT","PSRF"],"time")
-        # The two original tower and standalone-era references MUST be
-        # sourced on the same exact native half-hour axis.
-        if not tower.index.equals(era.index):
-            raise RuntimeError("Tower and standalone ERA5 native timestamps differ "+site)
-        if not tower.index.equals(chosen.index):
-            raise RuntimeError("Selected source time does not equal original native axis "+site)
-        if not bool(tower.index.to_series().diff().dt.total_seconds().iloc[1:].isin(
+        # Source packages may have different temporal extents. Stage07
+        # performs timestamp-keyed joins, not full-file index equality.
+        # Verify *source-native timestamp identity* on the Stage07 selected
+        # NO_LEAP grid and independently preserve any source coverage gap.
+        if not chosen.index.is_monotonic_increasing:
+            raise RuntimeError("Selected candidate native timeline unordered "+site)
+        if chosen.index.has_duplicates:
+            raise RuntimeError("Selected candidate native timeline duplicated "+site)
+        if not bool(chosen.index.to_series().diff().dt.total_seconds().iloc[1:].isin(
              [1800,1800+86400]).all()):
-            raise RuntimeError("Non-contiguous halfhour source clock "+site)
+            raise RuntimeError("Selected candidate NO_LEAP native clock not 30-minute "+site)
+        if int(((chosen.index.month==2)&(chosen.index.day==29)).sum())!=0:
+            raise RuntimeError("Selected candidate unexpectedly contains leap-day "+site)
+        missing_tower=chosen.index.difference(tower.index)
+        missing_era=chosen.index.difference(era.index)
+        print("STAGE13C SOURCE TIMELINE "+site+
+              " | selected="+str(len(chosen))+
+              " tower_original="+str(len(tower))+
+              " ERA5_original="+str(len(era))+
+              " | tower_missing_on_selected="+str(len(missing_tower))+
+              " ERA5_missing_on_selected="+str(len(missing_era)),flush=True)
+        if len(missing_tower):
+            # Stage07 successful sites require the full original measured
+            # native source grid; an absent source TIMESTAMP is not a
+            # meteorological NaN.
+            raise RuntimeError("Original tower missing selected NOLEAP native timestamps "+site+
+                               " example="+str(missing_tower[0]))
+        tower=tower.reindex(chosen.index)
+        era=era.reindex(chosen.index)
+        # ERA5 may cover a wider/narrower native source period; absent rows
+        # are explicitly NA and never interpolated/re-timed/filled.
         # All required years from original selected manifest; NOLEAP calendars.
         site_events=[("TA_QC0_MODIFIED",e) for e in original.loc[original.site.eq(site)].to_dict("records")]
         site_events += [("VPD_MANUAL_REVIEW",e) for e in manual.loc[manual.site.eq(site)].to_dict("records")]
@@ -181,13 +211,19 @@ def analyze():
             rc=tower.loc[center]
             ec=era.loc[center]
             cc=chosen.loc[center]
+            era_center_timestamp_present=(center in era.index and
+                                          center not in missing_era)
+            if not era_center_timestamp_present:
+                print("STAGE13C ERA MISSING AT CENTER "+site+" "+str(center)+
+                      " | retain as unsupported source provenance",flush=True)
             if kind=="TA_QC0_MODIFIED":
                 if rc.TA_F_QC!=0 or not np.isclose(
                     rc.TA_F,float(ev["original_value"]),atol=5e-7,rtol=0):
                     raise RuntimeError("QC0 center original tower value/provenance changed "+site+":"+str(center))
                 if not np.isclose(cc.TA_USE,float(ev["final_value"]),atol=5e-7,rtol=0):
                     raise RuntimeError("Center selected repaired tower T differs from original Stage13b "+site)
-                if not np.isclose(ec.TA_ERA,float(ev["era_reference"]),atol=5e-7,rtol=0):
+                if era_center_timestamp_present and not np.isclose(
+                    ec.TA_ERA,float(ev["era_reference"]),atol=5e-7,rtol=0):
                     raise RuntimeError("Center paired ERA5 T differs from original Stage13b ERA reference "+site)
             left=center-pd.Timedelta(minutes=30)
             right=center+pd.Timedelta(minutes=30)
@@ -200,6 +236,7 @@ def analyze():
                 "variable":str(ev["variable"]),
                 "reason":str(ev.get("reason","")),
                 "source_TA_QC0":float(rc.TA_F_QC)==0 if np.isfinite(rc.TA_F_QC) else False,
+                "ERA5_center_native_timestamp_present":bool(era_center_timestamp_present),
                 "tower_TA_before_minus30_C":left_t,
                 "tower_TA_center_C":rc.TA_F,
                 "tower_TA_after_plus30_C":right_t,
@@ -221,7 +258,8 @@ def analyze():
             event_centers.append(centerrow)
             for offset in OFFSETS:
                 stamp=center+pd.Timedelta(minutes=offset)
-                available=stamp in tower.index
+                available=stamp in chosen.index
+                era_available=bool(available and stamp not in missing_era)
                 if available:
                     t=tower.loc[stamp]
                     e=era.loc[stamp]
@@ -236,6 +274,7 @@ def analyze():
                     v=pd.Series({"TA_USE":np.nan,"VPD_USE":np.nan})
                 context.append({
                     "original_source_native_row_present":bool(available),
+                    "ERA5_source_native_row_present":bool(era_available),
                     "site":site,
                     "event_kind":kind,
                     "event_center":str(center),
@@ -267,7 +306,7 @@ def analyze():
 def presentation(full,centers):
     print("STAGE13C ORIGINAL TA(QC0) CENTERS 6; ADDITIONAL VPD MANUAL CENTERS 18",flush=True)
     print("FIRST: SIX SOURCE-TOWER QC0 SPIKES, 9 NATIVE INTERVALS EACH (-120..+120 MIN)",flush=True)
-    fmt=["offset_minutes","native_time","original_source_native_row_present","source_tower_TA_C","source_tower_TA_F_QC",
+    fmt=["offset_minutes","native_time","original_source_native_row_present","ERA5_source_native_row_present","source_tower_TA_C","source_tower_TA_F_QC",
          "standalone_ERA5_TA_C","selected_candidate_TA_C",
          "ERA5_minus_tower_TA_C"]
     for _,e in centers.loc[centers.event_kind.eq("TA_QC0_MODIFIED")].iterrows():
