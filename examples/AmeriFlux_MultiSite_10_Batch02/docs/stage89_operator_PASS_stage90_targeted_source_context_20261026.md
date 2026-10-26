@@ -18,8 +18,8 @@ Provisional: Original-QC0 isolated short interpolation candidates for BZS/CMW an
 ## Stage90 executable (IRIDIS6; entirely diagnostic)
 
 [Stage90 full source](../scripts/stage90/90_focus_Ha1_VPD_and_Ho1_Dec_boundary_readonly.py).
-Pinned Git commit: `504c5993ba933746ac2a8e35f8faec6b13b6877f`.
-Pinned Git blob: `b17d5215aa5c88e857b49055ea3bd0f25485b478`.
+Pinned Git commit: `6dda1d9c5bebf207855fdd357d55051bdb778599`.
+Pinned Git blob: `73668051df6d871920efe4a99bb164ff57b8920d`.
 
 ```bash
 (
@@ -28,8 +28,8 @@ Pinned Git blob: `b17d5215aa5c88e857b49055ea3bd0f25485b478`.
   PY="$CONDA_PREFIX/bin/python"
   REL="examples/AmeriFlux_MultiSite_10_Batch02"
   SCRIPT="$HOME/CLM-FATES-single-site-workflows/$REL/scripts/stage90/90_focus_Ha1_VPD_and_Ho1_Dec_boundary_readonly.py"
-  COMMIT="504c5993ba933746ac2a8e35f8faec6b13b6877f"
-  BLOB="b17d5215aa5c88e857b49055ea3bd0f25485b478"
+  COMMIT="6dda1d9c5bebf207855fdd357d55051bdb778599"
+  BLOB="73668051df6d871920efe4a99bb164ff57b8920d"
   mkdir -p "$(dirname "$SCRIPT")"
   TMP="$(mktemp)"
   trap 'rm -f "$TMP"' EXIT
@@ -52,3 +52,7 @@ Pinned Git blob: `b17d5215aa5c88e857b49055ea3bd0f25485b478`.
 Reads SHA-verified original Stage88 and Stage07 primary raw sources. Prints full 24 QC0 original/ERA/candidate values with exact original neighboring values; expanded 5-hour-native-row source context for the **two Ha1 VPD** cases; Ho1 December >8°C and >12°C discrepancy periods and 20 largest differences; actual first original 2001 native source observation and first following 2001 QC0 measured temperature (if present). Outputs source-evidence CSV/JSON only under a NEW isolated `reports/stage90_*` directory, never model input. The existing Stage87 technical NetCDFs are not changed.
 
 **Next:** ask for only the operator's missing science choices after examining the Stage90 evidence; do not re-audit approved Stage85 QC0 tower T/humidity. Five originally humidity-blocked Batch02 sites (EML,GLE,Ho1,ICh,ICt) still need a separate complete forcing source integration and Post-v5; a mere Stage90 diagnostic does not complete them.
+
+## Stage90 self-test hotfix (26 Oct 2026)
+
+Earlier code's synthetic dates `20000419 09:30`, `10:00`, `11:30` were erroneously expected to form a single consecutive 30-minute group. The last transition is **90 minutes**, hence it should form two groups (2+1 records). New source commit `6dda1d9c5bebf207855fdd357d55051bdb778599` corrects the test and adds the correct `09:30, 10:00, 10:30` consecutive case. The operator's `AssertionError` occurred in `--self-test`, before any source audit or report writes, and does not signify a failure of original data. Continue with the pinned new command above.
