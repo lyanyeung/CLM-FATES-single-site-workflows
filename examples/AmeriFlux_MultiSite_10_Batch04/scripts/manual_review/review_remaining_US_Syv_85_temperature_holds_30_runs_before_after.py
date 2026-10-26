@@ -165,14 +165,14 @@ def run(write):
             a=original[k];b=prev[k];c=repaired[k];d=packed[k]
             ta=num(a["TA_F"]);tref=num(d["TA_ERA"])
             delta="NA" if ta is None or tref is None else f"{ta-tref:+.3f}"
-            flag="HOLD" if k in rem else ("BEFORE" if k<g[0] else "AFTER" if k>g[-1] else "OTHER")
+            flag="HOLD" if k in remain else ("BEFORE" if k<g[0] else "AFTER" if k>g[-1] else "OTHER")
             row=[str(i),g[0],g[-1],k,flag,a["TA_F"],a["TA_F_QC"],
                  a["TA_F_MDS"],a["TA_F_MDS_QC"],d["TA_ERA"],delta,
                  b["TA_F"],c["TA_F"],c["TA_F_QC"],c["VPD_F"],c["VPD_F_QC"],
                  legacy.get(k,"-")]
             print(" ".join(row[3:]))
             out.append(row)
-    byQC=Counter(original[k]["TA_F_QC"] for k in rem)
+    byQC=Counter(original[k]["TA_F_QC"] for k in remain)
     print("\nUS-SYV 85 ORIGINAL TA QC",dict(byQC))
     print("US-SYV COMPLETE READ ONLY T TRIAGE PASS 85/85 HOLD HH 30/30 RUNS")
     print("OTHER SCIENCE REMAIN 518 ORIGINAL HOLD HH; 500 BASIC SATURATION VPD FAIL BEFORE ANY NEXT HUMIDITY REPAIR")
