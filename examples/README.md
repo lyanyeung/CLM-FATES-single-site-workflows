@@ -1,5 +1,9 @@
 # CLM-FATES examples
 
+## AmeriFlux 50-site vegetation and PFT index — 26 October 2026
+
+[**Ameriflux_Site**](Ameriflux_Site/) brings together all **five batches / 50 distinct stations** alongside [ICOS_sites](ICOS_sites/). Its [PFT collection](Ameriflux_Site/Ameriflux_PFT/) contains the master evidence table, source report and candidate compositions. It records **33 numerical composition/cover leads** while preserving the other 17 sites' qualitative/LAI/density/model-only evidence. Source denominators and model assumptions are explicit; original campaign directories remain in use.
+
 Each experiment has its own directory, site/release manifest, scripts and operational record. Start with the README of the relevant case.
 
 | Network / case | Entry | Scope |
