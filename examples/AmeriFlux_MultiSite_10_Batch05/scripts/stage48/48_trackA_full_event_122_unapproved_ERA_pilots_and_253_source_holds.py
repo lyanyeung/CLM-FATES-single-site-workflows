@@ -210,9 +210,9 @@ def main():
    era=n(r["source_ERA_RH_pct"]);nc=n(r["source_ERA_candidate_VPD_hPa"])
    if None in (T,V,era,nc) or not 0<=era<=100:
     raise ValueError("native original source T/VPD or trial source ERA RH invalid")
-   if abs(T-n(oldrow["TA_F_C"]))>.002 or abs(V-n(oldrow["VPD_F_hPa"]))>.002 or
-      r["source_QC_T"]!=oldrow["TA_F_QC"] or r["source_QC_VPD"]!=oldrow["VPD_F_QC"] or
-      r["source_QC_VPD"]=="0" or abs(era-n(oldrow["RH_ERA_pct"]))>.002):
+   if (abs(T-n(oldrow["TA_F_C"]))>.002 or abs(V-n(oldrow["VPD_F_hPa"]))>.002 or
+       r["source_QC_T"]!=oldrow["TA_F_QC"] or r["source_QC_VPD"]!=oldrow["VPD_F_QC"] or
+       r["source_QC_VPD"]=="0" or abs(era-n(oldrow["RH_ERA_pct"]))>.002):
     raise ValueError("original source T/VPD/QC or ERA RH reference changed")
    calc=sat(T)*(1-era/100)
    if abs(nc-calc)>.003 or nc<0 or nc>sat(T)+.002:
