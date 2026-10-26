@@ -206,14 +206,26 @@ def audit():
             .merge(era,on="TIMESTAMP_START",validate="one_to_one",how="left")
             .merge(g.drop(columns=["time"]),on="TIMESTAMP_START",
                    validate="one_to_one",how="left"))
-        if df[["TA_F","retained_tower_TA_USE_C","retained_PSRF_Pa"]].isna().any().any():
-            raise ValueError("Source context missing essential measured/retained tower T or P "+site)
-        if not np.allclose(df.TA_F,df.retained_tower_TA_USE_C,atol=1e-7,rtol=0):
-            raise ValueError("Original measured tower T and retained model T differ "+site)
+        # Original published FLUXNET can contain missing-data sentinels at
+        # neighbouring HH where earlier Stage12c legitimately retained a
+        # fallback TA_USE. Do not mistake such a fallback for a QC0 tower
+        # measurement or fail an otherwise valid original center review.
+        for field in ("TA_F","TA_F_QC","VPD_F","VPD_F_QC",
+                      "TA_ERA","VPD_ERA","VPD_F_MDS","VPD_F_MDS_QC"):
+            df[field]=pd.to_numeric(df[field],errors="coerce")
+            df.loc[df[field].le(-9990),field]=np.nan
+        if df[["retained_tower_TA_USE_C","retained_PSRF_Pa"]].isna().any().any():
+            raise ValueError("Stage12g retained T/P absent in original context "+site)
+        df["source_TA_F_measured_QC0"]=df.TA_F_QC.eq(0)&df.TA_F.notna()
+        checked=df.source_TA_F_measured_QC0
+        if checked.any() and not np.allclose(
+              df.loc[checked,"TA_F"],df.loc[checked,"retained_tower_TA_USE_C"],
+              atol=1e-7,rtol=0):
+            raise ValueError("Existing QC0 tower T unexpectedly altered "+site)
         df["source_original_RH_implied_pct"]=100*(1-df.VPD_F/es(df.TA_F))
         df["paired_native_ERA_RH_pct"]=100*(1-df.VPD_ERA/es(df.TA_ERA))
         df["paired_native_ERA_RH_at_tower_T_VPD_hPa"]=(
-            es(df.TA_F)*(1-df.paired_native_ERA_RH_pct/100))
+            es(df.retained_tower_TA_USE_C)*(1-df.paired_native_ERA_RH_pct/100))
         df["ERA5Land_T2M_C"]=np.nan
         df["ERA5Land_dewpoint_C"]=np.nan
         df["ERA5Land_water_RH_pct"]=np.nan
@@ -250,8 +262,9 @@ def audit():
             gd=stage10.interpolate(dt,fields["d2m"],utc)-273.15
             gp=stage10.interpolate(dt,fields["sp"],utc)
             grh=100*es(gd)/es(gt)
-            v=es(df.iloc[idx].TA_F.to_numpy(dtype=float))*(1-grh/100)
-            icepct=grh*es(df.iloc[idx].TA_F.to_numpy(dtype=float))/ice(df.iloc[idx].TA_F.to_numpy(dtype=float))
+            retained_t=df.iloc[idx].retained_tower_TA_USE_C.to_numpy(dtype=float)
+            v=es(retained_t)*(1-grh/100)
+            icepct=grh*es(retained_t)/ice(retained_t)
             df.loc[idx,"ERA5Land_T2M_C"]=gt
             df.loc[idx,"ERA5Land_dewpoint_C"]=gd
             df.loc[idx,"ERA5Land_water_RH_pct"]=grh
@@ -269,7 +282,7 @@ def audit():
             c=original_center.iloc[0]
             if (abs(float(c.ERA5Land_water_RH_pct)-float(row.grid_water_RH_pct))>0.005
                 or abs(float(c.ERA5Land_T2M_C)-float(row.grid_T2M_C))>0.005
-                or abs(float(c.TA_F)-float(row.original_tower_T_C))>0.005
+                or abs(float(c.retained_tower_TA_USE_C)-float(row.original_tower_T_C))>0.005
                 or int(c.VPD_F_QC)!=int(row.QC_VPD_F)):
                 raise ValueError("Grid reconstruction mismatch with ORIGINAL signed Stage12g HOLD row "+site+" "+k)
             time=pd.to_datetime(k,format="%Y%m%d%H%M")
@@ -299,7 +312,7 @@ def audit():
               "audit_class":center.audit_class,
               "original_center_VPD_F_QC":int(center.VPD_F_QC),
               "original_center_VPD_F_hPa":center.VPD_F,
-              "original_center_tower_T_C":center.TA_F,
+              "original_center_tower_T_C":center.retained_tower_TA_USE_C,
               "original_center_VPD_implied_RH_pct":center.source_original_RH_implied_pct,
               "native_companion_ERA_center_RH_pct":center.paired_native_ERA_RH_pct,
               "grid_ERA5Land_center_RH_pct":center.ERA5Land_water_RH_pct,
