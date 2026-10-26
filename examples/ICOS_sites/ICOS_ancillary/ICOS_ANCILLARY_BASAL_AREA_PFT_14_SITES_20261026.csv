@@ -1,0 +1,29 @@
+site,fixnc_cohort,current_PFT_in_use,icos_plot,year,total_BA_m2ha,species_BA_m2ha,residual_BA_m2ha_species_lt5pct_count,ENF_pct_BA,DNF_pct_BA,DBF_pct_BA,EBF_pct_BA,residual_pct_BA,residual_species_by_count,verdict,suggested_PFT_from_ICOS
+DK-Sor,Batch02 (Stage43 AD400 running),DBF80/ENF10/DNF10,CP,2023,26.9,Fagus sylvatica 26.6,0.3,0,0,98.9,0,1.1,"Ulmus glabra, Prunus avium, Fraxinus excelsior (all DBF)",DIFFERENT,DBF 100
+DK-Sor,,,SP,2021,37.5,Fagus sylvatica 37.5,0.0,0,0,100,0,0,,,
+BE-Bra,Batch02 (Stage43 AD400 running),ENF55/DBF45,CP,2023,24.4,"Pinus sylvestris 20.8; Betula pendula 1.8; Quercus robur 0.4; Frangula alnus 0.3; Sorbus aucuparia 0.3",0.8,85.2,0,11.5,0,3.3,"Quercus petraea, Fagus, Q. rubra, Betula pubescens (DBF); Pseudotsuga, Pinus strobus, Taxus (ENF); Ilex (evergreen broadleaf)",DIFFERENT,ENF 84 / DBF 16
+BE-Bra,,,SP,2020,19.5,"Pinus sylvestris 16.0; Betula pendula 0.7; Quercus robur 0.7; Frangula alnus 0.3; Sorbus aucuparia 0.3",1.5,82.1,0,10.3,0,7.7,as above,,
+FR-FBn,Batch02 (Stage43 AD400 running),ENF75/EBF25,CP,2023,26.2,Pinus halepensis 18.4; Quercus ilex 7.4,0.4,70.2,0,0,28.2,1.5,"Phillyrea latifolia (evergreen shrub), Quercus pubescens (DBF)",CONSISTENT (small shift),ENF 70 / EBF 30
+FR-FBn,,,SP,2020,23.0,Pinus halepensis 16.1; Quercus ilex 5.7,1.2,70.0,0,0,24.8,5.2,"Pinus brutia (ENF), Arbutus unedo (EBF), Phillyrea, Q. pubescens",,
+BE-Vie,Batch01 (Normal400 done),ENF64/DBF36,CP,2025,32.9,Picea abies 9.6; Abies alba 8.1; Pseudotsuga menziesii 8.1; Fagus sylvatica 6.4,0.7,78.4,0,19.5,0,2.1,"Pinus sylvestris, Larix, Quercus, Tsuga",WITHIN RANGE (CP vs SP differ),keep ENF 64 / DBF 36
+BE-Vie,,,SP,2019,34.6,Picea abies 6.3; Abies alba 8.3; Pseudotsuga menziesii 3.6; Fagus sylvatica 15.3,1.1,52.6,0,44.2,0,3.2,,,
+CH-Dav,Batch01,ENF100,CP,2025,56.4,Picea abies 56.3,0.1,99.8,0,0,0,0.2,,CONSISTENT,ENF 100
+CH-Dav,,,SP,2019,42.3,Picea abies 42.0,0.3,99.3,0,0,0,0.7,,,
+CZ-BK1,Batch01,ENF100,CP,2023,32.8,Picea abies 32.4,0.4,98.8,0,0,0,1.2,,CONSISTENT,ENF 100
+CZ-BK1,,,SP,2019,30.1,Picea abies 28.8,1.3,95.7,0,0,0,4.3,,,
+DE-Tha,Example (protected),ENF87/DNF10/DBF3,CP,2025,29.2,Picea abies 20.5; Fagus sylvatica 3.8; Larix decidua 3.3,1.6,70.2,11.3,13.0,0,5.5,"Abies alba, Pseudotsuga, Pinus sylvestris (ENF); Betula, Sorbus (DBF)",DIFFERENT (more beech),ENF 74 / DNF 11 / DBF 15 (sensitivity; case protected)
+DE-Tha,,,SP,2019,28.7,Picea abies 16.4; Larix decidua 4.1; Fagus sylvatica 1.5,6.7,57.1,14.3,5.2,0,23.3,"Pseudotsuga 10.5% and Betula 7.8% of stems",,
+FI-Hyy,Batch02 (Normal395 running),ENF94.79/DBF5.21,CP,2023,17.9,Pinus sylvestris 15.6; Picea abies 1.5; Betula pendula 0.7,0.1,95.6,0,3.9,0,0.5,,CONSISTENT,ENF 95 / DBF 5
+FI-Hyy,,,SP,2020,19.5,Pinus sylvestris 16.3; Picea abies 2.3; Betula pendula 0.6,0.3,95.4,0,3.1,0,1.5,,,
+FI-Sod,Batch01,ENF100,CP,2025,19.8,Pinus sylvestris 19.8,0.0,100,0,0,0,0,,CONSISTENT,ENF 100
+FI-Sod,,,SP,2018,21.1,Pinus sylvestris 19.3,1.8,91.5,0,0,0,8.5,not resolved in chart,,
+FR-Fon,Batch01,ENF2/DBF98,CP,2024,25.4,Quercus petraea 21.2; Carpinus betulus 4.2,0.0,0,0,100,0,0,,CONSISTENT,DBF 98 / ENF 2
+FR-Fon,,,SP,2020,29.2,Quercus petraea 22.4; Carpinus betulus 5.8,1.0,0,0,96.6,0,3.4,,,
+FR-Hes,Batch02 (Normal395 running),DBF100,CP,2025,22.9,Fagus sylvatica 17.1; Carpinus betulus 1.8,4.0,0,0,82.5,0,17.5,"Quercus petraea, Q. robur (DBF); Larix trace",CONSISTENT,DBF 100
+FR-Hes,,,SP,2021,26.6,Fagus sylvatica 15.9; Carpinus betulus 4.4,6.3,0,0,76.3,0,23.7,oaks,,
+FR-Pue,Batch01,EBF95/DBF5,CP,2024,26.5,Quercus ilex 26.1,0.4,0,0,0,98.5,1.5,,CONSISTENT,EBF 95 / DBF 5
+FR-Pue,,,SP,2021,25.1,Quercus ilex 24.5,0.6,0,0,0,97.6,2.4,,,
+IT-Ren,Batch01,ENF97/DNF3,CP,2023,42.0,Picea abies 29.0; Pinus cembra 10.2,2.8,93.3,6.7,0,0,0,"Larix decidua ~3% of stems (residual treated as DNF), Sorbus",CONSISTENT (DNF upper bound 7),ENF 97 / DNF 3
+IT-Ren,,,SP,2020,36.3,Picea abies 22.0; Pinus cembra 13.2,1.1,97.0,3.0,0,0,0,Larix decidua; Pinus sylvestris,,
+NL-Loo,Example (legacy),ENF93.6/DBF2.9/C3 3.5,CP,2023,27.6,Pinus sylvestris 27.0; Prunus serotina 0.7,0.0,97.8,0,2.5,0,0,,CONSISTENT,unchanged
+NL-Loo,,,SP,2023,27.1,Pinus sylvestris 22.3; Prunus serotina 0.6,4.2,82.3,0,2.2,0,15.5,not resolved in chart,,

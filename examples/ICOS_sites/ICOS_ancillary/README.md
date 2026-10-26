@@ -27,3 +27,19 @@ It outputs `01_report_inventory.csv`, `02_species_tables_long.csv`, `03_soil_tab
 ## Run 2 (`--from-raw`, 18:17 UK)
 
 All 14 reports contain **0 JSON widgets and 0 numeric tables**; every chart is an embedded PNG (12–22 per report, 103 sections in total). `--export-images` writes the charts from the GRP_TREE / GRP_AGB / GRP_SOIL / species / soil sections to `images/`, indexed in `07_exported_images_index.csv`, so species shares can be read from the charts. Values read from charts carry about ±2–3 percentage points of reading uncertainty.
+
+## Result: tree basal area by species, 14 sites (read from the charts, 26 Oct 2026)
+
+[ICOS_ANCILLARY_BASAL_AREA_PFT_14_SITES_20261026.csv](ICOS_ANCILLARY_BASAL_AREA_PFT_14_SITES_20261026.csv) has one row per site × plot type, for the latest CP (continuous plots near the tower) and the SP (sparse plots spread over the footprint).
+
+**Where the numbers come from:** chart 02 of each report ("Basal Area (m²/ha)") prints every value on the bars. Species below 5% of stem count are not drawn, so `residual = Total − listed species`, and the residual is attributed using chart 04 (stem-count species ratio). Basal-area share is used as the proxy for the canopy-area share. Chart labels are printed to 0.1 m²/ha, so the percentages are exact to about ±0.5.
+
+**Soil:** the GRP_SOIL charts (bulk density, SOC, total N for 0–100 cm; SOC and N stock maps) have **no sand/silt/clay**.
+
+| Verdict | Sites |
+| --- | --- |
+| Consistent | CH-Dav, CZ-BK1, FI-Hyy, FI-Sod, FR-Fon, FR-Hes, FR-Pue, IT-Ren, NL-Loo; FR-FBn (ENF 70 / EBF 30 vs 75/25 in use) |
+| Within the CP–SP range | BE-Vie (CP ENF 78 / DBF 20, SP ENF 53 / DBF 44; ENF 64 / DBF 36 in use) |
+| **Different** | **DK-Sor**: DBF 99–100 vs DBF 80 / ENF 10 / DNF 10 in use. **BE-Bra**: ENF 82–85 / DBF 15–18 vs ENF 55 / DBF 45 in use. **DE-Tha** (protected example): CP ENF 74 / DNF 11 / DBF 15 vs ENF 87 / DNF 10 / DBF 3 |
+
+The remaining 24 sites have no ICOS ETC ancillary report (HTTP 404): RU-Fyo, IL-Yat, DE-Hai, DE-Hzd, IT-Lav, GL-ZaH, IT-Noe, AT-Neu, CH-Aws, CH-Cha, CH-Fru, CH-Lae, CZ-Stn, DE-Lnf, DE-Obe, ES-Agu, ES-LJu, IT-Col, DE-Gri, DE-RuR, FI-Let, GF-Guy, IT-MBo, IT-Tor.
