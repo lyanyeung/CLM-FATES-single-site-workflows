@@ -505,7 +505,7 @@ def parse_site(site, root, output_root, native_minutes=30, standalone_era=False)
         tnow=float(current["TA_F"].iat[i])
         pnow=float(current["PA_F"].iat[i])
         if (not np.isfinite(tnow) or not np.isfinite(pnow)
-            or not np.isfinite(rh) or not 0.01 <= rh <= 100
+            or not np.isfinite(rh) or not 0 < rh <= 100
             or not np.isfinite(source_t) or abs(tnow-source_t)>0.02
             or not np.isfinite(source_p) or abs(pnow-source_p)>0.3):
             rejected[source_name+"_TEMP_PRESSURE_OR_RH"]+=1
