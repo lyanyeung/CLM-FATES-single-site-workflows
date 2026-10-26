@@ -28,7 +28,7 @@ import numpy as np
 import pandas as pd
 
 sys.dont_write_bytecode=True
-VERSION="batch03-stage13l-v1-20261026-signed-40HH-waiver-source-diff"
+VERSION="batch03-stage13l-v2-20261026-numpy-physical-gate-safe"
 HERE=Path(__file__).resolve().parent
 J=HERE/"13j_conditional_two_US_MOz_QC1_ERA5Land_SCOPED.py"
 J_BLOB="9283b411b49500428e7534b5f12041c71190e93b"
@@ -59,6 +59,34 @@ def sha(p):
 
 def close(a,b,tol=1e-8):
     return bool(np.isclose(float(a),float(b),atol=tol,rtol=0))
+
+def physical_gate(qbot, rh, vpd, es, temperature, external_pressure, local_pressure):
+    """Independent, explicitly parenthesised *boolean* NumPy masks.
+
+    Critical: `& np.abs(external_pressure-local_pressure)<=12000`
+    parses as a bitwise operation involving float values before comparison.
+    Always place `(np.abs(...) <= 12000)` inside boolean conjunctions.
+    Fail closed on NaN, nonphysical vapor pressure or invalid pressure.
+    """
+    arrays=[np.asarray(a,dtype=float) for a in
+           (qbot,rh,vpd,es,temperature,external_pressure,local_pressure)]
+    if any(x.shape!=(NUMBER,) for x in arrays):
+        raise RuntimeError("Science gate requires exactly 40 native 30min samples")
+    q,rh,v,es,temp,extp,localp=arrays
+    checks=[
+      np.isfinite(q), (q>0), (q<0.08),
+      np.isfinite(rh), (rh>0), (rh<100),
+      np.isfinite(v), (v>0), (v<es),
+      np.isfinite(temp), np.isfinite(es), (es>0),
+      np.isfinite(extp), np.isfinite(localp),
+      (localp>45000), (localp<111000),
+      (extp>45000), (extp<111000),
+      (np.abs(extp-localp)<=12000)
+    ]
+    result=np.logical_and.reduce(checks)
+    if result.shape!=(NUMBER,) or result.dtype!=np.bool_:
+        raise RuntimeError("Physics gate returned non-bool or wrong shape")
+    return result
 
 def module_J():
     if subprocess.run(["git","hash-object",str(must(J))],
@@ -152,7 +180,19 @@ def regression():
     e=(es-1.5)*100
     q=0.622*e/(101325-0.378*e)
     assert 0<q<0.01
-    print("STAGE13L SELF-TEST PASS | only 40 exact source halfhours; first 27 and Jan09 excluded",flush=True)
+    arr=lambda x:np.full(NUMBER,float(x),dtype=float)
+    g=physical_gate(arr(q),arr(50),arr(1.5),arr(es),
+                    arr(0),arr(101325),arr(100000))
+    assert g.dtype==np.bool_ and g.shape==(NUMBER,) and int(g.sum())==NUMBER
+    p=arr(101325);p[7]=126000
+    fail=physical_gate(arr(q),arr(50),arr(1.5),arr(es),
+                       arr(0),p,arr(100000))
+    assert int(fail.sum())==NUMBER-1 and not fail[7]
+    z=arr(50);z[12]=np.nan
+    bad=physical_gate(arr(q),z,arr(1.5),arr(es),
+                      arr(0),arr(101325),arr(100000))
+    assert int(bad.sum())==NUMBER-1 and not bad[12]
+    print("STAGE13L SELF-TEST PASS | 40-only scope; all physical-gate float-array precedence, pressure, NaN tests PASS",flush=True)
 
 def scientific_check(approval,previous):
     j=module_J()
@@ -204,11 +244,7 @@ def scientific_check(approval,previous):
     psrf=old.PSRF.to_numpy(float)
     qbot=0.622*gridEA/(psrf-0.378*gridEA)
     cdsp=g.sp.to_numpy(float)
-    physical=(np.isfinite(qbot)&(qbot>0)&(qbot<0.08)&
-              np.isfinite(gridRH)&(gridRH>0)&(gridRH<100)&
-              np.isfinite(gridV)&(gridV>0)&(gridV<gridES)&
-              np.isfinite(gridT)&np.isfinite(gridES)&np.isfinite(cdsp)&
-              np.abs(cdsp-psrf)<=12000)
+    physical=physical_gate(qbot,gridRH,gridV,gridES,gridT,cdsp,psrf)
     compare=(np.abs(gridT-compT)<=3.5)&(np.abs(gridRH-compRH)<=15)
     sourceQC=(original.TA_F_QC.to_numpy(float)==1)&(
                  original.VPD_F_QC.to_numpy(float)==1)
