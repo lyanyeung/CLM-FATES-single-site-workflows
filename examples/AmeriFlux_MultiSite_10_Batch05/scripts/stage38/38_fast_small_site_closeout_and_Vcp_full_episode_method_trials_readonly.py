@@ -45,6 +45,12 @@ ROW_FIELDS=("site","episode_id","method","event_start_native","event_end_native"
  "neighbors_QC2_or_not_measured","neighbors_are_other_P2P3_unapproved",
  "original_st37_sparse_new_gt4_edges","original_st37_sparse_new_gt2_edges",
  "candidate_range_seconds","science_gate","production_permission")
+TRIAL_FIELDS=("site","native_time","episode_id","research_method",
+ "original_source_T_C","original_source_VPD_hPa","original_VPD_QC",
+ "research_RH_source_pct","research_VPD_at_original_T_hPa",
+ "research_VPD_change_vs_original_hPa","full_original_episode_HH",
+ "full_episode_science_gate","original_FLUXMET_ZIP_SHA256",
+ "science_status","production_forcing_authorization")
 SITE_REPORT_FIELDS=("site","source_original_P2P3_unapproved_HH",
  "source_original_P2P3_events","source_ZIP_archive_SHA256",
  "exact_native_HH_verified_against_original_ZIP","number_of_full_episode_trials",
@@ -301,6 +307,34 @@ def main():
     outputs.append(evaluate(site,eid,ep[site,eid],rr,
                  "FRESH_ERA5L_ONLY_IF_FULL_REFERENCE",raw,p2map,
                  approved,sparse=st37.get((site,eid)),fresh=fresh))
+ # Materialise ONLY isolated research candidates for complete source
+ # episodes without original QC0 VPD, preserving original time/T/QC.
+ # Also retain blocked numeric trials in per-event matrix; no production use.
+ native_trial=[]
+ for item in outputs:
+  if item["method_coverage_all_original_episode"] is not True or item["source_QC0_protected_HH"]:
+   continue
+  site,eid,method=item["site"],item["episode_id"],item["method"]
+  source=group[site,eid]
+  for r in source:
+   T=num(r["TA_F_C"]);V=num(r["VPD_F_hPa"])
+   value=(num(r["RH_ERA_pct"]) if method=="SOURCE_ERA_ALL_EPISODE" else
+     num(r["RH_MDS_pct"]) if method=="SOURCE_MDS_ALL_EPISODE" else
+     fresh.get((site,r["native_time"])))
+   if T is None or V is None or value is None or not 0<=value<=100:
+    raise ValueError("complete trial method row unexpectedly missing native physical RH")
+   new=sat(T)*(1-value/100)
+   native_trial.append(dict(site=site,native_time=r["native_time"],episode_id=eid,
+     research_method=method,original_source_T_C=T,
+     original_source_VPD_hPa=V,original_VPD_QC=r["VPD_F_QC"],
+     research_RH_source_pct=round(value,8),
+     research_VPD_at_original_T_hPa=round(new,8),
+     research_VPD_change_vs_original_hPa=round(new-V,8),
+     full_original_episode_HH=len(source),
+     full_episode_science_gate=item["science_gate"],
+     original_FLUXMET_ZIP_SHA256=ziphash[site],
+     science_status="RESEARCH_ONLY_FULL_ORIGINAL_SOURCE_EVENT",
+     production_forcing_authorization="NO"))
  # No claims of science closure based only on data QC.
  summary=[]
  for site in SITES:
@@ -327,6 +361,7 @@ def main():
   raise ValueError("site summary total inconsistent")
  out.mkdir(exist_ok=False)
  wcsv(out/"stage38_ALL_SMALL_SITE_AND_VCP_FULL_EPISODE_METHOD_TRIALS.csv",ROW_FIELDS,outputs)
+ wcsv(out/"stage38_RESEARCH_ONLY_FULL_SOURCE_EPISODE_NATIVE_RH_VPD_CANDIDATES.csv",TRIAL_FIELDS,native_trial)
  wcsv(out/"stage38_TEN_SITE_PROVENANCE_AND_REMAINING_REPAIR_GATES.csv",SITE_REPORT_FIELDS,summary)
  report={"source_file_hashes":{
   "Stage27_1574":digest(fp2),"Stage27_483_episodes":digest(fep),
@@ -337,6 +372,7 @@ def main():
   "all_sites":list(SITES),"original_P2P3_total":1574,
   "US_Vcp_original_65_episode_methods_evaluated":sum(x["site"]=="US-Vcp" for x in outputs),
   "num_original_site_method_records":len(outputs),
+  "research_only_full_event_native_candidate_rows":len(native_trial),
   "full_site_forcing_science_pass_confirmed":0,
   "P1_46_HOLD_unchanged":True,"original_166_approved_unchanged":True,
   "P2P3_1574_no_new_science_approvals":True,
@@ -346,6 +382,8 @@ def main():
   "**Zero production forcing changes. All original 1574 P2/P3 remain unapproved.**",
   "Read ORIGINAL AmeriFlux FLUXMET ZIP and exact source-native QC for smaller sites",
   "and all 65 Stage37 flagged original US-Vcp episodes.",
+  "A separate native-row CSV contains all full-coverage, non-QC0 hypothetical RH/VPD candidates",
+  "for trial-only (even if the event has boundary concerns); production authorization NO.",
   "Testing a full episode uses its every original 30-minute source anomaly, NOT",
   "only Stage36's 251 sparse half-hours. Nothing is filled/interpolated.",
   "Missing 30-minute source periods, QC0 VPD, missing RH, suspect original neighbors",
@@ -380,6 +418,7 @@ def main():
     "ERA_NUMERIC_REVIEW",r["full_episode_ERA_review_candidates"],
     "SOURCE_ZIP",r["source_ZIP_archive_SHA256"][:12],
     "STATUS",r["site_closeout_status"])
+ print("STAGE38 FULL_EPISODE_NATIVE_RESEARCH_CANDIDATE_ROWS",len(native_trial))
  print("STAGE38 GATES",json.dumps(dict(Counter(r["science_gate"] for r in outputs)),sort_keys=True))
  print("STAGE38_REPORT="+str(out/"STAGE38_SMALL_SITE_AND_FULL_VCP_EVENT_CLOSURE.md"))
  print("STAGE38_OUT="+str(out))
