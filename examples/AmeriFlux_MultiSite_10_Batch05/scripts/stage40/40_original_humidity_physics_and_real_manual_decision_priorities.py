@@ -156,6 +156,8 @@ def main():
    rh=100*(1-v/es(t))
    cls=classify_rh(rh)
    cat[cls]+=1
+   if rh<5:cat["CUMULATIVE_RH_BELOW5"]+=1
+   if rh<10:cat["CUMULATIVE_RH_BELOW10"]+=1
    delta=cand-v
    implied.append(rh);changes.append(abs(delta));candrh.append(trh);orivpd.append(v);candvpd.append(cand)
    if abs(delta)<.01:unchanged+=1
