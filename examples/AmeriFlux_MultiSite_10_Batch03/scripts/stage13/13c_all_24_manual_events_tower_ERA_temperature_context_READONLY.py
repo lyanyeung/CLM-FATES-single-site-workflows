@@ -189,17 +189,23 @@ def analyze():
                     raise RuntimeError("Center selected repaired tower T differs from original Stage13b "+site)
                 if not np.isclose(ec.TA_ERA,float(ev["era_reference"]),atol=5e-7,rtol=0):
                     raise RuntimeError("Center paired ERA5 T differs from original Stage13b ERA reference "+site)
+            left=center-pd.Timedelta(minutes=30)
+            right=center+pd.Timedelta(minutes=30)
+            left_t=tower["TA_F"].get(left,np.nan)
+            right_t=tower["TA_F"].get(right,np.nan)
+            left_era=era["TA_ERA"].get(left,np.nan)
+            right_era=era["TA_ERA"].get(right,np.nan)
             centerrow={
                 "site":site,"event_kind":kind,"time":str(center),
                 "variable":str(ev["variable"]),
                 "reason":str(ev.get("reason","")),
                 "source_TA_QC0":float(rc.TA_F_QC)==0 if np.isfinite(rc.TA_F_QC) else False,
-                "tower_TA_before_minus30_C":tower.loc[center-pd.Timedelta(minutes=30),"TA_F"],
+                "tower_TA_before_minus30_C":left_t,
                 "tower_TA_center_C":rc.TA_F,
-                "tower_TA_after_plus30_C":tower.loc[center+pd.Timedelta(minutes=30),"TA_F"],
-                "ERA5_TA_before_minus30_C":era.loc[center-pd.Timedelta(minutes=30),"TA_ERA"],
+                "tower_TA_after_plus30_C":right_t,
+                "ERA5_TA_before_minus30_C":left_era,
                 "ERA5_TA_center_C":ec.TA_ERA,
-                "ERA5_TA_after_plus30_C":era.loc[center+pd.Timedelta(minutes=30),"TA_ERA"],
+                "ERA5_TA_after_plus30_C":right_era,
                 "candidate_selected_center_TA_C":cc.TA_USE,
                 "tower_VPD_center_hPa":rc.VPD_F,
                 "ERA5_VPD_center_hPa":ec.VPD_ERA,
@@ -210,17 +216,26 @@ def analyze():
             if kind=="TA_QC0_MODIFIED":
                 centerrow["center_ERA_minus_tower_C"]=ec.TA_ERA-rc.TA_F
                 centerrow["tower_center_minus_adjacent_tower_mean_C"]=rc.TA_F-.5*(
-                    tower.loc[center-pd.Timedelta(minutes=30),"TA_F"]+
-                    tower.loc[center+pd.Timedelta(minutes=30),"TA_F"])
+                    left_t+
+                    right_t)
             event_centers.append(centerrow)
             for offset in OFFSETS:
                 stamp=center+pd.Timedelta(minutes=offset)
-                if stamp not in tower.index:
-                    raise RuntimeError("Missing source-native context halfhour "+site+":"+str(stamp))
-                t=tower.loc[stamp]
-                e=era.loc[stamp]
-                v=chosen.loc[stamp]
+                available=stamp in tower.index
+                if available:
+                    t=tower.loc[stamp]
+                    e=era.loc[stamp]
+                    v=chosen.loc[stamp]
+                else:
+                    # A center at the first or last two hours of a release
+                    # cannot have both sides; show a clearly labeled NA
+                    # rather than fabricate a source halfhour.
+                    t=pd.Series({"TA_F":np.nan,"TA_F_QC":np.nan,
+                                 "VPD_F":np.nan,"VPD_F_QC":np.nan})
+                    e=pd.Series({"TA_ERA":np.nan,"VPD_ERA":np.nan})
+                    v=pd.Series({"TA_USE":np.nan,"VPD_USE":np.nan})
                 context.append({
+                    "original_source_native_row_present":bool(available),
                     "site":site,
                     "event_kind":kind,
                     "event_center":str(center),
@@ -252,7 +267,7 @@ def analyze():
 def presentation(full,centers):
     print("STAGE13C ORIGINAL TA(QC0) CENTERS 6; ADDITIONAL VPD MANUAL CENTERS 18",flush=True)
     print("FIRST: SIX SOURCE-TOWER QC0 SPIKES, 9 NATIVE INTERVALS EACH (-120..+120 MIN)",flush=True)
-    fmt=["offset_minutes","native_time","source_tower_TA_C","source_tower_TA_F_QC",
+    fmt=["offset_minutes","native_time","original_source_native_row_present","source_tower_TA_C","source_tower_TA_F_QC",
          "standalone_ERA5_TA_C","selected_candidate_TA_C",
          "ERA5_minus_tower_TA_C"]
     for _,e in centers.loc[centers.event_kind.eq("TA_QC0_MODIFIED")].iterrows():
