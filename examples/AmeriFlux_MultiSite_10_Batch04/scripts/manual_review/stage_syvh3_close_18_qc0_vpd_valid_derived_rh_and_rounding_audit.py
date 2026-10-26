@@ -158,8 +158,8 @@ def scan(parent,left,holds):
             es=sat(t)
             if es is None or v is None or v<0 or v>es:
                 bad_count+=1
-                if es is not None and v is not None and
-                   v>es and v-es<=ROUNDING_VPD_MAX_EXCESS_HPA:
+                if (es is not None and v is not None and
+                    v>es and v-es<=ROUNDING_VPD_MAX_EXCESS_HPA):
                     small_quantisation.append((k,t,v,es,v-es,row["TA_F_QC"],row["VPD_F_QC"]))
                 elif len(major)<12:
                     major.append((k,t,v,es,row["TA_F_QC"],row["VPD_F_QC"]))
