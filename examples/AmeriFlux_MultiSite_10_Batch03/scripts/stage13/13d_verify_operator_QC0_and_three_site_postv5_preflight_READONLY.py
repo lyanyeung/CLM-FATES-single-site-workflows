@@ -133,7 +133,7 @@ def runaudit(decision):
     if not (old9.loc[old9.site.isin(SITE_YEARS),"numeric_selected_candidate_screen"]==
             "CURRENT_NUMERIC_FIELDS_PASS_ONLY").all():
         raise RuntimeError("Three Stage13a selected numeric candidates did not pass")
-    sites,edits,vpd,heights,surface_records=[],[],[],[],[]
+    sites,edits,vpd,heights,other_changes=[],[],[],[],[]
     for site,(first,last) in SITE_YEARS.items():
         spec=specs[site]
         if int(spec["native_minutes"])!=30:
@@ -228,6 +228,26 @@ def runaudit(decision):
         # Non-QC0 variable changes remain algorithmic Stage07 candidates,
         # not implicitly approved by the operator's TA-only decision.
         n_unapproved=changed_count-len(approvedkeys)
+        for e in changes.to_dict("records"):
+            if event_key(site,e["time"]) in approvedkeys and e.get("variable")=="TA_F":
+                continue
+            original_val=pd.to_numeric(pd.Series([e.get("original_value")]),errors="coerce").iat[0]
+            final_val=pd.to_numeric(pd.Series([e.get("final_value")]),errors="coerce").iat[0]
+            other_changes.append({
+              "site":site,"source_native_time":event_key(site,e["time"]).split("|")[1],
+              "variable":e.get("variable",""),
+              "source_QC":e.get("official_qc",np.nan),
+              "original_value":original_val,
+              "candidate_value":final_val,
+              "candidate_delta":final_val-original_val,
+              "algorithm_final_source":e.get("final_source",""),
+              "stage07_event_reason":e.get("reason",""),
+              "operator_approved_by_six_TA_decision":False,
+              "next_review":"Existing manual VPD concern" if
+                 event_key(site,e["time"]) in {
+                  event_key(site,z["time"]) for z in
+                  review.to_dict("records")} else
+                 "Routine Stage07 candidate change: still requires Post-v5 science gate"})
         srow={
             "site":site,"Stage07_numeric_complete":True,
             "original_data_sha_verified":True,
@@ -294,7 +314,8 @@ def runaudit(decision):
         else:
             srow["BIF_height_record_count"]=None
         sites.append(srow)
-    return pd.DataFrame(sites),pd.DataFrame(edits),pd.DataFrame(vpd),pd.DataFrame(heights)
+    return (pd.DataFrame(sites),pd.DataFrame(edits),pd.DataFrame(vpd),
+            pd.DataFrame(heights),pd.DataFrame(other_changes))
 
 def main():
     p=argparse.ArgumentParser()
@@ -309,7 +330,9 @@ def main():
     if a.self_test:return
     if a.decision is None:
         p.error("Provide --decision path to exact operator-approved GitHub JSON")
-    sites,edits,vpd,heights=runaudit(a.decision)
+    sites,edits,vpd,heights,other_changes=runaudit(a.decision)
+    if len(other_changes)!=int(sites.other_stage07_variable_changes_NOT_APPROVED.sum()):
+        raise RuntimeError("Other Stage07 event register not conserved")
     if len(edits)!=6 or len(vpd)!=18:
         raise RuntimeError("Original six accepted TA / eighteen pending VPD scopes changed")
     print("\n=== THREE SITE POSTV5 ADMISSION SCIENCE STATUS ===",flush=True)
@@ -327,6 +350,11 @@ def main():
     if len(heights):
         print(heights.head(40).to_string(index=False),flush=True)
     else:print("NO BIF HEIGHT REFERENCES FOUND; ZBOT and canopy height remain HOLD",flush=True)
+    print("\n=== NON-QC0 STAGE07 CANDIDATE MODIFICATIONS (by site/variable/reason) ===",flush=True)
+    if len(other_changes):
+        grouped=other_changes.groupby(["site","variable","algorithm_final_source",
+             "stage07_event_reason"],dropna=False).size().reset_index(name="records")
+        print(grouped.to_string(index=False),flush=True)
     print("STAGE13D SIX QC0 TEMPERATURES APPROVED | zero other science approvals or original writes",flush=True)
     if a.check:
         print("STAGE13D CHECK ONLY | ZERO FILE WRITES",flush=True)
@@ -338,7 +366,8 @@ def main():
       "three_site_remaining_Postv5_science_gates.csv":sites,
       "six_operator_approved_TA_QC0_exact_values_verified.csv":edits,
       "eighteen_still_unapproved_VPD_review_values.csv":vpd,
-      "original_BIF_height_evidence_NOT_ZBOT.csv":heights}
+      "original_BIF_height_evidence_NOT_ZBOT.csv":heights,
+      "all_remaining_unapproved_Stage07_candidate_variable_changes.csv":other_changes}
     for name,data in objects.items():data.to_csv(out/name,index=False)
     note="TEMPERATURE_APPROVAL_ONLY_OTHER_GATES_RETAINED"
     (out/note).write_text(
