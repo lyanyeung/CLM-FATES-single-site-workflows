@@ -265,7 +265,7 @@ def main():
  write(out/"stage41_ALL15_EVENT_SOURCE_SCIENCE_REPAIR_GATES.csv",EVCOLS,events)
  write(out/"stage41_US_UMB_FULLSET_HH_EXACT23_SOURCE_QC_COMPARISON.csv",UCOLS,umb_rows)
  result=dict(source_sha256={k:digest(v) for k,v in paths.items()},
-  15_original_negative_or_nearzero_RH_events_verified=len(events),
+  original_negative_or_nearzero_RH_events_verified=len(events),
   research_only_candidate_native_HH=len(trials),
   stage41_new_scientific_approvals=0,
   all_stage24_166_approved_unchanged=True,all_P1_46_HOLD_unchanged=True,
