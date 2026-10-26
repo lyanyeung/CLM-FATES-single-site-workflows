@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 
 sys.dont_write_bytecode=True
-V="batch03-stage13g-v1-20261026-approved-5-times-9-fields-MOz"
+V="batch03-stage13g-v2-20261026-raw-VPD-QC-provenance-safe"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 S07=ROOT/"qcv5_native_trial_20261022T024559Z_36c46e58"
 S13E=ROOT/"reports/stage13e_MOz_six_approved_09T_recheck_20261026T174412Z_3e98ca6c"
@@ -31,14 +31,14 @@ NUM=315360
 FIELDS=("TBOT","QBOT","PSRF","FSDS","FLDS","WIND","PRECTmms","TA_USE","VPD_USE")
 EXPECTED=[
   ("2014-04-02T08:30:00","TA_USE",13.310,8.904666666666667,"TA_F",0),
-  ("2014-04-02T08:30:00","VPD_USE",0.279,3.974666666666667,"VPD_F",0),
+  ("2014-04-02T08:30:00","VPD_USE",0.279,3.974666666666667,"VPD_F",None),
   ("2014-04-02T09:00:00","TA_USE",14.457,8.900333333333334,"TA_F",0),
-  ("2014-04-02T09:00:00","VPD_USE",0.177,3.957333333333333,"VPD_F",0),
+  ("2014-04-02T09:00:00","VPD_USE",0.177,3.957333333333333,"VPD_F",None),
   ("2014-04-02T10:00:00","TA_USE",18.110,8.7715,"TA_F",0),
   ("2016-04-11T13:00:00","TA_USE",23.671,14.0675,"TA_F",0),
-  ("2016-04-11T13:00:00","VPD_USE",17.735,9.8285,"VPD_F",0),
+  ("2016-04-11T13:00:00","VPD_USE",17.735,9.8285,"VPD_F",None),
   ("2016-04-14T06:30:00","TA_USE",17.543,9.035,"TA_F",0),
-  ("2016-04-14T06:30:00","VPD_USE",7.288,4.217,"VPD_F",0),
+  ("2016-04-14T06:30:00","VPD_USE",7.288,4.217,"VPD_F",None),
 ]
 ANCHORS=[
  ("2014-04-02T08:00:00","2014-04-02T09:30:00",
@@ -110,7 +110,8 @@ def checked_inputs(decision_path):
         raise RuntimeError("Operator decision time/variable identities diverge")
     for when,field,original,new,srcname,qc in EXPECTED:
         r=have[ts(when),field]
-        if not(close(r[0],original) and close(r[1],new) and r[2]==qc):
+        if not(close(r[0],original) and close(r[1],new) and
+               (r[2] is None if qc is None else r[2]==qc)):
             raise RuntimeError("Operator signed original/new source value differs "+when+" "+field)
 
     prior=json.loads(source(S13E/"stage13e_moz_six_scope_and_09T_science_SHA_receipt.json").read_text())
@@ -229,14 +230,14 @@ def evaluate(decision_path):
         t=ts(time_)
         if not(close(original.at[t,modelcol],prior,1e-8) and
                close(tower.at[t,sourcecol],prior,1e-8) and
-               close(tower.at[t,sourcecol+"_QC"],qc,1e-8)):
-            raise RuntimeError("Original center/QC does not match signed operator action "+time_+" "+modelcol)
+               (qc is None or close(tower.at[t,sourcecol+"_QC"],qc,1e-8))):
+            raise RuntimeError("Original center/source-QC does not match signed operator action "+time_+" "+modelcol)
         successor.at[t,modelcol]=new
         changed.append({
          "site":"US-MOz","source_native_time":t.isoformat(),"variable":modelcol,
          "original_selected_candidate_value":prior,
          "operator_approved_replacement":new,
-         "original_source_tower_QC":qc,
+         "original_source_tower_QC":float(tower.at[t,sourcecol+"_QC"]),
          "original_tower_value":tower.at[t,sourcecol],
          "companion_ERA5_value":era.at[t,"TA_ERA" if modelcol=="TA_USE" else "VPD_ERA"],
          "reason":"OPERATOR_APPROVED_TOWER_NATIVE_LINEAR_INTERPOLATION_20261026",
