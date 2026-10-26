@@ -14,7 +14,8 @@ TA_ERA is a processed FLUXNET ERA5-derived product, NOT independently
 retrieved ERA5-Land. No original/candidate/model/forcing file changes.
 Use --report to create a stand-alone CSV report under user HOME only.
 """
-import argparse,csv,hashlib,json
+import argparse,csv,hashlib,json,math
+from uuid import uuid4
 from datetime import datetime,timedelta
 from pathlib import Path
 
@@ -98,9 +99,6 @@ def source_files():
        "Packaged paired original ERA source file SHA mismatch")
     ck(candidateinfo["source_rows"]==N and
        sha(candidate)==candidateinfo["sha256"],"Stage07 Syv full file SHA mismatch")
-    ck(sha(S05/"unresolved_hold.csv")==
-       r.get("new_receipts_sha256",{}).get("stage07_inherited_754_holds.csv","") or
-       True,"")  # Stage07 inherited table has a separate SHA and is checked below.
     ck(sha(S07/"stage07_inherited_754_holds.csv")==
        r["new_receipts_sha256"]["stage07_inherited_754_holds.csv"],
        "Stage07 inherited hold file changed")
@@ -142,10 +140,15 @@ def human_report():
         print("TIME SEGMENT ORIG_TA_F_C ORIG_TA_QC TA_F_MDS MDS_QC PROCESSED_TA_ERA_C ORIGINAL_T_minus_ERA_C STAGE07_TA_F_C STAGE07_TA_QC ORIGINAL_VPD_hPa STAGE07_VPD_hPa VPD_QC HOLD_REASON")
         for k in timekeys(start,stop):
             o=original[k];q=latest[k];e=era_rows[k]
-            delta=float(o["TA_F"])-float(e["TA_ERA"])
+            try:
+                dt=float(o["TA_F"]); de=float(e["TA_ERA"])
+                delta=f"{dt-de:.3f}" if (math.isfinite(dt) and math.isfinite(de)
+                     and dt not in (-9999.,-6999.) and de not in (-9999.,-6999.)) else "NA"
+            except (TypeError,ValueError):
+                delta="NA"
             segment="HOLD" if a<=k<=b else ("BEFORE" if k<a else "AFTER")
             vals=[k,segment,o["TA_F"],o["TA_F_QC"],o["TA_F_MDS"],
-                  o["TA_F_MDS_QC"],e["TA_ERA"],f"{delta:.3f}",
+                  o["TA_F_MDS_QC"],e["TA_ERA"],delta,
                   q["TA_F"],q["TA_F_QC"],o["VPD_F"],q["VPD_F"],
                   q["VPD_F_QC"],reasons.get(k,"-")]
             print(" ".join(vals))
@@ -159,7 +162,8 @@ def human_report():
 def write_report(rows):
     base=Path.home()/"ameriflux_batch04_manual_review"
     base.mkdir(parents=True,exist_ok=True)
-    out=base/"US-Syv_six_suspected_temperature_episodes_98HH_full_flanks_source_vs_ERA.csv"
+    out=base/("US-Syv_six_suspected_temperature_episodes_98HH_full_flanks_"+
+              uuid4().hex[:8]+".csv")
     names=["episode","TIMESTAMP_START","segment","original_TA_F_C",
            "original_TA_F_QC","original_TA_F_MDS","TA_F_MDS_QC",
            "FLUXNET_processed_TA_ERA_C","original_T_minus_ERA_C",
