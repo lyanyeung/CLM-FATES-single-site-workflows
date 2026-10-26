@@ -847,3 +847,17 @@ Expected **G01 26 + G03 34 + G05 26 + G06 31 = 117 candidate half-hours** (inclu
 **No IRIDIS6 Stage22 execution yet.** The script creates ONLY NEW output reports `stage22_VERSIONED_APPROVED_RH_VPD_native_overlay.csv` (162), `stage22_46_MANUAL_HOLD_P1_untouched.csv` (46), boundary QC table, manifest, and short operator review. It does NOT alter original source CSV/QC, existing DATM forcing, CLM-FATES cases, Slurm, or previous Stage18/20/21 files. Source `TA_ERA/VPD_ERA` were NOT independently verified as ERA5-Land; these values are processed source ERA and must carry reconstruction provenance.
 
 Run the pinned one-call command in the Stage22 decision documentation; after checking exact results, manually review the 46 HOLD and source native edge discontinuities. Model-ready forcing creation remains blocked until full Batch05 1,750-HH QC/P2/P3 review, Post-v5 technical checks and remaining source-specific holds are resolved.
+
+
+## Stage24 four explicitly approved edge-half-hour RH/VPD reconstructions (2026-10-26)
+
+**Most recent investigator science decision** (supersedes earlier Stage23 manual EDGE HOLD *for precisely four named timestamps*): replace processed-source ERA-derived RH while **retaining original measured tower `TA_F`**, reconstruct physically coherent VPD; **do not expand interval**.
+
+- E01 US-Vcm 2014-08-19 **08:30**, ERA-derived RH 56.194173% (previous source RH 17.18377%).
+- E02 US-Vcm 2025-10-14 **11:30**, ERA-derived RH 75.805596% (previous source RH 37.98483%). Afterward 12:00–13:30 source RH≈99.46% is **unapproved plateau review**.
+- E03 US-WCr 2025-08-25 **12:30**, ERA-derived RH 65.093868% (previous source RH 33.68535%). Preceding original 09:30–12:00 source RH=100% is **unapproved plateau review**.
+- E04 US-WCr 2025-08-26 **02:00**, ERA-derived RH 91.924097% (previous source RH 32.35776%).
+
+**Outputs after operator runs Stage24:** Stage22 existing 162 changed rows + exactly 4 approved edges = **166 versioned RH/VPD overlay half hours**; 46 original P1 human HOLD entries **byte-identical and unchanged**; original 176 P1=130 already approved + 46 held; 10 unapproved near-saturation plateau HH identified separately. All original FLUXMET, native source QC, DATM, CIME/Slurm remain unmodified; neither processed source `TA_ERA/VPD_ERA` nor derived `ERA_RH` has been independently verified as ERA5-Land.
+
+[Stage24 pinned source script](scripts/stage24/24_merge_four_approved_edge_RH_to_versioned_overlay.py) and [Stage24 exact decisions, operation and provenance](docs/STAGE24_EXACT_FOUR_EDGE_APPROVALS_2026-10-26.md). **Script committed to GitHub; operator execution still pending.** Do not advertise a finished forcing: 46 P1 RH HOLD and P2/P3 source-science QC remain unresolved.
