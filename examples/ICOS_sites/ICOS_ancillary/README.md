@@ -17,3 +17,9 @@ python3 -B 01_fetch_ICOS_ancillary_reports.py --out ~/ICOS_ancillary_20261026
 ```
 
 It outputs `01_report_inventory.csv`, `02_species_tables_long.csv`, `03_soil_tables_long.csv`, `04_keyword_context.csv`, `tables/*.csv` and `raw/*.html`. The next step is to map the species onto FATES PFTs and compare the result with [FINAL_38_SITE_FIXNC_PFT_20261025.csv](../ICOS_PFT/FINAL_38_SITE_FIXNC_PFT_20261025.csv).
+
+## Run 1 (operator, 26 Oct 2026 18:16 UK)
+
+- **14/38 sites have a summary report:** BE-Bra, BE-Vie, CH-Dav, CZ-BK1, DE-Tha, DK-Sor, FI-Hyy, FI-Sod, FR-FBn, FR-Fon, FR-Hes, FR-Pue, IT-Ren, NL-Loo. The other 24 return 404.
+- **Full reports:** HTTP 404 for all 38 sites.
+- **No HTML tables with species or soil:** the 3–7 MB summary reports carry their numbers inside chart widgets. `--from-raw` re-parses the downloaded `raw/*.html` without network. It exports every plotly trace point by report section (`05_plotly_traces_long.csv`) and a per-section count of tables, widgets and embedded images (`06_report_structure_by_section.csv`). Images cannot be read numerically.

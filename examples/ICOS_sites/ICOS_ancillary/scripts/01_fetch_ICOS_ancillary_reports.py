@@ -42,15 +42,24 @@ class Tables(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.tables, self.scripts, self.text = [], [], []
         self._stack, self._row, self._cell, self._script = [], None, None, None
+        self.section, self._head = "", None
+        self.table_sec, self.script_sec, self.images = [], [], {}
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
+        if tag in ("h1", "h2", "h3", "h4"): self._head = []
+        elif tag == "img" and (a.get("src") or "").startswith("data:image"):
+            self.images[self.section] = self.images.get(self.section, 0) + 1
         if tag == "table": self._stack.append([])
         elif tag == "tr" and self._stack: self._row = []
         elif tag in ("td", "th") and self._row is not None: self._cell = []
         elif tag == "script" and "json" in (a.get("type") or ""): self._script = []
 
     def handle_endtag(self, tag):
+        if tag in ("h1", "h2", "h3", "h4") and self._head is not None:
+            t = " ".join("".join(self._head).split())
+            if t: self.section = t[:120]
+            self._head = None
         if tag in ("td", "th") and self._cell is not None and self._row is not None:
             self._row.append(" ".join("".join(self._cell).split())); self._cell = None
         elif tag == "tr" and self._row is not None and self._stack:
@@ -58,12 +67,13 @@ class Tables(HTMLParser):
             self._row = None
         elif tag == "table" and self._stack:
             t = self._stack.pop()
-            if t: self.tables.append(t)
+            if t: self.tables.append(t); self.table_sec.append(self.section)
         elif tag == "script" and self._script is not None:
-            self.scripts.append("".join(self._script)); self._script = None
+            self.scripts.append("".join(self._script)); self.script_sec.append(self.section); self._script = None
 
     def handle_data(self, d):
         if self._script is not None: self._script.append(d); return
+        if self._head is not None: self._head.append(d)
         if self._cell is not None: self._cell.append(d)
         self.text.append(d)
 
@@ -96,6 +106,36 @@ def widget_tables(scripts):
     return out
 
 
+def plotly_traces(scripts, sections):
+    """htmlwidgets plotly: {"x": {"data": [{"type":..,"name":..,"x":[..],"y":[..]}], "layout": {...}}}."""
+    rows = []
+    for w, (raw, sec) in enumerate(zip(scripts, sections), 1):
+        try: obj = json.loads(raw)
+        except Exception: continue
+        x = obj.get("x") if isinstance(obj, dict) else None
+        if not isinstance(x, dict) or not isinstance(x.get("data"), list) or not x["data"] or not isinstance(x["data"][0], dict): continue
+        lay = x.get("layout", {}) or {}
+        def title(o):
+            t = o.get("title") if isinstance(o, dict) else None
+            return (t.get("text") if isinstance(t, dict) else t) or ""
+        meta = {"section": sec, "widget": w, "plot_title": re.sub(r"<[^>]+>", " ", str(title(lay)))[:150],
+                "xaxis": re.sub(r"<[^>]+>", " ", str(title(lay.get("xaxis", {}))))[:80],
+                "yaxis": re.sub(r"<[^>]+>", " ", str(title(lay.get("yaxis", {}))))[:80]}
+        for t, tr in enumerate(x["data"], 1):
+            def seq(k):
+                v = tr.get(k)
+                if v is None: return []
+                return v if isinstance(v, list) else [v]
+            xs, ys, tx = seq("x"), seq("y"), seq("text") or seq("hovertext")
+            n = max(len(xs), len(ys), len(tx), 1)
+            for i in range(n):
+                pick = lambda a: a[i] if i < len(a) else (a[0] if len(a) == 1 else "")
+                rows.append({**meta, "trace": t, "trace_name": str(tr.get("name", ""))[:120], "type": tr.get("type", ""),
+                             "legendgroup": str(tr.get("legendgroup", ""))[:80], "x": str(pick(xs))[:120],
+                             "y": str(pick(ys))[:60], "text": re.sub(r"<br\s*/?>", "; ", str(pick(tx)))[:300]})
+    return rows
+
+
 def fetch(url, tries=3):
     for k in range(tries):
         try:
@@ -109,8 +149,9 @@ def fetch(url, tries=3):
             time.sleep(3)
 
 
-def parse(raw):
+def parse(raw, full=False):
     p = Tables(); p.feed(raw.decode("utf-8", "replace"))
+    if full: return p
     return p.tables, widget_tables(p.scripts), " ".join(" ".join(p.text).split())
 
 
@@ -169,6 +210,32 @@ def run(out, sites, pause):
     print(f"SPECIES ROWS {len(spp)} | SOIL ROWS {len(soil)} | KEYWORD HITS {len(keys)} -> {out}")
 
 
+def from_raw(out):
+    """Re-parse already downloaded raw/*.html (no network): plotly traces + structure per section."""
+    out = Path(out).expanduser(); traces, struct = [], []
+    for f in sorted((out / "raw").glob("*.html")):
+        site, kind = f.stem.rsplit("_", 1)
+        p = parse(f.read_bytes(), full=True)
+        tr = plotly_traces(p.scripts, p.script_sec)
+        for r in tr: traces.append({"site": site, "report": kind, **r})
+        secs = sorted(set(p.table_sec) | set(p.script_sec) | set(p.images))
+        for sec in secs:
+            struct.append({"site": site, "report": kind, "section": sec,
+                           "html_tables": p.table_sec.count(sec), "json_widgets": p.script_sec.count(sec),
+                           "plotly_points": sum(1 for r in tr if r["section"] == sec),
+                           "embedded_images": p.images.get(sec, 0)})
+        print(f"{site:7} {kind:7} sections={len(secs):3} widgets={len(p.scripts):3} plotly_points={len(tr):6} "
+              f"images={sum(p.images.values()):3}", flush=True)
+    for name, rows in (("05_plotly_traces_long.csv", traces), ("06_report_structure_by_section.csv", struct)):
+        fields = []
+        for r in rows:
+            for k in r:
+                if k not in fields: fields.append(k)
+        with (out / name).open("w", newline="", encoding="utf-8") as fh:
+            w = csv.DictWriter(fh, fieldnames=fields or ["site"]); w.writeheader(); w.writerows(rows)
+    print(f"PLOTLY POINTS {len(traces)} | SECTIONS {len(struct)} -> {out}")
+
+
 def self_test():
     page = ("<html><body><h2>GRP_TREE</h2><table><tr><th>SPP</th><th>YEAR</th><th>PLOT</th><th>SPP_PERC</th></tr>"
             "<tr><td>Picea abies (L.) H.Karst.</td><td>2022</td><td>CP</td><td>41.24</td></tr></table>"
@@ -182,6 +249,12 @@ def self_test():
     assert classify(tabs[0]) == ["species"] and "soil" in classify(widgets[0])
     assert {m.group(1).lower() for m in KEY_RE.finditer(text)} >= {"clay", "soil texture"}
     assert len(SITES) == 38 and len(set(SITES)) == 38
+    pg = ('<h2>GRP_TREE</h2><img src="data:image/png;base64,AAAA"><script type="application/json" data-for="p1">'
+          '{"x":{"data":[{"type":"bar","name":"Fagus sylvatica","x":["2021","2023"],"y":[60.5,62.1]}],'
+          '"layout":{"title":{"text":"Species ratio"}}}}</script><h2>GRP_SOIL</h2>').encode()
+    pp = parse(pg, full=True); tr = plotly_traces(pp.scripts, pp.script_sec)
+    assert len(tr) == 2 and tr[1]["trace_name"] == "Fagus sylvatica" and tr[1]["y"] == "62.1" and tr[0]["section"] == "GRP_TREE"
+    assert pp.images == {"GRP_TREE": 1}
     print("ICOS ANCILLARY FETCH SELF-TEST PASS (no network)")
 
 
@@ -191,6 +264,8 @@ if __name__ == "__main__":
     ap.add_argument("--sites", nargs="+", default=SITES)
     ap.add_argument("--pause", type=float, default=1.0, help="seconds between requests")
     ap.add_argument("--self-test", action="store_true")
+    ap.add_argument("--from-raw", action="store_true", help="re-parse <out>/raw/*.html only (no network)")
     a = ap.parse_args()
     if a.self_test: self_test(); sys.exit(0)
+    if a.from_raw: from_raw(a.out); sys.exit(0)
     run(a.out, a.sites, a.pause)
