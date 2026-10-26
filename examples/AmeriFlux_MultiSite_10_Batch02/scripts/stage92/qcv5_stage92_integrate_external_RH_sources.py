@@ -486,7 +486,9 @@ def parse_site(site, root, output_root, native_minutes=30, standalone_era=False)
         print("STAGE92 Ho1-2000 Stage85 exact source QC0 reapplication",
               int(ok_mask.sum()),"QC0; nonQC0 remained source-tagged",
               int(all2000.sum()-ok_mask.sum()),flush=True)
-        if int(ok_mask.sum()) != 17294:
+        # Stage85 source contains 17568 leap-year half-hours, including 48
+        # measured-source QC0 records on Feb29; Stage07 NOLEAP drops those.
+        if int(ok_mask.sum()) != 17246:
             raise RuntimeError("Stage85 Ho1 QC0 native NOLEAP scope differs")
 
     patches=stage92.get("rh", {})
