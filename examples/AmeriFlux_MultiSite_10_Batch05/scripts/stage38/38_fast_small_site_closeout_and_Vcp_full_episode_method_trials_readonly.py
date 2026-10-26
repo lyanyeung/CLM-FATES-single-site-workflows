@@ -208,7 +208,31 @@ def selftest():
  assert all(x in SITES for x in SMALL) and len(SMALL)==7
  assert "US-Wkg" in SMALL
  assert len(SITES)==10
- print("STAGE38 SELF-TEST PASS | exact 10-site cohorts, original ZIP source QC, full-event candidate method comparisons, no writes")
+ cases=[
+  {"site":"US-Whs","episode_id":"E1","native_time":"200805241500","TA_F_C":"-10",
+   "VPD_F_hPa":"1.0","TA_F_QC":"2","VPD_F_QC":"2","RH_ERA_pct":"70",
+   "RH_MDS_pct":"71"},
+  {"site":"US-Whs","episode_id":"E1","native_time":"200805241530","TA_F_C":"-10",
+   "VPD_F_hPa":"1.1","TA_F_QC":"2","VPD_F_QC":"2","RH_ERA_pct":"72",
+   "RH_MDS_pct":"73"}]
+ raw={"200805241430":{"T":-10,"V":1.2,"QC_T":"2","QC_V":"2"},
+      "200805241500":{"T":-10,"V":1.0,"QC_T":"2","QC_V":"2"},
+      "200805241530":{"T":-10,"V":1.1,"QC_T":"2","QC_V":"2"},
+      "200805241600":{"T":-10,"V":1.3,"QC_T":"2","QC_V":"2"}}
+ p2={(r["site"],r["native_time"]):r for r in cases}
+ epi={"unapproved_HH":"2"}
+ trial=evaluate("US-Whs","E1",epi,cases,"SOURCE_ERA_ALL_EPISODE",raw,p2,{})
+ assert trial["method_coverage_all_original_episode"] is True
+ assert trial["method_valid_HH"]==2 and trial["new_external_jump_gt4"]==0
+ assert trial["production_permission"]=="NO_RESEARCH_ONLY"
+ protected=[dict(x) for x in cases]
+ protected[0]["VPD_F_QC"]="0"
+ raw2={k:dict(v) for k,v in raw.items()}
+ raw2["200805241500"]["QC_V"]="0"
+ p2x={(r["site"],r["native_time"]):r for r in protected}
+ q=evaluate("US-Whs","E1",epi,protected,"SOURCE_ERA_ALL_EPISODE",raw2,p2x,{})
+ assert q["source_QC0_protected_HH"]==1 and q["science_gate"]=="QC0_SENSOR_PROTECTED"
+ print("STAGE38 SELF-TEST PASS | exact ten-site source inventory; source-QC0-protecting full-event ERA trials; raw neighbor VPD gates; no writes")
 
 def main():
  p=argparse.ArgumentParser(description=__doc__)
