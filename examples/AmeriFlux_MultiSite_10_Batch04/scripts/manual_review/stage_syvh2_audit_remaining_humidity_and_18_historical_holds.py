@@ -164,7 +164,7 @@ def main():
     prev,_,_,_,_=native_rows(SECONDFILE,TARGET_COLS,need,True)
     latest,_,globally_invalid,glob_bad,qc=native_rows(result,TARGET_COLS,need,True)
     site,_,_,_,_=native_rows(original,
-            ("TIMESTAMP_START","TA_F","TA_F_QC","VPD_F","VPD_F_QC","RH"),need,True)
+            ("TIMESTAMP_START","TA_F","TA_F_QC","VPD_F","VPD_F_QC"),need,True)
     era,_,_,_,_=native_rows(grid,("TIMESTAMP_START","TA_ERA","VPD_ERA"),need)
     replaced={x["TIMESTAMP_START"] for x in
         table(directory/"SYVH1_HUMIDITY_SOURCE_PROVENANCE.tsv",
