@@ -213,8 +213,8 @@ def readback_new_nc(ncmod,produced,old):
     with ncmod.nc.Dataset(produced) as a, ncmod.nc.Dataset(old) as b:
         if set(ncmod.NC_FIELDS)-set(a.variables) or set(ncmod.NC_FIELDS)-set(b.variables):
             raise ValueError("NC canonical meteorology fields changed")
-        if len(a.dimensions["time"])!=len(b.dimensions["time"]) or
-            a.variables["time"].calendar!="noleap":
+        if (len(a.dimensions["time"])!=len(b.dimensions["time"]) or
+            a.variables["time"].calendar!="noleap"):
             raise ValueError("Native NOLEAP NC time count changed")
         fields=("time","lat","lon",*ncmod.NC_FIELDS)
         for col in fields:
@@ -352,9 +352,12 @@ def main():
         (output/"progress.json").write_text(json.dumps(statuses,indent=2,default=str)+chr(10))
     complete=sum(s.get("NC_count",0) for s in statuses)
     count=sum("NC_count" in x for x in statuses)
-    srcsha_changed=[str(Path(j[3])) for j in jobs
-       if not Path(j[3]).is_file() or sha(j[3])!=sha(
-           Path(output)/j[0]/"forcing/processed_v5"/Path(j[3]).name)]
+    srcsha_changed=[]
+    for job in jobs:
+        src=Path(job[3])
+        ver=output/job[0]/"forcing/processed_v5"/src.name
+        if not src.is_file() or not ver.is_file() or sha(src)!=sha(ver):
+            srcsha_changed.append(str(src))
     result={"schema":"STAGE95_BATCH02_VERSIONED_122_ORIGINAL_QC0_APPROVED_10SITE_215_NC_v1",
       "operator_approval_20261026":{"prior_Stage94_QC0_variables":33,
              "new_user_approved_US_ICt_QC0_VPD_variables":89,
