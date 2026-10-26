@@ -1,0 +1,86 @@
+{
+  "schema": "batch03-stage13e-scoped-operator-moz-5-v1",
+  "date": "2026-10-26",
+  "scope": "Approval for EXACT five pre-existing selected Stage07 US-MOz changes only. No source modifications or approvals of any unrelated time/variable.",
+  "operator_instruction": "人工审核决定：批准 US-MOz 这 5 条现有温度和 VPD 修复，不改变原始数据；2005-01-06 09:00 的 8.024°C 单独检查。请记录批准并继续科学准入。",
+  "source_stage07_release": "qcv5_native_trial_20261022T024559Z_36c46e58",
+  "source_stage13d_readonly_report": "reports/stage13d_three_site_postv5_QC0_science_gates_20261026T173233Z_79eebcb0",
+  "preexisting_six_QC0_approval": "decisions/STAGE13D_OPERATOR_APPROVED_SIX_QC0_TOWER_TA_INTERPOLATIONS_20261026.json",
+  "approved_five_original_stage07_events": [
+    {
+      "site": "US-MOz",
+      "native_time": "2004-12-03T23:30:00",
+      "variable": "TA_F",
+      "official_QC": 2,
+      "original_value": -132.985,
+      "approved_candidate_value": 1.753,
+      "stage07_event_reason": "hard_physical_range|short_gap_interpolated",
+      "approval": "OPERATOR_APPROVED_STAGE07_EXISTING_VALUE"
+    },
+    {
+      "site": "US-MOz",
+      "native_time": "2004-12-04T00:00:00",
+      "variable": "TA_F",
+      "official_QC": 2,
+      "original_value": -267.868,
+      "approved_candidate_value": 1.608,
+      "stage07_event_reason": "hard_physical_range|short_gap_interpolated",
+      "approval": "OPERATOR_APPROVED_STAGE07_EXISTING_VALUE"
+    },
+    {
+      "site": "US-MOz",
+      "native_time": "2004-12-04T00:30:00",
+      "variable": "TA_F",
+      "official_QC": 2,
+      "original_value": -133.275,
+      "approved_candidate_value": 1.463,
+      "stage07_event_reason": "hard_physical_range|short_gap_interpolated",
+      "approval": "OPERATOR_APPROVED_STAGE07_EXISTING_VALUE"
+    },
+    {
+      "site": "US-MOz",
+      "native_time": "2005-01-06T10:00:00",
+      "variable": "TA_F",
+      "official_QC": 1,
+      "original_value": 17.66,
+      "approved_candidate_value": -7.2055,
+      "stage07_event_reason": "isolated_spike_ERA_confirmed|short_gap_interpolated",
+      "approval": "OPERATOR_APPROVED_STAGE07_EXISTING_VALUE"
+    },
+    {
+      "site": "US-MOz",
+      "native_time": "2005-01-06T10:00:00",
+      "variable": "VPD_F",
+      "official_QC": 1,
+      "original_value": 4.653,
+      "approved_candidate_value": 1.6939598679479135,
+      "stage07_event_reason": "reconcile_VPD_from_ERA_RH_keep_TA",
+      "approval": "OPERATOR_APPROVED_STAGE07_EXISTING_VALUE"
+    }
+  ],
+  "separate_additional_science_hold": [
+    {
+      "site": "US-MOz",
+      "native_time": "2005-01-06T09:00:00",
+      "variable": "TA_F",
+      "original_tower_TA_C": 8.024,
+      "paired_ERA5_TA_C": -7.096,
+      "concern": "potential additional isolated spike in otherwise approximately -7 C tower series; specifically NOT approved for replacement or interpolation, source clock and adjacent QC context need audit",
+      "status": "SCOPED_PENDING_SOURCE_REVIEW"
+    }
+  ],
+  "scientific_boundaries": {
+    "original_source_immutable": true,
+    "existing_stage07_trial_immutable": true,
+    "all_six_prior_QC0_TA_approvals_still_valid": true,
+    "US_MOz_exact_five_approvals_recorded": true,
+    "no_automatic_09_00_2005_temperature_change": true,
+    "ec_footprint_PFT_approved": false,
+    "ZBOT_approved": false,
+    "clock_metadata_approved": false,
+    "all_site_postv5_gates_approved": false,
+    "DATM_ready": false,
+    "spinup_authorized": false,
+    "Slurm_jobs_submitted": false
+  }
+}
