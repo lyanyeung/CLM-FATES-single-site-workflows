@@ -51,6 +51,23 @@ Do **not** incorrectly cite Stage04a year-2000 gridded PFT as the operator's mos
 
 Do **not** ask the user to resend this BIF workbook, and do not re-open PFT research as if no recommended catalog existed.
 
+## Stage13f verified science recommendations after operator's 17:53 UTC run (NOT APPROVAL)
+
+Original source SHA, Stage13e receipt, 3-source-center identities and `--check/--run` passed. Sealed original report:
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13f_MOz_three_extra_QC0_tower_ERA_neighbors_20261026T175310Z_f93e321f`.
+
+All three additional source T flags are `QC0` and were **unchanged** in the original Stage07 candidate. The following are proposed values only, **not operator-approved** and not written into any model file.
+
+| Time | Original T | ERA T | Tower TA neighbors −30/+30 | Tentative T interpolation | Original VPD | Tower VPD neighbors −30/+30 | Tentative VPD interpolation | Decision |
+|---|---:|---:|---|---:|---:|---|---:|---|
+| 2014-04-02 10:00 | 18.110 | 7.879 | 8.896 / 8.647 | 8.7715 | 0.475 | 3.940 / 0.427 | 2.1835 | **HOLD** entire early-morning TA/VPD cluster; 08:30 T 13.310, 09:00 T 14.457, and abrupt 09:30 VPD changes need review; do not approve one isolated value |
+| 2016-04-11 13:00 | 23.671 | 12.214 | 12.059 / 16.076 | 14.0675 | 17.735 | 8.303 / 11.354 | 9.8285 | **Recommend approve BOTH TA and VPD two-sided tower interpolation**, not T alone |
+| 2016-04-14 06:30 | 17.543 | 6.433 | 7.756 / 10.314 | 9.0350 | 7.288 | 3.622 / 4.812 | 4.2170 | **Recommend approve BOTH TA and VPD** after operator decision; retains original 07:00+ course |
+
+At 2016-04-11 13:00, using interpolated T 14.0675°C but retaining original VPD 17.735 hPa would imply liquid-water RH ~**−10.54%** (because saturation VPD would be only 16.044 hPa), demonstrably invalid. Using interpolated VPD 9.8285 hPa gives RH ~**38.74%**, physically valid. At 2016-04-14 06:30 the paired-interpolation RH is ~**63.33%** (both values preliminary, not forcing changes). Conversely, at 2014-04-02, the abrupt adjacent VPD change 3.940 to 0.427 hPa makes the simple 2.1835 hPa interpolation unverified and the 08:30/09:00 temperature values are also suspect.
+
+**Operator decision remains pending on the 2016 two paired T+VPD replacements, pending for the wider 2014 event, and pending for the 2005-01-06 05:00–09:00 MDS/source mismatch.** Neither the original T/QC0, selected Stage07 candidates, PFT, or CIME/Slurm was edited.
+
 ## Current scientific gate
 
 - US-MOz Stage07 numerical forcing: complete; 6 originally modified source events operator approved.
