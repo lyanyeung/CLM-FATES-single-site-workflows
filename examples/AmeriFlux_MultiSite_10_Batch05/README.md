@@ -794,7 +794,7 @@ After success, `cat "$OUT/stage19_SEVEN_priority_original_before_after.md"` to c
 ## Stage20 user-approved RH source reconstruction candidates (2026-10-26; operator run pending)
 
 [User source humidity decisions and exact evidence](docs/STAGE20_USER_HUMIDITY_DECISIONS_2026-10-26.md).
-[Stage20 report-only original 109-candidate decision overlay script](scripts/stage20/20_make_investigator_decision_candidate_overlay_readonly.py).
+[Stage20 report-only original 117-candidate decision overlay script](scripts/stage20/20_make_investigator_decision_candidate_overlay_readonly.py).
 
 The investigator decided:
 - G01 WCr 2025-08-25 13:00 to 2025-08-26 01:30: 26 original low-RH measured HH → use original *processed ERA-pair RH* with tower T unchanged, rederive VPD coherently.
@@ -811,7 +811,7 @@ At this stage **nothing has been written to forcing, original QC, CIME, or Slurm
 (
   set -euo pipefail
   BASE="$HOME/ameriflux_batch05_stage20"
-  COMMIT="5b21921cad1d0b0f7c89edb3c1cc5c62d5aa4358"
+  COMMIT="801e16fd5df76d4b88183690766ebf937d1ce050"
   RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT"
   SCRIPT="$BASE/20_make_investigator_decision_candidate_overlay_readonly.py"
   STAGE18="$HOME/ameriflux_batch05_stage18/original_review_20261025T235716Z_1394929"
@@ -819,7 +819,7 @@ At this stage **nothing has been written to forcing, original QC, CIME, or Slurm
   curl -fLsS --retry 3 \
     "$RAW/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage20/20_make_investigator_decision_candidate_overlay_readonly.py" \
     -o "$SCRIPT"
-  test "$(git hash-object "$SCRIPT")" = "0ec09ffe1581c49a04daa4a6cf0bd6e6f969a81a"
+  test "$(git hash-object "$SCRIPT")" = "e5ffc43fef13e79034e160058be478a819f5ad92"
   echo "SOURCE VERIFIED"
   python3 -B -m py_compile "$SCRIPT"
   python3 -B "$SCRIPT" --self-test
@@ -830,4 +830,4 @@ At this stage **nothing has been written to forcing, original QC, CIME, or Slurm
 )
 ```
 
-Expected **G01 26 + G03 34 + G05 26 + G06 23 = 109 candidate half-hours**, G02 19 + G04 12 + G07 3 + G06 eight QC1 source-native low RH = **42 separate holds**. Two native source comparisons are essential: `RH_ERA` is diagnostic source-downscaled ERA RH, **not newly downloaded ERA5/ERA5-Land RH**; and the VPD must be `es(original TA_F)*(1 - chosen RH/100)`, never unmodified `VPD_ERA` combined with tower T. User has approved this candidate direction, but no source or production forcing changes have yet been run or verified.
+Expected **G01 26 + G03 34 + G05 26 + G06 31 = 117 candidate half-hours** (including G06 eight QC1 raw-low-RH entries with separate provenance). G02 19 + G04 12 + G07 3 = **34 separate missing-RH holds**. Two native source comparisons are essential: `RH_ERA` is diagnostic source-downscaled ERA RH, **not newly downloaded ERA5/ERA5-Land RH**; and the VPD must be `es(original TA_F)*(1 - chosen RH/100)`, never unmodified `VPD_ERA` combined with tower T. User has approved this candidate direction, but no source or production forcing changes have yet been run or verified.
