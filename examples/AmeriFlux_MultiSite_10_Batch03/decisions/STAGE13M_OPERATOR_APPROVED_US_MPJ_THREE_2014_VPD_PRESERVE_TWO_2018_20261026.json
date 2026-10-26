@@ -1,0 +1,67 @@
+{
+  "schema": "batch03-stage13m-operator-conditional-US-Mpj-three-VPD-and-two-preserve-v1",
+  "site": "US-Mpj",
+  "decision_date": "2026-10-26",
+  "operator_instruction": "批准 US-Mpj 三条 2014 年 VPD 修复候选：2014-10-11 02:30 使用 1.032 hPa，04:30 使用 1.163 hPa，2014-10-21 08:30 使用 2.103 hPa；仅在原始塔站/ERA SHA、时间与QC、前后VPD连续性、RH/QBOT物理检查全部通过后，在新的独立 forcing 候选中采纳。不通过则继续HOLD。2018-02-02 17:30 和19:00 两条VPD保持原值。保持此前已批准的2020温度插值和其他来源不变。不提交模型作业。",
+  "scoped_2014_VPD": [
+    {
+      "native_time": "2014-10-11T02:30:00",
+      "original_tower_VPD_hPa": 8.245,
+      "candidate_stage07_VPD_hPa_3dp": 1.032,
+      "decision": "CONDITIONAL_APPROVAL_ONLY"
+    },
+    {
+      "native_time": "2014-10-11T04:30:00",
+      "original_tower_VPD_hPa": 8.17,
+      "candidate_stage07_VPD_hPa_3dp": 1.163,
+      "decision": "CONDITIONAL_APPROVAL_ONLY"
+    },
+    {
+      "native_time": "2014-10-21T08:30:00",
+      "original_tower_VPD_hPa": 11.018,
+      "candidate_stage07_VPD_hPa_3dp": 2.103,
+      "decision": "CONDITIONAL_APPROVAL_ONLY"
+    }
+  ],
+  "keep_original_2018_VPD": [
+    {
+      "native_time": "2018-02-02T17:30:00",
+      "original_VPD_hPa_3dp": 11.261,
+      "decision": "NO_CHANGE_ORIGINAL"
+    },
+    {
+      "native_time": "2018-02-02T19:00:00",
+      "original_VPD_hPa_3dp": 9.178,
+      "decision": "NO_CHANGE_ORIGINAL"
+    }
+  ],
+  "already_approved_2020_temperature": {
+    "native_time": "2020-02-11T06:30:00",
+    "variable": "TA_USE",
+    "interpolated_C": 1.1795,
+    "policy": "PRESERVE_EXISTING_STAGE13D_OPERATOR_APPROVAL"
+  },
+  "source_rules": {
+    "source": "SHA-pinned Stage07 US-Mpj processed NOLEAP forcing paired with SHA-pinned original FLUXMET tower and standalone FLUXNET ERA",
+    "verify_original_native_clock": true,
+    "verify_original_source_VPD_QC_matches_stage07_manual_review": true,
+    "review_both_30min_neighbors": true,
+    "max_new_VPD_adjacent_jump_hPa": 4,
+    "water_RH_strictly_between_pct": [
+      0,
+      100
+    ],
+    "QBOT_positive_kgkg": true,
+    "preserve_PSRF": true,
+    "exactly_3_or_fewer_scoped_events": true,
+    "failed_events_HOLD_not_adopted": true,
+    "do_not_force_Stage11h_2018_changed_humidity_values": true
+  },
+  "status": {
+    "stage13m_research_shadow_only": true,
+    "postv5_approved": false,
+    "DATM_ready": false,
+    "spinup_authorized": false,
+    "Slurm_jobs_authorized": false
+  }
+}
