@@ -180,10 +180,10 @@ def build_requests(original,episodes):
   r=original[i]
   req.append(dict(r,scientific_purpose=("P1_REMAINING_HOLD_OR_RH_PLATFORM_REFERENCE"
     if i not in NINE[-3:] else "HIGH_RISK_VCP_P2P3_MDS_ERA_CONFLICT_REFERENCE")))
- wjs=sorted((x for x in episodes if x["site"]=="US-Wjs"),
+ wjs=sorted((x for x in episodes if x["site"]=="US-Wjs" and dt(x["original_native_start"])>=dt("200705041330")),
             key=lambda x:(-int(x["review_priority_rank"]),
                  -int(x["unapproved_HH"]),x["original_native_start"]))
- if not wjs:raise ValueError("US-Wjs 401 original P2P3 has no original episode")
+ if not wjs:raise ValueError("US-Wjs has no P2P3 episode covered by BIF DATE_START 200705041330")
  x=wjs[0]
  # Stage29 BIF Wjs UTC_OFFSET -7, native timestamps LST no DST,
  # original group has DATE_START, DATE_END absent => provisional.
