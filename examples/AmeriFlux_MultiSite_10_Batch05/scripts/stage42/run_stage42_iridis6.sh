@@ -3,8 +3,8 @@ set -euo pipefail
 BASE="$HOME/ameriflux_batch05_stage42"
 mkdir -p "$BASE"
 
-PY_COMMIT="6233a57b3e82d1b2ca9ad42523aedef70fab0368"
-PY_BLOB="5f68fdbe658470841da30a449f7143deb2bd8421"
+PY_COMMIT="ca8f49a048dcbe1036c150f950d1cda2d523bfae"
+PY_BLOB="b80320d75bfb404de4b8345340306399488b0e11"
 RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$PY_COMMIT"
 RELPATH="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage42/42_postv5_isolated_15_ERA_events_and_UMB23_fullset_source_trials.py"
 PY="$BASE/stage42.py"
