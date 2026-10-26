@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 sys.dont_write_bytecode=True
 
-VER="batch03-stage13b-v1-20261026-three-site-QC0-manual-science-onepass"
+VER="batch03-stage13b-v2-20261026-empty-manual-ledger-safe"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 STAGE07=ROOT/"qcv5_native_trial_20261022T024559Z_36c46e58"
 STAGE13A=ROOT/"reports/stage13a_Batch03_NINE_SITE_FORCING_ADMISSION_20261026T163725Z_cc70d4c8"
@@ -44,9 +44,28 @@ def sha(p):
             h.update(x)
     return h.hexdigest()
 
+def source_keys(frame):
+    """Stable native event keys, including pandas EMPTY manual_review.csv.
+
+    DataFrame.agg(axis=1) returns a DataFrame, not a Series, on empty frames
+    in some pandas versions. Do not use it for any site review ledger.
+    """
+    if not {"time","variable"}.issubset(frame.columns):
+        raise RuntimeError("Original manual/event key schema missing")
+    return pd.Series(
+        [str(t)+"|"+str(v) for t,v in zip(frame["time"],frame["variable"])],
+        index=frame.index,dtype="object")
+
 def selftest():
     assert sum(SITE_COUNTS.values())==6 and len(SITE_COUNTS)==3
     assert "VPD_F" in VARS
+    empty=pd.DataFrame(columns=["time","variable","reason"])
+    assert source_keys(empty).empty
+    one=pd.DataFrame({"time":["2020-01-01 12:30:00"],"variable":["VPD_F"]})
+    assert source_keys(one).tolist()==["2020-01-01 12:30:00|VPD_F"]
+    # Preserve source row index for selected QC0 event membership.
+    with_index=one.set_axis([17],axis=0)
+    assert source_keys(with_index).index.tolist()==[17]
     print("STAGE13B SELF-TEST PASS | original QC0 event + manual ledgers, no source writes",flush=True)
 
 def recorded(sha_manifest,path):
@@ -97,10 +116,8 @@ def read():
         selected=events.loc[pd.to_numeric(events.official_qc,errors="coerce").eq(0)].copy()
         if len(selected)!=want or not selected.variable.isin(VARS).all():
             raise RuntimeError("Original QC0 edits count or variable changed "+site)
-        keys=manual[["time","variable"]].astype(str).agg("|".join,axis=1).tolist()
-        manual_keys=set(keys)
-        selected["also_in_original_manual_review"]=(
-            selected[["time","variable"]].astype(str).agg("|".join,axis=1).isin(manual_keys))
+        manual_keys=set(source_keys(manual).tolist())
+        selected["also_in_original_manual_review"]=source_keys(selected).isin(manual_keys)
         for key in ["era_reference","original_value","final_value"]:
             if key in selected:
                 selected[key]=pd.to_numeric(selected[key],errors="coerce")
