@@ -152,9 +152,19 @@ def evaluate(i,e,rows):
         if var=="VPD_F" and positive_relative_humidity_from_vpd(
             x["original_TA_C"],cand):valid_vpd+=1
     if var=="TA_F":
-        if count==1 and mid_count==1 and strong_temp:
-            label="STRONG_ISOLATED_T_SPIKE_NEIGHBOR_AND_ERA"
-            advice="建议接受候选温度：原值为孤立尖峰、候选与邻点及ERA一致；用户最终批准"
+        # Operator 2026-10-26: candidate T must match BOTH ORIGINAL native neighbors.
+        # An ERA match alone never grants QC0 replacement approval.
+        valid_temperature_neighbors=all(
+            finite(x["raw_previous"]) and finite(x["raw_next"])
+            and finite(x["original_value"]) and finite(x["candidate_value"])
+            and abs(fl(x["raw_previous"])-fl(x["raw_next"]))<=6
+            and abs(fl(x["candidate_value"])-fl(x["raw_previous"]))<=4
+            and abs(fl(x["candidate_value"])-fl(x["raw_next"]))<=4
+            and abs(fl(x["candidate_value"])-fl(x["original_value"]))>=5
+            for x in rows)
+        if valid_temperature_neighbors:
+            label="USER_RULE_T_CANDIDATE_MATCHES_BOTH_ORIGINAL_NEIGHBORS"
+            advice="用户条件批准：候选温度与两个原始相邻观测均相差不超过4C，两邻点差不超过6C"
             attention="RECOMMEND_ACCEPT_REQUIRES_OPERATOR"
         else:
             label="QC0_T_CHANGE_NOT_FULLY_PROVEN"
@@ -170,7 +180,18 @@ def evaluate(i,e,rows):
             advice="人工确认辐射探头尖峰、云变化或ERA偏差"
             attention="MANUAL_REQUIRED"
     elif var=="VPD_F":
-        if bad_rh==count and valid_vpd==count:
+        if site=="US-ICt" and count>=6:
+            label="ICt_87_HH_QC0_VPD_SOURCE_NOT_PROVEN"
+            advice="保留HOLD：原始QC0 VPD连续87条，不可仅依ERA差异推断传感器故障"
+            attention="MANUAL_REQUIRED_P0"
+        elif site=="US-Ho2" and count<=4 and valid_vpd==count and all(
+             "near_zero_vapor_pressure" in (r.get("reason","") or "") or
+             "ERA_RH" in (r.get("candidate_source","") or "")
+             for r in rows):
+            label="USER_APPROVED_HO2_WET_HUMIDITY_PHYSICAL_CANDIDATE"
+            advice="按照用户指示接受候选：经已核验ERA湿度重建且在塔温下物理有效"
+            attention="RECOMMEND_ACCEPT_REQUIRES_OPERATOR"
+        elif bad_rh==count and valid_vpd==count:
             label="ORIGINAL_NEGATIVE_RH_ALL_ROWS_FIXED_PHYSICALLY"
             advice="建议接受候选VPD：全部原始配对RH<0且候选RH物理有效"
             attention="RECOMMEND_ACCEPT_REQUIRES_OPERATOR"
@@ -184,6 +205,11 @@ def evaluate(i,e,rows):
             attention="MANUAL_REQUIRED"
     else:
         label="OTHER_QC0_REVIEW";advice="人工确认";attention="MANUAL_REQUIRED"
+    # User already gave the conditional approval in this conversation.
+    # This changes the versioned DECISION LEDGER only; never overwrites a
+    # preview CSV/NC or elevates a site with remaining HOLD to production.
+    choice=("APPROVE_CANDIDATE" if attention=="RECOMMEND_ACCEPT_REQUIRES_OPERATOR"
+            else "HOLD")
     return dict(
        decision_id="B02-94-%02d"%i,site=site,variable=var,
        start_local=a["time"],end_local=b["time"],native_records=count,
@@ -195,10 +221,34 @@ def evaluate(i,e,rows):
        largest_abs_change=one(delta),
        original_RH_range=rng(rows,"original_implied_RH_pct"),
        evidence_class=label,scientific_recommendation=advice,
-       manual_attention=attention,operator_choice="HOLD",
+       manual_attention=attention,operator_choice=choice,
        production_approved="NO",
-       reason="Need explicit operator disposition; source/clock/QC unchanged"
+       reason="USER_2026_10_26_CONDITIONAL_RULE_EVALUATED; original/source/clock preserved"
     )
+
+def ho1_conditional_era_decision(ho1):
+    """User condition: only ERA-replace 09:00 if preceding ORIGINAL T is ~0C."""
+    idx={str(r["timestamp"]):r for r in ho1}
+    wanted=("200012270800","200012270830","200012270900","200012270930")
+    if not all(k in idx for k in wanted):
+        raise ValueError("Ho1 exact 08:00/08:30/09:00/09:30 source context absent")
+    t=[fl(idx[k]["original_TA_C"]) for k in wanted]
+    qc=[fl(idx[k]["original_TA_F_QC"]) for k in wanted]
+    if not (abs(t[2]+15.4)<0.05 and abs(t[3]-3.346)<0.05
+            and qc[2]==1 and qc[3]==2):
+        raise ValueError("Ho1 historical 2000-12-27 source transition changed")
+    # "Around zero" means -2 to +2 C for both preceding native records.
+    allow=all(finite(val) and abs(val)<=2.0 for val in t[:2])
+    return {"time":"2000-12-27 09:00","previous_0800_original_T_C":t[0],
+            "previous_0830_original_T_C":t[1],
+            "original_0900_QC1_T_C":t[2],
+            "original_0930_QC2_T_C":t[3],
+            "interpretation_near_zero":"both preceding original 30min temperatures within +-2 C",
+            "operator_condition_met":allow,
+            "source_decision":"CONDITIONALLY_AUTHORIZE_ERA_T_HUMIDITY_VERSIONED_OVERLAY" if allow
+                else "HOLD_PRECEDING_T_NOT_NEAR_ZERO_DO_NOT_USE_ERA",
+            "production_DATM_approved":False}
+
 
 def show(decisions,ordered,ho1):
     print("\n========== STAGE94 HUMAN DECISIONS (30 episodes) ==========",flush=True)
@@ -231,7 +281,14 @@ def show(decisions,ordered,ho1):
                   "status",r["science_status"],flush=True)
     count=Counter(d["manual_attention"] for d in decisions)
     print("\nSTAGE94 REVIEW CATEGORY COUNTS",dict(count),flush=True)
-    print("ALL SUGGESTIONS REQUIRE USER SIGNOFF BEFORE PRODUCING PRODUCTION DATM")
+    print("STAGE94 OPERATOR APPROVAL EPISODES",
+          dict(Counter(x["operator_choice"] for x in decisions)),flush=True)
+    verdict=ho1_conditional_era_decision(ho1)
+    print("STAGE94 HO1 PREVIOUS ORIGINAL TEMPERATURES 08:00",
+          verdict["previous_0800_original_T_C"],"08:30",
+          verdict["previous_0830_original_T_C"],"DECISION",
+          verdict["source_decision"],flush=True)
+    print("APPROVED USER CONDITIONALLY != PRODUCTION DATM APPROVAL")
 
 def save(dest,decisions,ordered,ho1,manifest):
     dest.mkdir(parents=True,exist_ok=False)
@@ -249,6 +306,17 @@ def save(dest,decisions,ordered,ho1,manifest):
         w=csv.DictWriter(f,fieldnames=FIELDS)
         w.writeheader();w.writerows(x for x in decisions
             if x["manual_attention"].startswith("RECOMMEND_ACCEPT"))
+    accepted=dest/"operator_approved_conditional_QC0_episodes.csv"
+    with accepted.open("w",newline="",encoding="utf8") as f:
+        w=csv.DictWriter(f,fieldnames=FIELDS)
+        w.writeheader();w.writerows(x for x in decisions if x["operator_choice"]=="APPROVE_CANDIDATE")
+    stillhold=dest/"operator_remaining_QC0_HOLD_episodes.csv"
+    with stillhold.open("w",newline="",encoding="utf8") as f:
+        w=csv.DictWriter(f,fieldnames=FIELDS)
+        w.writeheader();w.writerows(x for x in decisions if x["operator_choice"]=="HOLD")
+    verdict=ho1_conditional_era_decision(ho1)
+    (dest/"Ho1_2000_Dec27_0900_user_conditional_ERA.json").write_text(
+        json.dumps(verdict,indent=2)+"\\n")
     proof={
         "schema":"STAGE94_QC0_OPERATOR_EVIDENCE_NON_ACTIVATING_v1",
         "input_stage93_manifest_sha256":sha(S93/"manifest.json"),
@@ -256,13 +324,18 @@ def save(dest,decisions,ordered,ho1,manifest):
         "human_episodes":len(decisions),
         "remaining_Ho1_nonQC0_T_science_disposition":"HOLD",
         "production_DATM_approved":False,
-        "scientific_signoff_by_operator_recorded":False,
+        "scientific_signoff_by_operator_recorded":"USER_CONDITIONAL_RULE_ONLY",
+        "operator_approved_conditional_QC0_variable_records":sum(int(x["native_records"]) for x in decisions if x["operator_choice"]=="APPROVE_CANDIDATE"),
+        "operator_remaining_QC0_HOLD_variable_records":sum(int(x["native_records"]) for x in decisions if x["operator_choice"]=="HOLD"),
+        "Ho1_0900_source_operator_condition":verdict["source_decision"],
         "allowed_operator_choices":list(ALLOWED),
         "no_source_forcing_nc_cime_slurm_writes":True,
-        "reports_sha256":{p.name:sha(p) for p in (out,priority,strongest)}}
+        "reports_sha256":{p.name:sha(p) for p in (out,priority,strongest,accepted,stillhold)}}
     (dest/"manifest.json").write_text(json.dumps(proof,indent=2)+"\n")
     print("\nSTAGE94 REPORT",dest,flush=True)
-    print("STAGE94 REPORT PASS | evidence grouped; 30 operator decisions PREPARED (zero signed off)",flush=True)
+    print("STAGE94 USER CONDITIONAL DECISIONS CLASSIFIED | 30 episodes; 122 original QC0 changes",flush=True)
+    print("STAGE94 APPROVE",proof["operator_approved_conditional_QC0_variable_records"],
+          "HOLD",proof["operator_remaining_QC0_HOLD_variable_records"],flush=True)
     print("NO ORIGINAL SOURCE / CSV FORCING / NC / DATM / CASE / SLURM CHANGES",flush=True)
 
 def main():
@@ -278,7 +351,15 @@ def main():
         assert not positive_relative_humidity_from_vpd(-9999,1)
         demo={"site":"US-ICt","variable":"VPD_F","first":"2016-05-21 15:30:00","last":"2016-05-23 10:30:00","native_records":"87"}
         assert (datetime.fromisoformat(demo["last"])-datetime.fromisoformat(demo["first"])).total_seconds()==86*1800
-        print("STAGE94 SELF-TEST PASS | 30-episode template, native 87-HH, fail-closed physical QC; no writes")
+        sample={"site":"US-BZS","variable":"TA_F","first":"2012-10-12 16:00:00",
+           "last":"2012-10-12 16:00:00"}
+        datum={"original_value":"21.56","candidate_value":"-0.8765",
+               "ERA_reference":"-0.653","raw_previous":"-0.864",
+               "raw_next":"-0.889","delta":"-22.4365"}
+        trial=evaluate(1,sample,[{**datum,"time":sample["first"],"original_implied_RH_pct":"NA"}])
+        assert trial["operator_choice"]=="APPROVE_CANDIDATE"
+        assert sum(QC_COUNT.values())==122
+        print("STAGE94 SELF-TEST PASS | user conditional T, 30 episodes, native 87-HH, fail-closed physics; no writes")
         return
     manifest,ordered,ho1=gate()
     decisions=[evaluate(i,e,rows) for i,e,rows in ordered]
