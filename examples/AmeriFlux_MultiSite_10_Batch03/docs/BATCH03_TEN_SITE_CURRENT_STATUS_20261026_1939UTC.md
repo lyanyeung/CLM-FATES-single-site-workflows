@@ -1,5 +1,10 @@
 # AmeriFlux Batch03 — ten-site science and forcing progress at 2026-10-26 19:39 UTC
 
+## Latest changes after the original 19:39 UTC inventory
+
+- **US-Mpj Stage13o 21:07 UTC — actual IRIDIS6 check/apply SUCCESS:** full 20/20 original QC1 2014 source halfhours passed operator-approved two-group SHA, original source QC0 bookends, paired original ERA RH and <=4hPa joins. New isolated 315360-row site science shadow at `science_trials/stage13o_Mpj_20HH_operator_approved_ERA_RH_20261026T210746Z_5c3c8653`; exactly 17 VPD_USE +17 QBOT field-value edits, three existing centers plus original 2018 and 2020 protected. No further human review of those same two 2014 segments needed. Production DATM/AD400 still HOLD. [Exact results](STAGE13O_OPERATOR_APPROVED_US_MPJ_TWO_10HH_ERA_RH_RESEARCH_SHADOW_20261026.md).
+- **US-NR1 Stage13p — operator decision and GitHub science code committed, cluster not yet executed:** approved exactly six 2022 original-native VPD/QBOT source companion ERA RH sites plus five 2004 QC2 original native PSRF/FLDS values. New Stage13p check/apply compares signed Stage12af/ak/al sources and performs 490560-row diff with exactly 17 model field-cell changes; retains 234 NR1 VPD/QBOT unresolved records, Kon untouched, no Post-v5/DATM/Slurm. [Operator source approval and phone launcher](STAGE13P_NR1_USER_APPROVED_2022_SIX_RH_2004_FIVE_PSRF_FLDS_MOBILE_20261026.md).
+
 ## What the newest evidence actually establishes
 
 This note reconciles **separate stages with different validation status**. It is not a new IRIDIS6 ten-site inventory and does not claim new HPC job submissions.
