@@ -31,10 +31,10 @@ FIELDS={
  "PRECTmms":"Faxa_precn","FSDS":"Faxa_swdn","ZBOT":"Sa_z",
  "TBOT":"Sa_tbot","WIND":"Sa_wind","QBOT":"Sa_shum",
  "PSRF":"Sa_pbot","FLDS":"Faxa_lwdn"}
-PHYSICS={"PRECTmms":("mm/s",0,0.20),"FSDS":("W/m2",0,1600),
+PHYSICS={"PRECTmms":("mm s-1",0,0.20),"FSDS":("W m-2",0,1600),
          "ZBOT":("m",0.5,150),"TBOT":("K",180,340),
-         "WIND":("m/s",0,75),"QBOT":("kg/kg",0,0.08),
-         "PSRF":("Pa",49000,111000),"FLDS":("W/m2",0,800)}
+         "WIND":("m s-1",0,75),"QBOT":("kg kg-1",0,0.08),
+         "PSRF":("Pa",49000,111000),"FLDS":("W m-2",0,800)}
 
 def sha(p):
     h=hashlib.sha256()
@@ -128,8 +128,15 @@ def read_nc_file(item):
             raise ValueError("US-GLE original distinct TA+WS height evidence changed")
         if not set(FIELDS).issubset(set(ds.variables)):
             raise ValueError("CIME data variable name absent from original NC")
-        if "SHUM" in ds.variables:
-            raise ValueError("Unexpected SHUM NC source would invalidate explicit QBOT mapping")
+        # Original Stage87 builder intentionally outputs BOTH QBOT and
+        # SHUM aliases; SHUM is exactly QBOT (and RH is a derived diagnostic).
+        # Do not confuse an available SHUM alias with a mapping error.
+        if "SHUM" not in ds.variables or "RH" not in ds.variables:
+            raise ValueError("Original source NC SHUM/RH diagnostic aliases missing")
+        qbot=np.ma.filled(ds.variables["QBOT"][:],np.nan).astype(float)
+        shum=np.ma.filled(ds.variables["SHUM"][:],np.nan).astype(float)
+        if not np.array_equal(qbot,shum,equal_nan=True):
+            raise ValueError("Original Stage87 NC SHUM alias disagrees with QBOT")
         t=ds.variables["time"]
         if t.units!=f"days since {year}-01-01 00:00:00" or t.calendar!="noleap":
             raise ValueError("Wrong noleap time metadata for GLE "+str(year))
@@ -188,6 +195,8 @@ def main():
     if a.self_test:
         assert len(FIELDS)==8 and FIELDS["QBOT"]=="Sa_shum"
         assert FIELDS["ZBOT"]=="Sa_z" and len(PHYSICS)==8
+        assert PHYSICS["QBOT"][0]=="kg kg-1"
+        assert PHYSICS["PRECTmms"][0]=="mm s-1"
         assert len(range(FIRST,LAST+1))==16
         print("STAGE100 SELF-TEST PASS | verified QBOT Sa_shum + ZBOT Sa_z; 16 source NC only; no writes",flush=True)
         return 0
