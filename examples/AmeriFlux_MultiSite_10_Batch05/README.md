@@ -885,3 +885,12 @@ Stage25 **successfully executed by IRIDIS6 operator** (not merely published):
 [Stage26 1,574 native-hour MDS/ERA/ERA-e/native-RH research-only candidates](scripts/stage26/26_reconstruct_p2p3_physics_candidates_research_only.py) and [operator command / scientific decision guide](docs/STAGE26_ALL1574_P2P3_SCIENCE_OPTIONS_2026-10-26.md).
 
 Stage26 **pending operator execution**. It generates four mathematically distinct candidate hypotheses, records original source QC and source-vs-tower TA discrepancies, and partitions all 1,574 P2/P3 HH into *scientific evidence* subgroups. **No P2/P3 changes are approved by this step**; original FLUXMET, Stage24 approved 166, P1 HOLD 46, DATM and Slurm remain unmodified. This is intended to reduce human review to data-source/physics method decisions instead of 1,574 independent timestamps. Independent T/dewpoint meteorology is needed for unsupportable source alternatives and scientific corroboration. No actual full forcing or Post-v5 yet.
+
+
+## Stage27 operator P2/P3 RH-source comparison, source risk and 483 episode priority (2026-10-26)
+
+The Stage26 source audit has **executed successfully** on IRIDIS6. **All 1,574 original P2/P3 half-hours remain unapproved**, although all 1,574 have a mathematically feasible *processed source ERA-pair RH* candidate; options exist for 551 MDS pairs, 1,459 source ERA actual-vapor-pressure shadows, and 5 native source RH. These candidate counts overlap; 546 HH have both MDS and processed ERA RH alternatives. Original selected TA differs from source processed ERA TA by >5°C in **372 HH**, so unconditional source ERA pairing is scientifically unjustified. No independent ERA5/ERA5-Land downloaded.
+
+[Stage27 native-HH MDS-vs-source-ERA RH disagreement, processed ERA assumption and 483 original P2/P3 episode risk screener](scripts/stage27/27_compare_p2p3_mds_era_and_temperature_risk_readonly.py); [Stage26 actual operator output and pinned Stage27 executable instructions](docs/STAGE27_P2P3_SOURCE_AGREEMENT_DISAGREEMENT_AND_RISK_2026-10-26.md). **Stage27 published; operator run pending.** It partitions by native RH present, MDS–ERA RH concordance, disagreement, ERA-only cases; flags temperature discrepancy and large VPD sensitivity, ranks original P2/P3 episodes and produces zero new forcing approvals.
+
+The **166 Stage24 approved overlay** remains separate from 46 manual P1 HOLD and 10 unapproved saturated RH plateau HH. No original FLUXMET, production DATM, source QC or Slurm changes.
