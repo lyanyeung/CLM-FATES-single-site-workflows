@@ -10,7 +10,7 @@ Stage92 five: EML 3; GLE 0; Ho1 5; ICh 0; ICt 90 = 98.
 
 ## Stage93 integrated evidence
 
-[Stage93 script](../scripts/stage93/93_ten_site_postv5_and_manual_decision_priority.py) commit `5d53db0b0b3939a0d9a328e738d3c6d188f5ec13`, Git blob `263e6366fd44b09805eb8b675423c81d69793fd7`.
+[Stage93 script](../scripts/stage93/93_ten_site_postv5_and_manual_decision_priority.py) commit `6c8888ff3293d5fc0ab15ada7e79bbfc720c7251`, Git blob `1d06c2b68d1ebc7f108be32abd358771dc8e9326`.
 It verifies exact old and new manifests, raw site paired ERA hashes, every one of the 215 technical NC file SHA, original source/forcings; uses the original Stage09 uniform `science_review` routine (pinned Git blob `b2353089ff15b95b6a25c5c0e2fcf4e7be2671c7`) on each of the 10 actual final-forcing candidate files. It checks final RH and QBOT numerical physics, original QC0 changed events, source switching, jumps, and extreme counts, and directly inspects raw original ±1 native source records and VPD-derived RH for the exact 122 records. It groups all 122 source QC0 changes into per-site/per-variable 30/60-minute continuous episodes for rapid human decisions. It separately prints original and selected Ho1 Dec27 and Jan01 source boundary, and does not mark any production DATM science approved.
 
 Stage93 files (only inside a new unique `reports/stage93_*` directory): `ten_site_postv5_extreme_summary.csv`, `all_122_QC0_original_source_candidate_nearest_neighbors.csv`, `QC0_human_review_priority_episodes.csv`, `US-Ho1_2000_temperature_QC_transition_boundary.csv`, `annual_postv5_extreme_counts.csv`, `site_failures.csv`, checksum manifest. Source/forcing/NC/CIME/Slurm inputs untouched.
@@ -21,8 +21,8 @@ Stage93 files (only inside a new unique `reports/stage93_*` directory): `ten_sit
 (
   set +e
   REL="examples/AmeriFlux_MultiSite_10_Batch02/scripts"
-  COMMIT="5d53db0b0b3939a0d9a328e738d3c6d188f5ec13"
-  BLOB93="263e6366fd44b09805eb8b675423c81d69793fd7"
+  COMMIT="6c8888ff3293d5fc0ab15ada7e79bbfc720c7251"
+  BLOB93="1d06c2b68d1ebc7f108be32abd358771dc8e9326"
   BLOB09="b2353089ff15b95b6a25c5c0e2fcf4e7be2671c7"
   W="$HOME/Batch02_stage93_manual"
   mkdir -p "$W"
