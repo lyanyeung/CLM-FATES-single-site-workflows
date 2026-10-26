@@ -79,7 +79,7 @@ def source():
             raise ValueError("Original Stage07 numeric status missing: "+site)
         statuses[site]={"site":site,"first_year":start,"last_year":end,
           "step":EXPECTED[site],"source":p,"sha256":record[relative],
-          "status":old.get("status"),"source_qc0_edits":old.get("changes")}
+          "status":old.get("status"),"source_total_edits":old.get("changes")}
     if set(statuses)!=set(EXPECTED):
         raise ValueError("Five verified Stage07 site census incomplete")
     return [statuses[k] for k in sorted(statuses)]
@@ -109,7 +109,7 @@ def times(year,step):
         for i in range(1440//step):
             yield stamp+timedelta(minutes=i*step)
 
-def values(row,site,when):
+def values(row,site,when,step):
     out={}
     for field in BASE_COLS[1:]:
         try: v=float(row[field])
@@ -121,7 +121,7 @@ def values(row,site,when):
     if not (180<out["TBOT"]<340 and 49000<out["PSRF"]<111000
         and 0<out["QBOT"]<.08 and 0<=out["FSDS"]<=1600 and
         0<=out["FLDS"]<=800 and 0<=out["WIND"]<=75
-        and 0<=out["PRECTmms"]<.1):
+        and 0<=out["PRECTmms"]<=300/(step*60)):
         raise ValueError(site+" source forcing numeric bounds fail "+when)
     T=out["TBOT"]-273.15
     p=out["PSRF"]/100.0
@@ -150,7 +150,7 @@ def site_years(info):
                 expected=stamp.strftime("%Y-%m-%d %H:%M:%S")
                 if row["time"]!=expected:
                     raise ValueError(site+" wrong original NOLEAP time "+repr(row["time"])+" vs "+expected)
-                current.append(values(row,site,expected))
+                current.append(values(row,site,expected,step))
             if len(current)!=per_year:
                 raise ValueError(site+" incomplete original forcing year "+str(year))
             yield year,current
@@ -218,7 +218,7 @@ def self_test():
        "US-BZS","US-CMW","US-Ha1","US-Ho2","US-Ho3"}
     sample={"TBOT":273.15,"QBOT":0.003,"PSRF":100000,
             "FSDS":50,"FLDS":300,"WIND":2,"PRECTmms":0.0001}
-    assert 0<values(sample,"TEST","2000")["RH"]<=100
+    assert 0<values(sample,"TEST","2000",30)["RH"]<=100
     print("STAGE87 SELF-TEST PASS | five exact sources, native HH/HR NOLEAP, 7 DATM fields, no original writes")
 
 def main():
