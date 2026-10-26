@@ -163,7 +163,7 @@ def main():
     out=ROOT/"reports"/("stage101_GLE_DATM_solar_clock_phase_readonly_"+
          datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")+"_"+uuid4().hex[:8])
     out.mkdir(parents=True,exist_ok=False)
-    with (out/"solar_F​​SDS_clock_four_hypotheses.csv".replace("\u200b","")).open("w",newline="",encoding="utf8") as f:
+    with (out/"solar_FSDS_clock_four_hypotheses.csv").open("w",newline="",encoding="utf8") as f:
         w=csv.DictWriter(f,fieldnames=list(scores[0]));w.writeheader();w.writerows(scores)
     (out/"GF_Guy_CIME_CaseDocs_original_readonly.json").write_text(json.dumps(case,indent=2)+"\n")
     (out/"GLE_yearly_NC_SHA_used_for_clock_test.json").write_text(json.dumps(proof,indent=2)+"\n")
