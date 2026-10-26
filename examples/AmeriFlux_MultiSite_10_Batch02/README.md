@@ -1853,3 +1853,9 @@ Operator Stage87 produced the five preserved numerical **TECHNICAL PREVIEW** sit
 
 The [Stage88 SHA-pinned audit script](scripts/stage88/88_collect_exact_manual_decisions_readonly.py) prepares the *actual* remaining human-science review tables: **24 original Stage07 QC0 edits** in BZS(1), CMW(2), Ha1(2), Ho2(19), Ho3(0), and **274 original non-QC0 Ho1-year2000 temperature records** with original QC0 temperature neighbors. It leaves the already approved Ho1 17,294 QC0 tower T, 1,068 humidity-only repairs and 32 retained VPD records untouched. It does not start DATM/CIME/Slurm or release the remaining five sites. Read the [actual operator checkpoint, decision distinctions, and pinned one-paste Stage88 IRIDIS6 command](docs/stage87_operator_PASS_stage88_exact_manual_review_20261026.md).
 
+
+
+### Stage88 operator PASS → Stage89 print exact priority science decisions (26 Oct 2026)
+
+Operator Stage88 `AUDIT PASS` created the full original-source decision dossier at `reports/stage88_Batch02_exact_manual_science_review_20261026T004817Z_d9022864`, confirming **24** Stage07 original-QC0 changed-variable records and **274** Ho1-2000 original non-QC0 TA_F records. Stage87's 117 NC remain technical previews only. See [Stage89 read-only decision-ready print script](scripts/stage89/89_print_decision_ready_episodes_readonly.py), pinned commit `6e906776ee6de9bbdb4403bd996e326586631d1c`, blob `0bbdf1169945571c315238ee9f477e3e0ca1135a`. Stage89 verifies Stage88 file SHA, prints **all 24** original-QC0 edits (original/ERA/final/source/reason), groups 274 Ho1 non-QC0 records into 30-minute contiguous episodes with original QC0 temperature neighbor context; optional `--full-274` prints every record. **No source/forcing/NetCDF/CIME/Slurm writes, no blanket QC approval.** Previously approved Ho1 17,294 QC0 tower temperatures, 1,068 humidity transfers and 32 original VPD remain unchanged.
+
