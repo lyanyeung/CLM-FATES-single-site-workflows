@@ -861,3 +861,12 @@ Run the pinned one-call command in the Stage22 decision documentation; after che
 **Outputs after operator runs Stage24:** Stage22 existing 162 changed rows + exactly 4 approved edges = **166 versioned RH/VPD overlay half hours**; 46 original P1 human HOLD entries **byte-identical and unchanged**; original 176 P1=130 already approved + 46 held; 10 unapproved near-saturation plateau HH identified separately. All original FLUXMET, native source QC, DATM, CIME/Slurm remain unmodified; neither processed source `TA_ERA/VPD_ERA` nor derived `ERA_RH` has been independently verified as ERA5-Land.
 
 [Stage24 pinned source script](scripts/stage24/24_merge_four_approved_edge_RH_to_versioned_overlay.py) and [Stage24 exact decisions, operation and provenance](docs/STAGE24_EXACT_FOUR_EDGE_APPROVALS_2026-10-26.md). **Script committed to GitHub; operator execution still pending.** Do not advertise a finished forcing: 46 P1 RH HOLD and P2/P3 source-science QC remain unresolved.
+
+
+## Stage25 exact original 1750 anomaly crosswalk to Stage24 executed 166 approved rows
+
+**Verified operator Stage24 SUCCESS 2026-10-26:** exactly 166 versioned approved RH/VPD overlay HH and 46 manual P1 HOLD with unchanged original FLUXMET/DATM/CIME/Slurm. Three previously identified large edge jumps fixed, **one remains**: WCr 2025-08-25 **12:00→12:30** jumps +6.032576601 hPa because source RH=100% at 12:00; do **not** auto-replace the earlier RH 100% plateau. WCr 2025-08-25 09:30–12:00 (six HH) and Vcm 2025-10-14 12:00–13:30 (four HH) source near-saturation platforms remain **unapproved science-review only**.
+
+[Stage25 exact 1750/522 original source-to-overlay crosswalk](scripts/stage25/25_crosswalk_1750_source_anomalies_with_166_approved_readonly.py) and [Stage24 operator completion, Stage25 pinned execution instructions and science cautions](docs/STAGE25_ORIGINAL_1750_EXACT_CROSSWALK_AND_P2P3_QC_2026-10-26.md).
+
+**Stage25 script already published to GitHub, operator still needs to run it.** Do not assume all 1574 original P2/P3 abnormal HH remain unapproved: Stage24's 166 approved overlay half-hours include 36 outside the original P1 tier and an **exact site+native-HH join** is needed to establish which coincide with original P2/P3 flags versus unflagged transition/edge rows. Stage25 reports per-original-event approved/HOLD/unapproved counts and per-episode/workstream evidence strategies. NO new automatic P2/P3 changes, no independent reanalysis downloaded, no final forcing or model jobs.
