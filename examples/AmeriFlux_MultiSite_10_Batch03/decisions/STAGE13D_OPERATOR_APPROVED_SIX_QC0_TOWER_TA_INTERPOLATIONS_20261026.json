@@ -1,0 +1,97 @@
+{
+  "schema": "batch03-stage13d-qc0-operator-approval-v1",
+  "decision_date": "2026-10-26",
+  "operator_instruction": "同意全部六条 QC0 温度使用现有塔站插值修复值。请记录批准并继续进行其他科学准入检查，不改变原始文件。",
+  "scope": "ONLY six enumerated source-native TA_F QC0 replacements, using EXACT pre-existing Stage07 tower interpolation, with original sources immutable",
+  "evidence": {
+    "source_stage07_trial_relative": "qcv5_native_trial_20261022T024559Z_36c46e58",
+    "stage13b_receipt_relative": "reports/stage13b_THREE_NUMERIC_SITES_QC0_AND_MANUAL_DECISIONS_20261026T170134Z_06af8b8e/stage13b_three_site_decision_SHA_receipt.json",
+    "stage13c_receipt_relative": "reports/stage13c_24_manual_original_tower_ERA_TA_context_20261026T171801Z_bed5a936/stage13c_24_manual_original_temperature_context_SHA_receipt.json",
+    "source_reports_retained_on": "IRIDIS6 /iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03"
+  },
+  "six_approved_specific_events": [
+    {
+      "site": "US-MOz",
+      "native_time": "2016-03-17T22:00:00",
+      "variable": "TA_F",
+      "source_original_QC": 0,
+      "original_tower_TA_C": -15.213,
+      "approved_selected_TA_C": 12.1715,
+      "standalone_ERA5_TA_reference_C": 9.601,
+      "source_method": "existing_stage07_local_short_interpolation",
+      "decision": "APPROVED_QC0_REPLACEMENT_ONLY"
+    },
+    {
+      "site": "US-Mpj",
+      "native_time": "2020-02-11T06:30:00",
+      "variable": "TA_F",
+      "source_original_QC": 0,
+      "original_tower_TA_C": -17.667,
+      "approved_selected_TA_C": 1.1795,
+      "standalone_ERA5_TA_reference_C": -3.869,
+      "source_method": "existing_stage07_local_short_interpolation",
+      "decision": "APPROVED_QC0_REPLACEMENT_ONLY"
+    },
+    {
+      "site": "US-NC2",
+      "native_time": "2019-01-03T13:00:00",
+      "variable": "TA_F",
+      "source_original_QC": 0,
+      "original_tower_TA_C": -6.759,
+      "approved_selected_TA_C": 13.3525,
+      "standalone_ERA5_TA_reference_C": 12.537,
+      "source_method": "existing_stage07_local_short_interpolation",
+      "decision": "APPROVED_QC0_REPLACEMENT_ONLY"
+    },
+    {
+      "site": "US-NC2",
+      "native_time": "2019-01-04T03:30:00",
+      "variable": "TA_F",
+      "source_original_QC": 0,
+      "original_tower_TA_C": -14.342,
+      "approved_selected_TA_C": 9.3935,
+      "standalone_ERA5_TA_reference_C": 9.524,
+      "source_method": "existing_stage07_local_short_interpolation",
+      "decision": "APPROVED_QC0_REPLACEMENT_ONLY"
+    },
+    {
+      "site": "US-NC2",
+      "native_time": "2019-01-04T16:30:00",
+      "variable": "TA_F",
+      "source_original_QC": 0,
+      "original_tower_TA_C": -13.804,
+      "approved_selected_TA_C": 9.5665,
+      "standalone_ERA5_TA_reference_C": 11.016,
+      "source_method": "existing_stage07_local_short_interpolation",
+      "decision": "APPROVED_QC0_REPLACEMENT_ONLY"
+    },
+    {
+      "site": "US-NC2",
+      "native_time": "2019-01-08T03:30:00",
+      "variable": "TA_F",
+      "source_original_QC": 0,
+      "original_tower_TA_C": -11.506,
+      "approved_selected_TA_C": 7.5215,
+      "standalone_ERA5_TA_reference_C": 10.41,
+      "source_method": "existing_stage07_local_short_interpolation",
+      "decision": "APPROVED_QC0_REPLACEMENT_ONLY"
+    }
+  ],
+  "tally": {
+    "US-MOz": 1,
+    "US-Mpj": 1,
+    "US-NC2": 4
+  },
+  "restrictions": {
+    "original_tower_files_must_remain_unchanged": true,
+    "candidate_other_changed_records_approved": false,
+    "all_VPD_manual_reviews_approved": false,
+    "NC2_2025_ERA_clock_science_hold_resolved": false,
+    "post_v5_all_variables_accepted": false,
+    "scientific_PFT_soil_ZBOT_checks_complete": false,
+    "DATM_ready": false,
+    "spinup_authorized": false,
+    "no_model_submission": true,
+    "no_changes_to_source_or_prior_stage07_trial": true
+  }
+}
