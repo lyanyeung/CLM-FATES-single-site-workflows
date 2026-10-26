@@ -9,8 +9,8 @@ Stages:
  --fetch       DOWNLOAD a single separate CDS ERA5-Land Jan03-Jan11 point
                response to *new* separate evidence folder, SHA receipt only
  --apply       repeat all prior SHA/clock/grid/QC0/physics/boundary gates,
-               write a fully new isolated science forcing ONLY if BOTH
-               exact events PASS; otherwise print HOLD, zero candidate writes
+               write new isolated science forcing ONLY for PASSING scoped events;
+               failed events remain unchanged
 
 The CDS ERA5-Land source is distinct but ERA5-driven, not independent
 ground truth. We insist on measured source QC0 clock and event-boundary checks.
@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 sys.dont_write_bytecode=True
 
-VER="batch03-stage13j-v1-20261026-strict-conditional-CDS-native-QC0"
+VER="batch03-stage13j-v2-20261026-strict-per-event-CDS-native-QC0"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 SITE="US-MOz"
 S07=ROOT/"qcv5_native_trial_20261022T024559Z_36c46e58"
@@ -114,6 +114,12 @@ def metadata(spec):
         raise RuntimeError("Release BIF coordinates or clock offset invalid")
     if abs(utc-round(utc))>1e-8:
         raise RuntimeError("HOLD_HALF_HOUR_OR_FRACTIONAL_BIF_UTC_OFFSET")
+    # Cross-checked against user-provided official AMF_US-MOz_BIF_20230331.xlsx,
+    # AMF-BIF rows 174, 175 and 439, independently of raw surface data.
+    if not(np.isclose(lat,38.7441,atol=1e-5,rtol=0) and
+           np.isclose(lon,-92.2000,atol=1e-5,rtol=0) and
+           np.isclose(utc,-6.0,atol=1e-8,rtol=0)):
+        raise RuntimeError("BIF original source coordinates or UTC_OFFSET differ from verified official spreadsheet")
     return {"bif":str(bif),"bif_sha256":sha(bif),
             "latitude":lat,"longitude":lon,"utc_offset_hours":int(utc),
             "native_time":"FLUXNET-local-standard TIMESTAMP_START, verify by QC0",
@@ -300,6 +306,7 @@ def qc0_clock_and_boundary(t,e,grid,meta,segments):
             "measured_both_QC0":int(len(idx)),"clock_candidates":clock}
     if not clock_pass:return False,detail
     # Both ends must have measured original QC0 T+VPD within 6h.
+    passed=0
     for a,b,n in SCOPE:
         t0=pd.Timestamp(a);t1=pd.Timestamp(b)
         before=idx[(idx<t0)&(idx>=t0-pd.Timedelta(hours=6))]
@@ -308,7 +315,7 @@ def qc0_clock_and_boundary(t,e,grid,meta,segments):
         if not len(before) or not len(after):
             detail[label]={"status":"HOLD_NO_QC0_T_VPD_BOTH_ENDS_WITHIN_6H",
                            "before":len(before),"after":len(after)}
-            return False,detail
+            continue
         edges=[before[-1],after[0]]
         coords=at_native(grid,pd.DatetimeIndex(edges),meta["utc_offset_hours"])
         mism=np.abs(t.loc[edges,"TA_F"].to_numpy(float)-coords.grid_T_C.to_numpy(float))
@@ -317,7 +324,8 @@ def qc0_clock_and_boundary(t,e,grid,meta,segments):
         detail[label]={"status":"PASS" if acceptable else "HOLD_QC0_BOUNDARY_INCONSISTENT",
                        "edge_times":[str(z) for z in edges],
                        "edge_T_abs_C":mism.tolist(),"edge_VPD_abs_hPa":hum.tolist()}
-        if not acceptable:return False,detail
+        if acceptable:passed+=1
+    detail["eligible_event_count_with_QC0_boundaries"]=passed
     return True,detail
 
 def science(decision,strict=False):
@@ -364,6 +372,7 @@ def science(decision,strict=False):
         transition_ok=all((abs(float(c.at[boundary,"TA_USE"])-newtemp)<=4 and
                            abs(float(c.at[boundary,"VPD_USE"])-newvpd)<=4)
                           for boundary,newvpd,newtemp in immediate)
+        qc0_edges_ok=anchors.get(str(idx[0])+"/"+str(idx[-1]),{}).get("status")=="PASS"
         for i,when in enumerate(idx):
             events.append({
               "site":SITE,"source_native_time":str(when),
@@ -383,17 +392,20 @@ def science(decision,strict=False):
               "grid_vs_source_ERA_abs_RH_pct":float(abs(rh_grid[i]-rh_comp[i])),
               "source_native_physics_pass":bool(met_ok[i]),
               "source_event_boundary_continuity_pass":bool(transition_ok),
-              "event_science_pass":bool(met_ok.all() and transition_ok),
+              "event_QC0_boundary_pass":bool(qc0_edges_ok),
+              "event_science_pass":bool(qc0_edges_ok and met_ok.all() and transition_ok),
               "operator_approval_is_conditional":True,
             })
     patch=pd.DataFrame(events)
     if len(patch)!=67:raise RuntimeError("Signed science-target cardinality 67 changed")
-    if not patch.event_science_pass.all():
-        audit["overall"]="HOLD_CROSS_PRODUCT_PHYSICS_OR_NATIVE_TRANSITION"
-        audit["failed_center_rows"]=int((~patch.source_native_physics_pass).sum())
-        audit["failed_event_boundary_rows"]=int((~patch.source_event_boundary_continuity_pass).sum())
+    audit["eligible_event_times"]=int(patch.event_science_pass.sum())
+    audit["held_event_times"]=int((~patch.event_science_pass).sum())
+    audit["events"]=[{"start":start,"end":end,"event_science_pass":bool(g.event_science_pass.all()),
+                      "HH":len(g)} for (start,end),g in patch.groupby(["event_start","event_end"])]
+    if not patch.event_science_pass.any():
+        audit["overall"]="HOLD_ALL_EVENTS_NO_SOURCE_REPLACEMENT"
         return patch,audit
-    audit["overall"]="SCIENCE_SCOPE_PASS_READY_FOR_ISOLATED_SHADOW_ONLY"
+    audit["overall"]="SCIENCE_SCOPE_PASS_ELIGIBLE_EVENTS_ONLY"
     return patch,audit
 
 def download(decision):
@@ -429,12 +441,13 @@ def download(decision):
     print("STAGE13J CDS RECEIPT ONLY",RECEIPT,sha(end),flush=True)
 
 def apply(decision,patch,audit):
-    if audit.get("overall")!="SCIENCE_SCOPE_PASS_READY_FOR_ISOLATED_SHADOW_ONLY":
+    if audit.get("overall")!="SCIENCE_SCOPE_PASS_ELIGIBLE_EVENTS_ONLY":
         print("STAGE13J SCIENCE HOLD; no forcing output",json.dumps(audit,indent=2),flush=True)
         return 3
     c=forcing(CURRENT)
     out=c.copy(deep=True)
-    p=patch.set_index(pd.to_datetime(patch.source_native_time),drop=False)
+    eligible_patch=patch.loc[patch.event_science_pass].copy()
+    p=eligible_patch.set_index(pd.to_datetime(eligible_patch.source_native_time),drop=False)
     for when,row in p.iterrows():
         for col,value in (("TA_USE",row.CDS_grid_ERA5Land_T_C),
                           ("VPD_USE",row.CDS_grid_ERA5Land_VPD_hPa),
@@ -450,8 +463,9 @@ def apply(decision,patch,audit):
             raise RuntimeError("Unapproved source variable modified: "+col)
         if any(out.index[i] not in eligible for i in changed):
             raise RuntimeError("Unapproved native timestamp changed: "+col)
-    if len(eligible)!=67 or any(t not in eligible for t in p.index):
-        raise RuntimeError("Unexpected Stage13j new source candidate times")
+    all_scoped={pd.Timestamp(t) for a,b,n in SCOPE for t in pd.date_range(a,b,freq="30min")}
+    if not eligible or not eligible.issubset(all_scoped):
+        raise RuntimeError("Unexpected Stage13j conditional source candidate times")
     if sha(CURRENT)!=audit.get("prior_sha",sha(CURRENT)):
         raise RuntimeError("Stage13g source changed while auditing")
     dest=ROOT/"science_trials"/("stage13j_MOz_ONLY_67_conditional_QC1_"+
@@ -481,7 +495,9 @@ def apply(decision,patch,audit):
              "original_Stage13g_SHA256":sha(CURRENT),
              "original_Stage07_SHA256":sha(ORIGINAL),
              "ERA5Land_download_receipt_SHA256":sha(RECEIPT),
-             "total_exact_approved_timestamps":67,
+             "total_exact_scope_timestamps":67,
+             "total_exact_conditionally_repaired_timestamps":len(eligible),
+             "held_scoped_timestamps_untouched":67-len(eligible),
              "source_raw_and_Stage07_Stage13g_untouched":True,
              "postv5_production_approved":False,"spinup_authorized":False,
              "output_SHA256":{x:sha(dest/x) for x in paths}}
