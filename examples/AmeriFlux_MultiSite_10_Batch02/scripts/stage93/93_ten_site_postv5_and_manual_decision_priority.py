@@ -163,7 +163,7 @@ def raw_neighbors(item,qc0):
     add=[v for v in KEY_FIELDS if v in columns]
     use=list(dict.fromkeys(k for k in use+add if k in columns))
     raw=pd.read_csv(p,usecols=use,dtype={"TIMESTAMP_START":str},low_memory=False)
-    raw["key"]=raw["TIMESTAMP_START"].str.strip().str.replace(r"\\.0$","",regex=True)
+    raw["key"]=raw["TIMESTAMP_START"].str.strip().str.replace(r"\.0$","",regex=True)
     # Source raw chronology already source-audited at Stage07. Native prev/next
     # are accepted ONLY if their timestamps are exactly ±native interval.
     hits={}
@@ -261,7 +261,7 @@ def ho1_boundary(item,forcing):
     if not set(selected).issubset(columns):
         raise ValueError("Ho1 original source boundary field missing")
     d=pd.read_csv(raw,usecols=selected,dtype={"TIMESTAMP_START":str})
-    d["t"]=d["TIMESTAMP_START"].str.strip().str.replace(r"\\.0$","",regex=True)
+    d["t"]=d["TIMESTAMP_START"].str.strip().str.replace(r"\.0$","",regex=True)
     ff=pd.read_csv(forcing,usecols=["time","TA_USE","VPD_USE","TBOT","QBOT"])
     ff["key"]=ff["time"].str.replace(r"[^0-9]","",regex=True).str[:12]
     chosen=["200012270800","200012270830","200012270900",
