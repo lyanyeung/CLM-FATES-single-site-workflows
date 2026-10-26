@@ -300,7 +300,7 @@ def main():
    r["site"],r["episode_id"],r["original_native_start"],r["original_native_end"],
    r["unapproved_HH"],r["dual_disagrees_gt20pp_HH"],r["ERA_T_diff_gt5C_HH"]))
  lines+=["","## Required next actions",
-  "1. Review \`stage28_SITE_METADATA_AND_UTC_OFFSET_GATES.csv\`: confirm site-specific release UTC_OFFSET against original BADM; ZIP may lack BADM.",
+  "1. Review `stage28_SITE_METADATA_AND_UTC_OFFSET_GATES.csv`: confirm site-specific release UTC_OFFSET against original BADM; ZIP may lack BADM.",
   "2. Only after verification convert native TIMESTAMP_START to UTC for ERA5-Land reference request.",
   "3. Obtain ERA5-Land hourly 2m air temperature and 2m dewpoint temperature, and if possible an independent in-situ station reference; account for tower elevation vs reanalysis grid elevation.",
   "4. Compare source MDS and processed ERA humidity with independent reference, paired with correct unit, timestamps, and phase; never blindly replace QC2 source ERA with itself.",
