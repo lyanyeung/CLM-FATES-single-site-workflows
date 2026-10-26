@@ -118,3 +118,11 @@ sbatch --partition=batch --job-name=gc_11site_nine --nodes=1 --ntasks=1 \
 ```
 
 **Do not run a second copy**, do not delete `.git`, and do not manually clear a `gc.pid` that may belong to another host. The script verifies archive structure and the presence of a restart folder, but does not independently inspect NetCDF file contents or establish scientific carbon-pool convergence. The nine cases' post-maintenance inode reductions must be recorded from IRIDIS; this GitHub commit only publishes code, not evidence of completed cleanup.
+
+## Four ICOS/FLUXNET batches: 38 current cases (26 October 2026)
+
+Use [the four-batch audit and packing instructions](FOUR_BATCH_38_CASES.md) and
+[the standalone Python tool](pack_four_batch_case_git.py). This covers the
+6/8/11/13-site batches, including the six-site campaign's 3000-year continuations
+and the currently selected IT-Noe/CH-Aws branch cases. It excludes the 50-site
+AmeriFlux preparation campaign and historical/superseded case variants.
