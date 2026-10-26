@@ -18,8 +18,8 @@ Provisional: Original-QC0 isolated short interpolation candidates for BZS/CMW an
 ## Stage90 executable (IRIDIS6; entirely diagnostic)
 
 [Stage90 full source](../scripts/stage90/90_focus_Ha1_VPD_and_Ho1_Dec_boundary_readonly.py).
-Pinned Git commit: `777b36f0b6505d13beff29b5576c8c6f0b3398e4`.
-Pinned Git blob: `2d071eb218a41633ae0774139fa2de7bf8d428bf`.
+Pinned Git commit: `504c5993ba933746ac2a8e35f8faec6b13b6877f`.
+Pinned Git blob: `b17d5215aa5c88e857b49055ea3bd0f25485b478`.
 
 ```bash
 (
@@ -28,8 +28,8 @@ Pinned Git blob: `2d071eb218a41633ae0774139fa2de7bf8d428bf`.
   PY="$CONDA_PREFIX/bin/python"
   REL="examples/AmeriFlux_MultiSite_10_Batch02"
   SCRIPT="$HOME/CLM-FATES-single-site-workflows/$REL/scripts/stage90/90_focus_Ha1_VPD_and_Ho1_Dec_boundary_readonly.py"
-  COMMIT="777b36f0b6505d13beff29b5576c8c6f0b3398e4"
-  BLOB="2d071eb218a41633ae0774139fa2de7bf8d428bf"
+  COMMIT="504c5993ba933746ac2a8e35f8faec6b13b6877f"
+  BLOB="b17d5215aa5c88e857b49055ea3bd0f25485b478"
   mkdir -p "$(dirname "$SCRIPT")"
   TMP="$(mktemp)"
   trap 'rm -f "$TMP"' EXIT
