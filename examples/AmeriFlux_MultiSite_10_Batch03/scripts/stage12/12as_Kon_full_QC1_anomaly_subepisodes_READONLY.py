@@ -226,8 +226,7 @@ def audit():
                       "PHYSICAL_RH_OUT_OF_BOUNDS").sum()),
                     "severe_dry_QC0_T_N":int(seg.exploratory_review_class.eq(
                       "SEVERE_DRY_DISAGREEMENT").sum()),
-                    "source_T_not_QC0_N":int(~seg.tower_t_qc.eq(0).sum()) if False else
-                       int((~seg.tower_t_qc.eq(0)).sum()),
+                    "source_T_not_QC0_N":int((~seg.tower_t_qc.eq(0)).sum()),
                     "source_median_original_RH_pct":float(seg.source_rh_pct.median()),
                     "source_median_ERA_RH_pct":float(seg.era_rh_pct.median()),
                     "selected_31_neighbor_proposals_N":int(
