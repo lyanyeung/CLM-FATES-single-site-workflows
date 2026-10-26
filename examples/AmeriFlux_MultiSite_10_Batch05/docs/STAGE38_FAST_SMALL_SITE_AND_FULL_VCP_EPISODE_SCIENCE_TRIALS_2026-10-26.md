@@ -90,3 +90,13 @@ Output `stage38_TEN_SITE_PROVENANCE_AND_REMAINING_REPAIR_GATES.csv`: exact ten-s
 ## Script safety self-test strengthened
 
 The pinned Stage38 revision runs synthetic original two-half-hour site episode source RH trial versus both original neighboring VPD records and checks that a source-original QC0 VPD makes the entire event a `QC0_SENSOR_PROTECTED` science gate, without any production write.
+
+## One-click launcher (preferred)
+
+[Stage38 one-click operator script](../scripts/stage38/run_stage38_iridis6.sh) is pinned at GitHub commit `fbd18d283d593812565eccc214900e74afe6b115`, Git blob `39589e8b0ef66b135ae7fdd97fe5702242726cf9`. It retrieves and SHA-checks Stage38 Python from its pinned commit, performs syntax/self-test/source directory checks, evaluates both original-source workflows and prints the science report. **New output** `stage38_RESEARCH_ONLY_FULL_SOURCE_EPISODE_NATIVE_RH_VPD_CANDIDATES.csv` contains physically feasible, full-coverage event-level **native half-hour RH/VPD research candidates only**: original T and QC remain intact; any source-QC0 measured VPD excludes an event from the native candidate file, and `production_forcing_authorization=NO` for every row. Even events with boundary science concerns remain labeled, not approved. The launcher's Bash run remains untested on IRIDIS6 pending operator execution.
+
+```bash
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/fbd18d283d593812565eccc214900e74afe6b115/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage38/run_stage38_iridis6.sh" -o "$HOME/run_stage38.sh"
+test "$(git hash-object "$HOME/run_stage38.sh")" = "39589e8b0ef66b135ae7fdd97fe5702242726cf9"
+bash "$HOME/run_stage38.sh"
+```
