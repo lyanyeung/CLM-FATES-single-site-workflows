@@ -67,7 +67,7 @@ def episodes(times):
         else:
             groups[-1].append(k)
     return groups
-def collect(p,fields,need,expected_rows=None):
+def collect(p,fields,need,required=None,expected_rows=None):
     wanted={}
     count=0
     with regular(p).open(encoding="utf-8-sig",newline="") as f:
@@ -81,7 +81,8 @@ def collect(p,fields,need,expected_rows=None):
                 ck(k not in wanted,"Duplicated native HH "+k)
                 wanted[k]={c:row[c] for c in fields}
     if expected_rows is not None:ck(count==expected_rows,"Native full row count changed "+str(p))
-    ck(set(need).issubset(wanted),"Target/neighbor native HH missing from "+str(p))
+    if required is not None:
+        ck(set(required).issubset(wanted),"Target native HH missing from "+str(p))
     return wanted
 def source_contract():
     report=readjson(S05/"report.json")
@@ -139,10 +140,16 @@ def triage():
     print("LEGACY_HOLD_REASON_COUNTS",dict(Counter(y for r in syv for y in [r["reason"]])))
     print("STAGE07_SKIPPED_REASON_COUNTS",dict(Counter(y for r in skipped for y in [r["reason"]])))
     # Check both full native sources, only sample the exact 606/10 HH plus 1h flanks.
-    native=collect(raw,TOWER_KEYS,context,expected_rows=NROWS)
-    derived=collect(current,TOWER_KEYS,context,expected_rows=NROWS)
+    native=collect(raw,TOWER_KEYS,context,required=keys,expected_rows=NROWS)
+    derived=collect(current,TOWER_KEYS,context,required=keys,expected_rows=NROWS)
     paired=collect(grid,ERA_KEYS,context)
-    print("SOURCE_CONTEXT_VERIFIED",len(context),"native HH and their +/-1hour flanks; paired ERA same-native keys")
+    print("SOURCE_CONTEXT_COVERAGE",len(context),
+          "requested native hold HH +/- 1h flanks",
+          "native_present",len(native),
+          "candidate_present",len(derived),
+          "paired_ERA_present",len(paired))
+    print("PAIRED_ERA_UNMATCHED_EXACT_HOLD_HH",len(keys-set(paired)),
+          "(may be a valid source of earlier ERA skip; NOT silently repaired)")
     vals=Counter(validity(derived[k]) for k in keys)
     print("STAGE07_CANDIDATE_PHYSICAL_STATUS_AT_UNRESOLVED_HH",dict(vals))
     rawvals=Counter(validity(native[k]) for k in keys)
@@ -175,8 +182,8 @@ def triage():
         print("=== EPISODE",ix,group[0],"to",group[-1],"HH",len(group),"===")
         print("TIME FLAG RAW_T QC RAW_VPD QC STAGE07_T QC STAGE07_VPD QC STAGE07_RH PACKAGED_TA_ERA PACKAGED_VPD_ERA STAGE07_PHYS")
         for k in sorted(selection):
-            if k not in native or k not in derived or k not in paired:continue
-            a,b,c=native[k],derived[k],paired[k]
+            if k not in native or k not in derived:continue
+            a,b,c=native[k],derived[k],paired.get(k,{})
             print(k,"HOLD" if k in keys else "CONTEXT",
                   fmt(num(a["TA_F"])),a["TA_F_QC"],fmt(num(a["VPD_F"])),a["VPD_F_QC"],
                   fmt(num(b["TA_F"])),b["TA_F_QC"],fmt(num(b["VPD_F"])),b["VPD_F_QC"],
