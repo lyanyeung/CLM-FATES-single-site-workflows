@@ -33,3 +33,13 @@ Recommended priorities:
 On 2024-02-11 05:00–06:30, grid ERA5-Land water RH 92.510%,94.484%,95.152%,94.479% and original tower T approximately -8.39,-8.30,-8.50,-8.64°C. Water-RH-derived candidate VPD 0.244,0.181,0.156,0.176 hPa. Ice-relative RH may exceed 100% on T below freezing. The planned forcing is a **specific humidity QBOT** dataset, not a direct RH forcing. CTSM supports specific humidity forcing and can compute ice saturation separately; but official generic documentation does not establish that user's exact checked out Fortran source/compiled FATES/CTSM case accepts ice-supersaturated atmospheric QBOT at these exact records without an abort, clipping or internal logic change. Operator approval explicitly conditions release on this verification; keep four science holds pending exact installed source check/standalone forcing acceptance. No arbitrary RHice=100 clipping.
 
 No Post-v5/DATM/spinup approval; remain Stage12 science selection.
+
+## IRIDIS6 execution verified — 2026-10-26 01:33:49 UTC
+
+The operator ran pinned Stage12af original Git blob `bb12b009a686bbd0465cafebcd8f55e660d710fe`. SHA/AST, `--self-test`, `--check` and `--apply` all **PASS**. Operator-approved **temperature only**, new immutable derivative:
+
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/science_trials/stage12af_NR1_20220910_user_approved_three_T_only_20261026T013349Z_34ff1cda`
+
+The original three anomalous `TA_F` source points are explicitly `TA_F_QC=1`; all three interpolation temperature anchors `202209100600`, `202209100700`, `202209100830` passed source `TA_F_QC=0` within script verification. Signed new derivative `TA_USE`: 1.241000, 1.556666667, 1.393333333°C; corresponding `TBOT`: 274.391000, 274.706667, 274.543333 K. Their previous Stage12g QC1 VPD 8.427, 8.383 and 9.319 hPa became physically impossible at approved temperature and were **HOLD as missing VPD/QBOT** in new derivative. Three other old humidity holds in six-row interval remain unchanged. Exact six original-native companion ERA-RH proposal (RH pct): 71.945909,71.976540,72.009137,72.024243,72.023933,72.248312; **proposed not approved/applied** VPD hPa: 1.811838,1.873343,1.936537,1.912989,1.890739,1.853710; corresponding proposed QBOT kg/kg: .004091,.004236,.004385,.004335,.004282,.004243. All Post-v5/DATM/spinup approvals still zero. Original Stage12g and raw tower files remain immutable.
+
+**Decision gate:** user to authorize or decline the six-record native companion ERA-RH repair, only after this actual temperature-only fix; do not silently convert previous scientific recommendation into operator approval.
