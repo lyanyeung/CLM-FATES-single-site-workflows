@@ -1,5 +1,9 @@
 # AmeriFlux sites — CLM-FATES experiment collection
 
+## All five batches: central PFT evidence update — 26 October 2026
+
+[**Ameriflux_Site — 50 stations, five batches**](../Ameriflux_Site/) is the consolidated collection parallel to [ICOS_sites](../ICOS_sites/). The [50-site PFT master/report/candidate tables](../Ameriflux_Site/Ameriflux_PFT/) reuse the Batch01 ledgers below and add official/primary-source evidence for Batches02–05. **33 sites have numerical composition/cover leads; 17 retain qualitative composition, LAI/density or model-only evidence.** Historical percentages, partial inventories and published model fCover keep their separate definitions. This directory remains the shared metadata/script archive; the dated operational history below is preserved.
+
 This collection keeps AmeriFlux batches separate from the existing [ICOS multi-site campaigns](../ICOS_sites/) and the [AmeriFlux US-Ha1 single-site example](../AmeriFlux_US-Ha1/).
 
 | Batch | Sites | Current record |

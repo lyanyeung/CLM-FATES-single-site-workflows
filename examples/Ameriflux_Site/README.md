@@ -1,0 +1,30 @@
+# AmeriFlux sites — five batches, 50 stations
+
+This is the central **Ameriflux_Site** collection requested alongside [ICOS sites](../ICOS_sites/). It preserves all existing campaign directories and the earlier [AmeriFlux shared metadata collection](../AmeriFlux_sites/).
+
+## Vegetation and PFT composition
+
+[**Ameriflux_PFT — 50-site composition index, master table and source report**](Ameriflux_PFT/) consolidates all five batches, with **33 numerical composition/cover leads** and **17 sites whose reviewed evidence is qualitative composition, LAI/density or published model assumptions**. A numerical lead may be a partial tree inventory, a historical transect, basal area, tree counts or canopy cover. It does not by itself establish a complete PFT fraction of tower ground area.
+
+- [Master 50-site observed-vs-FATES evidence CSV](Ameriflux_PFT/MASTER_50_SITE_OBSERVED_VS_FATES_PFT_20261026.csv)
+- [Per-site sources, percentage denominators and dates](Ameriflux_PFT/50_SITE_OBSERVED_PFT_PERCENT_REPORT_20261026.md)
+- [Consolidated PFT candidates and model precedents](Ameriflux_PFT/FINAL_50_SITE_PFT_CANDIDATES_20261026.csv)
+- [Exact 50-site release manifest](Ameriflux_PFT/metadata/sites_50_manifest.csv)
+
+## Original experiments
+
+| Batch | Sites | Original workflow and release manifest |
+| --- | ---: | --- |
+| Batch01 | 10 | [Workflow](../AmeriFlux_MultiSite_10/) · [sites.tsv](../AmeriFlux_MultiSite_10/sites.tsv) |
+| Batch02 | 10 | [Workflow](../AmeriFlux_MultiSite_10_Batch02/) · [sites.tsv](../AmeriFlux_MultiSite_10_Batch02/sites.tsv) |
+| Batch03 | 10 | [Workflow](../AmeriFlux_MultiSite_10_Batch03/) · [sites.tsv](../AmeriFlux_MultiSite_10_Batch03/sites.tsv) |
+| Batch04 | 10 | [Workflow](../AmeriFlux_MultiSite_10_Batch04/) · [sites.tsv](../AmeriFlux_MultiSite_10_Batch04/sites.tsv) |
+| Batch05 | 10 | [Workflow](../AmeriFlux_MultiSite_10_Batch05/) · [sites.tsv](../AmeriFlux_MultiSite_10_Batch05/sites.tsv) |
+
+**Total: 50 distinct tower IDs.** Package names and first/last years are copied exactly from the original manifests, including FULLSET labels and case-sensitive IDs such as US-UMB, US-UMd and US-UiD. Membership is not a new statement about forcing QC or model readiness.
+
+## Scope of this update
+
+The central collection records tower vegetation, observed composition and candidate functional mapping. It preserves the earlier Batch01 evidence and the operator-selected US-Aud C4 70% / bare 30% model assumption. It also records 11 historical ORCHIDEE fCover configurations separately from observations.
+
+No end-spin-up FATES PFT vector was found in the reviewed AmeriFlux GitHub snapshot, so those master-table cells remain blank. The report is not a live query of IRIDIS6. Active cases, forcing, surfaces and jobs are unchanged. Original batch README files remain the dated operational records.

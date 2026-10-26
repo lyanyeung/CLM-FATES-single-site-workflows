@@ -1,5 +1,8 @@
 # CLM-FATES single-site workflows
 
+## AmeriFlux 50-site PFT composition — 26 October 2026
+
+[**Ameriflux_Site: five batches and all 50 tower stations**](examples/Ameriflux_Site/) now has a central [PFT composition index and master CSV](examples/Ameriflux_Site/Ameriflux_PFT/). It reuses existing Batch01 evidence and adds primary-source research across all five batches: **33 sites with numerical composition/cover leads, 17 with qualitative composition, LAI/density or model-only evidence**. Measured denominators, survey periods, spatial scope and uncertainty remain explicit. Eleven published ORCHIDEE configurations are listed separately as model precedents. Existing experiment paths and model files are unchanged.
 
 ## Stage82 VERIFIED — 213/213 DATM NetCDF SHA checks pass (24 October 2026)
 

@@ -31,6 +31,6 @@ See the [repository home page](../../README.md) for the most recent documented, 
 
 - **Display / collection name:** **ICOS sites**
 - **Existing script / experiment paths:** continue as `examples/FLUXNET_MultiSite_6/`, `_8/`, `_11/`, `_13/` to preserve paths used in reproducible experiments and IRIDIS6 workflows.
-- **Future AmeriFlux experiments:** separate collection; the existing [AmeriFlux US-Ha1](../AmeriFlux_US-Ha1/) remains unchanged.
+- **AmeriFlux experiments:** the parallel [Ameriflux_Site collection](../Ameriflux_Site/) now covers five batches / 50 distinct stations, with its [central PFT evidence index](../Ameriflux_Site/Ameriflux_PFT/). The earlier [shared AmeriFlux metadata](../AmeriFlux_sites/) and [AmeriFlux US-Ha1](../AmeriFlux_US-Ha1/) example remain in their original paths.
 
 Only GitHub documentation is reorganized here. Existing IRIDIS6 cases, Slurm jobs, restart files and outputs are not affected.
