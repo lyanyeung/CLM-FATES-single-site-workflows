@@ -293,18 +293,18 @@
     {
       "site": "US-Ho3",
       "fates_natland_percent": {
-        "2": 90,
-        "6": 10
+        "2": 80,
+        "6": 20
       },
       "bare_percent": 0,
-      "target_state": "Howland harvest-site forest-type prior",
+      "target_state": "Howland harvest-site forest within 200 m of tower (BADM footprint share)",
       "target_period": "Postharvest functional hypothesis, not age/biomass initialization",
-      "basis": "EXPLICIT_REGIONAL_FOREST_PRIOR",
-      "rationale": "Use conifer-dominant90/10 provisional mixture pending a tower-specific postharvest inventory.",
-      "residual_policy": "Neither composition nor fraction follows from the30% biomass removal; no bare30 prescription.",
+      "basis": "BADM_IGBP_COMMENT_FOOTPRINT_SHARE",
+      "rationale": "Revised 2026-10-26 (operator decision after full-BADM cross-check, BADM_PFT_CROSSCHECK_50_SITES_20261026.md). Full AmeriFlux BADM (AMF_US-Ho3_BIF_20260715) IGBP comment: '~80% ENF and 20% BDF in 200m around tower'; 2005 FIA plots list hemlock 44, red spruce 20, red maple (no %). Replaces the v1 regional prior ENF90/DBF10, kept as sensitivity.",
+      "residual_policy": "80/20 is the BADM tower-footprint estimate (area basis not stated); not an inventory of postharvest biomass.",
       "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
       "mapping_profile": "DEFAULT14",
-      "uncertainty": "HIGH",
+      "uncertainty": "MEDIUM",
       "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
     },
     {
@@ -632,18 +632,18 @@
     {
       "site": "US-Syv",
       "fates_natland_percent": {
-        "2": 50,
-        "6": 50
+        "2": 13,
+        "6": 87
       },
       "bare_percent": 0,
-      "target_state": "Footprint-mixture prior for old-growth mosaic",
-      "target_period": "Undated wider-footprint functional reference",
-      "basis": "EXPLICIT_SPATIAL_MIXTURE_PRIOR",
-      "rationale": "Use neutral50/50 DBF/ENF as provisional footprint mixture because local1ha and wider1km2 dominance differ.",
-      "residual_policy": "Do not present50/50 as observed; local-stem86/14 and hemlock-rich30/70 are required sensitivity alternatives.",
+      "target_state": "Old-growth hardwood-hemlock stand at the tower plots",
+      "target_period": "2002 tower-plot composition (Tang et al. 2008 via BADM)",
+      "basis": "BADM_TOWER_PLOT_COMPOSITION",
+      "rationale": "Revised 2026-10-26 (operator decision after full-BADM cross-check, BADM_PFT_CROSSCHECK_50_SITES_20261026.md). Full AmeriFlux BADM (AMF_US-Syv_BIF_20260908) SPP_O: sugar maple 71, eastern hemlock 14, yellow birch 7, basswood 8, ironwood 8 (sum 108; Tang et al. 2008), IGBP MF; normalised tree-layer ENF = 14/108 = 13. Replaces the v1 50/50 footprint-mixture prior, kept as sensitivity together with the hemlock-rich 70/30 prior.",
+      "residual_policy": "Composition basis not stated in BADM (Desai et al. 2005 report the same shares as overstory stems in 1 ha); hemlock dominance of the wider 1 km2 is covered by sensitivity scenarios.",
       "bare_policy": "Model convention bare=0; no independent zero-bare measurement.",
       "mapping_profile": "DEFAULT14",
-      "uncertainty": "HIGH",
+      "uncertainty": "MEDIUM",
       "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
     },
     {
@@ -818,16 +818,16 @@
     {
       "site": "US-Wjs",
       "fates_natland_percent": {
-        "2": 15,
-        "14": 85
+        "2": 26,
+        "14": 74
       },
       "bare_percent": 0,
-      "target_state": "Juniper savanna published model baseline",
-      "target_period": "Published2008-2014 reference",
-      "basis": "PUBLISHED_MODEL_PRECEDENT",
-      "rationale": "Retain15ENF/85C4 exactly as published model fCover; do not invent a new bare estimate in the main row.",
-      "residual_policy": "85%grass and absence of prescribed bare are modeling choices, not field-cover measurements.",
-      "bare_policy": "Bare0 is published model convention; bare25 sensitivity is explicitly assumed.",
+      "target_state": "Juniper savanna with BADM-reported juniper cover",
+      "target_period": "BADM IGBP record (IGBP SAV from 2007-05-04)",
+      "basis": "BADM_IGBP_COMMENT_COVER",
+      "rationale": "Revised 2026-10-26 (operator decision after full-BADM cross-check, BADM_PFT_CROSSCHECK_50_SITES_20261026.md). Full AmeriFlux BADM (AMF_US-Wjs_BIF_20260715) IGBP comment: 'Juniper savannah (~26% Juniper cover)'; site description: Juniperus monosperma with C4 Bouteloua gracilis. Replaces the v1 published model fCover ENF15/C4 85, kept as sensitivity.",
+      "residual_policy": "74% C4 is the complement of the BADM juniper cover; herbaceous cover and bare ground were not measured separately.",
+      "bare_policy": "Bare0 is a model convention; the assumed-bare25 sensitivity remains.",
       "mapping_profile": "DEFAULT14",
       "uncertainty": "MEDIUM",
       "nonvascular_policy": "Not separately represented; tree/grass patch convention does not measure every ground component."
@@ -1203,6 +1203,55 @@
       },
       "bare_percent": 60,
       "interpretation": "Alternative evergreen representation for mixed woody3; not a new cover observation."
+    },
+    {
+      "site": "US-Ho3",
+      "scenario": "v1_previous_primary_regional_prior_90_10",
+      "fates_natland_percent": {
+        "2": 90,
+        "6": 10
+      },
+      "bare_percent": 0,
+      "interpretation": "Former v1 primary (regional conifer prior), superseded 2026-10-26 by BADM 80/20."
+    },
+    {
+      "site": "US-Syv",
+      "scenario": "v1_previous_primary_footprint_mixture_50_50",
+      "fates_natland_percent": {
+        "2": 50,
+        "6": 50
+      },
+      "bare_percent": 0,
+      "interpretation": "Former v1 primary (neutral 1 km2 mixture prior), superseded 2026-10-26 by BADM tower plots 13/87."
+    },
+    {
+      "site": "US-Wjs",
+      "scenario": "v1_previous_primary_published_model_15_85",
+      "fates_natland_percent": {
+        "2": 15,
+        "14": 85
+      },
+      "bare_percent": 0,
+      "interpretation": "Former v1 primary (published model fCover), superseded 2026-10-26 by BADM ~26% juniper cover."
+    }
+  ],
+  "revisions": [
+    {
+      "date": "2026-10-26",
+      "sites": [
+        "US-Ho3",
+        "US-Syv",
+        "US-Wjs"
+      ],
+      "change": "US-Ho3 ENF90/DBF10 -> ENF80/DBF20; US-Syv ENF50/DBF50 -> ENF13/DBF87; US-Wjs ENF15/C4 85 -> ENF26/C4 74",
+      "reason": "Operator decision after the full AmeriFlux BADM cross-check (BADM_PFT_CROSSCHECK_50_SITES_20261026.md). Former primaries kept as sensitivity scenarios.",
+      "unchanged_by_decision": [
+        "US-Bar",
+        "US-Ha1",
+        "US-Slt",
+        "US-UMB",
+        "US-UMd"
+      ]
     }
   ]
 }

@@ -84,3 +84,6 @@ US-Vcp,oak_understory10,100.0,2,PASS,DEFAULT14
 US-Whs,published_evergreen_shrub_lump,100.0,2,PASS,DEFAULT14
 US-Wjs,assumed_bare25,100.0,2,PASS,DEFAULT14
 US-Wkg,evergreen_shrub_lump,100.0,2,PASS,DEFAULT14
+US-Ho3,v1_previous_primary_regional_prior_90_10,100.0,2,PASS,DEFAULT14
+US-Syv,v1_previous_primary_footprint_mixture_50_50,100.0,2,PASS,DEFAULT14
+US-Wjs,v1_previous_primary_published_model_15_85,100.0,2,PASS,DEFAULT14

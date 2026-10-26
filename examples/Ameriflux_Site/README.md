@@ -4,7 +4,7 @@ This is the central **Ameriflux_Site** collection requested alongside [ICOS site
 
 ## Recommended input PFT percentages — 26 October 2026
 
-[**50-site CLM-FATES recommended inputs v1**](Ameriflux_PFT/RECOMMENDED_INPUT_PFT_50_SITES_20261026.md) provides concrete percentages summing100 for every station, with35 sensitivity/period alternatives and explicit source-to-input assumptions. [Input CSV](Ameriflux_PFT/RECOMMENDED_50_SITE_CLM_FATES_INPUT_PFT_20261026.csv), [CLM `PCT_NAT_PFT` matrix](Ameriflux_PFT/RECOMMENDED_50_SITE_CLM_PCT_NAT_PFT_20261026.csv), and [FATES matrices](Ameriflux_PFT/RECOMMENDED_50_SITE_FATES_PFT_PERCENT_20261026.csv) are intended for FIXNC cold-start design. Model recommendations are separate from measured evidence. Arctic and hydrodeciduous-shrub profiles require the specified private HLM mapping; competition mode does not preserve these fractions.
+[**50-site CLM-FATES recommended inputs v1**](Ameriflux_PFT/RECOMMENDED_INPUT_PFT_50_SITES_20261026.md) provides concrete percentages summing100 for every station, with 38 sensitivity/period alternatives (3 added 26 Oct when US-Ho3, US-Syv and US-Wjs primaries were revised from full BADM) and explicit source-to-input assumptions. [Input CSV](Ameriflux_PFT/RECOMMENDED_50_SITE_CLM_FATES_INPUT_PFT_20261026.csv), [CLM `PCT_NAT_PFT` matrix](Ameriflux_PFT/RECOMMENDED_50_SITE_CLM_PCT_NAT_PFT_20261026.csv), and [FATES matrices](Ameriflux_PFT/RECOMMENDED_50_SITE_FATES_PFT_PERCENT_20261026.csv) are intended for FIXNC cold-start design. Model recommendations are separate from measured evidence. Arctic and hydrodeciduous-shrub profiles require the specified private HLM mapping; competition mode does not preserve these fractions.
 
 ## Soil texture — 26 October 2026
 
@@ -16,7 +16,7 @@ This is the central **Ameriflux_Site** collection requested alongside [ICOS site
 
 - 42 sites are consistent.
 - 5 differ only in metric or year (US-Bar, US-Ha1, US-Slt, US-UMB, US-UMd).
-- 3 need a decision: US-Ho3, US-Syv and US-Wjs.
+- 3 conflicts were decided in favour of BADM, and the recommended inputs revised: US-Ho3 ENF 80 / DBF 20, US-Syv ENF 13 / DBF 87, US-Wjs ENF 26 / C4 74.
 
 ## Vegetation and PFT composition
 

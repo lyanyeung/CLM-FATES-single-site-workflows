@@ -123,14 +123,14 @@ def generate():
          f'PFT_INPUT_SENSITIVITY_SCENARIOS_{DATE}.csv':csv_string(sensitivities,['site','scenario','recommended_percent','bare_percent','mapping_profile','fates_natland_percent_json','clm_pct_nat_pft_json','fates_vegetated_only_percent_json','interpretation']),
          f'PFT_INPUT_VALIDATION_{DATE}.csv':csv_string(all_diagnostics,['site','scenario','natural_area_sum','live_type_count','round_trip','mapping_profile'])}
     report=['# 50个AmeriFlux站点：建议的CLM-FATES输入PFT百分比 v1','',
-            '**2026年10月26日。下表已为全部50站给出具体、闭合到100%的主推荐；另有35组敏感性/时段替代方案。** 这是建模建议表，原实测证据表保持不变。', '',
+            '**2026年10月26日。下表已为全部50站给出具体、闭合到100%的主推荐；另有38组敏感性/时段替代方案。** 这是建模建议表，原实测证据表保持不变。', '',
             '适用范围：独立cold start、`use_fates_fixed_biogeog=.true.`且`use_fates_nocomp=.true.`（FIXNC）。下列百分比是**模型自然土壤landunit内的面积分配，含裸地host0**，不自动等于原始网格全部土地或观测足迹的实测覆盖率。竞争模式不能保证保持这些面积比例。','',
             '对新的理想化塔点，可将研究域定义为NATVEG100/CROP0的自然土壤点；这是另一个显式建模假设，不能因此改掉现有surface中的湖泊、湿地、农业等真实地类。本次只写建议表和参数映射配置，不写surface、现有parameter文件或作业。','',
             '## 可以直接查看的输入文件','',
             f'- [完整50站建议总表CSV](RECOMMENDED_50_SITE_CLM_FATES_INPUT_PFT_{DATE}.csv)：比例、目标状态、依据、余项处理、裸地假设及原始来源。',
             f'- [CLM host输入矩阵CSV](RECOMMENDED_50_SITE_CLM_PCT_NAT_PFT_{DATE}.csv)：`PCT_NAT_PFT_0`至`14`，每站合计100；0为裸地。若实际surface包含额外crop PFT槽位，先核对维度，不能盲目按15维重建变量。',
             f'- [FATES两种分母矩阵CSV](RECOMMENDED_50_SITE_FATES_PFT_PERCENT_{DATE}.csv)：`pct_natland`列加bare合计100；`pct_vegetated_only`列自身合计100。**不能将bare加到第二组再要求合计100。**',
-            f'- [35组敏感性/时段替代CSV](PFT_INPUT_SENSITIVITY_SCENARIOS_{DATE}.csv)。',
+            f'- [38组敏感性/时段替代CSV](PFT_INPUT_SENSITIVITY_SCENARIOS_{DATE}.csv)。',
             '- [三种HLM映射配置](metadata/recommended_hlm_profiles_v1_20261026.json)：包括原始默认映射及建议的独立站点映射。','',
             '例如US-Aud：自然土壤面积中C4=70、bare=30；活体植被内部C4=100。对应host14=70、host0=30。不能先把host14归一成100而丢掉裸地。','',
             '## 50站主推荐（%）','',
@@ -139,6 +139,10 @@ def generate():
     for r in primary:
         report.append(f"| {r['batch']} | {r['site']} | {r['recommended_percent']} | {r['basis']} | {r['uncertainty']} |")
     counts=Counter(r['mapping_profile'] for r in primary)
+    if data.get('revisions'):
+        report+=['','## 修订记录','']
+        for rv in data['revisions']:
+            report.append(f"- **{rv['date']}**：{rv['change']}。{rv['reason']} 维持不变：{', '.join(rv.get('unchanged_by_decision',[]))}。")
     report+=['','## HLM映射与实际代码约束','',
              f"主推荐中DEFAULT14为{counts['DEFAULT14']}站，ARCTIC_PURE为{counts['ARCTIC_PURE']}站，HYDRO_SHRUB为{counts['HYDRO_SHRUB']}站。后两类需要站点独立参数文件的映射改动，不能只改surface后沿用原参数。",'',
              '| 配置 | 用途 | 修改范围 |','| --- | --- | --- |',
@@ -163,7 +167,7 @@ def generate():
                    f"裸地：{r['bare_policy']} 非维管植物/地表约定：{r['nonvascular_policy']}",'',
                    f"原证据分母：{r['source_denominator']}。原始来源："+', '.join(f'[source{i}]({u.strip()})' for i,u in enumerate(r['source_urls'].split(';'),1) if u.strip())+'.','']
     report+=['## 重建与验证','','```bash','python3 scripts/build_recommended_inputs.py --build','python3 scripts/build_recommended_inputs.py --check','```','',
-             '纯Python标准库。检查50个唯一站点、每批10个、所有主/替代方案面积闭合、活体PFT≤4、host→FATES精确回算、活体内部比例归一化，以及生成文件可重复。验证表列出全部85组方案。本次未修改已有模型输入或提交作业。']
+             '纯Python标准库。检查50个唯一站点、每批10个、所有主/替代方案面积闭合、活体PFT≤4、host→FATES精确回算、活体内部比例归一化，以及生成文件可重复。验证表列出全部88组方案。本次未修改已有模型输入或提交作业。']
     out[f'RECOMMENDED_INPUT_PFT_50_SITES_{DATE}.md']='\n'.join(report)+'\n'
     return out,len(primary),len(sensitivities),counts
 

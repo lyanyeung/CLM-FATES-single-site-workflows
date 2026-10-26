@@ -1,6 +1,6 @@
 # 50个AmeriFlux站点：建议的CLM-FATES输入PFT百分比 v1
 
-**2026年10月26日。下表已为全部50站给出具体、闭合到100%的主推荐；另有35组敏感性/时段替代方案。** 这是建模建议表，原实测证据表保持不变。
+**2026年10月26日。下表已为全部50站给出具体、闭合到100%的主推荐；另有38组敏感性/时段替代方案。** 这是建模建议表，原实测证据表保持不变。
 
 适用范围：独立cold start、`use_fates_fixed_biogeog=.true.`且`use_fates_nocomp=.true.`（FIXNC）。下列百分比是**模型自然土壤landunit内的面积分配，含裸地host0**，不自动等于原始网格全部土地或观测足迹的实测覆盖率。竞争模式不能保证保持这些面积比例。
 
@@ -11,7 +11,7 @@
 - [完整50站建议总表CSV](RECOMMENDED_50_SITE_CLM_FATES_INPUT_PFT_20261026.csv)：比例、目标状态、依据、余项处理、裸地假设及原始来源。
 - [CLM host输入矩阵CSV](RECOMMENDED_50_SITE_CLM_PCT_NAT_PFT_20261026.csv)：`PCT_NAT_PFT_0`至`14`，每站合计100；0为裸地。若实际surface包含额外crop PFT槽位，先核对维度，不能盲目按15维重建变量。
 - [FATES两种分母矩阵CSV](RECOMMENDED_50_SITE_FATES_PFT_PERCENT_20261026.csv)：`pct_natland`列加bare合计100；`pct_vegetated_only`列自身合计100。**不能将bare加到第二组再要求合计100。**
-- [35组敏感性/时段替代CSV](PFT_INPUT_SENSITIVITY_SCENARIOS_20261026.csv)。
+- [38组敏感性/时段替代CSV](PFT_INPUT_SENSITIVITY_SCENARIOS_20261026.csv)。
 - [三种HLM映射配置](metadata/recommended_hlm_profiles_v1_20261026.json)：包括原始默认映射及建议的独立站点映射。
 
 例如US-Aud：自然土壤面积中C4=70、bare=30；活体植被内部C4=100。对应host14=70、host0=30。不能先把host14归一成100而丢掉裸地。
@@ -39,7 +39,7 @@
 | Batch02 | US-Ha1 | ENF 27.3 / DBF 72.7 | EXPLICIT_NORMALIZED_BASAL_AREA_PROXY | MEDIUM |
 | Batch02 | US-Ho1 | ENF 91.9 / DBF 8.1 | EXPLICIT_NORMALIZED_BASAL_AREA_PROXY | MEDIUM |
 | Batch02 | US-Ho2 | ENF 90 / DBF 10 | EXPLICIT_POOLED_INVENTORY_PRIOR | HIGH |
-| Batch02 | US-Ho3 | ENF 90 / DBF 10 | EXPLICIT_REGIONAL_FOREST_PRIOR | HIGH |
+| Batch02 | US-Ho3 | ENF 80 / DBF 20 | BADM_IGBP_COMMENT_FOOTPRINT_SHARE | MEDIUM |
 | Batch02 | US-ICh | ArcticEvergreenShrub 30 / ArcticDecidShrub 20 / ArcticC3 50 | COMMUNITY_CONTEXT_PLUS_EXPLICIT_VASCULAR_PRIOR | HIGH |
 | Batch02 | US-ICt | ArcticEvergreenShrub 15 / ArcticDecidShrub 25 / ArcticC3 60 | COMMUNITY_CONTEXT_PLUS_EXPLICIT_VASCULAR_PRIOR | HIGH |
 | Batch03 | US-Kon | CoolC3 10 / C4 90 | EXPLICIT_C3_C4_PRIOR | HIGH |
@@ -59,7 +59,7 @@
 | Batch04 | US-SP1 | ENF 85 / EvergreenShrub 15 | EXPLICIT_OVERSTORY_UNDERSTORY_PRIOR | HIGH |
 | Batch04 | US-SRG | DBF 11 / C4 44 / bare 45 | PUBLISHED_MODEL_PRECEDENT_WITH_HERB_PROXY | MEDIUM |
 | Batch04 | US-SRM | DBF 35 / C4 20 / bare 45 | GROUND_COVER_RANGE_SCENARIO | MEDIUM |
-| Batch04 | US-Syv | ENF 50 / DBF 50 | EXPLICIT_SPATIAL_MIXTURE_PRIOR | HIGH |
+| Batch04 | US-Syv | ENF 13 / DBF 87 | BADM_TOWER_PLOT_COMPOSITION | MEDIUM |
 | Batch04 | US-Ton | DBF 43 / CoolC3 57 | CANOPY_COVER_PLUS_C3_UNDERSTORY_ASSUMPTION | HIGH |
 | Batch04 | US-Uaf | ENF 50 / ArcticEvergreenShrub 20 / ArcticDecidShrub 20 / ArcticC3 10 | EXPLICIT_VASCULAR_PRIOR | HIGH |
 | Batch05 | US-UiD | CoolC3 20 / C4 80 | EXPLICIT_C3_C4_PRIOR | HIGH |
@@ -70,8 +70,12 @@
 | Batch05 | US-Vcp | ENF 100 | PUBLISHED_MODEL_PRECEDENT | MEDIUM |
 | Batch05 | US-WCr | DBF 100 | DOMINANT_BASAL_AREA_PROXY | MEDIUM |
 | Batch05 | US-Whs | EvergreenShrub 20 / HydrodecidShrub 20 / C4 3 / bare 57 | COVER_GROUPS_PLUS_PHENOLOGY_PRIOR | HIGH |
-| Batch05 | US-Wjs | ENF 15 / C4 85 | PUBLISHED_MODEL_PRECEDENT | MEDIUM |
+| Batch05 | US-Wjs | ENF 26 / C4 74 | BADM_IGBP_COMMENT_COVER | MEDIUM |
 | Batch05 | US-Wkg | HydrodecidShrub 3 / C4 37 / bare 60 | COVER_GROUPS_WITH_SHRUB_PHYSIOLOGY_PROXY | HIGH |
+
+## 修订记录
+
+- **2026-10-26**：US-Ho3 ENF90/DBF10 -> ENF80/DBF20; US-Syv ENF50/DBF50 -> ENF13/DBF87; US-Wjs ENF15/C4 85 -> ENF26/C4 74。Operator decision after the full AmeriFlux BADM cross-check (BADM_PFT_CROSSCHECK_50_SITES_20261026.md). Former primaries kept as sensitivity scenarios. 维持不变：US-Bar, US-Ha1, US-Slt, US-UMB, US-UMd。
 
 ## HLM映射与实际代码约束
 
@@ -270,11 +274,11 @@
 
 原证据分母：Live tree basal area; composition is described jointly for two tower plot populations, not a separately tabulated Ho2 PFT partition.。原始来源：[source1](https://ameriflux.lbl.gov/doi/FLUXNET/US-Ho2/), [source2](https://doi.org/10.1111/j.1365-2486.2004.00847.x).
 
-### US-Ho3 — ENF 90 / DBF 10
+### US-Ho3 — ENF 80 / DBF 20
 
-目标：Howland harvest-site forest-type prior；时段：Postharvest functional hypothesis, not age/biomass initialization。
+目标：Howland harvest-site forest within 200 m of tower (BADM footprint share)；时段：Postharvest functional hypothesis, not age/biomass initialization。
 
-依据及建议：Use conifer-dominant90/10 provisional mixture pending a tower-specific postharvest inventory. 余项处理：Neither composition nor fraction follows from the30% biomass removal; no bare30 prescription.
+依据及建议：Revised 2026-10-26 (operator decision after full-BADM cross-check, BADM_PFT_CROSSCHECK_50_SITES_20261026.md). Full AmeriFlux BADM (AMF_US-Ho3_BIF_20260715) IGBP comment: '~80% ENF and 20% BDF in 200m around tower'; 2005 FIA plots list hemlock 44, red spruce 20, red maple (no %). Replaces the v1 regional prior ENF90/DBF10, kept as sensitivity. 余项处理：80/20 is the BADM tower-footprint estimate (area basis not stated); not an inventory of postharvest biomass.
 
 裸地：Model convention bare=0; no independent zero-bare measurement. 非维管植物/地表约定：Not separately represented; tree/grass patch convention does not measure every ground component.
 
@@ -470,11 +474,11 @@
 
 原证据分母：Ground-area cover by vegetation layers and bare soil; quoted ranges are independently approximate。原始来源：[source1](https://ameriflux.lbl.gov/sites/siteinfo/US-SRM), [source2](https://doi.org/10.1029/2018WR023477), [source3](https://www.tucson.ars.ag.gov/unit/publications/PDFfiles/2308.pdf), [source4](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2008JG000900).
 
-### US-Syv — ENF 50 / DBF 50
+### US-Syv — ENF 13 / DBF 87
 
-目标：Footprint-mixture prior for old-growth mosaic；时段：Undated wider-footprint functional reference。
+目标：Old-growth hardwood-hemlock stand at the tower plots；时段：2002 tower-plot composition (Tang et al. 2008 via BADM)。
 
-依据及建议：Use neutral50/50 DBF/ENF as provisional footprint mixture because local1ha and wider1km2 dominance differ. 余项处理：Do not present50/50 as observed; local-stem86/14 and hemlock-rich30/70 are required sensitivity alternatives.
+依据及建议：Revised 2026-10-26 (operator decision after full-BADM cross-check, BADM_PFT_CROSSCHECK_50_SITES_20261026.md). Full AmeriFlux BADM (AMF_US-Syv_BIF_20260908) SPP_O: sugar maple 71, eastern hemlock 14, yellow birch 7, basswood 8, ironwood 8 (sum 108; Tang et al. 2008), IGBP MF; normalised tree-layer ENF = 14/108 = 13. Replaces the v1 50/50 footprint-mixture prior, kept as sensitivity together with the hemlock-rich 70/30 prior. 余项处理：Composition basis not stated in BADM (Desai et al. 2005 report the same shares as overstory stems in 1 ha); hemlock dominance of the wider 1 km2 is covered by sensitivity scenarios.
 
 裸地：Model convention bare=0; no independent zero-bare measurement. 非维管植物/地表约定：Not separately represented; tree/grass patch convention does not measure every ground component.
 
@@ -580,13 +584,13 @@
 
 原证据分母：Ground canopy cover by vegetation stratum; not sum-to100 whole-ground classification。原始来源：[source1](https://doi.org/10.3390/soilsystems3010006), [source2](https://www.tucson.ars.ag.gov/unit/publications/PDFfiles/2525.pdf).
 
-### US-Wjs — ENF 15 / C4 85
+### US-Wjs — ENF 26 / C4 74
 
-目标：Juniper savanna published model baseline；时段：Published2008-2014 reference。
+目标：Juniper savanna with BADM-reported juniper cover；时段：BADM IGBP record (IGBP SAV from 2007-05-04)。
 
-依据及建议：Retain15ENF/85C4 exactly as published model fCover; do not invent a new bare estimate in the main row. 余项处理：85%grass and absence of prescribed bare are modeling choices, not field-cover measurements.
+依据及建议：Revised 2026-10-26 (operator decision after full-BADM cross-check, BADM_PFT_CROSSCHECK_50_SITES_20261026.md). Full AmeriFlux BADM (AMF_US-Wjs_BIF_20260715) IGBP comment: 'Juniper savannah (~26% Juniper cover)'; site description: Juniperus monosperma with C4 Bouteloua gracilis. Replaces the v1 published model fCover ENF15/C4 85, kept as sensitivity. 余项处理：74% C4 is the complement of the BADM juniper cover; herbaceous cover and bare ground were not measured separately.
 
-裸地：Bare0 is published model convention; bare25 sensitivity is explicitly assumed. 非维管植物/地表约定：Not separately represented; tree/grass patch convention does not measure every ground component.
+裸地：Bare0 is a model convention; the assumed-bare25 sensitivity remains. 非维管植物/地表约定：Not separately represented; tree/grass patch convention does not measure every ground component.
 
 原证据分母：No measured whole-ground PFT fraction。原始来源：[source1](https://ameriflux.lbl.gov/sites/siteinfo/US-Wjs), [source2](https://www.litvaklab.org/juniper-savanna-us-wjs.html).
 
@@ -607,4 +611,4 @@ python3 scripts/build_recommended_inputs.py --build
 python3 scripts/build_recommended_inputs.py --check
 ```
 
-纯Python标准库。检查50个唯一站点、每批10个、所有主/替代方案面积闭合、活体PFT≤4、host→FATES精确回算、活体内部比例归一化，以及生成文件可重复。验证表列出全部85组方案。本次未修改已有模型输入或提交作业。
+纯Python标准库。检查50个唯一站点、每批10个、所有主/替代方案面积闭合、活体PFT≤4、host→FATES精确回算、活体内部比例归一化，以及生成文件可重复。验证表列出全部88组方案。本次未修改已有模型输入或提交作业。

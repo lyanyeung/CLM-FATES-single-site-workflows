@@ -7,7 +7,12 @@ Files:
 - Raw extraction: [metadata/full_badm_vegetation_50_20261026/](metadata/full_badm_vegetation_50_20261026/)
 - Species-to-PFT map: [metadata/badm_species_to_pft_20261026.csv](metadata/badm_species_to_pft_20261026.csv)
 
-**No recommended input was changed by this check.**
+**Operator decision, 26 October 2026:**
+- The three conflicts were resolved in favour of BADM: US-Ho3 → ENF 80 / DBF 20; US-Syv → ENF 13 / DBF 87; US-Wjs → ENF 26 / C4 74.
+- The five "different metric or year" sites keep their previous recommendation: US-Bar, US-Ha1, US-Slt, US-UMB and US-UMd.
+- The recommended input tables were rebuilt with `scripts/build_recommended_inputs.py --build`, and `--check` passes.
+- The former primaries are kept as sensitivity scenarios (`v1_previous_primary_*`).
+- The CSV records each decision in the columns `operator_decision_20261026` and `recommended_after_decision`.
 
 ## Caveat on BADM percentages
 
@@ -29,7 +34,7 @@ So a BADM species percentage is a composition proxy, not a ground-area PFT fract
 
 Batch01 (CA-TP1/3/4, CA-Ca3, CA-Man) matches BADM exactly. CA-TP4's ENF 93 / DBF 7 is the BADM inventory itself.
 
-### Conflicts to decide
+### Conflicts (decided 26 Oct 2026: BADM adopted for all three)
 
 | Site | Recommended | BADM | Suggestion |
 | --- | --- | --- | --- |
@@ -37,7 +42,7 @@ Batch01 (CA-TP1/3/4, CA-Ca3, CA-Man) matches BADM exactly. CA-TP4's ENF 93 / DBF
 | US-Syv | ENF 50 / DBF 50 (hemlock dominates the surrounding 1 km²) | IGBP MF; tower plots (Tang et al. 2008): sugar maple 71, hemlock 14, yellow birch 7, basswood 8, ironwood 8 → ENF ≈ 13 | Choose the footprint scale: ~13/87 (tower plots) or 50/50 (1 km mixture); run both as a sensitivity |
 | US-Wjs | ENF 15 / C4 85 (model precedent) | IGBP SAV; "Juniper savannah (~26% Juniper cover)" | ENF 26 / C4 74 |
 
-### Same forest, different metric or year
+### Same forest, different metric or year (decided: keep previous recommendation)
 
 | Site | Recommended | BADM | Note |
 | --- | --- | --- | --- |
