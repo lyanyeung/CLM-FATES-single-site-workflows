@@ -239,7 +239,7 @@ def main():
  (out/"stage29_summary.json").write_text(json.dumps(summary,indent=2,default=dict,sort_keys=True)+"\n")
  md=["# Stage29 — original AmeriFlux BIF GROUP_ID clock offsets and UTC candidate times",
   "","Source BADM Interchange Format has five fields and groups of related metadata by GROUP_ID.",
-  "All original ZIPs were read-only. BIF metadata \`UTC_OFFSET=-7\` found in Stage28",
+  "All original ZIPs were read-only. BIF metadata `UTC_OFFSET=-7` found in Stage28",
   "is evidence, but source release GROUP_ID effectivity is checked here.",
   "FLUXNET timestamps are LST, no DST; UTC candidate = local native time minus BIF signed offset.",
   "No automatic ERA5-Land retrieval, no new RH approval, no source changes.","",
