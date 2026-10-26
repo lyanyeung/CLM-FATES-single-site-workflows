@@ -396,9 +396,9 @@ def main():
   site_rows=[r for r in candidates if r["site"]==site]
   md.append("- {}: {} research-only native candidate HH".format(site,len(site_rows)))
  md+=["","## Reviewer action",
-  "1. Inspect \`stage36_ALL_EPISODE_RISK_AND_TRIAL_DECISION_MATRIX.csv\` for the risk-screen categories, not individual 251 approvals.",
-  "2. Inspect \`stage36_502_ORIGINAL_ZIP_NATIVE_NEIGHBOR_VPD_QC_TRANSITIONS.csv\` for true original-source boundaries and other unapproved neighboring anomalies.",
-  "3. **Do not** feed \`stage36_251_ISOLATED_TRIAL_ONLY_source_ERA_RH_at_original_T.csv\` directly to DATM, models or an existing approved overlay. This is not a versioned approval.",
+  "1. Inspect `stage36_ALL_EPISODE_RISK_AND_TRIAL_DECISION_MATRIX.csv` for the risk-screen categories, not individual 251 approvals.",
+  "2. Inspect `stage36_502_ORIGINAL_ZIP_NATIVE_NEIGHBOR_VPD_QC_TRANSITIONS.csv` for true original-source boundaries and other unapproved neighboring anomalies.",
+  "3. **Do not** feed `stage36_251_ISOLATED_TRIAL_ONLY_source_ERA_RH_at_original_T.csv` directly to DATM, models or an existing approved overlay. This is not a versioned approval.",
   "4. Original 46 P1 manually HELD (H01 etc.), 10 RH saturation platforms and other 1323 original P2/P3 remain unapproved.",
   "5. After reviewing event categories, investigator may explicitly authorize a separate versioned experiment overlay with Post-v5 physical and boundary QC, still preserving original source and Stage24-approved overlay.",
   "","**NO automatic science approval was made.**",""]
