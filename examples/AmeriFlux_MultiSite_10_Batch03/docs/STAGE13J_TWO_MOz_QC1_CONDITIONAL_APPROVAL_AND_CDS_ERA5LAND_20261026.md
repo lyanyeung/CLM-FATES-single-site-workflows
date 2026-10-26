@@ -47,6 +47,22 @@ The subsequent Stage13j v2 `--check` stopped with `CDS response did not cover UT
 
 **Anticipated conservative scientific HOLD:** Stage13i showed original 2005 Jan03–Jan06 and Jan06–Jan09 contiguous QC1 blocks; the operator explicitly required measured `TA_F_QC=0` **and** `VPD_F_QC=0` anchors on BOTH sides within 6h of each approved event. These may be absent. Stage13j v4 now always reports the exact native QC0 six-hour before/after counts for **both** scoped events, even when the broader time-alignment screen fails. If either condition fails, the event remains completely **HOLD**; do NOT relax QC0 to QC2 or increase window without a new operator science approval. No original or Stage13g forcing change from the observed failure.
 
+## 2026-10-26 Stage13j v4 IRIDIS6 verified scientific HOLD — download complete, no replacements
+
+User executed the pinned v4 Git blob `9283b411b49500428e7534b5f12041c71190e93b`, `--self-test` PASS and `--check` PASS as a read-only science diagnostic. Exact source `FLUXNET_BIF` SHA, original source/ERA, current Stage13g candidate SHA and CDS SHA all verified. CDS hourly UTC time range **2005-01-03 00:00 to 2005-01-11 23:00 inclusive, 216 h**. Exact required two events **27+40=67 native halfhours**.
+
+**Why both events are scientifically held** (not a code/runtime exception):
+
+- Jan05 20:00–Jan06 09:00, native original measured QC0 TA+VPD within 6 h: **before 0 / after 0**.
+- Jan06 14:00–Jan07 09:30, native original measured QC0 TA+VPD within 6 h: **before 0 / after 0**.
+- Jan03–Jan10 has **29 original TA_F_QC=0 + VPD_F_QC=0 paired measured** analogues in aggregate, but none near the required two event edges.
+- BIF official `UTC_OFFSET=-6`. QC0 tower-vs-CDS grid 29-analogue T MAEs: UTC−7 **0.7761585°C**, UTC−6 **0.5937427°C**, UTC−5 **0.7098455°C**. VPD MAEs: −7 **0.2718506 hPa**, −6 **0.2455981 hPa**, −5 **0.2186896 hPa**. UTC−6 has the **lowest T MAE**, but Stage13j's chosen stringent time-offset superiority gate requires ≥1.0°C advantage over both neighbors; observed advantages only 0.1824°C and 0.1161°C. This **fails the original science rule**, not the source BIF metadata.
+- Result: `overall=HOLD_MEASURED_QC0_CLOCK_OR_BOUNDARY`, exact new patches **0**, previously approved Stage13g **fully retained**; user code correctly skipped `--apply`.
+
+**Next diagnostic already committed:** [Stage13k nearest true measured QC0/QC2 from full source and all 67 external ERA comparison, read-only](../scripts/stage13/13k_MOz_two_events_original_QC0_and_ERA5Land_evidence_READONLY.py). Its `--check` and `--run` require the existing already-downloaded CDS evidence and an unmodified adjacent signed Stage13j v4 source, and explicitly quantify nearest QC0 anchors beyond six hours, source-QC2 provenance and complete event grid-vs-companion humidity/time differences. It **does not** relax the operator's original approval, authorize a blanket 67-row ERA5Land substitution, or change any model file. `--run` creates a new versioned SHA report only.
+
+To overcome absent local QC0 source measurement, a new documented operator-approved independent validation policy would be required; simply changing Stage13j's 1°C advantage cutoff or treating QC2 as QC0 is not sufficient.
+
 ## IRIDIS6 script and behavior
 
 [Stage13j pinned fail-closed conditional script](../scripts/stage13/13j_conditional_two_US_MOz_QC1_ERA5Land_SCOPED.py). Use exact Git blob hash in the supplied command, pin the Stage13j decision JSON in the same commit.
