@@ -190,8 +190,8 @@ def recommend(profiles, priority):
                 break
         if pick is None:
             prev = layers[-1]["source"] if layers else None
-            for src in ((prev,) if prev in profiles else ()) + DEEP_FILL:
-                prof = profiles.get(src, [])
+            for src in ((prev,) if prev in DEEP_FILL else ()) + DEEP_FILL:
+                prof = [r for r in profiles.get(src, []) if r.get("bot") is not None]
                 if prof:
                     deepest = max(prof, key=lambda r: r["bot"])
                     if z >= deepest["bot"]:
@@ -493,8 +493,18 @@ def run(a):
     T = {k: [] for k in ("coords", "bif", "reesh", "ssurgo", "soilgrids", "surface", "cand", "rec", "summary", "wide")}
     meta_all = {"generated_utc": utc(), "priority": a.priority, "nodes_m": NODES_M, "network": not a.no_network, "sites": {}}
     for m in read_manifest(a.sites):
+        print(f"=== {m['site']}", flush=True)
+        try:
+            one_site(a, m, net, cache, known, lit, coords_override, surf_override, T, meta_all)
+        except Exception as e:
+            import traceback; traceback.print_exc()
+            print(f"  SITE FAILED (others continue): {type(e).__name__}: {e}", flush=True)
+            T["summary"].append({"site": m["site"], "batch": m["batch"], "tier": "SCRIPT_ERROR", "notes": f"{type(e).__name__}: {e}"})
+    finish(out, T, meta_all)
+
+
+def one_site(a, m, net, cache, known, lit, coords_override, surf_override, T, meta_all):
         s = m["site"]; info = {"batch": m["batch"], "package": m["package"]}
-        print(f"=== {s}", flush=True)
         profiles, notes = {}, []
         lat = lon = None; csrc = ""
         try:
@@ -603,6 +613,9 @@ def run(a):
         print(f"  coords={lat},{lon} ({csrc or 'MISSING'}) sources={sorted(profiles)} tier={tier} "
               f"top30 sand/clay={top_mean(layers, 'PCT_SAND')}/{top_mean(layers, 'PCT_CLAY')}"
               + (f" NOTES: {' | '.join(notes)}" if notes else ""), flush=True)
+
+
+def finish(out, T, meta_all):
     names = {"coords": "01_site_coordinates.csv", "bif": "02_bif_soil_badm_rows.csv", "reesh": "03_reesh_samples.csv",
              "ssurgo": "04_ssurgo_horizons.csv", "soilgrids": "05_soilgrids_profiles.csv", "surface": "06_current_surface_layers.csv",
              "cand": "07_clm10_candidates_by_source.csv", "rec": "08_RECOMMENDED_CLM10_SOIL_TEXTURE_LONG.csv",
@@ -613,8 +626,9 @@ def run(a):
     (out / "metadata.json").write_text(json.dumps(meta_all, indent=1, default=str) + "\n")
     print("\nWROTE", out)
     for r in T["summary"]:
-        print(f"{r['site']:7} {r['tier']:18} top30 {r['top30cm_PCT_SAND']}/{r['top30cm_PCT_CLAY']} {r['top30cm_class']:16} "
-              f"current {r['current_top30cm_PCT_SAND']}/{r['current_top30cm_PCT_CLAY']} {r['flags']}")
+        g = lambda k: r.get(k, "")
+        print(f"{r['site']:7} {r['tier']:18} top30 {g('top30cm_PCT_SAND')}/{g('top30cm_PCT_CLAY')} {str(g('top30cm_class')):16} "
+              f"current {g('current_top30cm_PCT_SAND')}/{g('current_top30cm_PCT_CLAY')} {g('flags')} {g('notes')}")
 
 
 def self_test():
@@ -633,6 +647,12 @@ def self_test():
     assert len(pr) == 3 and pr[2]["sand"] == 80 and pr[2]["top"] == 34.5, pr
     lay = recommend({"LIT": interval_profile([{"top": 0, "bot": 50, "sand": 98, "clay": 1}], "L")}, DEFAULT_PRIORITY)
     assert all(l["PCT_SAND"] == 98 for l in lay) and lay[9]["how"].startswith("EXTENDED")
+    surf = [{"top": None, "bot": None, "sand": 30.0 + j, "clay": 20.0, "om_kgm3": None} for j in range(10)]
+    lay = recommend({"SURFACE": surf}, DEFAULT_PRIORITY)
+    assert all(l["source"] == "SURFACE" for l in lay) and lay[9]["PCT_SAND"] == 39.0, lay
+    lay = recommend({"SURFACE": surf, "SOILGRIDS": interval_profile([{"top": 30, "bot": 200, "sand": 50, "clay": 10}], "S")},
+                    DEFAULT_PRIORITY)
+    assert [l["source"] for l in lay] == ["SURFACE"] * 5 + ["SOILGRIDS"] * 5, lay
     rows = [r for r in csv.DictReader(MANIFEST.open(encoding="utf-8"))]
     assert len(rows) == 50 and len({r["site"] for r in rows}) == 50
     lit = read_lit(); assert set(lit) <= {r["site"] for r in rows}, set(lit) - {r["site"] for r in rows}
