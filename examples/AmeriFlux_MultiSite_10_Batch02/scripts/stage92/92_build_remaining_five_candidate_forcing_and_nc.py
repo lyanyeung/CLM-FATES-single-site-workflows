@@ -117,31 +117,53 @@ def library():
     if shadow[STAGE74_NUMERIC]!=15199:raise ValueError("Stage74 independent numerical source census drift")
     replacements=defaultdict(dict)
     origin=Counter()
+    holds=[]
+    def source_hold(stage,row,site,time,reason):
+        # Science or numerical problems are native-row HOLD, never fatal to
+        # the ten-site pass. Preserve the source-row identity and reason.
+        holds.append({"source_stage":stage, "site":site,
+            "tower_local_start":time,
+            "source_csv_row":str(row.get("source_csv_row","")),
+            "science_status":str(row.get("science_status","")),
+            "native_TA_C":str(row.get("TA_C",row.get("original_TA_C_kept",""))),
+            "source_TA_QC":str(row.get("TA_original_QC","")),
+            "source_PA_kPa":str(row.get("PA_kPa",row.get("original_PA_kPa_kept",""))),
+            "source_ERA5_RH_pct":str(row.get("CDS_ERA5_RH_water_pct",row.get("replacement_RH_water_pct",""))),
+            "reason":reason,"approved_for_DATM":"NO"})
+        origin[stage+"_ROW_HOLD_"+reason]+=1
+
     for row in r64:
-        site=row["site"]; time=stamp(row["tower_local_start"])
+        site=row["site"];time=stamp(row["tower_local_start"])
         if site not in FIVE:continue
         rh=number(row["replacement_RH_water_pct"])
         t=number(row["original_TA_C_kept"])
         p=number(row["original_PA_kPa_kept"])
         if not (0<rh<=100 and -80<t<65 and 50<p<110):
-            raise ValueError("Stage64 numerical source claimed physical but is invalid "+site+" "+time)
-        if time in replacements[site]:raise ValueError("Stage64 original duplicated")
+            source_hold("Stage64",row,site,time,"RH_T_PA_INVALID")
+            continue
+        if time in replacements[site]:
+            # Double correction of the same original timestamp would destroy
+            # attribution. Leave existing source unchanged and mark source HOLD.
+            source_hold("Stage64",row,site,time,"DUPLICATE_NATIVE_SOURCE_KEY")
+            continue
         replacements[site][time]=(rh,"STAGE64_INDEPENDENT_ERA5_WATER_RH",t,p,"STAGE64_PHYSICAL_CANDIDATE")
         origin["Stage64"]+=1
     for row in r74:
         site=row["site"];time=stamp(row["tower_local_start"])
         if site not in FIVE:continue
         is_numeric = row["science_status"]==STAGE74_NUMERIC
-        # Independently verified CDS RH exists also for the original 1,675
-        # temperature-source SCIENCE HOLDS. These can serve as explicit
-        # numeric TECHNICAL-PREVIEW shadows (not as approved model forcing),
-        # retaining their original exact status in the review ledger.
+        # Independent CDS can contain negative/nonfinite/oversaturated RH.
+        # Such rows are NOT a humidity correction. They remain explicit HOLD;
+        # do NOT clip RH, silently impute it, or abort processing other rows.
         rh=number(row["CDS_ERA5_RH_water_pct"])
         t=number(row["TA_C"])
         p=number(row["PA_kPa"])
         if not (0<rh<=100 and -80<t<65 and 50<p<110):
-            raise ValueError("Stage74 physical RH shadow bounds violated "+site+" "+time)
-        if time in replacements[site]:raise ValueError("Stage64/74 source timestamp overlap; reconcile before build")
+            source_hold("Stage74",row,site,time,"RH_T_PA_INVALID")
+            continue
+        if time in replacements[site]:
+            source_hold("Stage74",row,site,time,"DUPLICATE_OR_STAGE64_OVERLAP")
+            continue
         name=("STAGE74_CDS_INDEPENDENT_WATER_RH" if is_numeric else
               "STAGE74_CDS_HUMIDITY_WITH_ORIGINAL_T_SCIENCE_HOLD")
         replacements[site][time]=(rh,name,t,p,row["science_status"])
@@ -157,8 +179,14 @@ def library():
     if len(q0)!=EXPECTED_QC0_2000:
         raise ValueError("Stage85 original measured-source T approvals changed")
     print("STAGE92 SOURCE LEDGERS VERIFIED 9389/16874/17568; scoped external numerical",
-          dict(origin),"site source sizes",{site:len(val) for site,val in replacements.items()},flush=True)
-    return specs,replacements,ho1,old
+          dict(origin),"site source sizes",{site:len(val) for site,val in replacements.items()},
+          "skipped_source_rows_HOLD",len(holds),flush=True)
+    for row in holds[:20]:
+        print("STAGE92 SOURCE ROW HOLD",row["source_stage"],row["site"],
+              row["tower_local_start"],row["reason"],
+              "RH",row["source_ERA5_RH_pct"],"T",row["native_TA_C"],
+              "PA",row["source_PA_kPa"],flush=True)
+    return specs,replacements,ho1,old,holds
 
 def load_module(path,name):
     m=importlib.util.spec_from_file_location(name,path)
@@ -167,7 +195,7 @@ def load_module(path,name):
     m.loader.exec_module(mod)
     return mod
 
-def build(specs,replacements,ho1,old,netcdf_path,no_nc=False):
+def build(specs,replacements,ho1,old,holds,netcdf_path,no_nc=False):
     if not EXT_ENGINE.is_file():raise ValueError("Missing GitHub Stage92 engine placed beside driver")
     engine=load_module(EXT_ENGINE,"stage92_external_engine")
     if engine.INTERPOLATE!={"TA_F":4,"VPD_F":4,"PA_F":4,
@@ -202,6 +230,15 @@ def build(specs,replacements,ho1,old,netcdf_path,no_nc=False):
     out.mkdir(parents=True,exist_ok=False)
     marker=out/"INCOMPLETE_DO_NOT_USE_FOR_DATM_OR_SPINUP"
     marker.write_text("SCIENTIFIC SHADOW ONLY. Do not activate DATM; complete site Post-v5 and source-clock reviews.\\n")
+    holdpath=out/"source_row_holds_stage64_stage74.csv"
+    cols=("source_stage","site","tower_local_start","source_csv_row",
+          "science_status","native_TA_C","source_TA_QC","source_PA_kPa",
+          "source_ERA5_RH_pct","reason","approved_for_DATM")
+    with holdpath.open("w",newline="",encoding="utf8") as fh:
+        writer=csv.DictWriter(fh,fieldnames=cols)
+        writer.writeheader()
+        writer.writerows(holds)
+    print("STAGE92 SOURCE HOLD CSV",holdpath,"n=",len(holds),flush=True)
     results=[]
     summaries=[]
     for site,n_years in FIVE.items():
@@ -271,6 +308,10 @@ def build(specs,replacements,ho1,old,netcdf_path,no_nc=False):
         "stage85_manifest_sha256":sha(STAGE85/"stage85_source_decision_manifest.json"),
         "stage91_manifest_sha256":sha(STAGE91/"manifest.json"),
         "engine_sha256":sha(EXT_ENGINE),
+        "source_row_holds":len(holds),
+        "source_row_holds_csv":str(holdpath),
+        "source_row_holds_sha256":sha(holdpath),
+        "source_hold_reasons":dict(Counter(x["reason"] for x in holds)),
         "original_source_SHA_unchanged":not changed,"sites":results}
     (out/"manifest.json").write_text(json.dumps(manifest,indent=2,default=str)+chr(10))
     if complete==5 and (no_nc or built==98):
@@ -300,16 +341,22 @@ def main():
         assert np.isclose(number("75.0"),75.0)
         assert np.isnan(number("-9999"))
         assert EXT_ENGINE.name=="qcv5_stage92_integrate_external_RH_sources.py"
+        assert not (0<float("nan")<=100)
+        assert not (0<float("inf")<=100)
+        assert 0<50<=100
+        assert set(("Stage74","RH_T_PA_INVALID"))=={"Stage74","RH_T_PA_INVALID"}
+        # Malformed/non-physical humidity must be a native-row HOLD;
+        # it cannot stop loading other sites or be used as a valid repair.
         print("STAGE92 SELF-TEST PASS | five blocked, 98 NC, source-provenance guarded; no writes")
         return
     if args.forcing_only and not args.build:
         parser.error("--forcing-only requires --build")
-    specs,replacements,ho1,old=library()
+    specs,replacements,ho1,old,holds=library()
     print("STAGE92 PREFLIGHT VERIFIED | five original raw source pairs + 3 SHA ledgers + Stage91 98-year list")
     if args.check:
         print("STAGE92 CHECK PASS | no candidate/source/NetCDF writes")
         return
-    return build(specs,replacements,ho1,old,args.netcdf_module,args.forcing_only)
+    return build(specs,replacements,ho1,old,holds,args.netcdf_module,args.forcing_only)
 
 if __name__=="__main__":
     raise SystemExit(main())
