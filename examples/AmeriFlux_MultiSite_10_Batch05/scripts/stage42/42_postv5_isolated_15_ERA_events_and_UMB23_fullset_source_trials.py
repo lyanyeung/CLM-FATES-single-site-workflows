@@ -189,13 +189,15 @@ def evaluate(site,eid,method,rr,original,raw,approved,allP2,provenance):
   for side,t in (("BEFORE",times[0]),("AFTER",times[-1])):
    nt=plus(t,-30 if side=="BEFORE" else 30)
    obs=raw.get(nt)
-   if obs is None:raise ValueError("original FLUXMET native ±30 neighbor missing "+site+" "+nt)
+   if obs is None:
+    obs=dict(T=None,V=None,TQC="MISSING",VQC="MISSING")
    key=(site,nt)
    nV=(num(approved[key]["modified_VPD_hPa"]) if key in approved else obs["V"])
    nRH=(100*(1-obs["V"]/es(obs["T"])) if obs["T"] is not None and
         -80<=obs["T"]<=60 and obs["V"] is not None else None)
    status=("ALREADY_APPROVED_STAGE24" if key in approved else
            "OTHER_P2P3_UNAPPROVED" if key in allP2 else
+           "SOURCE_NATIVE_NEIGHBOR_MISSING" if obs["VQC"]=="MISSING" else
            "SOURCE_ORIGINAL_NEIGHBOR")
    if nV is None:
     uncomparable+=1
