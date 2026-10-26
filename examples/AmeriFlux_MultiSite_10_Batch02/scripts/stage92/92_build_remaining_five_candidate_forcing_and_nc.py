@@ -123,7 +123,7 @@ def library():
         rh=number(row["replacement_RH_water_pct"])
         t=number(row["original_TA_C_kept"])
         p=number(row["original_PA_kPa_kept"])
-        if not (0.01<=rh<=100 and -80<t<65 and 50<p<110):
+        if not (0<rh<=100 and -80<t<65 and 50<p<110):
             raise ValueError("Stage64 numerical source claimed physical but is invalid "+site+" "+time)
         if time in replacements[site]:raise ValueError("Stage64 original duplicated")
         replacements[site][time]=(rh,"STAGE64_INDEPENDENT_ERA5_WATER_RH",t,p,"STAGE64_PHYSICAL_CANDIDATE")
@@ -131,17 +131,21 @@ def library():
     for row in r74:
         site=row["site"];time=stamp(row["tower_local_start"])
         if site not in FIVE:continue
-        if row["science_status"]!=STAGE74_NUMERIC:
-            origin["Stage74_TEMP_SCIENCE_HOLD_SKIP"]+=1
-            continue
+        is_numeric = row["science_status"]==STAGE74_NUMERIC
+        # Independently verified CDS RH exists also for the original 1,675
+        # temperature-source SCIENCE HOLDS. These can serve as explicit
+        # numeric TECHNICAL-PREVIEW shadows (not as approved model forcing),
+        # retaining their original exact status in the review ledger.
         rh=number(row["CDS_ERA5_RH_water_pct"])
         t=number(row["TA_C"])
         p=number(row["PA_kPa"])
-        if not (0.01<=rh<=100 and -80<t<65 and 50<p<110):
+        if not (0<rh<=100 and -80<t<65 and 50<p<110):
             raise ValueError("Stage74 physical RH shadow bounds violated "+site+" "+time)
         if time in replacements[site]:raise ValueError("Stage64/74 source timestamp overlap; reconcile before build")
-        replacements[site][time]=(rh,"STAGE74_CDS_INDEPENDENT_WATER_RH",t,p,row["science_status"])
-        origin["Stage74"]+=1
+        name=("STAGE74_CDS_INDEPENDENT_WATER_RH" if is_numeric else
+              "STAGE74_CDS_HUMIDITY_WITH_ORIGINAL_T_SCIENCE_HOLD")
+        replacements[site][time]=(rh,name,t,p,row["science_status"])
+        origin["Stage74_NUMERIC" if is_numeric else "Stage74_T_SOURCE_HOLD_PREVIEW_ONLY"]+=1
 
     ho1={}
     for row in r85:
