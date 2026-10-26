@@ -1,5 +1,7 @@
 # US-Me2 documented clock, 2026-10-26
 
+See the [docs README](README.md) for Chinese status and execution instructions. The complete runnable script is also archived [inside docs/code](code/14a_US_Me2_documented_clock_READONLY.py), identical to the maintained Stage14a script.
+
 The missing UTC offset has now been recovered from the user's separately downloaded AmeriFlux site BADM. The selected FULLSET ZIP itself still contains no BIF. The new evidence supersedes the historical statement that UTC−8 has only solar/temperature diagnostic support.
 
 ## Evidence and interpretation
