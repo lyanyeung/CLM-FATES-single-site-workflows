@@ -37,6 +37,9 @@ from uuid import uuid4
 
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch04")
 S05=ROOT/"qcv5_stage05_candidates/candidate_20261024T103113Z"
+S08=ROOT/"qcv5_stage08_remaining_seven_candidates/candidate_20261024T120137Z"
+SOURCE_STAGES={"US-SP1":"STAGE05","US-Syv":"STAGE05","US-Ton":"STAGE05",
+               "US-Slt":"STAGE08","US-Uaf":"STAGE08"}
 SYVH3=ROOT/"manual_US_Syv_stage_SYVH3_last_18_QC0_RH_closure_candidate_not_approved/candidate_20261026T034556Z_3372d66c"
 MANIFEST=SYVH3/"RESEARCH_TEN_SITE_MANIFEST.tsv"
 FINAL_SYV_SHA="9299193bc12b06e37211d84d31c333e299f99cb0ed96ebc6ed224ef9eaaf02aa"
@@ -95,6 +98,7 @@ def targets():
                 arr.add(k)
         out[site]=arr
     ck(sum(map(len,out.values()))==12 and len(out)==5 and
+       set(SOURCE_STAGES)==set(EXPECTED) and
        all(set(OLD_LW_EXPECTED[s])==out[s] for s in out),
        "Expected precisely 12 already operator-observed extreme LW HH")
     return out
@@ -147,25 +151,48 @@ def pinned_inputs():
     ck(Path(selected["US-Syv"]["source_path"])==final_path and
        selected["US-Syv"]["source_SHA256"]==FINAL_SYV_SHA,
        "Must start from actual final 18-RH Syv source")
-    ck(set(EXPECTED).issubset(source.get("sites",{})),
-       "Stage05 original native+ERA sources missing for affected 5 sites")
+    # Stage05 was scoped explicitly to the FIRST three priority sites
+    # (US-SP1, US-Syv, US-Ton); Stage08 independently prepared the other
+    # seven sites. Never claim Stage05 contains all ten sites.
+    stage08=j(S08/"report.json")
+    ck(stage08.get("mode")=="BUILD_CANDIDATE_OVERLAY" and
+       set(stage08.get("sites",{}))==
+           {"US-Rpf","US-Seg","US-Ses","US-Slt",
+            "US-SRG","US-SRM","US-Uaf"},
+       "Stage08 seven-site immutable source receipt changed")
+    ck(set(source.get("sites",{}))==
+           {"US-SP1","US-Syv","US-Ton"},
+       "Stage05 first-three site source receipt changed")
+    ck(set(SOURCE_STAGES)==set(EXPECTED) and
+       {site for site,stage in SOURCE_STAGES.items() if stage=="STAGE08"}==
+       {"US-Slt","US-Uaf"},
+       "Exact five-site stage-by-stage source routing changed")
     paths={}
     for site in EXPECTED:
-        spec=source["sites"][site]
+        source_meta=source if SOURCE_STAGES[site]=="STAGE05" else stage08
+        spec=source_meta["sites"][site]
+        ck(spec.get("rows")==NATIVE_HH_EXPECTED[site],
+           site+" original Stage05/08 native full row census changed")
         raw=Path(spec["paths"]["native"]);era=Path(spec["paths"]["era"])
         ck(sha(raw)==spec["source_provenance"]["native"]["sha256"],
-           site+" original native source SHA mismatch")
+           site+" original native source SHA mismatch from "+
+           SOURCE_STAGES[site])
         ck(sha(era)==spec["source_provenance"]["era"]["sha256"],
-           site+" paired processed FLUXNET ERA SHA mismatch")
+           site+" paired processed FLUXNET ERA SHA mismatch from "+
+           SOURCE_STAGES[site])
         chosen=Path(selected[site]["source_path"])
         ck(sha(chosen)==selected[site]["source_SHA256"],
-           site+" operator selected full site SHA mismatch")
+           site+" selected research site full file SHA mismatch")
+        print("PINNED ORIGINAL SOURCE",site,SOURCE_STAGES[site],
+              "NATIVE_SHA",spec["source_provenance"]["native"]["sha256"],
+              "ERA_SHA",spec["source_provenance"]["era"]["sha256"],
+              "SELECTED_SHA",selected[site]["source_SHA256"])
         paths[site]=(chosen,raw,era)
     for site in EXPECTED_SITES-set(EXPECTED):
         ck(sha(Path(selected[site]["source_path"]))==
            selected[site]["source_SHA256"],
            site+" source manifest SHA mismatch")
-    print("SHA VERIFIED FINAL 10-SITE SYVH3 SELECTION + ORIGINAL FIVE-SITE FLUXMET AND PROCESSED ERA")
+    print("SHA VERIFIED FINAL TEN-SITE MANIFEST, THREE STAGE05 + TWO STAGE08 ORIGINAL SOURCES AND ERA PAIRS")
     return fieldnames,old,paths
 def assess(paths,tt):
     patch={};counts=Counter()
