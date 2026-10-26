@@ -132,24 +132,11 @@ def record_before_after(candidate,edge):
  source=num(candidate["original_VPD_hPa"])
  trial=num(candidate["hypothetical_VPD_preserve_processed_source_ERA_RH_hPa"])
  neighbor=num(edge["adjacent_current_selected_VPD_hPa"])
- if None in (source,trial,neighbor):raise ValueError("source/trial/adjacent VPD missing")
+ if source is None or trial is None:raise ValueError("original candidate VPD/trial missing")
  if abs(num(edge["trial_source_ERA_RH_VPD_hPa"])-trial)>0.00001:
   raise ValueError("Stage36 actual trial VPD changed")
  if edge["adjacent_status"]=="ADJACENT_SAME_TRIAL_CANDIDATE":
   return None
- # For edge BEFORE: candidate minus previous neighbor; for AFTER:
- # next neighbor minus candidate. Sign is chronological, unlike Stage36's
- # reversed sign convention; thresholds use absolute values regardless.
- orig_jump=(source-neighbor) if side=="BEFORE" else (neighbor-source)
- new_jump=(trial-neighbor) if side=="BEFORE" else (neighbor-trial)
- orig=abs(orig_jump);new=abs(new_jump)
- if abs(new-abs(num(edge["trial_vs_adjacent_selected_VPD_jump_hPa"])))>0.00001:
-  raise ValueError("Stage36 signed boundary magnitude vs recompute mismatch")
- change=new-orig
- new2=orig<=GT2 and new>GT2
- new4=orig<=GT4 and new>GT4
- worsened=change>DELTA+EPS
- improved=change<-DELTA-EPS
  qc=edge["adjacent_original_VPD_QC"]
  if boolstr(edge["neighbor_QC2_or_not_measured"]) != (qc!="0"):
   raise ValueError("QC flag from Stage36 changed")
@@ -160,11 +147,47 @@ def record_before_after(candidate,edge):
  unapproved=boolstr(edge["neighbor_is_unapproved_P2P3"])
  if unapproved != (edge["adjacent_status"]=="ADJACENT_OTHER_P2P3_ORIGINAL_UNAPPROVED_DIAGNOSTIC"):
   raise ValueError("external P2P3 neighbor status and flag mismatch")
- state=("NEW_GT4_AFTER_TRIAL" if new4 else
-        "NEW_GT2_AFTER_TRIAL" if new2 else
-        "WORSENED_ABS_GT0_5" if worsened else
-        "IMPROVED_ABS_AT_LEAST0_5" if improved else
-        "STABLE_OR_SMALL_CHANGE_STILL_PROVENANCE_REVIEW")
+ values=dict(original_chronological_signed_jump_hPa="",
+  trial_chronological_signed_jump_hPa="",
+  original_abs_jump_hPa="",trial_abs_jump_hPa="",
+  absolute_jump_change_trial_minus_original_hPa="",
+  source_original_above2=False,source_trial_above2=False,
+  source_original_above4=False,source_trial_above4=False,
+  NEW_threshold2_crossing=False,NEW_threshold4_crossing=False,
+  WORSENED_gt0_5hPa=False,IMPROVED_at_least0_5hPa=False)
+ if neighbor is None:
+  if num(edge["trial_vs_adjacent_selected_VPD_jump_hPa"]) is not None:
+   raise ValueError("Stage36 source edge jump exists though neighbor VPD missing")
+  state="ORIGINAL_NEIGHBOR_VPD_MISSING_NOT_COMPARABLE"
+ else:
+  # For BEFORE: trial time minus preceding time, and for AFTER:
+  # following time minus trial time, so the signed jump is chronological.
+  orig_jump=(source-neighbor) if side=="BEFORE" else (neighbor-source)
+  trial_jump=(trial-neighbor) if side=="BEFORE" else (neighbor-trial)
+  orig=abs(orig_jump);new=abs(trial_jump)
+  saved=num(edge["trial_vs_adjacent_selected_VPD_jump_hPa"])
+  if saved is None or abs(new-abs(saved))>0.00001:
+   raise ValueError("Stage36 original edge VPD jump inconsistent with candidate")
+  change=new-orig
+  new2=orig<=GT2 and new>GT2
+  new4=orig<=GT4 and new>GT4
+  worsened=change>DELTA+EPS
+  improved=change<-DELTA-EPS
+  state=("NEW_GT4_AFTER_TRIAL" if new4 else
+         "NEW_GT2_AFTER_TRIAL" if new2 else
+         "WORSENED_ABS_GT0_5" if worsened else
+         "IMPROVED_ABS_AT_LEAST0_5" if improved else
+         "STABLE_OR_SMALL_CHANGE_STILL_PROVENANCE_REVIEW")
+  values.update(dict(
+   original_chronological_signed_jump_hPa=round(orig_jump,8),
+   trial_chronological_signed_jump_hPa=round(trial_jump,8),
+   original_abs_jump_hPa=round(orig,8),
+   trial_abs_jump_hPa=round(new,8),
+   absolute_jump_change_trial_minus_original_hPa=round(change,8),
+   source_original_above2=orig>GT2,source_trial_above2=new>GT2,
+   source_original_above4=orig>GT4,source_trial_above4=new>GT4,
+   NEW_threshold2_crossing=new2,NEW_threshold4_crossing=new4,
+   WORSENED_gt0_5hPa=worsened,IMPROVED_at_least0_5hPa=improved))
  return dict(site=candidate["site"],episode_id=candidate["episode_id"],
   candidate_native=candidate["native_time"],adjacent_side=side,
   neighbor_native=edge["adjacent_native_time"],
@@ -172,20 +195,13 @@ def record_before_after(candidate,edge):
   neighbor_original_VPD_QC=qc,
   neighbor_original_RH_water_pct=neighbor_rh if neighbor_rh is not None else "",
   candidate_original_VPD_hPa=source,candidate_trial_VPD_hPa=trial,
-  neighbor_selected_VPD_hPa=neighbor,
-  original_chronological_signed_jump_hPa=round(orig_jump,8),
-  trial_chronological_signed_jump_hPa=round(new_jump,8),
-  original_abs_jump_hPa=round(orig,8),trial_abs_jump_hPa=round(new,8),
-  absolute_jump_change_trial_minus_original_hPa=round(change,8),
-  source_original_above2=orig>GT2,source_trial_above2=new>GT2,
-  source_original_above4=orig>GT4,source_trial_above4=new>GT4,
-  NEW_threshold2_crossing=new2,NEW_threshold4_crossing=new4,
-  WORSENED_gt0_5hPa=worsened,IMPROVED_at_least0_5hPa=improved,
+  neighbor_selected_VPD_hPa=neighbor if neighbor is not None else "",
   original_neighbor_QC0_measured=qc=="0",
   original_neighbor_QC2_or_not_measured=qc!="0",
   neighbor_RH_below10pct_or_unphysical=low,
   neighbor_is_unapproved_P2P3=unapproved,
-  border_review_decision=state+"__NOT_FORCING_APPROVED")
+  border_review_decision=state+"__NOT_FORCING_APPROVED",
+  **values)
 
 def segments(candidates):
  groups=defaultdict(list)
@@ -274,6 +290,13 @@ def selftest():
  z2=record_before_after(c2,e2)
  assert z2["NEW_threshold4_crossing"] and z2["WORSENED_gt0_5hPa"]
  assert not z2["IMPROVED_at_least0_5hPa"]
+ no_neighbor=dict(e,adjacent_current_selected_VPD_hPa="",
+                   trial_vs_adjacent_selected_VPD_jump_hPa="",
+                   adjacent_implied_RH_water_pct="",
+                   neighbor_RH_below10pct_or_unphysical="True")
+ nrow=record_before_after(c,no_neighbor)
+ assert nrow["original_abs_jump_hPa"]=="" and nrow["trial_abs_jump_hPa"]==""
+ assert "NOT_COMPARABLE" in nrow["border_review_decision"]
  assert tadd("200812312330",30)=="200901010000"
  print("STAGE37 SELF-TEST PASS | original-vs-trial jump causality, threshold crossing, exact 30-min clock, zero forcing changes")
 
@@ -339,6 +362,8 @@ def main():
     p2=sum(x["neighbor_is_unapproved_P2P3"] for x in boundaries),
     rh_low=sum(x["neighbor_RH_below10pct_or_unphysical"] for x in boundaries))
   label=("CROSS_ORIGINAL_EPISODE_TRIAL_BOUNDARY_REVIEW" if len(boundaries)!=2 else
+    "MISSING_ORIGINAL_NEIGHBOR_VPD_SCIENCE_HOLD" if any(
+      x["original_abs_jump_hPa"]=="" for x in boundaries) else
     "NEW_OR_WORSENED_GT4_BOUNDARY_REVIEW" if risks["new4"] or any(
     x["source_trial_above4"] and x["WORSENED_gt0_5hPa"] for x in boundaries) else
     "NEW_OR_WORSENED_GT2_BOUNDARY_REVIEW" if risks["new2"] or any(
@@ -394,7 +419,9 @@ def main():
   unapproved=count("neighbor_is_unapproved_P2P3")
   original4=count("source_original_above4")
   trial4=count("source_trial_above4")
-  label=("NEW_GT4_AT_EVENT_BOUNDARY" if new4 else
+  label=("MISSING_ORIGINAL_NEIGHBOR_VPD_SCIENCE_HOLD" if any(
+    x["original_abs_jump_hPa"]=="" for x in rr) else
+    "NEW_GT4_AT_EVENT_BOUNDARY" if new4 else
     "WORSENED_GT4" if trial4 and worsened else
     "NEW_GT2_AT_EVENT_BOUNDARY" if new2 else
     "WORSENED_GT2" if count("source_trial_above2") and worsened else
