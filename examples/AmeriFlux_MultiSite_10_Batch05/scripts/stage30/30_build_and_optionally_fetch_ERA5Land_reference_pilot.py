@@ -88,8 +88,17 @@ def selftest():
  assert len(list(months_cover(datetime(2008,1,31,23),datetime(2008,2,1,1))))==2
  assert label(parse("200805241500")-timedelta(hours=-7))=="200805242200"
  assert label(parse("202508250930")-timedelta(hours=-6))=="202508251530"
- assert "2007-12-14/2007-12-17".count("/")==1
- print("STAGE30 SELF-TEST PASS | ISO slash-date range required by CDS time-series, BIF arithmetic, month crossing, site-specific offsets, no auto writes")
+ fake=[dict(site="US-Vcm",BIF_UTC_OFFSET_hours="-7",
+   UTC_OFFSET_group_coverage="OPEN_ENDED_START_DATED_REVIEW",
+   native_context_start="200712151500",native_context_end="200712160000",
+   UTC_context_start_CANDIDATE="200712152200",
+   UTC_context_end_CANDIDATE="200712160700",
+   episode_or_event="SELFTEST",source_event_type="P1_MANUAL_HOLD_UNCHANGED")]
+ _,_,requests=plan(fake)
+ assert len(requests)==1
+ assert requests[0]["request"]["date"]=="2007-12-14/2007-12-17"
+ assert set(requests[0]["request"])=={"variable","date","location","data_format"}
+ print("STAGE30 SELF-TEST PASS | actual CDS ISO date interval construction, BIF arithmetic, month crossing, site-specific offsets, no auto writes")
 def get_inputs(d29,d28):
  win29=d29/"stage29_27_PILOT_NATIVE_TO_UTC_CANDIDATE_WINDOWS.csv"
  g29=d29/"stage29_ORIGINAL_BIF_UTC_OFFSET_ALL_GROUPS.csv"
