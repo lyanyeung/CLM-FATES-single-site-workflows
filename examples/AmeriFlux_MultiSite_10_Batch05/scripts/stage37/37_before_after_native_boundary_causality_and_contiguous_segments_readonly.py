@@ -146,8 +146,8 @@ def record_before_after(candidate,edge):
  if abs(new-abs(num(edge["trial_vs_adjacent_selected_VPD_jump_hPa"])))>0.00001:
   raise ValueError("Stage36 signed boundary magnitude vs recompute mismatch")
  change=new-orig
- new2=orig<=GT2+EPS and new>GT2+EPS
- new4=orig<=GT4+EPS and new>GT4+EPS
+ new2=orig<=GT2 and new>GT2
+ new4=orig<=GT4 and new>GT4
  worsened=change>DELTA+EPS
  improved=change<-DELTA-EPS
  qc=edge["adjacent_original_VPD_QC"]
@@ -177,8 +177,8 @@ def record_before_after(candidate,edge):
   trial_chronological_signed_jump_hPa=round(new_jump,8),
   original_abs_jump_hPa=round(orig,8),trial_abs_jump_hPa=round(new,8),
   absolute_jump_change_trial_minus_original_hPa=round(change,8),
-  source_original_above2=orig>GT2+EPS,source_trial_above2=new>GT2+EPS,
-  source_original_above4=orig>GT4+EPS,source_trial_above4=new>GT4+EPS,
+  source_original_above2=orig>GT2,source_trial_above2=new>GT2,
+  source_original_above4=orig>GT4,source_trial_above4=new>GT4,
   NEW_threshold2_crossing=new2,NEW_threshold4_crossing=new4,
   WORSENED_gt0_5hPa=worsened,IMPROVED_at_least0_5hPa=improved,
   original_neighbor_QC0_measured=qc=="0",
