@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 sys.dont_write_bytecode=True
 
-VER="batch03-stage13j-v3-20261026-correct-CDS-UTC-coverage-gate"
+VER="batch03-stage13j-v4-20261026-UTC-coverage-QC0-edge-census"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 SITE="US-MOz"
 S07=ROOT/"qcv5_native_trial_20261022T024559Z_36c46e58"
@@ -303,8 +303,23 @@ def qc0_clock_and_boundary(t,e,grid,meta,segments):
     span=t.loc[START:END-pd.Timedelta(microseconds=1)]
     candidates=span.TA_F_QC.eq(0)&span.VPD_F_QC.eq(0)
     idx=span.index[candidates]
+    # Always expose evidence for EACH event, even when the broad QC0 clock
+    # calibration fails: otherwise the user cannot distinguish a missing
+    # measured QC0 boundary from time-offset or ERA-Land incompatibility.
+    context={"measured_both_QC0":int(len(idx))}
+    for a,b,n in SCOPE:
+        left=pd.Timestamp(a);right=pd.Timestamp(b)
+        before=idx[(idx<left)&(idx>=left-pd.Timedelta(hours=6))]
+        after=idx[(idx>right)&(idx<=right+pd.Timedelta(hours=6))]
+        context[a+"/"+b]={
+            "original_measured_QC0_T_and_VPD_6h_before":int(len(before)),
+            "original_measured_QC0_T_and_VPD_6h_after":int(len(after)),
+            "closest_QC0_before":str(before[-1]) if len(before) else None,
+            "closest_QC0_after":str(after[0]) if len(after) else None,
+            "status":"PENDING_GRID_TEST" if len(before) and len(after)
+                     else "HOLD_MISSING_ORIGINAL_QC0_BOUNDARY"}
     if len(idx)<12:
-        return False,{"status":"HOLD_QC0_ANALOGUES_INSUFFICIENT","measured_both_QC0":int(len(idx))}
+        return False,{"status":"HOLD_QC0_ANALOGUES_INSUFFICIENT",**context}
     clock={}
     for off in (meta["utc_offset_hours"]-1,meta["utc_offset_hours"],
                 meta["utc_offset_hours"]+1):
@@ -320,7 +335,7 @@ def qc0_clock_and_boundary(t,e,grid,meta,segments):
     clock_pass=(target["T_MAE_C"]<=3.0 and target["VPD_MAE_hPa"]<=2.0 and
                 all(target["T_MAE_C"]+1.0<=p["T_MAE_C"] for p in neighbors))
     detail={"status":"PASS" if clock_pass else "HOLD_BIF_OFFSET_NOT_CONFIDENTLY_VALIDATED_BY_QC0",
-            "measured_both_QC0":int(len(idx)),"clock_candidates":clock}
+            **context,"clock_candidates":clock}
     if not clock_pass:return False,detail
     # Both ends must have measured original QC0 T+VPD within 6h.
     passed=0
