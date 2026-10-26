@@ -246,6 +246,7 @@ def create_one(parent,output,site,changes):
         ck(reader.fieldnames is not None and
            {"TIMESTAMP_START","LW_IN_F"}.issubset(reader.fieldnames),
            "Selected site missing LW_IN_F for new candidate "+site)
+        has_lw_qc="LW_IN_F_QC" in reader.fieldnames
         writer=csv.DictWriter(dest,fieldnames=reader.fieldnames)
         writer.writeheader()
         for r in reader:
@@ -254,9 +255,10 @@ def create_one(parent,output,site,changes):
                 ck(k not in seen,"Duplicate target native HH "+site+" "+k)
                 seen.add(k)
                 r["LW_IN_F"]=format(changes[(site,k)]["new_research_LW_IN_F_Wm2"],".12g")
-                # Keep the ORIGINAL QC value + provide a separate provenance
-                # ledger. No column pretending that ERA substituted LW is
-                # original measured source/QC0; source LW_IN_F_QC not altered.
+                # Mark the modified source as ERA-origin whenever the
+                # assembled full source actually supplies this QC column.
+                # Original source QC is retained in the immutable 12HH ledger.
+                if has_lw_qc:r["LW_IN_F_QC"]="2"
             writer.writerow(r)
     ck(n==NATIVE_HH_EXPECTED[site] and
        seen=={k for s,k in changes if s==site},
@@ -278,11 +280,16 @@ def diff(old,new,site,changes):
                 ck(not changedfields,"Unapproved source field edited "+site+" "+k+
                    " fields="+repr(changedfields))
                 continue
-            ck(k not in seen and changedfields=={"LW_IN_F"},
-               "Approved exact HH must change only LW_IN_F "+site+" "+k+
+            ck(k not in seen and
+               "LW_IN_F" in changedfields and
+               changedfields.issubset({"LW_IN_F","LW_IN_F_QC"}),
+               "Approved exact HH must change only LW_IN_F and its ERA QC "+site+" "+k+
                " diffs="+repr(changedfields))
             seen.add(k);changed+=1
             grid=changes[(site,k)]["new_research_LW_IN_F_Wm2"]
+            if "LW_IN_F_QC" in y:
+                ck(y["LW_IN_F_QC"]=="2",
+                   "Edited LW native QC column must identify ERA origin "+site+" "+k)
             ck(abs(float(y["LW_IN_F"])-grid)<1e-8,
                "Output LW does not equal paired verified ERA at "+site+" "+k)
     ck(n==NATIVE_HH_EXPECTED[site] and
@@ -345,7 +352,7 @@ def run():
      "final_original_SYVH3_Syv_SHA":FINAL_SYV_SHA,
      "exact_source_12_low_LW_HH":12,"affected_site_count":5,
      "all_original_and_upstream_sources_unmodified":True,
-     "affected_source_fields_changed":["LW_IN_F"],
+     "affected_source_fields_changed":["LW_IN_F","LW_IN_F_QC_IF_PRESENT"],
      "source_ERA_class":"ORIGINAL_PACKAGED_FLUXNET_PROCESSED_ERA5_LW_NOT_INDEPENDENT_ERA5LAND",
      "input_pinned_manifest":str(MANIFEST),
      "input_manifest_SHA256":sha(MANIFEST),
@@ -355,7 +362,7 @@ def run():
      "full_input_source_record_counts":NATIVE_HH_EXPECTED,
      "new_LW_source_halfhours":12,
      "unchanged_selected_sites":[r["site"] for r in manifest if r["site"] not in tt],
-     "source_QC_at_changes":"PRESERVED_RAW_QC_COLUMN_EXPLICIT_NEW_ERA_SOURCE_IN_SEPARATE_LEDGER",
+     "source_QC_at_changes":"ORIGINAL_QC_IN_LEDGER_CANDIDATE_QC2_IF_COLUMN_PRESENT",
      "followup_gate":"INDEPENDENT_ALL_TEN_SITE_7MET_NOLEAP_NUMERICAL_RECHECK_REQUIRED"
     }
     (out/"SYVH7_RESEARCH_RECEIPT.json").write_text(
