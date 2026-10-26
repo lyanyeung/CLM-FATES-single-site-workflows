@@ -52,11 +52,11 @@ TRIAL_FIELDS=("site","native_time","episode_id","research_method",
  "full_episode_science_gate","original_FLUXMET_ZIP_SHA256",
  "science_status","production_forcing_authorization")
 SITE_REPORT_FIELDS=("site","source_original_P2P3_unapproved_HH",
- "source_original_P2P3_events","source_ZIP_archive_SHA256",
- "exact_native_HH_verified_against_original_ZIP","number_of_full_episode_trials",
+ "source_original_P2P3_events","original_FLUXMET_source_SHA256",
+ "exact_native_HH_verified_against_original_FLUXMET","number_of_full_episode_trials",
  "full_episode_ERA_review_candidates","full_episode_MDS_review_candidates",
  "source_original_QC0_protected_HH",
- "P1_manual_HOLD_total_batch_unchanged",
+ "original_FLUXMET_source_provenance","P1_manual_HOLD_total_batch_unchanged",
  "approved166_unchanged","site_closeout_status")
 def digest(p):
  h=hashlib.sha256()
@@ -451,14 +451,15 @@ def main():
   summary.append(dict(site=site,
    source_original_P2P3_unapproved_HH=len(psite),
    source_original_P2P3_events=len({r["episode_id"] for r in psite}),
-   source_ZIP_archive_SHA256=ziphash.get(site,"NOT_SCANNED"),
-   exact_native_HH_verified_against_original_ZIP=sum(
+   original_FLUXMET_source_SHA256=ziphash.get(site,"NOT_SCANNED"),
+   exact_native_HH_verified_against_original_FLUXMET=sum(
      len(group[site,eid]) for eid in {r["episode_id"] for r in psite})
      if site in trial_sites and site not in site_source_holds else 0,
    number_of_full_episode_trials=len(rr),
    full_episode_ERA_review_candidates=sum(x["science_gate"]=="NUMERIC_CANDIDATE_REVIEW_NO_SCIENCE_APPROVAL" for x in er),
    full_episode_MDS_review_candidates=sum(x["science_gate"]=="NUMERIC_CANDIDATE_REVIEW_NO_SCIENCE_APPROVAL" for x in md),
    source_original_QC0_protected_HH=sum(r["VPD_F_QC"]=="0" for r in psite),
+   original_FLUXMET_source_provenance=source_location.get(site,"NOT_SCANNED"),
    P1_manual_HOLD_total_batch_unchanged=46,approved166_unchanged=True,
    site_closeout_status=status))
  if sum(r["source_original_P2P3_unapproved_HH"] for r in summary)!=1574:
@@ -507,7 +508,7 @@ def main():
   md.append("| {} | {} | {} | {} | {} | {} |".format(
    r["site"],r["source_original_P2P3_unapproved_HH"],
    r["source_original_P2P3_events"],
-   "YES" if r["source_ZIP_archive_SHA256"]!="NOT_SCANNED" else "NOT_SCANNED",
+   "YES" if r["original_FLUXMET_source_SHA256"]!="NOT_SCANNED" else "NOT_SCANNED",
    r["full_episode_ERA_review_candidates"],r["site_closeout_status"]))
  md+=["","## Site source discovery blockers (unverified, NOT PASSED)"]
  if site_source_holds:
@@ -530,7 +531,7 @@ def main():
   print("STAGE38 SITE",r["site"],"P2P3",r["source_original_P2P3_unapproved_HH"],
     "EVENTS",r["source_original_P2P3_events"],
     "ERA_NUMERIC_REVIEW",r["full_episode_ERA_review_candidates"],
-    "SOURCE_ZIP",r["source_ZIP_archive_SHA256"][:12],
+    "SOURCE_ZIP",r["original_FLUXMET_source_SHA256"][:12],
     "STATUS",r["site_closeout_status"])
  print("STAGE38 FULL_EPISODE_NATIVE_RESEARCH_CANDIDATE_ROWS",len(native_trial))
  print("STAGE38 ORIGINAL_SOURCE_SITE_HOLDS",json.dumps(site_source_holds,sort_keys=True))
