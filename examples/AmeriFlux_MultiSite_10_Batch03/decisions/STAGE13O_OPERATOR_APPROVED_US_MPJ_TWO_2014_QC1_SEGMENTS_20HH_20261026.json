@@ -1,0 +1,75 @@
+{
+  "schema": "batch03-stage13o-operator-approved-two-full-US-Mpj-QC1-20HH-v1",
+  "site": "US-Mpj",
+  "operator_decision_date": "2026-10-26",
+  "operator_exact_instruction": "批准 US-Mpj Stage13o 成段修复：2014-10-11 01:30–06:00 共10条、2014-10-21 04:00–08:30 共10条，均为原始 QC1；授权范围包含此前3条中心及新增17条。仅在原始塔站和ERA SHA、时间/QC、全段联合VPD连续性、两端原始QC0、RH/QBOT物理检查全部通过后，才在新独立forcing候选中用配对ERA RH结合保留TA重建VPD/QBOT，保留原有3条已批准中心值。未通过的整段HOLD。原始数据、Stage07、2018两条VPD、2020已批准温度、PFT不变，不提交模型作业。请直接更新GitHub代码并给IRIDIS6运行指令。",
+  "exact_original_source_native_events": [
+    {
+      "start": "2014-10-11T01:30:00",
+      "end": "2014-10-11T06:00:00",
+      "half_hours": 10,
+      "pre_QC0": "2014-10-11T01:00:00",
+      "post_QC0": "2014-10-11T06:30:00",
+      "original_VPD_QC_required": 1
+    },
+    {
+      "start": "2014-10-21T04:00:00",
+      "end": "2014-10-21T08:30:00",
+      "half_hours": 10,
+      "pre_QC0": "2014-10-21T03:30:00",
+      "post_QC0": "2014-10-21T09:00:00",
+      "original_VPD_QC_required": 1
+    }
+  ],
+  "previous_three_approved_centers": [
+    {
+      "native_time": "2014-10-11T02:30:00",
+      "retain_existing_Stage07_VPD_hPa_rounded_3dp": 1.032
+    },
+    {
+      "native_time": "2014-10-11T04:30:00",
+      "retain_existing_Stage07_VPD_hPa_rounded_3dp": 1.163
+    },
+    {
+      "native_time": "2014-10-21T08:30:00",
+      "retain_existing_Stage07_VPD_hPa_rounded_3dp": 2.103
+    }
+  ],
+  "additional_neighbour_source_records_authorized": 17,
+  "new_candidate_source": "SHA-signed original Stage07 18-year NOLEAP US-Mpj, not separate Stage11h shadow",
+  "new_values": "At exactly the other 17 source-native QC1 slots reconstruct VPD_USE from original paired source ERA RH transferred to retained Stage07 TA_USE; recompute QBOT from es(T) minus VPD and retained PSRF; retain original Stage07 three center VPD/QBOT",
+  "science_gates": [
+    "exact 20 original native 30min timestamps and original VPD_F_QC=1 at all 20",
+    "existing Stage07 3 operator approved centers unchanged, prior Stage13m/Stage13d approvals verified",
+    "original source tower/paired ERA, Stage07 candidate and actual Stage13n read-only report SHA verified",
+    "original 4 bookend source VPD QC0 observations and original Stage07 QC0 exact VPD retained",
+    "ERA source RH strict 0<RH<100%, site tower TA vs ERA source TA <=8C, site RH strict (0,100), positive VPD below es, QBOT in (0,.08), PSRF unchanged",
+    "each adjacent 30min VPD difference through both full episodes including immutable QC0 bookends <=4hPa",
+    "fail-closed per entire 10HH run if any gate fails (never partial segments)",
+    "full 315360-row, native-time and all other model columns/times exact numerical equality to original Stage07",
+    "new isolated research-only shadow with SHA receipt; never modify originals"
+  ],
+  "protection": {
+    "original_raw_FLUXMET": true,
+    "original_paired_ERA": true,
+    "Stage07_selected": true,
+    "2018-02-02T17:30:00_original_VPD_hPa": 11.261,
+    "2018-02-02T19:00:00_original_VPD_hPa": 9.178,
+    "2020-02-11T06:30:00_existing_Stage07_TA_C": 1.1795,
+    "all_2014_QC0_and_other_QC1_unrelated": true,
+    "PFT_surface_ZBOT": true,
+    "Stage11h_separate_unapproved_2018_shadow": true,
+    "Postv5_DATM_AD400_Normal400_Slurm": true
+  },
+  "signed_context": {
+    "Stage07_US_Mpj_source_sha256": "c227f65b800baca3160efe40442fee91ee83c5f04308a0453e0c22bd05d0f592",
+    "original_tower_sha256": "11f4383dd6deebec8d8ec4f8d82ea00b94e2d4100144811f335f395925451e75",
+    "original_companion_ERA_sha256": "fb9dc6954b585c125669fab10af1f6d1ca22f2ee84ef18b59f55c9d2449b7f2e",
+    "stage13n_evidence_report_dir": "/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13n_Mpj_original_QC1_ERA_RH_episode_READONLY_20261026T201029Z_3b42b67d"
+  },
+  "status": "OPERATOR_APPROVED_EXACT_20HH_RESEARCH_SHADOW_ONLY_PENDING_IRIDIS6_SCIENCE_GATES",
+  "Postv5_approved": false,
+  "DATM_ready": false,
+  "spinup_authorized": false,
+  "model_jobs_authorized": false
+}
