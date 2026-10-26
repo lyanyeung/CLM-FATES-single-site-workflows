@@ -203,7 +203,8 @@ def main():
     a=p.parse_args()
     if a.self_test:
         assert dt("200012312330")+timedelta(minutes=30)==dt("200101010000")
-        assert len(contiguous([{"tower_local_start":x} for x in ("200004190930","200004191000","200004191130")]))==1
+        assert [len(g) for g in contiguous([{"tower_local_start":x} for x in ("200004190930","200004191000","200004191130")])] == [2, 1]
+        assert [len(g) for g in contiguous([{"tower_local_start":x} for x in ("200004190930","200004191000","200004191030")])] == [3]
         assert fmt(None)=="NA"
         print("STAGE90 SELF-TEST PASS | native HH/HR source neighborhood and cross-year QC0 boundary; no writes")
         return
