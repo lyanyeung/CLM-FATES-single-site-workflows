@@ -237,7 +237,7 @@ def audit():
                 raise ValueError("Unapproved Kon off-target T/humidity changed: "+col)
     for k in OTHER_10:
         j=ix[k]
-        if not np.array_equal(orig.iloc[j].to_numpy(),selected.iloc[j].to_numpy(),equal_nan=True):
+        if not orig.iloc[j].equals(selected.iloc[j]):
             raise ValueError("Unapproved 10 other QC1 source T changed "+k)
     protected_34=sorted(set(preview.loc[(preview.relative_halfhours==0)&
              (preview.center_reason=="HOLD_NEW_ADJACENT_VPD_JUMP_GT4HPA"),
