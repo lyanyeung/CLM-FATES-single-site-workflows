@@ -1,5 +1,15 @@
 # Stage13p — user-approved US-NR1 six 2022 humidity and five 2004 nonhumidity repairs
 
+## 2026-10-26 22:36 UTC — ACTUAL IRIDIS6 Stage13p source science and applied result
+
+The operator executed the Git blob verified [Stage13p mobile one-click](../scripts/stage13/13p_NR1_mobile_one_click.sh) from `login6003` and provided full terminal log. Hash guard PASS; original Stage12af/ak/al receipt and source-chain read-only check PASS; original five 2004 source QC2 interpolations and six 2022 original-native paired ERA RH 7-edge VPD scientific checks PASS. Final:
+
+`STAGE13P TWO SOURCE GROUPS PASS; NR1 6 HUMIDITY + 5 NONHUMIDITY FIELDS SUCCESS /iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/science_trials/stage13p_NR1_6ERA_RH_5_PSRF_FLDS_OPERATOR_APPROVED_20261026T223628Z_6b3f07eb`
+
+Original 490,560 NOLEAP rows with full-source and output readback verified. Exactly `{'QBOT': 6, 'PSRF': 3, 'FLDS': 2, 'VPD_USE': 6}` field changes compared to the last operator-approved Stage12af NR1 source; 17 changed field-values over 10 native time stamps. The VPD seven 30min edges have maximum `0.06319390197164276` hPa. All other original source times/fields unchanged, previous Stage12af approved temperature retained; Stage12ak audit prints hypothetical source Kon pressure corrections as part of its verified original source audit, **but US-Kon has no file written by Stage13p**. The other 234 NR1 humidity-held timestamps remain blank, and **Post-v5/DATM/AD400/Slurm false**.
+
+These exact 11 operator-approved US-NR1 model-field corrections need no repeated user scientific approval. The new output is still research-only, not an admitted model forcing.
+
 ## Exact approved scope and Stage12 source facts
 
 Operator explicitly approved two bounded site-science groups, ONLY **US-NR1**.
