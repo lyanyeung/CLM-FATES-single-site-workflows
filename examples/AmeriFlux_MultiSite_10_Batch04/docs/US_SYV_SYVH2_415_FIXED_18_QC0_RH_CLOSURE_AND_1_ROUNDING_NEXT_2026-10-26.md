@@ -10,7 +10,7 @@
 
 ## Next operation — new independent research candidate, not yet performed on IRIDIS6
 
-[Source SHA-pinned SYVH3 last-18-RH-only closure code](../scripts/manual_review/stage_syvh3_close_18_qc0_vpd_valid_derived_rh_and_rounding_audit.py), GitHub commit `349a56d277af0ad62a1d31a5d8812f2b622670e6`.
+[Source SHA-pinned SYVH3 last-18-RH-only closure code](../scripts/manual_review/stage_syvh3_close_18_qc0_vpd_valid_derived_rh_and_rounding_audit.py), GitHub commit `51acbc12de6b741f879c7bd91165893997fcaf27`.
 
 ```bash
 conda activate clm_fates_env
@@ -18,7 +18,7 @@ conda activate clm_fates_env
   set -euo pipefail
   BASE="$HOME/ameriflux_batch04_manual_review"
   RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows"
-  COMMIT="349a56d277af0ad62a1d31a5d8812f2b622670e6"
+  COMMIT="51acbc12de6b741f879c7bd91165893997fcaf27"
   REL="examples/AmeriFlux_MultiSite_10_Batch04/scripts/manual_review"
   mkdir -p "$BASE"
   SCRIPT="$BASE/stage_syvh3_close_18_qc0_vpd_valid_derived_rh_and_rounding_audit.py"
