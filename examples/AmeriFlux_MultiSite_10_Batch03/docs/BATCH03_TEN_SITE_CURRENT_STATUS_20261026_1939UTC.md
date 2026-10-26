@@ -14,7 +14,7 @@ Exactly **40** records changed in each `TA_USE, VPD_USE, TBOT, QBOT` (160 model-
 
 ## Ten-site comparison (last verified comparable site-numerical report vs newer separate research trials)
 
-Last complete 10-site survey: [Stage12ai 2026-10-26 03:00 UTC](STAGE12AI_20261026_TEN_SITE_STATUS_AFTER_KON_12AH.md). Exact selected nine-site baseline was 3788 VPD/QBOT-missing site-native half-hour rows; 3789 any-source-missing rows (one extra US-NR1 nonhumidity-only source row); US-Me2 was not included in a comparable numeric source. **These counts are NOT a newly rerun post-19:39 inventory.** Later, some Kon and NR1 research candidates changed numerical completeness without production/admission. No ten-site model is verified as production-approved.
+Last complete 10-site survey: [Stage12ai 2026-10-26 03:00 UTC](STAGE12AI_20261026_TEN_SITE_STATUS_AFTER_KON_12AH.md). Exact selected nine-site baseline was 3788 VPD/QBOT-missing site-native time-step rows (US-MMS is hourly; all other listed stations are half-hourly); 3789 any-source-missing rows (one extra US-NR1 nonhumidity-only source row); US-Me2 was not included in a comparable numeric source. **These counts are NOT a newly rerun post-19:39 inventory.** Later, some Kon and NR1 research candidates changed numerical completeness without production/admission. No ten-site model is verified as production-approved.
 
 | Site | Verified latest production-selected source gaps (Stage12ai baseline) | Later research evidence / separately verified work | Blocking issue(s) |
 |---|---:|---|---|
@@ -23,7 +23,7 @@ Last complete 10-site survey: [Stage12ai 2026-10-26 03:00 UTC](STAGE12AI_2026102
 | US-NC2 | 0 | Stage11q numeric shadow and six QC0 temperature correction operator policy includes four NC2 spikes | **13 VPD manual records** incl 2025 source/ERA/time provenance, Jan2019 05:30 extra T source event, PFT and Post-v5 QA |
 | US-Kon | 389 | Stage12ay latest signed **RESEARCH-ONLY** after Stage12an/ax/ay: **77 missing** (70 routine bridge proposals evaluated, 9 specially protected holds), 77 remains NON DATM; earlier VPD repairs unapproved as production | 77 unresolved source-native research gaps and approval/scientific provenance of prior hundreds of alternative humidity hypotheses |
 | US-Me6 | 65 | Stage12ac operator-approved five native 2017 Jul04 source humidity patch already included; original 33 candidate procedure approvals require independent final on-grid native audit | missing humidity 65 in last signed selected source; 33 candidate methods / 29 >5°C source tower-grid T holds; source-specific continuity and original-source QC |
-| US-MMS | 16 | Stage12g selected | 15 source-year evidence slots + one separate physics/source hold; native hourly clock (not 30min) and humidity QC |
+| US-MMS | 16 **hourly** records | Stage12g selected | 15 source-year evidence slots + one separate physics/source hold; native hourly clock (not 30min) and humidity QC |
 | US-MtB | **2840** | Stage12j tested four bulk methods; **all four failed the original QC0 external analogue science gate** | high-elevation station/grid T bias, humidity physics, source-year evidence, protected hard holds; cannot approve blanket fill |
 | US-NR1 | **240** | Stage12al six exact source-native ERA-RH science `RESEARCH-ONLY` values reduced separate research gap **240 -> 234**, but not operator-approved final input; Stage12ak nonhumidity research suggestions unapproved | 6 specific RH near 2022-09-10 QA, other 234 hold events, four original nonhumidity missing flags overlap VPD gaps except one unique timestamp |
 | US-NR3 | **238** | Stage12g selected | source-year gaps, 172 original physics holds and native RH/VPD/QBOT QA |
@@ -32,7 +32,7 @@ Last complete 10-site survey: [Stage12ai 2026-10-26 03:00 UTC](STAGE12AI_2026102
 ### Reliable status distinctions
 
 - **3/10 site candidates fully numerical** (US-MOz, US-Mpj, US-NC2) in the verified original census; US-MOz's 40 new repairs are now in a sealed isolated research-only successor.
-- **6/10** had missing selected-source humidity (US-Kon, US-Me6, US-MMS, US-MtB, US-NR1, US-NR3). Original 3788 subtotal is historical snapshot; Kon 77 and NR1 234 are not automatically admitted because latest source trials are not production-authorised and are not an independently rerun all-ten consolidated selected-input audit.
+- **6/10** had missing selected-source humidity (US-Kon, US-Me6, US-MMS, US-MtB, US-NR1, US-NR3). Original 3788 native-time-step subtotal is historical snapshot; Kon 77 and NR1 234 are not automatically admitted because latest source trials are not production-authorised and are not an independently rerun all-ten consolidated selected-input audit.
 - **US-Me2** documented time metadata gate is resolved, but no forcing repair or production candidate has yet been established in the open PR.
 - **0/10 confirmed Post-v5 / DATM / AD400 model-ready**; all ten still need input height (ZBOT) and actual active surface/PFT/case-forcing implementation validation where not already evidenced. Recommended PFT compositions are scientific assumptions, not evidence they have been applied.
 
