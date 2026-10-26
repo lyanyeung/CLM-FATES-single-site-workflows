@@ -5,8 +5,8 @@ BASE="$HOME/ameriflux_batch05_stage38"
 mkdir -p "$BASE"
 
 # GitHub source commit and Git blob SHA are immutable science provenance.
-PY_COMMIT="4330b9bd7f8441896f3e723893d42d9e2c52f48e"
-PY_BLOB="e54855fc0414f126300719e506c4996d6c20d2a5"
+PY_COMMIT="60cbc5520441e90105f94c7c0843cdb477186ba5"
+PY_BLOB="d6884f53b3a7f3eae46860862a2c3ea023a585bf"
 REMOTE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$PY_COMMIT"
 RELPATH="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage38/38_fast_small_site_closeout_and_Vcp_full_episode_method_trials_readonly.py"
 SCRIPT="$BASE/stage38.py"
