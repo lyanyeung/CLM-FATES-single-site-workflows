@@ -316,7 +316,7 @@ def save(dest,decisions,ordered,ho1,manifest):
         w.writeheader();w.writerows(x for x in decisions if x["operator_choice"]=="HOLD")
     verdict=ho1_conditional_era_decision(ho1)
     (dest/"Ho1_2000_Dec27_0900_user_conditional_ERA.json").write_text(
-        json.dumps(verdict,indent=2)+"\\n")
+        json.dumps(verdict,indent=2)+chr(10))
     proof={
         "schema":"STAGE94_QC0_OPERATOR_EVIDENCE_NON_ACTIVATING_v1",
         "input_stage93_manifest_sha256":sha(S93/"manifest.json"),
@@ -330,7 +330,8 @@ def save(dest,decisions,ordered,ho1,manifest):
         "Ho1_0900_source_operator_condition":verdict["source_decision"],
         "allowed_operator_choices":list(ALLOWED),
         "no_source_forcing_nc_cime_slurm_writes":True,
-        "reports_sha256":{p.name:sha(p) for p in (out,priority,strongest,accepted,stillhold)}}
+        "reports_sha256":{p.name:sha(p) for p in (out,priority,strongest,accepted,stillhold,
+            dest/"Ho1_2000_Dec27_0900_user_conditional_ERA.json")}}
     (dest/"manifest.json").write_text(json.dumps(proof,indent=2)+"\n")
     print("\nSTAGE94 REPORT",dest,flush=True)
     print("STAGE94 USER CONDITIONAL DECISIONS CLASSIFIED | 30 episodes; 122 original QC0 changes",flush=True)
