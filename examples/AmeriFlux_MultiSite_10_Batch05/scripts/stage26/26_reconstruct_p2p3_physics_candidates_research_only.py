@@ -200,7 +200,10 @@ def variants(r):
  return ans
 
 def pack(source,work):
- details=[];options=[];by_site=defaultdict(Counter);subgroups=defaultdict(lambda:dict(count=0,episodes=set(),opts=0,tempgt5=0,needs=0))
+ details=[];options=[];by_site=defaultdict(lambda:{
+  "count":0,"episodes":set(),"native":0,"mds":0,"era":0,"era_e":0,
+  "none":0,"gt5":0,"independent":0
+ });subgroups=defaultdict(lambda:dict(count=0,episodes=set(),opts=0,tempgt5=0,needs=0))
  for key,row in sorted(work.items()):
   r=source[key]
   opts=variants(r)
