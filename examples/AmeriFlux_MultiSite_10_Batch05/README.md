@@ -831,3 +831,19 @@ At this stage **nothing has been written to forcing, original QC, CIME, or Slurm
 ```
 
 Expected **G01 26 + G03 34 + G05 26 + G06 31 = 117 candidate half-hours** (including G06 eight QC1 raw-low-RH entries with separate provenance). G02 19 + G04 12 + G07 3 = **34 separate missing-RH holds**. Two native source comparisons are essential: `RH_ERA` is diagnostic source-downscaled ERA RH, **not newly downloaded ERA5/ERA5-Land RH**; and the VPD must be `es(original TA_F)*(1 - chosen RH/100)`, never unmodified `VPD_ERA` combined with tower T. User has approved this candidate direction, but no source or production forcing changes have yet been run or verified.
+
+
+## Stage22 user-approved NON-HOLD overlay (2026-10-26)
+
+**Latest status supersedes any earlier Stage20 Stage21 instructions to keep all candidates on hold.** User: “hold我人工审核，其他的按照你的决定修改。” Stage21 was successfully run by operator (source verified) and categorized 57 remaining original P1 HH into A=44, B=11, C=2.
+
+- **Scientific approval for a new reconstructed RH+VPD native-time overlay: 162 HH** = 117 original Stage20 candidate HH + 34 non-2015 US-Vcm QC0 extreme-low source RH records reconstructed using processed source ERA RH with observed tower TA + 11 QC2 records reconstructed using available original source RH and selected TA.
+- **46 original P1 HH specifically HOLD for user's manual review** = 34 Stage20 native original RH missing events (G02 19, G04 12, G07 3), 10 A-class 2015-12-06 source extreme-low RH (source ERA T differs strongly and processed ERA RH can be <10%), plus 2 2008-12-27 C-class missing source RH events.
+- **3 specific QC0 transition boundary HH not modified:** WCr 2025-08-25 12:30, WCr 2025-08-26 02:00, Vcm 2025-10-14 11:30, until user's explicit per-time replacement decision.
+- Original 176 P1 HH = 130 approved P1 + 46 held P1; the 162-overlay row total additionally includes 32 Stage20 non-P1 transition / original source RH QC1 records. No double count.
+
+[Stage22 operator-ready script](scripts/stage22/22_apply_decisions_to_versioned_native_overlay.py) and [decision provenance documentation](docs/STAGE22_APPROVED_NONHOLD_RECONSTRUCTION_2026-10-26.md).
+
+**No IRIDIS6 Stage22 execution yet.** The script creates ONLY NEW output reports `stage22_VERSIONED_APPROVED_RH_VPD_native_overlay.csv` (162), `stage22_46_MANUAL_HOLD_P1_untouched.csv` (46), boundary QC table, manifest, and short operator review. It does NOT alter original source CSV/QC, existing DATM forcing, CLM-FATES cases, Slurm, or previous Stage18/20/21 files. Source `TA_ERA/VPD_ERA` were NOT independently verified as ERA5-Land; these values are processed source ERA and must carry reconstruction provenance.
+
+Run the pinned one-call command in the Stage22 decision documentation; after checking exact results, manually review the 46 HOLD and source native edge discontinuities. Model-ready forcing creation remains blocked until full Batch05 1,750-HH QC/P2/P3 review, Post-v5 technical checks and remaining source-specific holds are resolved.
