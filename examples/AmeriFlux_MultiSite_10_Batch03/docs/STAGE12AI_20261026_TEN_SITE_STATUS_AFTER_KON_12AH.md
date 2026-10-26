@@ -36,3 +36,28 @@ New source-inventory workflow: [Stage12ai ten site current source states, SHA an
 6. US-Me2 native FULLSET clock and 2020 fire/ENF land cover and US-MOz/US-Mpj/US-NC2 production QA/PFT and time offsets must be resolved before running models.
 
 **None of these stage milestones authorizes Post-v5, DATM, model spinup.**
+
+## IRIDIS6 Stage12ai verified, 2026-10-26 03:00 UTC
+
+Operator log confirms git source SHA/AST PASS, Stage12ai --self-test PASS, --check PASS, --run PASS, SHAs of each of nine separate latest research science successors checked, and isolated ten-site report:
+
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage12ai_ten_site_selected_sources_current_20261026T030050Z_7717ee91/`
+
+| Site | SHA-verified selected stage | Selected source NOLEAP rows | VPD missing | QBOT missing | Non-humidity missing rows | Any missing row count |
+|---|---|---:|---:|---:|---:|---:|
+| US-Kon | Stage12ah | 280,320 | 389 | 389 | 3 | 389 |
+| US-MMS | Stage12g | 219,000 | 16 | 16 | 0 | 16 |
+| US-MOz | Stage11h | 315,360 | **0** | **0** | 0 | **0** |
+| US-Me2 | release clock HOLD | unquantified | unquantified | unquantified | unquantified | unquantified |
+| US-Me6 | Stage12ac | 280,320 | 65 | 65 | 0 | 65 |
+| US-Mpj | Stage11h | 315,360 | **0** | **0** | 0 | **0** |
+| US-MtB | Stage12g | 280,320 | 2,840 | 2,840 | 0 | 2,840 |
+| US-NC2 | Stage11q | 367,920 | **0** | **0** | 0 | **0** |
+| US-NR1 | Stage12af | 490,560 | 240 | 240 | 4 | 241 |
+| US-NR3 | Stage12g | 315,360 | 238 | 238 | 0 | 238 |
+
+*Exact numbers from operator log, not inferred from pre-Stage12 patches.* Nine selected sites have **3,788 time rows missing humidity** and **3,789 time rows with any model meteorology missing**; 3 Kon and 4 NR1 nonhumidity missing **rows** overlap the respective humidity gaps except **one NR1 row**. Therefore 7 nonhumidity source-row flags are not 7 additional independent forcing gaps. Three former Stage11 shadows US-MOz/US-Mpj/US-NC2 have **zero finite-missing numerical fields**, but scientific, original source clock, PFT and post-v5 acceptance must still be resolved. Six latest Stage12 successors still incomplete. US-Me2 has four original source-clock metadata holds, not a comparable nine-site CSV census.
+
+[New Stage12aj source-native nonhumidity 7 row ±2 HH original source and QC provenance review](../scripts/stage12/12aj_audit_latest_Kon_NR1_nonhumidity_seven_native_rows_READONLY.py) GitHub commit `962a4105a17ffae6da734af39cd9a9611f570cff`, Git blob `ce5ca0141a9aa9841a696ea323266a6eaccff30d`, **not yet IRIDIS6 tested**. It reads the exact sealed Stage12ai report, selected Kon Stage12ah and NR1 Stage12af source CSV and original immutable Stage07 tower/paired ERA source SHA. Prints exactly which nonhumidity forcing variables are missing and their ±2 original-native HH tower and source QC context. No forcing modifications/approval.
+
+**Priority**: audit seven other-field failure rows (4 NR1, 3 Kon); then prepare one coherent humidity source/replacement decision for 6 NR1 Sep10 records, 34 Kon old VPD centers plus 23 newly held corrected-temperature neighbors, and independently repair Me6 33 policy-approved episodes. Remaining MtB 2840 requires stringent source QC evidence since Stage12j multiyear analog-screen rejects all four bulk gridded methods; NR3 238 and MMS 16 need source-year and original science physics holds. All ten `Post-v5=0, DATM-ready=0, spinup=0`.
