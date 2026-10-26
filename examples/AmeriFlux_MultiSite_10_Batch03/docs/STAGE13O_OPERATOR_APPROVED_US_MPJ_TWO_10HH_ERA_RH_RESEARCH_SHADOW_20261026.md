@@ -1,5 +1,19 @@
 # Stage13o — US-Mpj two 2014 original 10HH QC1 episodes: operator-approved group repair
 
+## 2026-10-26 21:07 UTC — ACTUAL US-Mpj STAGE13O IRIDIS6 SUCCESS
+
+The operator pasted terminal output from `login6002` running pinned Stage13o `92bb58fcf86ab3962f84bff1a886cf0e2a2d912d`: download Git hashes verified, `--self-test` PASS, `--check` **STAGE13O READONLY CHECK PASS**, and subsequent **`--apply` SUCCESS**. This supersedes the old 'not yet executed' text below.
+
+Actual final log:
+
+`STAGE13O 20/20 SOURCE SCIENCE PASS; 17 NEW PAIRED VPD/QBOT SOURCE EDITS SUCCESS /iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/science_trials/stage13o_Mpj_20HH_operator_approved_ERA_RH_20261026T210746Z_5c3c8653`
+
+`NOLEAP SOURCE ROWS 315360 ACTUAL NEW NUMERIC CHANGES {'VPD_USE': 17, 'QBOT': 17}`
+
+Original Oct11 ten-record event: all 10 physical and QC1 checks PASS, two measured QC0 boundaries retained at 01:00 and 06:30, maximum joined VPD adjacent halfhour jump **1.414406073 hPa**, 8 new source-native records and 2 original Stage07 operator-selected centers numerically retained. Oct21 ten-record event: all 10 physical and QC1 checks PASS, measured QC0 boundaries at 03:30 and 09:00 retained, maximum VPD jump **1.443101863 hPa**, 9 new source-native records and final existing center preserved. Both original Feb2018 low-but-positive RH VPD records and Feb2020 1.1795°C TA preserved. Original Stage07, PFT, ZBOT, CIME, DATM and Slurm untouched. Source full-18y 315,360 NOLEAP rows reopened and differential verified by the script.
+
+**Final source verdict for THESE TWO episodes:** operator-approved source science is satisfied; **no further human review needed for these same 20 native 2014 timestamps**. New shadow is still **research-only**, not a Post-v5/DATM or spinup production candidate. No other US-Mpj source reviews are implicitly cleared.
+
 ## Operator approval (26 October 2026)
 
 Operator explicitly approved BOTH original-source-native 2014 US-Mpj humidity QC1 intervals:
