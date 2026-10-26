@@ -25,7 +25,7 @@ Python emitted six `SyntaxWarning: invalid escape sequence '\\`'` from backslash
 
 [Stage37 read-only original-vs-trial jump attribution and maximal same-episode contiguous segments](../scripts/stage37/37_before_after_native_boundary_causality_and_contiguous_segments_readonly.py).
 
-Pinned Stage37 final source commit `d1d8d5494876fee273e870933dcdf3a7466fa6dc`, Git blob SHA `0526cac58a46f61fc0a0ee99c1e21711377067fb`.
+Pinned Stage37 final source commit `90d76de7d3f4d4651e2c98b8b01f6a50bc8df3b2`, Git blob SHA `f0c0c70801ca166df2352431e28a5be9cf3e633d`.
 
 The script reads only the **existing verified Stage36 251 candidate CSV, 502 source-ZIP boundary audit CSV, and 65 original Stage27-event summary CSV** plus **Stage35 429 candidate original source dataset** for consistent source values and input hash provenance. **No new download or source ZIP extraction.**
 
@@ -53,7 +53,7 @@ Outputs (new research folder, read-only):
 (
   set -euo pipefail
   BASE="$HOME/ameriflux_batch05_stage37"
-  COMMIT="d1d8d5494876fee273e870933dcdf3a7466fa6dc"
+  COMMIT="90d76de7d3f4d4651e2c98b8b01f6a50bc8df3b2"
   RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT"
   SCRIPT="$BASE/37_before_after_native_boundary_causality_and_contiguous_segments_readonly.py"
 
@@ -65,7 +65,7 @@ Outputs (new research folder, read-only):
     "$RAW/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage37/37_before_after_native_boundary_causality_and_contiguous_segments_readonly.py" \
     -o "$SCRIPT"
 
-  test "$(git hash-object "$SCRIPT")" = "0526cac58a46f61fc0a0ee99c1e21711377067fb"
+  test "$(git hash-object "$SCRIPT")" = "f0c0c70801ca166df2352431e28a5be9cf3e633d"
   echo "SOURCE VERIFIED"
   python3 -B -m py_compile "$SCRIPT"
   python3 -B "$SCRIPT" --self-test
@@ -88,3 +88,7 @@ Outputs (new research folder, read-only):
 - Even a trial reducing all original jumps still requires investigator decision and **separate isolated Post-v5 QC**, rather than mutating original approved 166 or forcing.
 
 **Stage37 source code on GitHub, IRIDIS6 operator run pending.** No new science approval or source/forcing/model modifications made. Original 46 P1 manually held, 1574 P2/P3 science-unapproved, 10 saturation platforms, and 166 prior-approved versioned RH/VPD overlay stay untouched. BIF original timezone date-end remains missing and native-time mapping is provisional.
+
+## Additional science-input safeguards in final Stage37 commit
+
+Stage37 now explicitly handles original neighboring half-hours where source VPD is missing: these rows are **not comparable**, retain blank numerical jump fields (not zero), and are routed to `MISSING_ORIGINAL_NEIGHBOR_VPD_SCIENCE_HOLD`. It also retains adjacent candidate trial half-hours belonging to two different original Stage27 episodes as explicit cross-episode review rather than erroneously demanding two external edges for every same-episode segment. Stage36 >2/>4 hPa strict comparison is replicated exactly. The self-test exercises both a reduced preexisting 5-to-1 hPa jump, a new >4hPa created discontinuity and a missing original-neighbor diagnostic.
