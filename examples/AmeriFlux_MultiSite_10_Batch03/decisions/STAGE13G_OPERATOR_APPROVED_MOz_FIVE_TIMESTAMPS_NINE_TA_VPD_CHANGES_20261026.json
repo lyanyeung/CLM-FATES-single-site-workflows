@@ -83,7 +83,7 @@
       "time": "2014-04-02T08:30:00",
       "variable": "VPD_USE",
       "original": 0.279,
-      "original_tower_qc": 0,
+      "original_tower_qc": null,
       "new_value": 3.974666666666667
     },
     {
@@ -97,7 +97,7 @@
       "time": "2014-04-02T09:00:00",
       "variable": "VPD_USE",
       "original": 0.177,
-      "original_tower_qc": 0,
+      "original_tower_qc": null,
       "new_value": 3.957333333333333
     },
     {
@@ -118,7 +118,7 @@
       "time": "2016-04-11T13:00:00",
       "variable": "VPD_USE",
       "original": 17.735,
-      "original_tower_qc": 0,
+      "original_tower_qc": null,
       "new_value": 9.8285
     },
     {
@@ -132,7 +132,7 @@
       "time": "2016-04-14T06:30:00",
       "variable": "VPD_USE",
       "original": 7.288,
-      "original_tower_qc": 0,
+      "original_tower_qc": null,
       "new_value": 4.217
     }
   ],
@@ -169,5 +169,6 @@
     "PFT_config_apply_approved_by_this_decision": false,
     "ZBOT_height_selected": false,
     "model_or_Slurm_submission": false
-  }
+  },
+  "qc_note": "Stage13f printed TA_F_QC for the event centers, not the independent VPD_F_QC. Do NOT assert undocumented VPD QC0; validate actual original VPD_F_QC source provenance without changing it."
 }
