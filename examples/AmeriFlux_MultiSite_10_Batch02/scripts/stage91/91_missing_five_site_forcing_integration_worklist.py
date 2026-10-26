@@ -60,11 +60,24 @@ def normal_stamp(row):
             return dig[:12]
     raise ValueError("No valid original native timestamp in candidate ledger")
 
-def keyed(rows,where):
+def keyed(rows,where,default_site=None):
+    """Stage85 is a SHA-pinned US-Ho1-only artifact without a site column.
+
+    The missing site can be supplied ONLY for the explicitly named Stage85
+    original Ho1 manifest, never inferred for other multi-site ledgers.
+    """
+    if default_site is not None and (where!="Stage85" or default_site!="US-Ho1"):
+        raise ValueError("Refuse inferred site except exact Stage85 US-Ho1 scope")
     seen={}
     for r in rows:
-        site=str(r.get("site",""))
-        if not site:raise ValueError("Empty site in "+where)
+        original_site=r.get("site")
+        site=str(original_site).strip() if original_site is not None else ""
+        if not site:
+            if default_site is None:
+                raise ValueError("Empty site in "+where)
+            site=default_site
+        if default_site is not None and site!=default_site:
+            raise ValueError("Stage85 source row declares a different site: "+site)
         stamp=normal_stamp(r)
         key=(site,stamp)
         if key in seen:raise ValueError("Duplicate native site/time in "+where+" "+str(key))
@@ -108,8 +121,21 @@ def gate():
         raise ValueError("Ho1 manual Stage85 scope changed")
     ca=keyed(a,"Stage64")
     cb_all=keyed(b,"Stage74")
-    cc=keyed(c,"Stage85")
-    if set(cc) != {("US-Ho1",k[1]) for k in cc} or any(t[:4]!="2000" for s,t in cc):
+    # Exact Stage85 is a single-site operator-approved artifact. Its CSV
+    # has native timestamp/source row and no 'site' column by design.
+    # Supply the site from its pinned manifest, not from a guessed CSV header.
+    if (m85.get("schema")!="STAGE85_MANUAL_TOWER_TEMP_PRESERVED_HO1_2000_HUMIDITY_CANDIDATE_v1"
+        or m85.get("original_measured_T_QC0_preserved_count")!=17294
+        or m85.get("nonQC0_original_T_retained_but_science_HOLD_count")!=274
+        or m85.get("original_tower_temperature_changed_count")!=0
+        or any(str(r.get("original_VPD_value_changed","")).lower()!="true"
+               or str(r.get("native_TA_F_original_QC","")) not in ("0","0.0")
+               or str(r.get("temperature_modified","")).lower()!="false"
+               for r in c)):
+        raise ValueError("Stage85 exact manually approved Ho1 QC0-only humidity scope changed")
+    cc=keyed(c,"Stage85",default_site="US-Ho1")
+    if len(cc)!=1068 or any(site!="US-Ho1" or time[:4]!="2000"
+                            for site,time in cc):
         raise ValueError("Approved Stage85 overlay escaped Ho1 year 2000")
     statuses=Counter(str(r.get("science_status","")) for r in b)
     wanted="SHADOW_NUMERIC_VALID_KEEP_ORIGINAL_T_PA_BIF_DATE_HOLD"
@@ -198,6 +224,22 @@ def main():
         assert sum(BLOCKED.values())==4904
         assert normal_stamp({"timestamp_start":"2000-12-27T09:30:00"})=="200012270930"
         assert len(keyed([{"site":"US-Ho1","time":"200012270930"}],"unit"))==1
+        # Regression: Stage85 authentic CSV intentionally has no site field.
+        assert set(keyed([{"tower_local_start":"200001010000"}],
+                         "Stage85",default_site="US-Ho1"))=={("US-Ho1","200001010000")}
+        try:
+            keyed([{"tower_local_start":"200001010000"}],"Stage74")
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("Missing multi-site source label must fail closed")
+        try:
+            keyed([{"site":"US-BZS","tower_local_start":"200001010000"}],
+                  "Stage85",default_site="US-Ho1")
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("Cross-site injection into Ho1 scope must fail closed")
         print("STAGE91 SELF-TEST PASS | exact 5-site 98-year target, native timestamp identity, distinct candidate sources; no writes")
         return
     if not (a.check or a.audit):p.error("Use --check/--audit or --self-test")
