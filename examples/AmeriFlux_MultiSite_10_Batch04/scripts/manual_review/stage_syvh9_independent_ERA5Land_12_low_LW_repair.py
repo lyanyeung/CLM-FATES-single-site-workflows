@@ -261,7 +261,8 @@ def check_original(g7):
     tt=g7.targets()
     fields,old,paths=g7.pinned_inputs()
     original_source={}
-    print("SYVH9 SOURCE CHECK: PACKAGED ERA LW IS CONTAMINATED; NO PACKAGED ERA SUBSTITUTIONS")
+    same_count=0;paired_valid_count=0
+    print("SYVH9 SOURCE CHECK: ORIGINAL/PROCESSED ERA CONTAMINATION DIAGNOSIS; NO PACKAGED ERA SUBSTITUTIONS")
     for site in sorted(tt):
         chosen,raw,era=paths[site]
         scope=set(tt[site])
@@ -279,10 +280,11 @@ def check_original(g7):
             pair=g7.val(packaged[key]["LW_IN_ERA"])
             wanted=g7.OLD_LW_EXPECTED[site][key]
             ck(oldlw is not None and orig is not None and pair is not None and
-               abs(oldlw-wanted)<.002 and abs(orig-wanted)<.002 and
-               abs(pair-wanted)<.002,
-               "12 target source contaminated ERA/FLUXMET provenance differs "+
+               abs(oldlw-wanted)<.002 and abs(orig-wanted)<.002,
+               "Observed low LW differs from pinned original/source "+
                site+" "+key+" "+str((oldlw,orig,pair)))
+            if abs(pair-oldlw)<.002:same_count+=1
+            if 60<=pair<=800:paired_valid_count+=1
             ck(oldlw<60.,"Target source LW is not a low outlier "+site+" "+key)
             print("BAD PAIRED LW",site,key,
                   "SELECTED",oldlw,"RAW",orig,"PACKAGED_ERA",pair,
@@ -295,7 +297,9 @@ def check_original(g7):
     ck(len(REQ)==N_REQUESTS and sum(map(len,tt.values()))==12,
        "Expected six independent CDS site-years / 12 original source HH")
     print("SYVH9 SOURCE/BIF/EARLIER_CANDIDATE SHA CHECK PASS",
-          "FIVE_SITES",5,"TWELVE_HH",12,"SIX_SITE_YEARS",len(REQ))
+          "FIVE_SITES",5,"TWELVE_HH",12,"SIX_SITE_YEARS",len(REQ),
+          "ORIGINAL_PACKAGED_ERA_SAME_AT_HH",same_count,
+          "PACKAGED_ERA_HAD_PHYSICAL_LONGWAVE",paired_valid_count)
     return fields,old,paths,tt,original_source
 def decide(g7,tt,sources,grids):
     edits={};per=Counter()
@@ -352,7 +356,7 @@ def decide(g7,tt,sources,grids):
     ck(len(edits)==12 and dict(per)==
        {"US-SP1":4,"US-Slt":2,"US-Syv":2,"US-Ton":2,"US-Uaf":2},
        "Independent longwave target exactness failed")
-    print("SYVH9 INDEPENDENT CDS LONGWAVE 12/12 FOURTEEN? NO EXACT TWELVE PREFLIGHT PASS",
+    print("SYVH9 INDEPENDENT CDS LONGWAVE EXACT 12/12 PREFLIGHT PASS",
           dict(per))
     return edits
 def apply(g7,helper,fields,old,paths,edits,grids):
@@ -395,7 +399,7 @@ def apply(g7,helper,fields,old,paths,edits,grids):
        "six_site_year_CDS_response_SHAs":
           {s+"_"+str(y):grids[(s,y)][1]["sha256"] for s,y in sorted(REQ)},
        "source_native_HH_QC2_where_column_exists":True,
-       "original_paired_ERA_contaminated_all_12_HH":True,
+       "original_paired_ERA_contamination_diagnosed_by_timestamp_in_ledger":True,
        "input_manifest_SHA256":sha(g7.MANIFEST),
        "new_manifest_sha256":sha(mf),
        "new_manifest_path":str(mf),
