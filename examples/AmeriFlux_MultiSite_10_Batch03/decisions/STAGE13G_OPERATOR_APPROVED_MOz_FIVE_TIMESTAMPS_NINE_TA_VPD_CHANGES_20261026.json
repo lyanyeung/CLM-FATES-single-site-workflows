@@ -1,0 +1,173 @@
+{
+  "schema": "batch03-stage13g-five-native-timestamps-nine-variable-edits-v1",
+  "date": "2026-10-26",
+  "operator_statement": "全部按照你说的做，然后3。里面的8:30和9:00也插值。",
+  "interpretation": "Approve two 2016 isolated spikes with paired temperature/VPD interpolations; expand 2014-04-02 10:00 temperature correction to 08:30 and 09:00, and pair those earlier temperature repairs with VPD interpolations to avoid spurious humidity; leave 10:00 original VPD=0.475 hPa unchanged.",
+  "scope": "ONLY five source-native half-hours at US-MOz; exactly five TA_USE and four VPD_USE edits in an NEW isolated Stage07-successor research forcing shadow.",
+  "interpolation_anchors": [
+    {
+      "date": "2014-04-02",
+      "source_time_start": "08:00",
+      "source_time_end": "09:30",
+      "new_times": [
+        "08:30",
+        "09:00"
+      ],
+      "anchor_tower_TA_C": [
+        8.909,
+        8.896
+      ],
+      "anchor_tower_VPD_hPa": [
+        3.992,
+        3.94
+      ],
+      "rule": "linear 3-interval source-native tower interpolation for paired TA/VPD"
+    },
+    {
+      "date": "2014-04-02",
+      "source_time_start": "09:30",
+      "source_time_end": "10:30",
+      "new_times": [
+        "10:00"
+      ],
+      "anchor_tower_TA_C": [
+        8.896,
+        8.647
+      ],
+      "rule": "linear 2-interval tower TA interpolation ONLY; retain VPD at 10:00"
+    },
+    {
+      "date": "2016-04-11",
+      "source_time_start": "12:30",
+      "source_time_end": "13:30",
+      "new_times": [
+        "13:00"
+      ],
+      "anchor_tower_TA_C": [
+        12.059,
+        16.076
+      ],
+      "anchor_tower_VPD_hPa": [
+        8.303,
+        11.354
+      ],
+      "rule": "linear 2-interval tower TA and VPD interpolation"
+    },
+    {
+      "date": "2016-04-14",
+      "source_time_start": "06:00",
+      "source_time_end": "07:00",
+      "new_times": [
+        "06:30"
+      ],
+      "anchor_tower_TA_C": [
+        7.756,
+        10.314
+      ],
+      "anchor_tower_VPD_hPa": [
+        3.622,
+        4.812
+      ],
+      "rule": "linear 2-interval tower TA and VPD interpolation"
+    }
+  ],
+  "exact_original_tower_event_values": [
+    {
+      "time": "2014-04-02T08:30:00",
+      "variable": "TA_USE",
+      "original": 13.31,
+      "original_tower_qc": 0,
+      "new_value": 8.904666666666667
+    },
+    {
+      "time": "2014-04-02T08:30:00",
+      "variable": "VPD_USE",
+      "original": 0.279,
+      "original_tower_qc": 0,
+      "new_value": 3.974666666666667
+    },
+    {
+      "time": "2014-04-02T09:00:00",
+      "variable": "TA_USE",
+      "original": 14.457,
+      "original_tower_qc": 0,
+      "new_value": 8.900333333333334
+    },
+    {
+      "time": "2014-04-02T09:00:00",
+      "variable": "VPD_USE",
+      "original": 0.177,
+      "original_tower_qc": 0,
+      "new_value": 3.957333333333333
+    },
+    {
+      "time": "2014-04-02T10:00:00",
+      "variable": "TA_USE",
+      "original": 18.11,
+      "original_tower_qc": 0,
+      "new_value": 8.7715
+    },
+    {
+      "time": "2016-04-11T13:00:00",
+      "variable": "TA_USE",
+      "original": 23.671,
+      "original_tower_qc": 0,
+      "new_value": 14.0675
+    },
+    {
+      "time": "2016-04-11T13:00:00",
+      "variable": "VPD_USE",
+      "original": 17.735,
+      "original_tower_qc": 0,
+      "new_value": 9.8285
+    },
+    {
+      "time": "2016-04-14T06:30:00",
+      "variable": "TA_USE",
+      "original": 17.543,
+      "original_tower_qc": 0,
+      "new_value": 9.035
+    },
+    {
+      "time": "2016-04-14T06:30:00",
+      "variable": "VPD_USE",
+      "original": 7.288,
+      "original_tower_qc": 0,
+      "new_value": 4.217
+    }
+  ],
+  "explicitly_unchanged": [
+    {
+      "time": "2014-04-02T10:00:00",
+      "variable": "VPD_USE",
+      "value": 0.475,
+      "reason": "10:00 and 10:30 both low VPD; independent sudden humidity increase remains recorded as original"
+    },
+    {
+      "date_window": "2005-01-06T05:00:00/2005-01-06T09:00:00",
+      "variables": [
+        "TA_USE",
+        "VPD_USE"
+      ],
+      "reason": "multiple-hour source discrepancy requires separate source-clock/MDS review"
+    }
+  ],
+  "historical_approvals_retained": [
+    "STAGE13D_OPERATOR_APPROVED_SIX_QC0_TOWER_TA_INTERPOLATIONS_20261026.json",
+    "STAGE13E_OPERATOR_APPROVED_FIVE_ADDITIONAL_US_MOz_TA_VPD_FIXES_20261026.json"
+  ],
+  "restrictions": {
+    "raw_tower_data_immutable": true,
+    "raw_ERA_data_immutable": true,
+    "existing_Stage07_trial_immutable": true,
+    "create_new_isolated_shadow_only": true,
+    "all_other_times_and_variables_unchanged": true,
+    "initial_stage07_six_approved_changes_retained": true,
+    "postv5_approved": false,
+    "DATM_ready": false,
+    "spinup_authorized": false,
+    "PFT_config_apply_approved_by_this_decision": false,
+    "ZBOT_height_selected": false,
+    "model_or_Slurm_submission": false
+  }
+}
