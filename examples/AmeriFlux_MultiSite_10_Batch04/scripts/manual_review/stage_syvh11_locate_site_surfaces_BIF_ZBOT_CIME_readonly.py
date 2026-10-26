@@ -80,8 +80,8 @@ def float_or_none(x):
 def kind(variable):
     var=(variable or "").strip().upper()
     for name in ("SW_IN","LW_IN","WIND","VPD","TA","WS","RH","PA","P"):
-        if (var==name or var.startswith(name+"_")) and
-           not var.endswith(("_F_QC","_ERA")):
+        if ((var==name or var.startswith(name+"_")) and
+            not var.endswith(("_F_QC","_ERA"))):
             return name
     return None
 def read_grouped_height_rows(rows,site):
@@ -93,8 +93,8 @@ def read_grouped_height_rows(rows,site):
         field=(r.get("VARIABLE") or "").strip().upper()
         val=(r.get("DATAVALUE") or "").strip()
         # Reject conflicting metadata rows inside the exact original group.
-        if field in ALL_META_KEYS and field in group[key] and
-           group[key][field]!=val:
+        if (field in ALL_META_KEYS and field in group[key] and
+            group[key][field]!=val):
             group[key].setdefault("_GROUP_CONFLICTS",[]).append(
                 (field,group[key][field],val))
         if field in ALL_META_KEYS:group[key][field]=val
@@ -193,8 +193,8 @@ def cime_cases(site):
         try:
             for p in root.iterdir():
                 if len(hits)>=MAX_CASES_PER_SITE:break
-                if not p.is_dir() or p.is_symlink() or
-                   not pat.search(p.name) or str(p) in considered:
+                if (not p.is_dir() or p.is_symlink() or
+                    not pat.search(p.name) or str(p) in considered):
                     continue
                 considered.add(str(p))
                 config=[]
@@ -204,8 +204,8 @@ def cime_cases(site):
                                  "env_run.xml","user_nl_clm",
                                  "user_nl_datm","user_nl_datm_streams"):
                         target=d/name
-                        if not target.is_file() or target.is_symlink() or
-                           target.stat().st_size>MAX_CONFIG_BYTES:
+                        if (not target.is_file() or target.is_symlink() or
+                            target.stat().st_size>MAX_CONFIG_BYTES):
                             continue
                         text=target.read_text(encoding="utf-8",errors="replace")
                         matches=[v.strip()[:300] for v in text.splitlines()
