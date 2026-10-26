@@ -11,8 +11,10 @@ User decisions:
       preserve selected T_F/QC0; recalc VPD.
  G06: 23 flagged native Vcm low-RH QC0 HH -> processed source ERA RH,
       preserve selected T_F/QC0; recalc VPD.
- G06 supplemental: 8 native source RH~0.3 QC1/MDS HH listed as
-      RH_FIELD_PROPOSAL_ONLY, never automatically replace plausible selected MDS VPD.
+ G06 supplemental: 8 native source RH~0.3 QC1/MDS HH are separately
+      flagged candidate provenance to honor ALL source RH<1% replacements;
+      selected MDS air T retained while VPD is rederived from the user-chosen
+      source ERA RH. Original MDS VPD retained in the audit for comparison.
  G02/G04/G07: original RH missing, processed ERA RH nonphysical or <=1%:
       no inferred repair. Print evidence holds.
  Every suggested VPD obeys VPD=es_water(T_F)*(1-RH_target/100).
@@ -92,19 +94,17 @@ def overlay(ix):
     if orig_rh is None:raise ValueError("G03 source native RH missing")
     scope="ALL_NATIVE_SOURCE_RH_INCLUDING_TRANSITION"
    elif group=="G06_Vcm_Oct2025" and not is_p1:
-    # The original raw RH~0.3 persists in 8 MDS/QC1 points even though
-    # their selected MDS VPD is physically plausible. Do not alter MDS VPD.
+    # Eight original RH≈0.3% samples occur during selected MDS QC1/1.
+    # User explicitly approved replacing *all* these low source RH records.
+    # Create separate QC1 provenance candidate, with VPD recomputed at
+    # selected QC1 T to ensure the RH/VPD pair stays self-consistent.
+    # Do NOT mislabel revised MDS VPD as original measured QC0.
     if (orig_rh is not None and 0<=orig_rh<1 and
         r["TA_F_QC"]=="1" and r["VPD_F_QC"]=="1"):
-     holds.append(dict(site=site,time_native=r["time_native"],group=group,
-       TA_F_QC=r["TA_F_QC"],VPD_F_QC=r["VPD_F_QC"],
-       RH_original_pct=r["RH_original_pct"],
-       ERA_RH_Magnus_water_pct=r["ERA_RH_Magnus_water_pct"],
-       VPD_F_hPa=r["VPD_F_hPa"],
-       reason="QC1 selected MDS VPD already independently physically plausible; raw source RH <1% not the selected forcing VPD",
-       decision="HOLD_SOURCE_RH_FIELD_REPLACEMENT_QC1_CONTEXT"))
-     counts["G06_QC1_low_RH_original_held"]+=1
-    continue
+     scope="ORIGINAL_SOURCE_RH_LT1_QC1_MDS_RECONSTRUCT_PER_USER"
+     counts["G06_QC1_low_RH_original_reconstructed"]+=1
+    else:
+     continue
    else:
     if not is_p1:continue
     if r["TA_F_QC"]!="0" or r["VPD_F_QC"]!="0":
@@ -140,9 +140,9 @@ def overlay(ix):
       original_data_unchanged="TRUE")
    repairs.append(rec);selected.append(rec)
   if group=="G06_Vcm_Oct2025":
-   if len(selected)!=23:raise ValueError("G06 exact 23 original QC0 P1 flags missing")
-   if counts["G06_QC1_low_RH_original_held"]!=8:
-    raise ValueError("G06 exact 8 QC1 context raw-low-RH flags missing")
+   if len(selected)!=31:raise ValueError("G06 exact 23 QC0 + 8 QC1 raw low-RH source flags missing")
+   if counts["G06_QC1_low_RH_original_reconstructed"]!=8:
+    raise ValueError("G06 exact 8 QC1 source RH reconstructed count missing")
   elif len(selected)!=expected:
    raise ValueError("expected original native subgroup count "+group+" got "+str(len(selected)))
   counts[group]=len(selected)
@@ -162,9 +162,9 @@ def overlay(ix):
      VPD_F_hPa=r["VPD_F_hPa"],reason="Original RH absent; "+status,
      decision="HOLD_NO_REPLACEMENT_SOURCE"))
   counts[group+"_HOLD"]=len(part)
- if len(repairs)!=109:raise ValueError("approved scope 109 primary candidate HH mismatch")
- if len(holds)!=42:raise ValueError("expected G02/G04/G07 34 and G06 extra QC1 8 holds")
- if len({(x["site"],x["time_native"]) for x in repairs})!=109:
+ if len(repairs)!=117:raise ValueError("approved scope 117 primary candidate HH mismatch")
+ if len(holds)!=34:raise ValueError("expected G02/G04/G07 34 missing-RH holds")
+ if len({(x["site"],x["time_native"]) for x in repairs})!=117:
   raise ValueError("duplicate original target half-hours")
  return repairs,holds,counts
 def selftest():
@@ -207,7 +207,7 @@ def main():
    "unresolved_rows":len(holds),
    "G03_original_RH_native_including_transitions":True,
    "G05_G06_original_tower_T_preserved":True,
-   "G06_extra_QC1_source_RH_low_unmodified":True}
+   "G06_extra_QC1_source_RH_low_reconstructed_separately":True}
  with (dest/"stage20_summary.json").open("x",encoding="utf-8") as f:
   json.dump(summary,f,indent=2,sort_keys=True)
  print("STAGE20 SCIENCE DECISION COUNTS",json.dumps(dict(counts),sort_keys=True),flush=True)
@@ -219,6 +219,6 @@ def main():
      "originalVPD",r["VPD_F_hPa_original"],
      "candidateRH",r["candidate_RH_pct"],
      "candidateVPD",r["candidate_VPD_hPa_with_original_TA"],flush=True)
- print("STAGE20 SUMMARY proposed_candidate_HH=109 source_RH_unresolved_HH=42 forcing_written=0 reports="+str(dest),flush=True)
+ print("STAGE20 SUMMARY proposed_candidate_HH=117 source_RH_unresolved_HH=34 forcing_written=0 reports="+str(dest),flush=True)
  print("NO ORIGINAL FLUXMET / EXISTING FORCING / ORIGINAL QC / MODEL / SLURM WRITES")
 if __name__=="__main__":main()
