@@ -8,7 +8,7 @@ New [Stage87](../scripts/stage87/87_build_five_verified_Stage07_DATM_noleap_tech
 
 **IMPORTANT distinction:** Existing Stage07 candidate files may contain automated QC0 source edits and QCv5 adjustments requiring human signoff; Stage87 confirms their original NUMERICAL candidate status and generates a *technical-preview* NetCDF, **NOT** validated/approved site meteorology. Stage09 Post-v5, site QC0 and RH edits, local time/NOLEAP centering, sensor height ZBOT, domain/site footprint/PFT, actual DATM-vs-CDEPS stream format and smoke test remain pending. Existing Stage85 Ho1 2000 candidate does NOT belong to those five sources, is not modified, and MUST be integrated into a separate Ho1 complete-year selection later. Existing Stage08 5-site partial outputs are neither ignored as evidence nor treated as complete.
 
-Original source script commit `e3c7ab2e57e2796ad88187f4ef7b7ea1164abc3b`, Git blob `4f188cd785f31812bd8ec002b05dafda09e884b2`. Structural text lint/Git hash checked; real IRIDIS6 Python self-test and source checks still need operator run.
+Original source script commit `7e4c3cd653289872d09f7a6a71e75fa35a258c2b`, Git blob `4f62ba03f52b41b98d7b6db3e89af2bf10bee8a1`. Structural text lint/Git hash checked; real IRIDIS6 Python self-test and source checks still need operator run.
 
 ## One-paste IRIDIS6 execution
 
@@ -19,8 +19,8 @@ Original source script commit `e3c7ab2e57e2796ad88187f4ef7b7ea1164abc3b`, Git bl
   PY="$CONDA_PREFIX/bin/python"
   REL="examples/AmeriFlux_MultiSite_10_Batch02"
   SCRIPT="$HOME/CLM-FATES-single-site-workflows/$REL/scripts/stage87/87_build_five_verified_Stage07_DATM_noleap_technical_preview.py"
-  COMMIT="e3c7ab2e57e2796ad88187f4ef7b7ea1164abc3b"
-  EXPECTED="4f188cd785f31812bd8ec002b05dafda09e884b2"
+  COMMIT="7e4c3cd653289872d09f7a6a71e75fa35a258c2b"
+  EXPECTED="4f62ba03f52b41b98d7b6db3e89af2bf10bee8a1"
   mkdir -p "$(dirname "$SCRIPT")"
   TMP="$(mktemp)"
   trap 'rm -f "$TMP"' EXIT
