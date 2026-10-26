@@ -23,14 +23,14 @@ Stage93 files (only inside a new unique `reports/stage93_*` directory): `ten_sit
   REL="examples/AmeriFlux_MultiSite_10_Batch02/scripts"
   COMMIT="5d53db0b0b3939a0d9a328e738d3c6d188f5ec13"
   BLOB93="263e6366fd44b09805eb8b675423c81d69793fd7"
-  C09="b2353089ff15b95b6a25c5c0e2fcf4e7be2671c7"
+  BLOB09="b2353089ff15b95b6a25c5c0e2fcf4e7be2671c7"
   W="$HOME/Batch02_stage93_manual"
   mkdir -p "$W"
   BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows"
   curl -fLsS --retry 3 "$BASE/$COMMIT/$REL/stage93/93_ten_site_postv5_and_manual_decision_priority.py" -o "$W/93_ten_site_postv5_and_manual_decision_priority.py" || exit 1
-  curl -fLsS --retry 3 "$BASE/$C09/$REL/stage09/09_post_qcv5_batch02.py" -o "$W/09_post_qcv5_batch02.py" || exit 1
+  curl -fLsS --retry 3 "$BASE/$COMMIT/$REL/stage09/09_post_qcv5_batch02.py" -o "$W/09_post_qcv5_batch02.py" || exit 1
   test "$(git hash-object "$W/93_ten_site_postv5_and_manual_decision_priority.py")" = "$BLOB93" || exit 1
-  test "$(git hash-object "$W/09_post_qcv5_batch02.py")" = "$C09" || exit 1
+  test "$(git hash-object "$W/09_post_qcv5_batch02.py")" = "$BLOB09" || exit 1
   python3 -B -c 'import ast,sys;[ast.parse(open(p,encoding="utf8").read()) for p in sys.argv[1:]];print("SYNTAX PASS 2/2")' "$W"/*.py || exit 1
   python3 -B "$W/93_ten_site_postv5_and_manual_decision_priority.py" --self-test || exit 1
   LOG="$HOME/Batch02_stage93_manual.log"
