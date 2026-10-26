@@ -51,10 +51,12 @@ MANIFEST = AMF / "Ameriflux_PFT/metadata/sites_50_manifest.csv"
 LIT_CSV = SOIL / "data/literature_soil_evidence_20261026.csv"
 REESH_KNOWN = SOIL / "data/reesh_records_found_20261026.csv"
 BADM_MANUAL = SOIL / "data/badm_manual_depth_assignments_20261026.csv"
+PROXY_CSV = SOIL / "data/site_proxy_assignments_20261026.csv"
 NODES_M = [0.025 * (math.exp(0.5 * (j - 0.5)) - 1.0) for j in range(1, 11)]   # CLM nlevsoifl=10
 NODES_CM = [100.0 * z for z in NODES_M]
-DEFAULT_PRIORITY = ("REESH", "BADM", "LIT", "SSURGO", "SOILGRIDS")
-DEEP_FILL = ("SSURGO", "SOILGRIDS", "REESH", "BADM", "LIT")
+DEFAULT_PRIORITY = ("REESH", "BADM", "LIT", "PROXY", "SSURGO", "SOILGRIDS")
+DEEP_FILL = ("SSURGO", "SOILGRIDS", "REESH", "BADM", "LIT", "PROXY")
+T1_STORE = {}   # site -> best site-measured profile (for documented neighbour proxies)
 SOILGRIDS_DEPTHS = ("0-5cm", "5-15cm", "15-30cm", "30-60cm", "60-100cm", "100-200cm")
 UA = "CLM-FATES-single-site-workflows soil evidence (research; contact repo owner)"
 
@@ -314,17 +316,37 @@ def parse_bif(path, site=None, manual=None):
             pre = grp.replace("GRP_", "")
             hz = g.get(pre + "_HORIZON", "").strip().upper()
             t, b = num(g.get(pre + "_PROFILE_MIN")), num(g.get(pre + "_PROFILE_MAX"))
-            if hz and t is not None and b is not None and b > t:
+            if hz and hz not in ("TOTAL", "ALL") and t is not None and b is not None and b > t:
                 horizon_depth.setdefault(hz, (t, b))
+    # merge texture groups that each carry only one of SAND/SILT/CLAY for the same horizon and depth
+    keyed = {}
+    for gid, g in groups.items():
+        if g["_group"].upper() == "GRP_SOIL_TEX":
+            have = [v for v in ("SOIL_TEX_SAND", "SOIL_TEX_SILT", "SOIL_TEX_CLAY") if num(g.get(v)) is not None]
+            key = (g.get("SOIL_TEX_HORIZON", "").strip().upper(), g.get("SOIL_TEX_PROFILE_MIN", ""), g.get("SOIL_TEX_PROFILE_MAX", ""))
+            if len(have) == 1 and (key[0] or key[1] or key[2]):
+                keyed.setdefault(key, []).append((gid, have[0]))
+    for key, parts in keyed.items():
+        vars_ = [v for _, v in parts]
+        if len(parts) >= 2 and len(set(vars_)) == len(vars_) and "SOIL_TEX_SAND" in vars_ and "SOIL_TEX_CLAY" in vars_:
+            new = {"_group": "GRP_SOIL_TEX", "SOIL_TEX_HORIZON": key[0], "SOIL_TEX_PROFILE_MIN": key[1], "SOIL_TEX_PROFILE_MAX": key[2],
+                   "SOIL_TEX_COMMENT": "merged single-variable groups " + "+".join(gid for gid, _ in parts)}
+            for gid, v in parts:
+                new[v] = groups[gid][v]; groups[gid]["_merged_into"] = "+".join(x for x, _ in parts)
+            groups["+".join(gid for gid, _ in parts)] = new
     for gid, g in groups.items():
         if "LOCATION_LAT" in g and lat is None:
             lat, lon = num(g.get("LOCATION_LAT")), num(g.get("LOCATION_LONG"))
         if not g["_group"].upper().startswith("GRP_SOIL"):
             continue
         for k, v in g.items():
-            if k != "_group":
+            if k != "_group" and not k.startswith("_") and "+" not in gid:
                 soil_rows.append({"group_id": gid, "variable_group": g["_group"], "variable": k, "value": v, "bif_file": path.name})
         if g["_group"].upper() != "GRP_SOIL_TEX":
+            continue
+        if g.get("_merged_into"):
+            decisions.append({"group_id": gid, "decision": "MERGED_INTO_" + g["_merged_into"], "bif_file": path.name,
+                              "sand": num(g.get("SOIL_TEX_SAND")), "silt": num(g.get("SOIL_TEX_SILT")), "clay": num(g.get("SOIL_TEX_CLAY"))})
             continue
         sand, clay, silt = num(g.get("SOIL_TEX_SAND")), num(g.get("SOIL_TEX_CLAY")), num(g.get("SOIL_TEX_SILT"))
         if sand is None and clay is None:
@@ -358,6 +380,14 @@ def parse_bif(path, site=None, manual=None):
             d.update(decision="USED", depth_top_cm=max(top, 0.0), depth_bottom_cm=bot, depth_source=how)
             tex.append({"top": max(top, 0.0), "bot": bot, "sand": sand, "clay": clay, "note": f"BADM group {gid} {how}"})
         decisions.append(d)
+    # a deeper horizon reported as 0-X below a shallower 0-Y horizon starts at Y
+    tex.sort(key=lambda r: r["bot"])
+    for i in range(1, len(tex)):
+        if tex[i]["top"] == 0 and tex[i - 1]["top"] == 0 and tex[i - 1]["bot"] < tex[i]["bot"]:
+            tex[i]["top"] = tex[i - 1]["bot"]; tex[i]["note"] += f" TOP_SHIFTED_BELOW_{tex[i - 1]['bot']:g}cm"
+            for d in decisions:
+                if f"BADM group {d['group_id']} " in tex[i]["note"]:
+                    d["depth_top_cm"] = tex[i]["top"]; d["depth_source"] = d.get("depth_source", "") + "+TOP_SHIFTED"
     return lat, lon, soil_rows, interval_profile(tex, "BADM"), decisions
 
 
@@ -367,6 +397,12 @@ def find_full_badm(badm_dir, site):
     hits = [p for p in badm_dir.rglob("*") if p.is_file() and p.suffix.lower() in (".xlsx", ".csv")
             and re.search(r"AMF_" + re.escape(site) + r"_BIF_(\d{8})", p.name, re.I)]
     return max(hits, key=lambda p: re.search(r"_BIF_(\d{8})", p.name).group(1)) if hits else None
+
+
+def read_proxies():
+    if not PROXY_CSV.is_file():
+        return {}
+    return {r["site"]: r for r in csv.DictReader(PROXY_CSV.open(encoding="utf-8"))}
 
 
 def read_manual():
@@ -645,6 +681,7 @@ def one_site(a, m, net, cache, known, lit, coords_override, surf_override, T, me
             p = lit_profile(lit[s])
             if p: profiles["LIT"] = p
             info["literature_rows"] = len(lit[s])
+        prox = read_proxies().get(s)
         if "REESH" in a.priority:
             try:
                 smp, rm = reesh(net, s, cache, known); info["reesh"] = rm
@@ -655,6 +692,16 @@ def one_site(a, m, net, cache, known, lit, coords_override, surf_override, T, me
                         lat, lon, csrc = smp[0]["lat"], smp[0]["lon"], "REESH"
             except Exception as e:
                 notes.append(f"ReESH: {e}"); info["reesh"] = {"status": "ERROR", "error": str(e)}
+        for src in ("REESH", "BADM", "LIT"):
+            if src in profiles:
+                T1_STORE[s] = (src, profiles[src]); break
+        if prox:
+            if prox["source_site"] in T1_STORE:
+                src, prof = T1_STORE[prox["source_site"]]
+                profiles["PROXY"] = [dict(r, label="PROXY", note=f"{prox['source_site']} {src}: {r.get('note', '')}") for r in prof]
+                info["proxy"] = {"source_site": prox["source_site"], "source": src, "rationale": prox["rationale"]}
+            else:
+                notes.append(f"proxy source {prox['source_site']} has no site-measured profile (run it in the same call, before this site)")
         T["coords"].append({"site": s, "lat": lat, "lon": lon, "coord_source": csrc or "MISSING"})
         if lat is not None and "SSURGO" in a.priority and (s.startswith("US-")):
             try:
@@ -708,7 +755,7 @@ def one_site(a, m, net, cache, known, lit, coords_override, surf_override, T, me
                              "delta_clay": None if not c or l["PCT_CLAY"] is None else round(l["PCT_CLAY"] - c["clay"], 2)})
         top_src = [l["source"] for l in layers[:5]]
         primary = max(set(top_src), key=top_src.count) if top_src else "NONE"
-        tier = {"REESH": "T1_SITE_MEASURED", "BADM": "T1_SITE_MEASURED", "LIT": "T1_SITE_MEASURED",
+        tier = {"REESH": "T1_SITE_MEASURED", "BADM": "T1_SITE_MEASURED", "LIT": "T1_SITE_MEASURED", "PROXY": "T1N_NEIGHBOUR_MEASURED",
                 "SSURGO": "T2_SSURGO_POINT", "SOILGRIDS": "T3_SOILGRIDS_250M", "SURFACE": "T4_KEEP_SURFACE"}.get(primary, "NO_DATA")
         flags = []
         site_src = next((x for x in ("REESH", "BADM", "LIT") if x in profiles), None)
@@ -791,6 +838,14 @@ def self_test():
         _, _, _, prof, dec = parse_bif(f, "XX-Tst", {("XX-Tst", "1"): {"decision": "USE", "depth_top_cm": "0", "depth_bottom_cm": "300",
                                                                       "sand_pct": "", "clay_pct": "", "rationale": "t"}})
         assert len(prof) == 2 and find_full_badm(Path(td), "XX-Tst") == f
+        g = Path(td) / "AMF_XX-Two_BIF_20260101.csv"
+        g.write_text("SITE_ID,GROUP_ID,VARIABLE_GROUP,VARIABLE,DATAVALUE\n" + "".join(
+            f"XX-Two,{i},GRP_SOIL_TEX,{v},{x}\nXX-Two,{i},GRP_SOIL_TEX,SOIL_TEX_HORIZON,{h}\n"
+            f"XX-Two,{i},GRP_SOIL_TEX,SOIL_TEX_PROFILE_MIN,0\nXX-Two,{i},GRP_SOIL_TEX,SOIL_TEX_PROFILE_MAX,{b}\n"
+            for i, v, x, h, b in ((1, "SOIL_TEX_SAND", 7.5, "A", 38), (2, "SOIL_TEX_CLAY", 15, "A", 38),
+                                  (3, "SOIL_TEX_SAND", 10.5, "B", 165), (4, "SOIL_TEX_CLAY", 34, "B", 165))))
+        _, _, _, prof, dec = parse_bif(g, "XX-Two", {})
+        assert [(r["top"], r["bot"], r["sand"], r["clay"]) for r in prof] == [(0, 38, 7.5, 15), (38, 165, 10.5, 34)], prof
     rows = [r for r in csv.DictReader(MANIFEST.open(encoding="utf-8"))]
     assert len(rows) == 50 and len({r["site"] for r in rows}) == 50
     lit = read_lit(); assert set(lit) <= {r["site"] for r in rows}, set(lit) - {r["site"] for r in rows}

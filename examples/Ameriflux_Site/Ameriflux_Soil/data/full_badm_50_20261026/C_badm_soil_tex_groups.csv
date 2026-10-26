@@ -1,0 +1,50 @@
+site,group_id,sand,silt,clay,horizon,comment,bif_file,manual_rationale,decision,depth_top_cm,depth_bottom_cm,depth_source
+BR-Ma2,23788,,,65.0,A,Luziao et al GBC 10 2004:,AMF_BR-Ma2_BIF_20260527.xlsx,BADM clay 65% at 0-10 cm A horizon (Luizao et al. 2004 GBC) but no sand/silt; not used until a sand value is chosen,MANUAL_REVIEW,,,
+CA-Ca3,27900,39.8,43.7,16.5,,"Loam; contact Jassal, P. of UBC biomet",AMF_CA-Ca3_BIF_20260527.xlsx,,USED,50.0,60.0,BADM_PROFILE_MIN_MAX
+CA-Ca3,29457,39.9,39.9,20.2,,"Loam; contact Jassal, P. of UBC biomet",AMF_CA-Ca3_BIF_20260527.xlsx,,USED,0.0,10.0,BADM_PROFILE_MIN_MAX
+CA-Ca3,28269,40.3,40.7,19.0,,"Loam; contact Jassal, P. of UBC biomet",AMF_CA-Ca3_BIF_20260527.xlsx,,USED,40.0,50.0,BADM_PROFILE_MIN_MAX
+CA-Ca3,29103,42.2,41.5,16.3,,"Loam; contact Jassal, P. of UBC biomet",AMF_CA-Ca3_BIF_20260527.xlsx,,USED,30.0,40.0,BADM_PROFILE_MIN_MAX
+CA-Ca3,28991,42.5,38.4,19.1,,"Loam; contact Jassal, P. of UBC biomet",AMF_CA-Ca3_BIF_20260527.xlsx,,USED,10.0,20.0,BADM_PROFILE_MIN_MAX
+CA-Ca3,26701,44.6,36.7,18.7,,"Loam; contact Jassal, P. of UBC biomet",AMF_CA-Ca3_BIF_20260527.xlsx,,USED,20.0,30.0,BADM_PROFILE_MIN_MAX
+CA-Man,26374,0.627272727,4.372727273,95.13636364,B,measured by BOREAS,AMF_CA-Man_BIF_20250731.xlsx,,USED,11.0,37.73,DEPTH_FROM_HORIZON_B
+CA-Man,25641,1.742857143,22.54285714,75.84285714,C,measured by BOREAS,AMF_CA-Man_BIF_20250731.xlsx,,USED,37.73,74.43,DEPTH_FROM_HORIZON_C
+CA-Man,26515,2.516666667,10.66666667,86.94166667,A,measured by BOREAS,AMF_CA-Man_BIF_20250731.xlsx,,USED,0.0,11.0,DEPTH_FROM_HORIZON_A
+CA-TP1,27561,98.0,2.0,0.0,,sieving method,AMF_CA-TP1_BIF_20251017.xlsx,BADM 98/2/0 (sieving) has no depth; same BADM gives SOIL_DEPTH 300 cm and classification comment '>3m' (deep sandy Brunisolic Grey Brown Luvisol); applied to full profile,USED,0.0,300.0,MANUAL_ASSIGNMENT
+CA-TP3,27921,98.0,2.0,0.0,,,AMF_CA-TP3_BIF_20260129.xlsx,"BADM 98/2/0 has no depth; SOIL_DEPTH 300 cm, '>3m'; consistent with McMaster site page 98/1/<1; applied to full profile",USED,0.0,300.0,MANUAL_ASSIGNMENT
+CA-TP4,26636,98.0,2.0,0.0,,,AMF_CA-TP4_BIF_20260715.xlsx,"BADM 98/2/0 has no depth; SOIL_DEPTH 300 cm, '>3m'; same deposit as CA-TP3 (0.8 km); applied to full profile",USED,0.0,300.0,MANUAL_ASSIGNMENT
+US-Bar,23724,74.0,23.0,4.0,,"data from Bartlett Experimental Forest, but not within tower footprint. Texture is for shallow-C layer material.",AMF_US-Bar_BIF_20241204.xlsx,"BADM comment: Bartlett EF but outside tower footprint, shallow C-layer material; NEON BART megapit BC/C horizons (40-200 cm) are loamy sand; applied below 40 cm only",USED,40.0,200.0,MANUAL_ASSIGNMENT
+US-Ha1,22050,66.0,29.0,6.0,Total,"Source: Kathleen Savage (savage@whrc.org), personal communication",AMF_US-Ha1_BIF_20260908.xlsx,,NOT_USED_NO_DEPTH,,,
+US-Me2,19730,67.0,26.0,7.0,,,AMF_US-Me2_BIF_20260527.xlsx,,NOT_USED_NO_DEPTH,,,
+US-Me6,19725,80.341666667,16.858333333,2.875,,,AMF_US-Me6_BIF_20260527.xlsx,,NOT_USED_NO_DEPTH,,,
+US-MMS,22038,34.0,3.0,63.0,,,AMF_US-MMS_BIF_20260715.xlsx,,NOT_USED_NO_DEPTH,,,
+US-MOz,24171,10.5,,,B,(range 1-20) Weller: 1.65  Clinkenbeard: 0.36,AMF_US-MOz_BIF_20230331.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-MOz,24937,7.5,,,A,"(range 5-10) Weller: 0.38  Clinkenbeard:  0.25
+Stephen Pallardy: choose Weller as representative for site",AMF_US-MOz_BIF_20230331.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-MOz,24938,,,15.0,A,"(range 12-18) Weller: 0.38  Clinkenbeard:  0.25
+Stephen Pallardy: choose Weller as representative for site",AMF_US-MOz_BIF_20230331.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-MOz,24173,,,34.0,B,(range 20-48) Weller: 1.65  Clinkenbeard: 0.36,AMF_US-MOz_BIF_20230331.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-Slt,28772,50.8,,,,"in > 2 mm fraction; n = 15 total, 3 soil cores per tree census plot.",AMF_US-Slt_BIF_20260908.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-Slt,27808,79.3,,,,"in > 2 mm fraction; n = 15 total, 3 soil cores per tree census plot.",AMF_US-Slt_BIF_20260908.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-Slt,28770,82.9,3.8,,,"in > 2 mm fraction; n = 15 total, 3 soil cores per tree census plot.",AMF_US-Slt_BIF_20260908.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-Slt,28771,83.6,,,,"in > 2 mm fraction; n = 15 total, 3 soil cores per tree census plot.",AMF_US-Slt_BIF_20260908.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-Slt,29303,95.1,4.9,,,"includes clay; in < 2 mm fraction; n = 15 total, 3 soil cores per tree census plot.",AMF_US-Slt_BIF_20260908.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-Slt,28424,95.2,4.8,,,"includes clay; in < 2 mm fraction; n = 15 total, 3 soil cores per tree census plot.",AMF_US-Slt_BIF_20260908.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-Slt,29615,95.6,4.4,,,"includes clay; in < 2 mm fraction; n = 15 total, 3 soil cores per tree census plot.",AMF_US-Slt_BIF_20260908.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-Slt,29411,95.7,4.3,,,"includes clay; in < 2 mm fraction; n = 15 total, 3 soil cores per tree census plot.",AMF_US-Slt_BIF_20260908.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-SP1,27977,99.0,0.0,1.0,,,AMF_US-SP1_BIF_20260129.xlsx,,NOT_USED_NO_DEPTH,,,
+US-SRM,27601,72.0,,,,"loamy sand, sampled on WS#6 from spreadsheet (source: P. Heilman), same soil type",AMF_US-SRM_BIF_20260527.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-SRM,27063,74.0,,,,"loamy sand, sampled on WS#6 from spreadsheet (source: P. Heilman), same soil type",AMF_US-SRM_BIF_20260527.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-SRM,27605,80.0,,,,"loamy sand, sampled on WS#6 from spreadsheet (source: P. Heilman), same soil type",AMF_US-SRM_BIF_20260527.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-SRM,29169,84.0,,,,"loamy sand, sampled on WS#6 from spreadsheet (source: P. Heilman), same soil type",AMF_US-SRM_BIF_20260527.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-SRM,27065,87.0,,,,"loamy sand, sampled on WS#6 from spreadsheet (source: P. Heilman), same soil type",AMF_US-SRM_BIF_20260527.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-SRM,27606,,,11.0,,"loamy sand, sampled on WS#6 from spreadsheet (source: P. Heilman), same soil type",AMF_US-SRM_BIF_20260527.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-SRM,26911,,,15.0,,"loamy sand, sampled on WS#6 from spreadsheet (source: P. Heilman), same soil type",AMF_US-SRM_BIF_20260527.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-SRM,27600,,,6.0,,"loamy sand, sampled on WS#6 from spreadsheet (source: P. Heilman), same soil type",AMF_US-SRM_BIF_20260527.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-SRM,28586,,,6.0,,"loamy sand, sampled on WS#6 from spreadsheet (source: P. Heilman), same soil type",AMF_US-SRM_BIF_20260527.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-SRM,27973,,,9.0,,"loamy sand, sampled on WS#6 from spreadsheet (source: P. Heilman), same soil type",AMF_US-SRM_BIF_20260527.xlsx,,NOT_USED_SAND_OR_CLAY_MISSING,,,
+US-Syv,28539,57.0,36.0,6.0,,http://www.cheas.psu.edu/data/cheas/publish-on-cheas/Sylvania_tower/Site%20Characterization/Soil%20Characterization/Soil%20Texture/Soil%20Texture.doc,AMF_US-Syv_BIF_20260908.xlsx,,NOT_USED_NO_DEPTH,,,
+US-UMB,24587,92.6,6.8,0.6,Total,,AMF_US-UMB_BIF_20260908.xlsx,,USED,0.0,20.0,DEPTH_FROM_HORIZON_TOTAL
+US-WCr,26899,54.0,33.0,13.0,,(Top 0-30 cm.)  Cook et al 2004;  (2007 Fluxnet file),AMF_US-WCr_BIF_20260527.xlsx,,USED,0.0,30.0,BADM_PROFILE_MIN_MAX
+US-WCr,27045,59.3,34.0,6.9,,from Cheas website,AMF_US-WCr_BIF_20260527.xlsx,,NOT_USED_NO_DEPTH,,,
+US-Wkg,23654,67.0,16.0,17.0,A,,AMF_US-Wkg_BIF_20241204.xlsx,,USED,0.0,5.0,BADM_PROFILE_MIN_MAX
+US-Wkg,24295,70.0,20.0,10.0,B,,AMF_US-Wkg_BIF_20241204.xlsx,,USED,0.0,147.0,BADM_PROFILE_MIN_MAX

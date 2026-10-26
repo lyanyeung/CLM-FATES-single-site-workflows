@@ -1,0 +1,51 @@
+site,batch,badm_file,soil_classification,soil_depth_cm,n_tex_groups,n_tex_used,tex_not_used,used_profile_sand_clay
+BR-Ma2,Batch01,AMF_BR-Ma2_BIF_20260527.xlsx,clay latosol,10,1,0,23788:MANUAL_REVIEW,
+CA-Ca3,Batch01,AMF_CA-Ca3_BIF_20260527.xlsx,Humoferric Podzols,15; 6.7,6,6,,0-10cm 39.9/20.2 | 10-20cm 42.5/19.1 | 20-30cm 44.6/18.7 | 30-40cm 42.2/16.3 | 40-50cm 40.3/19.0 | 50-60cm 39.8/16.5
+CA-Cbo,Batch01,AMF_CA-Cbo_BIF_20260316.xlsx,,,0,0,,
+CA-LP1,Batch01,AMF_CA-LP1_BIF_20220228.xlsx,,,0,0,,
+CA-Man,Batch01,AMF_CA-Man_BIF_20250731.xlsx,peaty-phase orthic gleysol,40,3,3,,0-11cm 2.5/86.9 | 11-37.73cm 0.6/95.1 | 37.73-74.43cm 1.7/75.8
+CA-TP1,Batch01,AMF_CA-TP1_BIF_20251017.xlsx,brunisolic grey brown luvisol,300,1,1,,0-300cm 98.0/0.0
+CA-TP3,Batch01,AMF_CA-TP3_BIF_20260129.xlsx,brunisolic grey brown luvisol,300,1,1,,0-300cm 98.0/0.0
+CA-TP4,Batch01,AMF_CA-TP4_BIF_20260715.xlsx,brunisolic grey brown luvisol,300,1,1,,0-300cm 98.0/0.0
+US-Aud,Batch01,AMF_US-Aud_BIF_20260715.xlsx,,,0,0,,
+US-Bar,Batch01,AMF_US-Bar_BIF_20241204.xlsx,Spodosol,100; 7,1,1,,40-200cm 74.0/4.0
+US-BZS,Batch02,AMF_US-BZS_BIF_20260715 (1).xlsx,,,0,0,,
+US-CMW,Batch02,AMF_US-CMW_BIF_20260527.xlsx,,,0,0,,
+US-EML,Batch02,AMF_US-EML_BIF_20251017.xlsx,,,0,0,,
+US-GLE,Batch02,AMF_US-GLE_BIF_20260908.xlsx,,,0,0,,
+US-Ha1,Batch02,AMF_US-Ha1_BIF_20260908.xlsx,,,1,0,22050:NOT_USED_NO_DEPTH,
+US-Ho1,Batch02,AMF_US-Ho1_BIF_20260527 (1).xlsx,"Soils throughout the forest are glacial tills, acid in reaction, with low fertility and high organic composition. Upland soils are fine sandy loams, classified as Aquic Haplorthods.",80,0,0,,
+US-Ho2,Batch02,AMF_US-Ho2_BIF_20260527.xlsx,"Soils throughout the forest are glacial tills, acid in reaction, with low fertility and high organic composition. Upland soils are fine sandy loams, classified as Aquic Haplorthods.",80,0,0,,
+US-Ho3,Batch02,AMF_US-Ho3_BIF_20260715.xlsx,"Soils throughout the forest are glacial tills, acid in reaction, with low fertility and high organic composition. Upland soils are fine sandy loams, classified as Aquic Haplorthods.",80,0,0,,
+US-ICh,Batch02,AMF_US-ICh_BIF_20260527.xlsx,"Embedded in piedmont hills, with a predominance of porous organic peat underlain by silt and glacial till",,0,0,,
+US-ICt,Batch02,AMF_US-ICt_BIF_20230331.xlsx,"Embedded in piedmont hills, with a predominance of porous organic peat underlain by silt and glacial till",,0,0,,
+US-Kon,Batch03,AMF_US-Kon_BIF_20251017.xlsx,Silty clay loam,,0,0,,
+US-Me2,Batch03,AMF_US-Me2_BIF_20260527.xlsx,,90,1,0,19730:NOT_USED_NO_DEPTH,
+US-Me6,Batch03,AMF_US-Me6_BIF_20260527.xlsx,,,1,0,19725:NOT_USED_NO_DEPTH,
+US-MMS,Batch03,AMF_US-MMS_BIF_20260715.xlsx,,,1,0,22038:NOT_USED_NO_DEPTH,
+US-MOz,Batch03,AMF_US-MOz_BIF_20230331.xlsx,"Weller silt loam (typic Hapudalf, fine, montmorillonitic, mesic); rocky thin soil covering, pH 4-7",165; 200; 38,4,0,24171:NOT_USED_SAND_OR_CLAY_MISSING; 24937:NOT_USED_SAND_OR_CLAY_MISSING; 24938:NOT_USED_SAND_OR_CLAY_MISSING; 24173:NOT_USED_SAND_OR_CLAY_MISSING,
+US-Mpj,Batch03,AMF_US-Mpj_BIF_20260715.xlsx,,,0,0,,
+US-MtB,Batch03,AMF_US-MtB_BIF_20250731.xlsx,,,0,0,,
+US-NC2,Batch03,AMF_US-NC2_BIF_20260527.xlsx,"Loamy, mixed, dysic, thermic terric, Haplosaprists",,0,0,,
+US-NR1,Batch03,AMF_US-NR1_BIF_20260908.xlsx,Extremely rocky (granite) consisting primarily of mineral clays covered with a surface layer (~10 cm) of organic material,15,0,0,,
+US-NR3,Batch03,AMF_US-NR3_BIF_20260908.xlsx,,,0,0,,
+US-Rpf,Batch04,AMF_US-Rpf_BIF_20260715.xlsx,,,0,0,,
+US-Seg,Batch04,AMF_US-Seg_BIF_20260715.xlsx,Loamy Sand - Top 40 cm; Sandy Loam - Below 40 cm; Shallow root depth derived from the vegetation dominance of grasses.,,0,0,,
+US-Ses,Batch04,AMF_US-Ses_BIF_20260715.xlsx,"Sandy Loam - Below 40 cm; Deep rooth depth, 20-40 cm, derived from the vegetation dominance of shurbs.",,0,0,,
+US-Slt,Batch04,AMF_US-Slt_BIF_20260908.xlsx,"Podzol, underlain by late Miocene fluvial sediments of the Kirkwood formation, and overlain with Cohansey sandy soil with low nutrient and cation exchange capacity",,8,0,28772:NOT_USED_SAND_OR_CLAY_MISSING; 27808:NOT_USED_SAND_OR_CLAY_MISSING; 28770:NOT_USED_SAND_OR_CLAY_MISSING; 28771:NOT_USED_SAND_OR_CLAY_MISSING; 29303:NOT_USED_SAND_OR_CLAY_MISSING; 28424:NOT_USED_SAND_OR_CLAY_MISSING; 29615:NOT_USED_SAND_OR_CLAY_MISSING; 29411:NOT_USED_SAND_OR_CLAY_MISSING,
+US-SP1,Batch04,AMF_US-SP1_BIF_20260129.xlsx,"Poorly drained ultic alaquods (sandy, silicecous, thermic) overlying a discontinuous spodic horizon spanning from 0.30 - 0.80 m deep transitioning to an argillic horizon at depths below 0.80 m",300,1,0,27977:NOT_USED_NO_DEPTH,
+US-SRG,Batch04,AMF_US-SRG_BIF_20260527.xlsx,,,0,0,,
+US-SRM,Batch04,AMF_US-SRM_BIF_20260527.xlsx,Sandy loams,,10,0,27601:NOT_USED_SAND_OR_CLAY_MISSING; 27063:NOT_USED_SAND_OR_CLAY_MISSING; 27605:NOT_USED_SAND_OR_CLAY_MISSING; 29169:NOT_USED_SAND_OR_CLAY_MISSING; 27065:NOT_USED_SAND_OR_CLAY_MISSING; 27606:NOT_USED_SAND_OR_CLAY_MISSING; 26911:NOT_USED_SAND_OR_CLAY_MISSING; 27600:NOT_USED_SAND_OR_CLAY_MISSING; 28586:NOT_USED_SAND_OR_CLAY_MISSING; 27973:NOT_USED_SAND_OR_CLAY_MISSING,
+US-Syv,Batch04,AMF_US-Syv_BIF_20260908.xlsx,"Upland soils that are moderately well-drained, coarse or sandy loam spodosols. The thickness of the overlying organic horizon is approximately 0.1 m.",10,1,0,28539:NOT_USED_NO_DEPTH,
+US-Ton,Batch04,AMF_US-Ton_BIF_20260715.xlsx,,,0,0,,
+US-Uaf,Batch04,AMF_US-Uaf_BIF_20260715.xlsx,,,0,0,,
+US-UiD,Batch05,AMF_US-UiD_BIF_20260527.xlsx,,,0,0,,
+US-UMB,Batch05,AMF_US-UMB_BIF_20260908.xlsx,"Entic Haplorthod, glacial till, sandy, thin Wisconsin sandy lake deposits",12100,1,1,,0-20cm 92.6/0.6
+US-UMd,Batch05,AMF_US-UMd_BIF_20260908.xlsx,"Entic Haplorthod, glacial till, sandy, thin Wisconsin sandy lake deposits",,0,0,,
+US-Var,Batch05,AMF_US-Var_BIF_20260527.xlsx,,,0,0,,
+US-Vcm,Batch05,AMF_US-Vcm_BIF_20260715.xlsx,,,0,0,,
+US-Vcp,Batch05,AMF_US-Vcp_BIF_20260715.xlsx,,,0,0,,
+US-WCr,Batch05,AMF_US-WCr_BIF_20260527.xlsx,"Entic Haplorthod - Sandy loam soils at this site (about 54% sand, 33% silt, and 13% clay in the upper 30 cm) have developed from acidic, reddish, unsorted, coarse glacial till with 1040% rock fragments. Soils have been subjected to mixing by windthrows, burrowing animals and earthworm activity, and frost action. Mottling and saturated soils were observed between 50 and 100 cm below the surface at different times during the year in these somewhat poorly drained soils.",30; 300; 70; 8,2,1,27045:NOT_USED_NO_DEPTH,0-30cm 54.0/13.0
+US-Whs,Batch05,AMF_US-Whs_BIF_20260316.xlsx,,,0,0,,
+US-Wjs,Batch05,AMF_US-Wjs_BIF_20260715.xlsx,,,0,0,,
+US-Wkg,Batch05,AMF_US-Wkg_BIF_20241204.xlsx,"Course-loamy, mixed, thermic, Ustollic Haplargids with limestone fragments",0; 147; 150; 5,2,2,,0-5cm 67.0/17.0 | 0-147cm 70.0/10.0
