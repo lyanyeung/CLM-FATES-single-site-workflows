@@ -315,11 +315,19 @@ def main():
          r["candidate_native"]==left and r["adjacent_side"]=="BEFORE"),None)
   after=next((r for r in comparisons if r["site"]==site and r["episode_id"]==eid and
          r["candidate_native"]==right and r["adjacent_side"]=="AFTER"),None)
-  # This segment definition is maximal contiguous trial half-hours in the
-  # same ORIGINAL source episode. Each run has two external neighbor edges.
-  if before is None or after is None:
-   raise ValueError("maximal native contiguous run has no two external boundaries "+str(site_eid))
-  boundaries=[before,after]
+  # A maximal contiguous segment is defined WITHIN its ORIGINAL event.
+  # If its neighboring trial half-hour belongs to a DIFFERENT source event,
+  # Stage36 treats that adjacency as another trial value (not an external
+  # boundary). Retain it explicitly as a cross-event boundary review.
+  for side,record,time in (("BEFORE",before,left),("AFTER",after,right)):
+   if record is None:
+    e=edges.get((site,time,side))
+    if e is None or e["adjacent_status"]!="ADJACENT_SAME_TRIAL_CANDIDATE":
+     raise ValueError("real source segment lacks expected external/cross-event edge")
+    target=ci.get((site,e["adjacent_native_time"]))
+    if target is None or target["episode_id"]==eid:
+     raise ValueError("missing segment border cannot be an internal same-episode pair")
+  boundaries=[x for x in (before,after) if x is not None]
   epi=events[site,eid]
   count=int(epi["original_episode_unapproved_HH"])
   coverage=int(epi["trial_selected_HH"])
@@ -330,7 +338,8 @@ def main():
     qc_nonmeas=sum(x["original_neighbor_QC2_or_not_measured"] for x in boundaries),
     p2=sum(x["neighbor_is_unapproved_P2P3"] for x in boundaries),
     rh_low=sum(x["neighbor_RH_below10pct_or_unphysical"] for x in boundaries))
-  label=("NEW_OR_WORSENED_GT4_BOUNDARY_REVIEW" if risks["new4"] or any(
+  label=("CROSS_ORIGINAL_EPISODE_TRIAL_BOUNDARY_REVIEW" if len(boundaries)!=2 else
+    "NEW_OR_WORSENED_GT4_BOUNDARY_REVIEW" if risks["new4"] or any(
     x["source_trial_above4"] and x["WORSENED_gt0_5hPa"] for x in boundaries) else
     "NEW_OR_WORSENED_GT2_BOUNDARY_REVIEW" if risks["new2"] or any(
     x["source_trial_above2"] and x["WORSENED_gt0_5hPa"] for x in boundaries) else
@@ -344,10 +353,10 @@ def main():
    original_episode_unapproved_HH=count,
    total_episode_selected_HH=coverage,
    episode_is_only_partially_selected=coverage!=count,
-   before_boundary_original_abs_jump_hPa=before["original_abs_jump_hPa"],
-   before_boundary_trial_abs_jump_hPa=before["trial_abs_jump_hPa"],
-   after_boundary_original_abs_jump_hPa=after["original_abs_jump_hPa"],
-   after_boundary_trial_abs_jump_hPa=after["trial_abs_jump_hPa"],
+   before_boundary_original_abs_jump_hPa=before["original_abs_jump_hPa"] if before else "",
+   before_boundary_trial_abs_jump_hPa=before["trial_abs_jump_hPa"] if before else "",
+   after_boundary_original_abs_jump_hPa=after["original_abs_jump_hPa"] if after else "",
+   after_boundary_trial_abs_jump_hPa=after["trial_abs_jump_hPa"] if after else "",
    new_gt2_boundary_count=risks["new2"],new_gt4_boundary_count=risks["new4"],
    improved_boundary_count=risks["improved"],
    worsened_boundary_count=risks["worsened"],
@@ -357,8 +366,14 @@ def main():
    segment_science_gate=label))
  if sum(int(r["segment_native_HH"]) for r in seg_out)!=251:
   raise ValueError("original source candidate segmented count mismatch")
- if 2*len(seg_out)!=len(comparisons):
-  raise ValueError("two external boundaries per segment verification failed")
+ # Each maximal same-episode segment has zero, one or two actual external
+ # edges. Adjacent trial segments from DIFFERENT source episodes share a
+ # cross-episode trial edge and must not be falsely counted as source edges.
+ actual_segment_external=sum(
+  int(r["before_boundary_original_abs_jump_hPa"]!="")+
+  int(r["after_boundary_original_abs_jump_hPa"]!="") for r in seg_out)
+ if actual_segment_external!=len(comparisons):
+  raise ValueError("cross-original-episode physical external boundary accounting failed")
  ep_out=[]
  seg_per=Counter((s["site"],s["episode_id"]) for s in seg_out)
  for ep in orig_episodes:
@@ -457,7 +472,7 @@ def main():
  for key,v in sorted(manifest["segment_review_lanes"].items()):
   report.append("- **{}**: {} contiguous segments".format(key,v))
  report+=["","## Human review ordering",
-  "1. Compare \`newly_crossed_4hPa\` and \`worsened_abs_jump_by_gt0_5hPa\` against the old original jumps: prioritize genuine trial-created worsening.",
+  "1. Compare `newly_crossed_4hPa` and `worsened_abs_jump_by_gt0_5hPa` against the old original jumps: prioritize genuine trial-created worsening.",
   "2. If original and trial boundaries both already large, investigate the *original adjacent QC2 / P2P3 source* before expanding a trial. No adjacent record is automatically amended.",
   "3. Separate contiguous trial segments from partially selected 65 original episodes; do NOT join distant dates or interpolate across unapproved records.",
   "4. H01 US-Vcm two suspicious QC2 original neighbors, H02-H05 P1 46 original HOLD total, RH platforms 10 and remaining P2P3 1574 are excluded from this Stage37 US-Vcp trial.",
