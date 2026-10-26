@@ -23,7 +23,7 @@ import numpy as np
 import pandas as pd
 sys.dont_write_bytecode=True
 
-VER="batch03-stage13a-v1-20261026-nine-site-exact-forcing-admission"
+VER="batch03-stage13a-v2-20261026-aligned-to-original-stage07-numerical-science-gates"
 R=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 STAGE07=R/"qcv5_native_trial_20261022T024559Z_36c46e58"
 STAGE10D=R/"reports/stage10d_humidity_manual_triage_20261024T042016Z_7fa50aaa"
@@ -86,6 +86,10 @@ def numeric_candidate(site,p,entry):
     report["independent_audit_verified"]=True
     if int(aj.get("noleap_rows",-1))!=expected_rows(site):
         raise RuntimeError("Stage07 independent audit row count does not agree "+site)
+    report["Stage07_audit_QC0_changed_N"]=int(aj.get("changed_QC0_records",0))
+    report["Stage07_audit_ERA_RH_floor_N"]=int(aj.get("ERA_RH_floor_records",0))
+    report["Stage07_audit_manual_review_N"]=int(aj.get("manual_review_records",0))
+    report["Stage07_audit_min_RH_pct"]=float(aj.get("min_RH_pct",float("nan")))
     fields=["time",*MET]
     df=pd.read_csv(safe(out),usecols=fields,dtype={"time":str},
                    low_memory=False)
@@ -118,11 +122,22 @@ def numeric_candidate(site,p,entry):
         e=(sw-v)*100
         calcq=.622*e/(p-.378*e)
         rh=100*e/(sw*100)
-        bad=(~np.isfinite([t,v,p,q,rh,calcq]).all(axis=0)|
-             (v<=0)|(rh<=0)|(rh>100.05)|
-             (q<=0)|(q>=.08)|
-             (~np.isclose(q,calcq,rtol=1e-6,atol=1e-10,equal_nan=False)))
-    report["candidate_physically_invalid_HH"]=int(np.sum(bad))
+        # Match Stage07 independent numeric physics: RH (0,100.05]%
+        # is allowed, including true saturation (VPD=0). Its QC-v5
+        # humidity reconstruction permits up to 0.05pp rounding excess.
+        # Count these as explicit scientific cautions, not new numeric fails.
+        finite=np.isfinite(np.vstack([t,v,p,q,rh,calcq])).all(axis=0)
+        paired=np.isclose(q,calcq,rtol=1e-6,atol=1e-10,equal_nan=False)
+        bad=(~finite)|(rh<=0)|(rh>100.05)|(q<0)|(q>.08)|(~paired)
+        old_gate_bad=(~finite)|(v<=0)|(rh<=0)|(rh>100.05)|
+                      (q<=0)|(q>=.08)|(~paired))
+        saturation_caution=(v<=0)|(rh>100.0)|(q<=0)
+    report["candidate_physically_invalid_HH"]=int(np.count_nonzero(bad))
+    report["candidate_v1_extra_strict_fail_HH"]=int(np.count_nonzero(old_gate_bad & ~bad))
+    report["candidate_saturation_or_roundoff_caution_HH"]=int(np.count_nonzero(saturation_caution))
+    report["candidate_negative_VPD_roundoff_caution_HH"]=int(np.count_nonzero((v<0)&(rh<=100.05)))
+    report["candidate_zero_VPD_saturation_HH"]=int(np.count_nonzero(v==0))
+    report["candidate_RH_above100_to100p05_HH"]=int(np.count_nonzero((rh>100)&(rh<=100.05)))
     report["candidate_TBOT_K_range_violation"]=int(
         ((data.TBOT<180)|(data.TBOT>340)|~np.isfinite(data.TBOT)).sum())
     dv=np.abs(np.diff(v))
@@ -229,12 +244,24 @@ def main():
     print("STAGE13A SOURCE VERIFIED SITES 9/9",flush=True)
     columns=["site","Stage07_historical_candidate_status",
              "numeric_selected_candidate_screen",
-             "candidate_missing_humidity_HH",
              "candidate_missing_any_required_met_HH",
+             "candidate_physically_invalid_HH",
+             "candidate_v1_extra_strict_fail_HH",
+             "candidate_saturation_or_roundoff_caution_HH",
+             "Stage07_audit_ERA_RH_floor_N",
              "Stage10d_original_humidity_events",
-             "latest_known_additional_HOLD",
              "DATM_ready"]
     print(report.reindex(columns=columns).fillna("-").to_string(index=False),flush=True)
+    print("STAGE13A SIX ORIGINAL STAGE07 BLOCKER REASONS:",flush=True)
+    for row in report.loc[report.Stage07_historical_candidate_status.eq("FAIL")].to_dict("records"):
+        print(row["site"],"|",str(row.get("Stage07_old_error",""))[:240],flush=True)
+    print("STAGE13A THREE HISTORICAL NUMERIC-SITE CAUTIONS:",flush=True)
+    for row in report.loc[report.site.isin(HISTORICAL_NUMERIC)].to_dict("records"):
+        print(row["site"],"original_stage07_floor=",row.get("Stage07_audit_ERA_RH_floor_N"),
+              "original_stage07_QC0_change=",row.get("Stage07_audit_QC0_changed_N"),
+              "additional_saturation_or_roundoff=",row.get("candidate_saturation_or_roundoff_caution_HH"),
+              "extra_v1_gate_errors=",row.get("candidate_v1_extra_strict_fail_HH"),
+              "validation_error=",row.get("current_validation_error",""),flush=True)
     print("STAGE13A GATES: historical numeric candidates 3, historical humidity-blocked 6;",
           "NO Post-v5/production approvals. Kon sealed 77 humidity holds; no new model jobs.",
           flush=True)
