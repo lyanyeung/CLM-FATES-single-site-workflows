@@ -23,7 +23,7 @@ import argparse,csv,json,math,hashlib
 from pathlib import Path
 from collections import Counter
 
-SOURCE_COLS=("site","time_native","phase","TA_F_C","VPD_F_hPa",
+SOURCE_COLS=("site","time_native","is_P1","TA_F_C","VPD_F_hPa",
              "TA_F_QC","VPD_F_QC","RH_original_pct","TA_ERA_C",
              "VPD_ERA_hPa","ERA_RH_Magnus_water_pct")
 GROUPS={
@@ -85,7 +85,7 @@ def overlay(ix):
                  key=lambda r:r["time_native"])
   selected=[]
   for r in entries:
-   is_p1=(r["phase"]=="P1")
+   is_p1=(r["is_P1"]=="1")
    orig_rh=val(r["RH_original_pct"])
    if group=="G03_Vcm_Jan2007":
     # Every native HH with source RH, including QC0, QC1 and QC2 transition.
@@ -147,7 +147,7 @@ def overlay(ix):
    raise ValueError("expected original native subgroup count "+group+" got "+str(len(selected)))
   counts[group]=len(selected)
  for group,(site,start,end,count) in HOLDS.items():
-  part=sorted((r for (s,t),r in ix.items() if s==site and start<=t<=end and r["phase"]=="P1"),
+  part=sorted((r for (s,t),r in ix.items() if s==site and start<=t<=end and r["is_P1"]=="1"),
               key=lambda r:r["time_native"])
   if len(part)!=count:raise ValueError("source hold count differs "+group)
   for r in part:
