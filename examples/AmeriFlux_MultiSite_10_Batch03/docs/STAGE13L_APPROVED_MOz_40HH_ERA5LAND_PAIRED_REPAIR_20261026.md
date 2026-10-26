@@ -1,5 +1,21 @@
 # Stage13L — US-MOz 40 half-hours, operator-approved reanalysis-backed repair
 
+## 2026-10-26 19:39 UTC — STAGE13L v2 APPLIED AND VERIFIED on IRIDIS6
+
+Operator-supplied `login6003` original full terminal transcript verifies Stage13l v2 pinned source hash, Python AST / `--self-test` PASS, `--check` PASS, and **`--apply` SUCCESS**. The exact new SHA-sealed **research-only** 315,360 native halfhour forcing was written and reparsed with all source-data differential and 40-source science checks:
+
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/science_trials/stage13l_US_MOz_40HH_user_approved_CDSEra5Land_20261026T193902Z_95631db8`
+
+Final operator program output:
+
+`STAGE13L 40/40 OPERATOR APPROVED SCIENCE SHADOW SUCCESS`
+
+`SOURCE NOLEAP ROWS 315360 ACTUAL NEW MODEL FIELD EDIT COUNTS {'TBOT': 40, 'QBOT': 40, 'TA_USE': 40, 'VPD_USE': 40}`
+
+Previous signed Stage13g SHA256 `f6b740491fd3b7d9b66fe9bc33c20586db6124442b93df72273410d761bd6b27`; CDS SHA256 `5879ed81aca701d53b8b9674183556df7369861ce4a8cdca1ffd54126fb712ef`; signed Stage13k receipt SHA `05531f8ce7d85229b85335912c5855ce8f99e296d593039644d66c26091a7e2d`. BIF official UTC−6 and original measured tower QC0 29 analogue records were verified; replacement **waived local ±6h QC0 for the 40 slots only** by documented operator decision. Both source-native boundary T/VPD steps and all paired ERA/RH/pressure numerical checks **PASS**.
+
+Original FLUXMET, prior Stage07, Stage13g, PFT, ZBOT, CIME and Slurm unchanged. **First 27 Jan05/06 QC1 source records remain HOLD**, as do the Jan09 negative discrepancy and any other unapproved source event. **Post-v5/DATM/AD400/spinup remain FALSE**. This supersedes the older 'no IRIDIS6 execution received yet' language below.
+
 ## Decision and scientific provenance — 26 October 2026
 
 The operator explicitly authorised the **second** Stage13k original QC1 episode only, source-native `2005-01-06 14:00:00` through `2005-01-07 09:30:00`, 40 x 30-minute records. This permits **one new isolated science shadow**, replacing `TA_USE` and `VPD_USE` with paired signed CDS ERA5-Land T2m and dewpoint-derived VPD and regenerating `TBOT` and `QBOT` using unchanged `PSRF`. Original FLUXMET, companion source ERA, existing Stage07 and successful Stage13g (315,360 source-native half-hours) stay immutable.
