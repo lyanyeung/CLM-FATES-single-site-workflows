@@ -33,7 +33,7 @@ Stage29 source SHA256 is preserved in original Stage29 reports; no source files/
 
 [Stage30 candidate UTC–CDS request planner and explicitly opt-in downloader](../scripts/stage30/30_build_and_optionally_fetch_ERA5Land_reference_pilot.py)
 
-Script GitHub commit `907fd93a7f6a932586a20687224f7638baf01898`, Git blob SHA `ace3def89430b2677e97fea34008449020225453`.
+Script GitHub commit `14d976fb4fb6e8d0514d677b0aa9ee5055a48a6b`, Git blob SHA `3b5446297834ee4a4d587e668038d5eb0143a2c1`.
 
 CDS datasets:
 - [ERA5-Land hourly time-series (ARCO, point/nearest 0.1° grid)](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-land-timeseries), dataset name `reanalysis-era5-land-timeseries`; 2 m temperature and 2 m dewpoint, units K, hourly UTC.
@@ -54,7 +54,7 @@ The Stage30 planner reads original Stage29 27 *candidate* UTC windows and checks
 (
   set -euo pipefail
   BASE="$HOME/ameriflux_batch05_stage30"
-  COMMIT="907fd93a7f6a932586a20687224f7638baf01898"
+  COMMIT="14d976fb4fb6e8d0514d677b0aa9ee5055a48a6b"
   RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT"
   SCRIPT="$BASE/30_build_and_optionally_fetch_ERA5Land_reference_pilot.py"
   D29="$HOME/ameriflux_batch05_stage29/bif_UTC_20261026T112153Z_2957771"
@@ -63,7 +63,7 @@ The Stage30 planner reads original Stage29 27 *candidate* UTC windows and checks
   curl -fLsS --retry 3 \
     "$RAW/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage30/30_build_and_optionally_fetch_ERA5Land_reference_pilot.py" \
     -o "$SCRIPT"
-  test "$(git hash-object "$SCRIPT")" = "ace3def89430b2677e97fea34008449020225453"
+  test "$(git hash-object "$SCRIPT")" = "3b5446297834ee4a4d587e668038d5eb0143a2c1"
   echo "SOURCE VERIFIED"
   python3 -B -m py_compile "$SCRIPT"
   python3 -B "$SCRIPT" --self-test
@@ -97,3 +97,47 @@ python3 -B "$SCRIPT" --stage29-dir "$D29" --stage28-dir "$D28" \
 - Original Stage24 versioned overlay **166** approved half-hour pairs unchanged; original P1 human HOLD **46** unchanged; original P2/P3 **1,574** unapproved; 10 near-saturation plateau native records unapproved.
 - Priority conflict US-Vcp original P2/P3 (339 MDS-vs-processed-ERA RH conflicts >20 percentage points); future external T/dewpoint reference compares source alternatives with explicitly chosen RH-based vs vapour-pressure-based temperature adjustment.
 - No arbitrary timezone guessing or DST; continue to label BIF DATE_END as missing even if pilots align with expected climatology.
+
+
+## Stage30 operator PASS and corrected API date syntax (2026-10-26)
+
+Confirmed by operator: `SOURCE VERIFIED`, `STAGE30 SELF-TEST PASS` and `STAGE30 SUCCESS | 27 windows; CDS site-month plans 11 DOWNLOADS 0 RESEARCH_ONLY`. Source Stage30 reports: `/home/ly3n24/ameriflux_batch05_stage30/request_plan_20261026T113644Z_3061960`.
+
+Exactly **11 original planned CDS groups**: US-Vcm 6 (2007-12, 2008-02, 2008-12, 2015-12, 2020-09, 2025-10), US-Vcp 4 (2008-04, 2008-05, 2008-06, 2011-01), US-WCr 1 (2025-08), **US-Wjs 0** (top-20 episode pilot did not select a US-Wjs episode, even though it has 401 unresolved P2/P3 anomaly HH). Later cross-site pilot must explicitly include US-Wjs; the present 11 planned requests do not validate it.
+
+**IMPORTANT PATCH after operator run**: the original Stage30 request builder emitted `"date": ["2007-12-14", "2007-12-17"]`. CDS *time-series* constraints expect an ISO date-range selector `"date": "2007-12-14/2007-12-17"`, which is different from the standard `reanalysis-era5-land` year/month/day/time API. The Stage30 code was patched on GitHub in commit `14d976fb4fb6e8d0514d677b0aa9ee5055a48a6b` to produce an ISO slash-separated range; self-test now builds a real sample request and checks its fields. Original 27 pilot intervals, 11 original request identifiers, original Stage24 overlay and science statuses are unchanged.
+
+**Do NOT execute `--fetch` with the original Stage30 script at previous commit**. Re-download the updated version and verify new Git blob SHA `3b5446297834ee4a4d587e668038d5eb0143a2c1`. The date selector follows a public documented CDS time-series constraints summary; if CDS rejects a request, verify current exact syntax from the download form's `Show API request code` and do not silently substitute a different dataset.
+
+A small first test request is `ERA5L_US_Vcm_200712` (2007-12-14..17 UTC, original US-Vcm H01 P1 RH missing/negative source ERA case). It fetches reference temperature/dewpoint, not independently measured weather truth. This is a read-only scientific reference pilot with known source BIF `UTC_OFFSET=-7` but missing `DATE_END`. Even downloaded files must undergo metadata/UTC/units/nearest grid validation before reference RH calculation.
+
+### Safe first fetch (OPTIONAL; requires operator accepted CDS license + private credentials)
+
+```bash
+(
+  set -euo pipefail
+  BASE="$HOME/ameriflux_batch05_stage30"
+  COMMIT="14d976fb4fb6e8d0514d677b0aa9ee5055a48a6b"
+  RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT"
+  SCRIPT="$BASE/30_build_and_optionally_fetch_ERA5Land_reference_pilot.py"
+  mkdir -p "$BASE"
+  curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage30/30_build_and_optionally_fetch_ERA5Land_reference_pilot.py" -o "$SCRIPT"
+  test "$(git hash-object "$SCRIPT")" = "3b5446297834ee4a4d587e668038d5eb0143a2c1"
+  python3 -B -m py_compile "$SCRIPT"
+  python3 -B "$SCRIPT" --self-test
+  python3 -c "import cdsapi; print('CDSAPI IMPORT PASS')" || {
+    echo "CDSAPI missing; install into the active user-managed environment first"; exit 1;
+  }
+  test -f "$HOME/.cdsapirc" || { echo "Private CDS API configuration file not found"; exit 1; }
+  D29="$HOME/ameriflux_batch05_stage29/bif_UTC_20261026T112153Z_2957771"
+  D28="$HOME/ameriflux_batch05_stage28/reference_preflight_20261026T043201Z_1748291"
+  OUT="$BASE/one_reference_fetch_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+  python3 -B "$SCRIPT" --stage29-dir "$D29" --stage28-dir "$D28" \
+    --out "$OUT" --fetch --acknowledge-provisional-bif-offsets --max-fetch 1 \
+    2>&1 | tee "$BASE/stage30_one_fetch.log"
+  echo "STAGE30_FETCH_DIR=$OUT"
+  find "$OUT" -maxdepth 1 -type f -printf '%f %s bytes\n'
+)
+```
+
+Do not paste API credentials, `~/.cdsapirc`, access tokens or connection logs containing them into public GitHub issues. Only share error messages after redacting secrets. The first request may still fail if the CDS dataset request schema has changed or CDS is unavailable; that is not a scientific failure. A successful file download still is NOT a validated humidity correction.
