@@ -142,8 +142,9 @@ def ho1_future_boundary(sites):
                 preview.append({k:r.get(k,"") for k in need})
             if when>="200101010000" and first_2001 is None:
                 first_2001={k:r.get(k,"") for k in need}
-            if when>="200101010000" and num(r.get("TA_F_QC"))==0:
+            if when>="200101010000" and first_QC0 is None and num(r.get("TA_F_QC"))==0:
                 first_QC0={k:r.get(k,"") for k in need}
+            if when>"200101022330" and first_QC0 is not None:
                 break
     return first_2001,first_QC0,preview
 
