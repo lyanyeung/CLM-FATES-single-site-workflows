@@ -1,5 +1,7 @@
 # Batch03 Stage13c — 24 manual issues: original tower vs ERA5, 2026-10-26
 
+> **2026-10-26 OPERATOR DECISION AFTER THIS REPORT:** All six specific source-T QC0 edits listed in section A were explicitly **APPROVED** using the existing two-sided original tower linear interpolation values. The original measured CSV and prior Stage07 science-only trial remain immutable. The 18 VPD manual-review records, US-NC2 2025 time/ERA source HOLD, broader Post-v5 acceptance, DATM and spin-up are **NOT APPROVED**. See [machine-readable scoped decision](../decisions/STAGE13D_OPERATOR_APPROVED_SIX_QC0_TOWER_TA_INTERPOLATIONS_20261026.json). In the historical tables below, any `PENDING` operator status for these exact six TA edits is superseded by this dated decision only; no other status is changed.
+
 **Status:** SCIENTIFIC RECOMMENDATIONS ONLY. **0** operator approvals recorded. No DATM/spinup authorisation. **6** originally tower-QC0 TA_F edits; **18** Stage07 VPD manual-review items. Stage13c 24-event native ±2-hour context checked against the actual SHA-pinned original tower, paired ERA5 and Stage07 processed candidate; source timestamps verified complete for the three sites.
 
 Source-of-truth on IRIDIS6:
