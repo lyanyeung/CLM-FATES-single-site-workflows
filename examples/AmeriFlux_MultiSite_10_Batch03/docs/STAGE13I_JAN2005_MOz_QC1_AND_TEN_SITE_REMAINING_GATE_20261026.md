@@ -1,5 +1,7 @@
 # Batch03 Stage13i verified source QC1 science gate and ten-site completion blocker summary — 2026-10-26
 
+> **2026-10-26 OPERATOR CONDITIONAL APPROVAL (Stage13j):** The prior manual decision needed for US-MOz was granted for two exactly bounded QC1 events (27+40=67 native halfhours), conditional upon signed CDS ERA5-Land cross-product verification, published BIF -6h clock independently validated with measured QC0 analogues, measured QC0 on both original event sides, original release time/QC, and humidity/T/QBOT physics plus event edges. This is NOT a blanket acceptance of other original source QC1; the Jan09 negative-bias event remains held. **Do not claim the new 67 rows were actually changed yet.** The [scoped Stage13j decision](../decisions/STAGE13J_OPERATOR_CONDITIONAL_US_MOz_2005_TWO_QC1_EVENTS_20261026.json), [fail-closed Stage13j scientific script](../scripts/stage13/13j_conditional_two_US_MOz_QC1_ERA5Land_SCOPED.py) and [BIF/ERA5-Land runbook](STAGE13J_TWO_MOz_QC1_CONDITIONAL_APPROVAL_AND_CDS_ERA5LAND_20261026.md) are committed on GitHub. US-MOz original uploaded BIF: LOCATION_LAT 38.7441, LOCATION_LONG -92.2000 and UTC_OFFSET -6.00; height of canopy=24.2m is not ZBOT. Stage13g original remains immutable, Postv5/DATM/spinup NOT approved. 
+
 ## Verified Stage13i from IRIDIS6 user's 18:29 log
 
 Stage13i original pinned source and all preflight/readonly run checks **PASSED**, with sealed report at
