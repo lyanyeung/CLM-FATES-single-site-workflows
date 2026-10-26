@@ -43,7 +43,7 @@ Use the exact published script and verified Git blob SHA. It requires successful
 (
   set -euo pipefail
   BASE="$HOME/ameriflux_batch05_stage22"
-  COMMIT="2ab80c9dafa06d72e20257dafaadcdd5a908e44f"
+  COMMIT="cca9d4e6f14492fda3e86836004c3245bb9698bc"
   RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT"
   SCRIPT="$BASE/22_apply_decisions_to_versioned_native_overlay.py"
   STAGE18="$HOME/ameriflux_batch05_stage18/original_review_20261025T235716Z_1394929"
@@ -53,7 +53,7 @@ Use the exact published script and verified Git blob SHA. It requires successful
   curl -fLsS --retry 3 \
     "$RAW/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage22/22_apply_decisions_to_versioned_native_overlay.py" \
     -o "$SCRIPT"
-  test "$(git hash-object "$SCRIPT")" = "82259ee20fb663fd249d7ec1e7cd29b23e52b5f1"
+  test "$(git hash-object "$SCRIPT")" = "b8b87b2182ccfae35f93020df8feeddb0505bd83"
   echo "SOURCE VERIFIED"
   python3 -B -m py_compile "$SCRIPT"
   python3 -B "$SCRIPT" --self-test
@@ -73,3 +73,18 @@ Outputs:
 - `STAGE22_OPERATOR_REVIEW.md` readable science gate and critical transitions.
 
 **Status:** code committed to GitHub; IRIDIS6 Stage22 **not yet executed by operator**. No source, forcing, cases or Slurm changed. To proceed to model-ready full forcing, independently verify manual holds and screen remaining 1,574 non-P1 low-RH source HH; join overlay only through a future provenance-safe forcing builder and post-v5 checks.
+
+
+## Execution patch — Stage22 source-RH full-precision recomputation
+
+The operator first ran the original Stage22 and got `ValueError: candidate pair incoherent` at `US-Vcm 200801162100`. **This was an overly strict checker applied to Stage21's six-decimal VPD CSV, not an erroneous humidity input.** For original `TA_F=-14.802°C`, original `RH=88.56054%`, Stage21 produced `VPD=0.222795 hPa` (six decimals). A rederived RH differs from 88.56054 by ~0.000023 percentage points, crossing Stage22's 0.000011 tolerance. The scientific physical-pair calculation is well defined at full precision.
+
+[Patched Stage22 program](../scripts/stage22/22_apply_decisions_to_versioned_native_overlay.py) at GitHub commit `cca9d4e6f14492fda3e86836004c3245bb9698bc`, Git blob SHA `b8b87b2182ccfae35f93020df8feeddb0505bd83`, now:
+
+1. Verifies the pre-rounded Stage20/21 RH candidate still matches **the immutable source-provenance RH** within 0.000012 percentage points;
+2. Verifies the previously rounded VPD is within **0.000002 hPa** of the source-derived exact VPD (much stricter than typical meteorological uncertainty but above mere CSV rounding);
+3. Recomputes the authoritative overlay VPD from full available original-source RH precision and `TA_F`; keeps physical RH/VPD checks and all approved/hold set membership checks;
+4. Adds a self-test reproducing this *exact original failed* `US-Vcm` 2008 sample;
+5. Writes original source, held cases, forcing, model, QC and Slurm **nowhere**; the initial operator execution failed before the new output directory was created.
+
+**Patch execution not yet confirmed by the operator**. Retry with the updated pinned Git commit and SHA, always write to a new timestamped output folder. Do not merely relax physical consistency thresholds, do not touch HOLD rows.
