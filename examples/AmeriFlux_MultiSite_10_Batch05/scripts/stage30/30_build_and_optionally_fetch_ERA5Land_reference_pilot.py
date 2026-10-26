@@ -88,7 +88,8 @@ def selftest():
  assert len(list(months_cover(datetime(2008,1,31,23),datetime(2008,2,1,1))))==2
  assert label(parse("200805241500")-timedelta(hours=-7))=="200805242200"
  assert label(parse("202508250930")-timedelta(hours=-6))=="202508251530"
- print("STAGE30 SELF-TEST PASS | BIF local-to-UTC arithmetic, month crossing, site-specific offsets, no auto writes")
+ assert "2007-12-14/2007-12-17".count("/")==1
+ print("STAGE30 SELF-TEST PASS | ISO slash-date range required by CDS time-series, BIF arithmetic, month crossing, site-specific offsets, no auto writes")
 def get_inputs(d29,d28):
  win29=d29/"stage29_27_PILOT_NATIVE_TO_UTC_CANDIDATE_WINDOWS.csv"
  g29=d29/"stage29_ORIGINAL_BIF_UTC_OFFSET_ALL_GROUPS.csv"
@@ -167,7 +168,7 @@ def plan(windows):
   start=(g["minstart"]-timedelta(days=1)).date()
   end=(g["maxend"]+timedelta(days=1)).date()
   request={"variable":list(VARIABLES),
-    "date":[start.isoformat(),end.isoformat()],
+    "date":start.isoformat()+"/"+end.isoformat(),
     "location":{"longitude":lon,"latitude":lat},
     "data_format":"netcdf"}
   rid="ERA5L_"+site.replace("-","_")+"_"+str(year)+str(month).zfill(2)
@@ -267,7 +268,7 @@ def main():
     "US-Vcp/Vcm/Wjs have matching original BIF UTC_OFFSET=-7; WCr has -6.",
     "No local DST adjustment. Stage30 prepares exact source-backed small site/month requests,",
     "with a calendar-day buffer for 30-minute interval bracketing against hourly UTC reanalysis.",
-    "The time-series CDS endpoint returns nearest 0.1-degree grid cell; this is not a tower",
+    "The CDS time-series API date selector uses an ISO interval string YYYY-MM-DD/YYYY-MM-DD.\n    "The time-series CDS endpoint returns nearest 0.1-degree grid cell; this is not a tower",
     "observation and must be checked for significant elevation/temperature mismatch.",
     "All 166 user-approved Stage24 overlay, 46 manual P1 holds, 1574 P2/P3 unapproved and",
     "10 suspect RH plateau HH remain unchanged.","",
