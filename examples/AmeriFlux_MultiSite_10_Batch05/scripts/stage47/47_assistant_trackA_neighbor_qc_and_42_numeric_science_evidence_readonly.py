@@ -32,8 +32,8 @@ R44={"site","native_time","episode_id","source_QC_T","source_QC_VPD",
  "original_T_C","original_VPD_hPa","original_implied_RH_pct",
  "source_ERA_RH_pct","source_MDS_RH_pct","source_ERA_candidate_VPD_hPa",
  "source_ERA_humidity_valid","source_MDS_humidity_valid"}
-R27={"site","native_time","episode_id","RH_ERA_e_pct",
- "abs_selected_T_minus_ERA_T_C","RH_ERA_pct","RH_MDS_pct"}
+R27={"site","native_time","episode_id","TA_F_C","VPD_F_hPa","VPD_F_QC",
+ "RH_ERA_e_pct","abs_selected_T_minus_ERA_T_C","RH_ERA_pct","RH_MDS_pct"}
 R45EVENT={"site","episode_id","original_HH","risk_screen",
  "original_episode_number_of_contiguous_segments",
  "source_original_QC0_HH","original_full_event_ERA_covered",
@@ -193,8 +193,6 @@ def main():
    raise ValueError("original native episode lacks source timestamps or original external edges")
   if e["original_episode_number_of_contiguous_segments"]!="1":
    raise ValueError("assistant lane source event not one contiguous actual native interval")
-  if any(s["native_time"] not in source for s in []):
-   raise ValueError("unreachable")
   if r["owner_lane"]==OWNER_NEIGH:
    ct=Counter()
    oldj=[];newj=[]
@@ -258,6 +256,15 @@ def main():
     o=source.get((h["site"],h["native_time"]))
     if o is None or o["episode_id"]!=key[1]:
      raise ValueError("original Stage27 source-native timestamp mismatch")
+    if (h["source_QC_VPD"]!=o["VPD_F_QC"] or
+        abs(num(h["original_T_C"])-num(o["TA_F_C"]))>.002 or
+        abs(num(h["original_VPD_hPa"])-num(o["VPD_F_hPa"]))>.002):
+     raise ValueError("Stage44 original site T/VPD/QC was not preserved")
+    for f1,f2 in (("source_ERA_RH_pct","RH_ERA_pct"),
+                  ("source_MDS_RH_pct","RH_MDS_pct")):
+     p,q=num(h[f1]),num(o[f2])
+     if (p is None)!=(q is None) or (p is not None and abs(p-q)>.002):
+      raise ValueError("original Stage27 source humidity columns drifted")
     rh=num(h["original_implied_RH_pct"])
     era=num(h["source_ERA_RH_pct"]);mds=num(h["source_MDS_RH_pct"])
     diff=num(h["source_ERA_change_VPD_hPa"]) if "source_ERA_change_VPD_hPa" in h else None
