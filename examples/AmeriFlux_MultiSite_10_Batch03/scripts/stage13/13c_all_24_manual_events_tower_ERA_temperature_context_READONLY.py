@@ -74,6 +74,12 @@ def reader(path,cols,clock_col):
     for col in frame.columns:
         frame[col]=numeric(frame[col])
     frame.index=pd.DatetimeIndex(time,name="original_native_time")
+    # Stage07 explicitly excludes Feb 29 from the original tower and ERA5
+    # sources BEFORE creating its NO_LEAP forcing. Match that selection
+    # exactly; keep the raw input files untouched.
+    if clock_col=="TIMESTAMP_START":
+        feb29=(frame.index.month==2)&(frame.index.day==29)
+        frame=frame.loc[~feb29].copy()
     return frame
 
 def selftest():
@@ -82,6 +88,11 @@ def selftest():
     assert sum(MANUAL_COUNTS.values())==18
     assert make_stamp("2016-03-17T22:00:00")==pd.Timestamp("2016-03-17 22:00")
     assert pd.Timestamp("2019-01-04 03:30")+pd.Timedelta(minutes=-30)==pd.Timestamp("2019-01-04 03:00")
+    # NOAA-style source native axis may contain leap-day source rows;
+    # processed Stage07 NO_LEAP axis must not.
+    t=pd.to_datetime(["2016-02-28 23:30","2016-02-29 00:00","2016-03-01 00:00"])
+    mask=(t.month==2)&(t.day==29)
+    assert t[~mask].strftime("%Y-%m-%d").tolist()==["2016-02-28","2016-03-01"]
     one=pd.Series(["-9999","10.75"])
     assert pd.isna(numeric(one).iat[0]) and numeric(one).iat[1]==10.75
     print("STAGE13C SELF-TEST PASS | 6 QC0 +18 VPD; native 30m ±2h; NO WRITES",flush=True)
@@ -157,8 +168,8 @@ def analyze():
             raise RuntimeError("Tower and standalone ERA5 native timestamps differ "+site)
         if not tower.index.equals(chosen.index):
             raise RuntimeError("Selected source time does not equal original native axis "+site)
-        if tower.index.to_series().diff().dt.total_seconds().iloc[1:].isin(
-             [1800,1800+86400]).all() is False:
+        if not bool(tower.index.to_series().diff().dt.total_seconds().iloc[1:].isin(
+             [1800,1800+86400]).all()):
             raise RuntimeError("Non-contiguous halfhour source clock "+site)
         # All required years from original selected manifest; NOLEAP calendars.
         site_events=[("TA_QC0_MODIFIED",e) for e in original.loc[original.site.eq(site)].to_dict("records")]
