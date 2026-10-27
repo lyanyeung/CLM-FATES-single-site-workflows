@@ -24,6 +24,10 @@ B49={"site","episode_id","side","candidate_native","neighbor_native",
      "original_neighbor_QC_VPD","original_neighbor_RH_pct","neighbor_kind",
      "original_VPD_jump_hPa","ERA_trial_VPD_jump_hPa","new_crossed_gt2",
      "new_crossed_gt4","production_DATM_authorized"}
+B45={"site","context_kind","context_id","side","candidate_time","neighbor_time",
+     "original_candidate_VPD_hPa","trial_candidate_VPD_hPa",
+     "neighbor_selected_VPD_hPa","neighbor_original_QC_VPD","neighbor_kind",
+     "before_jump_hPa","after_jump_hPa"}
 N44={"site","native_time","episode_id","original_T_C","original_VPD_hPa",
      "source_QC_T","source_QC_VPD","source_ERA_RH_pct",
      "source_ERA_candidate_VPD_hPa","original_implied_RH_pct"}
@@ -108,30 +112,30 @@ def feasible_internal(orig,new):
  return gt2,gt4
 def offset_grid():
  # Deterministic 0.5 RH-pp increments, including zero.
- return [i/2 for i in range(-80,81)]
+ return [i/2 for i in range(-40,41)]
 def context_gate(x):
  return "OBSERVED_QC0_REFERENCE_SCIENCE_HOLD" if x=="JUMP_TO_MEASURED_QC0_NEIGHBOR_REQUIRES_ALTERNATE_RH" else "QC1_NEIGHBOR_SOURCE_SCIENCE_HOLD"
 def selftest():
  assert feasible_internal([1,1],[1,3.5])==(1,0)
  assert feasible_internal([1,1],[1,5.5])==(1,1)
  assert feasible_internal([1,1],[1,1])==(0,0)
- assert len(offset_grid())==161 and 0 in offset_grid()
+ assert len(offset_grid())==81 and 0 in offset_grid()
  assert 70+52+253+108==483
  print("STAGE50 SELF-TEST PASS | full-event RH-offset sensitivity only, 70 source-reference queue, 52 holds, strict numeric original-edge gates; NO APPROVAL")
 def main():
  p=argparse.ArgumentParser(description=__doc__)
  p.add_argument("--self-test",action="store_true")
- for x in ("stage49-dir","stage48-dir","stage44-dir","stage27-dir","out"):
+ for x in ("stage49-dir","stage48-dir","stage45-dir","stage44-dir","stage27-dir","out"):
   p.add_argument("--"+x,type=Path)
  a=p.parse_args()
  if a.self_test:selftest();return
- keys=("stage49_dir","stage48_dir","stage44_dir","stage27_dir")
+ keys=("stage49_dir","stage48_dir","stage45_dir","stage44_dir","stage27_dir")
  if any(getattr(a,k) is None for k in (*keys,"out")):p.error("Stage49/48/44/27 dirs and a NEW --out required")
- d49,d48,d44,d27=[getattr(a,k).expanduser().resolve() for k in keys]
+ d49,d48,d45,d44,d27=[getattr(a,k).expanduser().resolve() for k in keys]
  out=a.out.expanduser().resolve()
- if any(not d.is_dir() for d in (d49,d48,d44,d27)) or out.exists() or not out.parent.is_dir():
+ if any(not d.is_dir() for d in (d49,d48,d45,d44,d27)) or out.exists() or not out.parent.is_dir():
   p.error("source directories must exist, output must be NEW")
- if any(out==d or out in d.parents or d in out.parents for d in (d49,d48,d44,d27)):
+ if any(out==d or out in d.parents or d in out.parents for d in (d49,d48,d45,d44,d27)):
   p.error("original reports must never be overwritten")
  paths={
   "70":d49/"stage49_70_NUMERIC_CANDIDATE_EVENT_REFERENCE_QC_GATES.csv",
@@ -142,11 +146,13 @@ def main():
   "48passed":d48/"stage48_ELIGIBLE_FULL_EVENT_SOURCE_ERA_NUMERIC_GATES.csv",
   "48rejected":d48/"stage48_INITIAL122_FAILED_SCIENCE_GATE_EVENTS.csv",
   "48holds":d48/"stage48_253_ORIGINAL_NEIGHBOR_SOURCE_HOLDS.csv",
+  "45edges":d45/"stage45_TRUE_ORIGINAL_EVENT_AND_JOINED_RUN_EXTERNAL_EDGES.csv",
   "44native":d44/"stage44_ALL1574_NATIVE_HH_ORIGINAL_RH_AND_ERA_MDS_FIRST_PASS.csv",
   "27original":d27/"stage27_ALL1574_paired_source_comparisons_and_risks.csv"}
  s70=rows(paths["70"],E49)
  h52=rows(paths["52"],H49)
  ed104=rows(paths["edges"],B49)
+ native45=rows(paths["45edges"],B45)
  site49=rows(paths["49site"],{"site","Stage46_assistant_original_events"})
  p48=rows(paths["48passed"],P48)
  f48=rows(paths["48rejected"],F48)
@@ -164,6 +170,10 @@ def main():
   raise ValueError("duplicate source research event or hold")
  if len(index(ed104,("site","episode_id","side")))!=104:
   raise ValueError("source true native original edge duplicate or missing")
+ original45edges=index((r for r in native45 if r["context_kind"]=="ORIGINAL_STAGE27_EVENT"),
+  ("site","context_id","side"))
+ if len(original45edges)!=966:
+  raise ValueError("original Stage45 483 source episodes times 2 boundaries changed")
  if set(index(p48,("site","episode_id")))!=set(index(s70,("site","episode_id"))) or set(index(f48,("site","episode_id")))!=set(index(h52,("site","episode_id"))):
   raise ValueError("Stage48 native methods no longer agree with source Stage49")
  bynative=defaultdict(list)
@@ -216,40 +226,58 @@ def main():
   valid_bounds=[]
   for side in ("BEFORE","AFTER"):
    e=edge[side]
-   if e["production_DATM_authorized"]!="NO":raise ValueError("source boundary production approval unexpectedly present")
-   old=n(e["original_VPD_jump_hPa"]);trial=n(e["ERA_trial_VPD_jump_hPa"])
-   if None in (old,trial):raise ValueError("native original source boundary jump unavailable")
-   valid_bounds.append((side,e,old,trial))
+   raw=original45edges.get((key[0],key[1],side))
+   if raw is None:raise ValueError("original Stage45 source signed VPD edge missing "+str(key))
+   if e["production_DATM_authorized"]!="NO":
+    raise ValueError("boundary production approval unexpectedly present")
+   old=n(e["original_VPD_jump_hPa"]);era_jump=n(e["ERA_trial_VPD_jump_hPa"])
+   neighborV=n(raw["neighbor_selected_VPD_hPa"])
+   orig_candidate=n(raw["original_candidate_VPD_hPa"])
+   era_candidate=n(raw["trial_candidate_VPD_hPa"])
+   idx=0 if side=="BEFORE" else -1
+   if None in (old,era_jump,neighborV,orig_candidate,era_candidate):
+    raise ValueError("original signed source VPD from Stage45 missing")
+   if (e["neighbor_native"]!=raw["neighbor_time"] or
+       e["candidate_native"]!=raw["candidate_time"] or
+       e["original_neighbor_QC_VPD"]!=raw["neighbor_original_QC_VPD"] or
+       e["neighbor_kind"]!=raw["neighbor_kind"] or
+       abs(orig_candidate-orig[idx])>.002 or
+       abs(era_candidate-v_era[idx])>.003 or
+       abs(abs(orig_candidate-neighborV)-old)>.003 or
+       abs(abs(era_candidate-neighborV)-era_jump)>.003):
+    raise ValueError("Stage49/45 original signed boundary provenance mismatch "+str(key))
+   if raw["neighbor_kind"] not in ("ORIGINAL_SOURCE","STAGE24_APPROVED"):
+    raise ValueError("cannot fit counterfactual to unapproved source neighbor "+str(key))
+   valid_bounds.append((side,e,old,era_jump,neighborV))
   old_gt2=sum(z[2]<=2<z[3] for z in valid_bounds)
   old_gt4=sum(z[2]<=4<z[3] for z in valid_bounds)
   if old_gt2+old_gt4==0:
-   raise ValueError("event from Stage49 failed source ERA new-jump trace")
+   raise ValueError("Stage49 rejected original source ERA candidate has no new jump")
   options=[]
   for offset in offset_grid():
-   rh=[z+offset for z in RH0]
-   if any(z<0 or z>100 for z in rh):continue
-   vals=[sat(t)*(1-h/100) for t,h in zip(Ts,rh)]
+   rh=[v+offset for v in RH0]
+   if any(v<0 or v>100 for v in rh):continue
+   vals=[sat(t)*(1-r/100) for t,r in zip(Ts,rh)]
    d2,d4=feasible_internal(orig,vals)
-   new2=new4=0;max_old=0;max_new=0
-   for side,e,old,trial in valid_bounds:
-    neighbor=n(e["original_neighbor_RH_pct"])
-    # Actual neighbor ORIGINAL selected VPD is held in Stage45 edge
-    # only as signed distance unavailable here; retrieve the exact
-    # neighbor selected VPD and original candidate from Stage45 in
-    # the source-native event scientific detail rather than guessing.
-    pass
-   # Counterfactual native jumps require signed neighbor VPD:
-   # this script has no Stage45 edge signed VPD and therefore can only
-   # assess original-event internal physical plausibility, not claim
-   # true two-sided external continuity or fabricate a passing method.
-   options.append((abs(offset),offset,vals,rh,d2,d4))
-  options.sort(key=lambda z:(z[4]>0 or z[5]>0,z[0],z[1]))
-  feasible=[y for y in options if y[4]==0 and y[5]==0]
+   new2=new4=0;largest_new=0;max_worsening=0
+   for side,e,old,era_jump,neighborV in valid_bounds:
+    v=vals[0 if side=="BEFORE" else -1]
+    jump=abs(v-neighborV)
+    new2+=old<=2+1e-9 and jump>2+1e-9
+    new4+=old<=4+1e-9 and jump>4+1e-9
+    largest_new=max(largest_new,jump)
+    max_worsening=max(max_worsening,jump-old)
+   if max(abs(v-o) for v,o in zip(vals,orig))>10+1e-9:continue
+   options.append((abs(offset),max_worsening,offset,vals,rh,d2,d4,
+                   new2,new4,largest_new))
+  feasible=[z for z in options if z[5]==0 and z[6]==0 and z[7]==0 and z[8]==0
+            and z[1]<=0.5+1e-9]
+  feasible.sort(key=lambda z:(z[0],z[1],z[2]))
   picked=feasible[0] if feasible else None
-  lane=("INTERNAL_NUMERIC_ONLY_SOURCE_EDGE_UNVERIFIED"
-        if picked is not None else "NO_PHYSICAL_EVENTWIDE_OFFSET_INTERNAL_SCREEN_HOLD")
+  lane=("NUMERIC_EVENTWIDE_BOUNDARIES_POSSIBLE_SCIENCE_HOLD"
+       if picked is not None else "NO_FEASIBLE_BOUNDED_EVENT_RH_OFFSET_SCIENCE_HOLD")
   if picked is not None:
-   _,offset,vals,rh,d2,d4=picked
+   _,_,offset,vals,rh,d2,d4,new2,new4,largest_new=picked
    for r,t,o,v,v0,rrh in zip(rs,Ts,orig,vals,v_era,rh):
     counterfactual_native.append(dict(site=key[0],episode_id=key[1],
       native_time=r["native_time"],original_T_C=t,original_VPD_hPa=o,
@@ -262,18 +290,19 @@ def main():
   alternatives.append(dict(site=key[0],episode_id=key[1],
     method="EVENTWIDE_CONSTANT_RH_OFFSET_SOURCE_ERA_INTERNAL_SENSITIVITY",
     source_original_HH=len(rs),first_native=rs[0]["native_time"],last_native=rs[-1]["native_time"],
-    offset_RH_percentage_points=picked[1] if picked is not None else "",
+    offset_RH_percentage_points=picked[2] if picked is not None else "",
     all_original_event_HH_covered=True,source_native_QC0_protected=True,
     source_RH_and_VPD_physical_bounds=picked is not None,
-    new_internal_gt2=picked[4] if picked is not None else "",
-    new_internal_gt4=picked[5] if picked is not None else "",
-    new_external_gt2="",new_external_gt4="",
+    new_internal_gt2=picked[5] if picked is not None else "",
+    new_internal_gt4=picked[6] if picked is not None else "",
+    new_external_gt2=picked[7] if picked is not None else "",
+    new_external_gt4=picked[8] if picked is not None else "",
     original_external_new_gt2=sum(z[2]<=2<z[3] for z in valid_bounds),
     original_external_new_gt4=sum(z[2]<=4<z[3] for z in valid_bounds),
-    max_abs_trial_minus_source_ERA_VPD_hPa=round(max(abs(v-w) for v,w in zip(picked[2],v_era)),6) if picked else "",
-    max_abs_trial_minus_original_VPD_hPa=round(max(abs(v-w) for v,w in zip(picked[2],orig)),6) if picked else "",
+    max_abs_trial_minus_source_ERA_VPD_hPa=round(max(abs(v-w) for v,w in zip(picked[3],v_era)),6) if picked else "",
+    max_abs_trial_minus_original_VPD_hPa=round(max(abs(v-w) for v,w in zip(picked[3],orig)),6) if picked else "",
     max_original_boundary_jump_hPa=max(z[2] for z in valid_bounds),
-    max_hypothesis_boundary_jump_hPa="NOT_ASSESSED_MISSING_SIGNED_NEIGHBOR_VPD",
+    max_hypothesis_boundary_jump_hPa=round(picked[9],6) if picked is not None else "",
     edge_QC0_count=sum(z[1]["original_neighbor_QC_VPD"]=="0" for z in valid_bounds),
     edge_QC1_count=sum(z[1]["original_neighbor_QC_VPD"]=="1" for z in valid_bounds),
     source_reference_status=context_gate(x["boundary_science_lane"]),
@@ -281,8 +310,11 @@ def main():
     production_DATM_authorized="NO"))
  if len(alternatives)!=52 or len(ranked70)!=70:raise ValueError("52/70 original event population no longer conserved")
  for r in alternatives:
-  if r["new_external_gt2"]!="" or r["new_external_gt4"]!="" or r["production_DATM_authorized"]!="NO":
-   raise ValueError("counterfactual external edge not supported; cannot claim source pass")
+  if r["production_DATM_authorized"]!="NO":
+   raise ValueError("counterfactual must never be production approved")
+  if r["numerical_screen_status"]=="NUMERIC_EVENTWIDE_BOUNDARIES_POSSIBLE_SCIENCE_HOLD" and any(
+    r[k]!=0 for k in ("new_internal_gt2","new_internal_gt4","new_external_gt2","new_external_gt4")):
+   raise ValueError("accepted hypothetical source numeric method creates new discontinuity")
  siteout=[]
  for site in SITES:
   so=[r for r in site49 if r["site"]==site]
@@ -293,9 +325,9 @@ def main():
   ho=[r for r in oldholds if r["site"]==site]
   siteout.append(dict(site=site,original_P2P3_HH="",Assistant_original_events=int(x["Stage46_assistant_original_events"]),
    Stage49_70_reference_science_pending=len(pa),Stage49_52_failed_original_ERA_events=len(ea),
-   Stage50_exploratory_boundary_offset_numeric_feasible=0,
-   Stage50_alternative_numeric_not_feasible=sum(r["numerical_screen_status"]=="NO_PHYSICAL_EVENTWIDE_OFFSET_INTERNAL_SCREEN_HOLD" for r in ea),
-   Stage50_unverifiable_boundary_source_holds=len(ea),
+   Stage50_exploratory_boundary_offset_numeric_feasible=sum(r["numerical_screen_status"]=="NUMERIC_EVENTWIDE_BOUNDARIES_POSSIBLE_SCIENCE_HOLD" for r in ea),
+   Stage50_alternative_numeric_not_feasible=sum(r["numerical_screen_status"]=="NO_FEASIBLE_BOUNDED_EVENT_RH_OFFSET_SCIENCE_HOLD" for r in ea),
+   Stage50_unverifiable_boundary_source_holds=0,
    original_253_neighbor_science_HOLD=len(ho),Claude_108_untouched=True,
    additional_science_approvals=0,site_full_met_forcing_pass=False))
  if sum(r["Assistant_original_events"] for r in siteout)!=375:
@@ -309,7 +341,7 @@ def main():
   candidate_70_numerical_source_events=70,candidate_native_141_HH_prior_source=True,
   original_jump_method_HOLD_events=52,original_other_neighbor_HOLD_events=253,
   counterfactual_source_native_HH=len(counterfactual_native),
-  external_true_boundary_continuity_not_evaluated=True,
+  external_true_boundary_signed_VPD_checked_from_original_Stage45=True,
   new_science_approvals=0,Claude_108_unchanged=True,
   existing_166_approved_46_P1_HOLD_10_RH_platform_1574_P2P3_protected=True,
   original_FLUXMET_DATM_CIME_Slurm_modified=False)
@@ -317,21 +349,21 @@ def main():
  md=["# Stage50 — Batch05 Assistant 70 provenance priorities, 52 RH offset exploratory sensitivities",
  "**NO official forcing changes; ALL 52 original source methods stay HOLD.**",
  "Source-processed ERA is not an independent measurement. A constant event-wide RH offset is only an uncalibrated mathematical sensitivity.",
- "Current Stage50 sensitivity does NOT have signed original VPD of neighboring native half-hours; it cannot legitimately claim that a new candidate passes true original external boundary gates.",
+ "Stage50 checks signed original neighbor VPD from Stage45, paired with Stage49 true native boundaries; even a numerically safe hypothesis is NOT station-grounded scientific approval.",
  "","## 70 original ERA source candidates — independent source evidence gaps"]
  for g,nn in sorted(Counter(x["Stage49_source_reference_gate"] for x in ranked70).items()):
   md.append("- {}: {} events".format(g,nn))
- md+=["","## 52 original ERA source new external jump holds — internal-only sensitivity"]
+ md+=["","## 52 original ERA source new external jump holds — full-event source-native boundary sensitivity"]
  for g,nn in sorted(Counter(x["numerical_screen_status"] for x in alternatives).items()):
   md.append("- {}: {} original events".format(g,nn))
- md+=["","Do not interpret these internal screens as repaired source humidity. For real external numeric gates, obtain the exact original native neighbor selected VPD from the actual Stage45 edges, preserving approved Stage24 and observed QC0.","",
-  "53? Never infer changes to Claude Track B: 108 separate original high-risk events remain untouched.",
+ md+=["","These full-event offset sensitivities use exact Stage45 signed neighbor VPD; they are artificial numerical hypotheses, not evidence of correct tower RH. Preserve approved Stage24 and observed QC0.","",
+  "Never infer changes to Claude Track B: 108 separate original high-risk events remain untouched.",
   "Existing Stage24 approved 166, original P1 held 46, RH plateau 10, and source P2P3 unapproved 1574 all unchanged.",
   "Source SCIENTIFIC APPROVALS NEW: 0; Official DATM writes: 0."]
  (out/"STAGE50_ASSISTANT_REFERENCE_SCIENCE_AND_EVENTWIDE_OFFSET_LIMITS.md").write_text("\n".join(md)+"\n")
- print("STAGE50 SUCCESS | 70 source-reference pending; 52 original-new-jump HOLD, internal-only eventwide sensitivity, 253 neighbor source holds; zero approvals")
+ print("STAGE50 SUCCESS | 70 source-reference pending; 52 original-new-jump HOLD, full-event source-native boundary sensitivity, 253 neighbor source holds; zero approvals")
  print("STAGE50 LOW_RISK_REFERENCE",json.dumps(dict(Counter(r["Stage49_source_reference_gate"] for r in ranked70)),sort_keys=True))
- print("STAGE50 OFFSET_INTERNAL_SCREEN",json.dumps(dict(Counter(r["numerical_screen_status"] for r in alternatives)),sort_keys=True))
+ print("STAGE50 RH_OFFSET_BOUNDARY_SENSITIVITY",json.dumps(dict(Counter(r["numerical_screen_status"] for r in alternatives)),sort_keys=True))
  print("STAGE50_OUT="+str(out))
  print("STAGE50 SOURCE/DATM/CIME/SLURM UNCHANGED CLAUDE108 UNTOUCHED")
 if __name__=="__main__":main()
