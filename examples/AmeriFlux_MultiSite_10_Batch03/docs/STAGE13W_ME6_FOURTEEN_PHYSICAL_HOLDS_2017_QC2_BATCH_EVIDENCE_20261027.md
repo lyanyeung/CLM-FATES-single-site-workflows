@@ -1,5 +1,21 @@
 # US-Me6 — actual Stage13v results and next Stage13w signed batch physical-source diagnosis
 
+## ACTUAL IRIDIS6 Stage13w source-science PASS (operator terminal 2026-10-27 08:57 UTC)
+
+Operator ran pinned Stage13w `--self-test`, `--check`, and `--run` successfully on IRIDIS6. Full original signed Stage13u SHA256 `432f8ce81348be6ab54d8b0791886481c61e71bf2f945e90a33f23dccf1cd9a4`; Stage13v SHA256 `c8b661f779a3aa4ec6aa01352a2926d69d3704d9adb621c01651cfcb104d7f0c` checked. Signed **READONLY** report:
+
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13w_Me6_14_exact_physics_causes_and_2017_QC2_BOUNDARIES_READONLY_20261027T085711Z_f6efb289`
+
+**All 14 original-source physical-HOLD cases have EXACTLY ONE failure clause: site measured TA versus paired original ERA TA exceeds existing strict 8°C threshold.** None of these 14 fail the water RH 0–100%, derived QBOT 0–0.08 or VPD saturation tests by themselves. Exceedance temperature magnitudes by run:
+- Stage13r original run14: 2015-11-07 five original native halfhours 03:00, 04:00, 04:30, 05:00, 08:00, |TA_site - TA_ERA| = **8.190–9.168°C**; source ERA RH 60.953–68.701%.
+- Run15: 2017-06-29 23:00 to 2017-06-30 02:30 (eight 30min halfhours), TA mismatch **8.291–11.088°C**, ERA RH 26.381–36.377%.
+- Run17: 2017-07-03 07:00, mismatch **8.378°C**, ERA RH 82.168%.
+All 782 previous original full-run QC1 source records, 768 physical PASS, 11 provisional subgroups and original 5 approved Stage12ac July04 rows unchanged.
+
+**Four 2017 original full QC1 runs ID15–18 have QC2 on both IMMEDIATE original VPD boundaries** (zero direct two-QC0 anchors). Nearest truly measured source QC0 distances in original 30min halfhours (before, after) are: run15 **(17,233)**; run16 **(113,202)**; run17 **(151,57)**; run18 **(296,2)**. These *remote* QC0 cannot be used as direct 30min group bookends. ERA-RH candidate max native VPD jumps and number of >4hPa edges respectively: run15 **5.741840 (2)**, run16 **4.489297 (2)**, run17 **4.190815 (1)**, run18 **6.552221 (4)**. **No approved blanket QC2 bridge; no new forcing and no model jobs.**
+
+**Scientific implication:** the 8°C mismatch is an empirical concern about RH source transferability, not proof tower TA is wrong; do not relax the threshold to 12°C or auto-impute 14 cases just because water thermodynamics are feasible. Next batch should independently measure original tower QC0 VPD-implied RH minus native ERA RH skill on surrounding available directly measured tower QC0 records, and compare QC2 immediate edge records against ERA RH; remote QC0 only source-skill context, not interpolation anchors. User prefers a single justified grouped operator approval after evidence.
+
 ## Stage13v actual signed success (user IRIDIS6, 27 Oct 2026 08:35 UTC)
 
 User ran `--self-test`, `--check`, `--run` PASS. New read-only signed science report at
