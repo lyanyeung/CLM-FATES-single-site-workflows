@@ -1,0 +1,248 @@
+{
+  "schema": "batch03-stage13s-proposal-only-US-Me6-12-original-QC1-full-2015-runs",
+  "status": "PROPOSAL_ONLY_OPERATOR_APPROVAL_REQUIRED_DO_NOT_APPLY",
+  "science_site": "US-Me6",
+  "actual_operator_verified_stage13r_report": "/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13r_Me6_original_full_QC1_run_and_original_QC0_ERA_RH_READONLY_20261027T004033Z_5eefea7b",
+  "actual_stage13q_report": "/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13q_Me6_33_original_ERA_RH_group_source_review_20261027T002737Z_445444f6",
+  "source_results": {
+    "source_original_QC1_full_runs": 18,
+    "earlier_single_center_operator_method_approvals": 33,
+    "all_extra_source_QC1_neighbors_2015_and_2017": 979,
+    "fully_science_pass_original_QC1_runs": 12,
+    "still_HOLD_original_QC1_runs": 6,
+    "original_five_2017_Stage12ac_slots_protected": 5
+  },
+  "twelve_conditional_approval_proposals": [
+    {
+      "stage13r_full_source_original_QC1_run_id": 1,
+      "native_start": "2015-06-03T01:30:00",
+      "native_end": "2015-06-03T05:30:00",
+      "original_QC1_native_halfhours": 9,
+      "previously_method_approved_center_records": 1,
+      "additional_QC1_neighbors_requiring_new_operator_authorization": 8,
+      "stage13r_whole_run_max_VPD_30min_jump_hPa_approx": 1.357435,
+      "original_both_QC0_bookends_verified": true,
+      "source_ERA_RH_T_QBOT_fullrun_basic_physics_PASS": true,
+      "currently_authorized_to_apply": false
+    },
+    {
+      "stage13r_full_source_original_QC1_run_id": 2,
+      "native_start": "2015-07-27T02:30:00",
+      "native_end": "2015-07-27T05:30:00",
+      "original_QC1_native_halfhours": 7,
+      "previously_method_approved_center_records": 1,
+      "additional_QC1_neighbors_requiring_new_operator_authorization": 6,
+      "stage13r_whole_run_max_VPD_30min_jump_hPa_approx": 2.434734,
+      "original_both_QC0_bookends_verified": true,
+      "source_ERA_RH_T_QBOT_fullrun_basic_physics_PASS": true,
+      "currently_authorized_to_apply": false
+    },
+    {
+      "stage13r_full_source_original_QC1_run_id": 3,
+      "native_start": "2015-08-29T17:00:00",
+      "native_end": "2015-08-30T10:00:00",
+      "original_QC1_native_halfhours": 35,
+      "previously_method_approved_center_records": 3,
+      "additional_QC1_neighbors_requiring_new_operator_authorization": 32,
+      "stage13r_whole_run_max_VPD_30min_jump_hPa_approx": 2.999654,
+      "original_both_QC0_bookends_verified": true,
+      "source_ERA_RH_T_QBOT_fullrun_basic_physics_PASS": true,
+      "currently_authorized_to_apply": false
+    },
+    {
+      "stage13r_full_source_original_QC1_run_id": 4,
+      "native_start": "2015-08-30T16:30:00",
+      "native_end": "2015-08-31T06:00:00",
+      "original_QC1_native_halfhours": 28,
+      "previously_method_approved_center_records": 1,
+      "additional_QC1_neighbors_requiring_new_operator_authorization": 27,
+      "stage13r_whole_run_max_VPD_30min_jump_hPa_approx": 1.069926,
+      "original_both_QC0_bookends_verified": true,
+      "source_ERA_RH_T_QBOT_fullrun_basic_physics_PASS": true,
+      "currently_authorized_to_apply": false
+    },
+    {
+      "stage13r_full_source_original_QC1_run_id": 5,
+      "native_start": "2015-09-02T05:00:00",
+      "native_end": "2015-09-02T06:30:00",
+      "original_QC1_native_halfhours": 4,
+      "previously_method_approved_center_records": 1,
+      "additional_QC1_neighbors_requiring_new_operator_authorization": 3,
+      "stage13r_whole_run_max_VPD_30min_jump_hPa_approx": 1.621207,
+      "original_both_QC0_bookends_verified": true,
+      "source_ERA_RH_T_QBOT_fullrun_basic_physics_PASS": true,
+      "currently_authorized_to_apply": false
+    },
+    {
+      "stage13r_full_source_original_QC1_run_id": 6,
+      "native_start": "2015-09-02T21:30:00",
+      "native_end": "2015-09-03T06:00:00",
+      "original_QC1_native_halfhours": 18,
+      "previously_method_approved_center_records": 1,
+      "additional_QC1_neighbors_requiring_new_operator_authorization": 17,
+      "stage13r_whole_run_max_VPD_30min_jump_hPa_approx": 0.410787,
+      "original_both_QC0_bookends_verified": true,
+      "source_ERA_RH_T_QBOT_fullrun_basic_physics_PASS": true,
+      "currently_authorized_to_apply": false
+    },
+    {
+      "stage13r_full_source_original_QC1_run_id": 7,
+      "native_start": "2015-09-04T20:00:00",
+      "native_end": "2015-09-05T06:00:00",
+      "original_QC1_native_halfhours": 21,
+      "previously_method_approved_center_records": 1,
+      "additional_QC1_neighbors_requiring_new_operator_authorization": 20,
+      "stage13r_whole_run_max_VPD_30min_jump_hPa_approx": 1.583328,
+      "original_both_QC0_bookends_verified": true,
+      "source_ERA_RH_T_QBOT_fullrun_basic_physics_PASS": true,
+      "currently_authorized_to_apply": false
+    },
+    {
+      "stage13r_full_source_original_QC1_run_id": 8,
+      "native_start": "2015-09-14T23:00:00",
+      "native_end": "2015-09-15T06:00:00",
+      "original_QC1_native_halfhours": 15,
+      "previously_method_approved_center_records": 1,
+      "additional_QC1_neighbors_requiring_new_operator_authorization": 14,
+      "stage13r_whole_run_max_VPD_30min_jump_hPa_approx": 0.841656,
+      "original_both_QC0_bookends_verified": true,
+      "source_ERA_RH_T_QBOT_fullrun_basic_physics_PASS": true,
+      "currently_authorized_to_apply": false
+    },
+    {
+      "stage13r_full_source_original_QC1_run_id": 9,
+      "native_start": "2015-09-15T15:30:00",
+      "native_end": "2015-09-16T06:00:00",
+      "original_QC1_native_halfhours": 30,
+      "previously_method_approved_center_records": 1,
+      "additional_QC1_neighbors_requiring_new_operator_authorization": 29,
+      "stage13r_whole_run_max_VPD_30min_jump_hPa_approx": 0.790999,
+      "original_both_QC0_bookends_verified": true,
+      "source_ERA_RH_T_QBOT_fullrun_basic_physics_PASS": true,
+      "currently_authorized_to_apply": false
+    },
+    {
+      "stage13r_full_source_original_QC1_run_id": 10,
+      "native_start": "2015-09-16T16:30:00",
+      "native_end": "2015-09-17T07:30:00",
+      "original_QC1_native_halfhours": 31,
+      "previously_method_approved_center_records": 2,
+      "additional_QC1_neighbors_requiring_new_operator_authorization": 29,
+      "stage13r_whole_run_max_VPD_30min_jump_hPa_approx": 1.935307,
+      "original_both_QC0_bookends_verified": true,
+      "source_ERA_RH_T_QBOT_fullrun_basic_physics_PASS": true,
+      "currently_authorized_to_apply": false
+    },
+    {
+      "stage13r_full_source_original_QC1_run_id": 11,
+      "native_start": "2015-09-17T16:00:00",
+      "native_end": "2015-09-18T06:00:00",
+      "original_QC1_native_halfhours": 29,
+      "previously_method_approved_center_records": 2,
+      "additional_QC1_neighbors_requiring_new_operator_authorization": 27,
+      "stage13r_whole_run_max_VPD_30min_jump_hPa_approx": 1.521027,
+      "original_both_QC0_bookends_verified": true,
+      "source_ERA_RH_T_QBOT_fullrun_basic_physics_PASS": true,
+      "currently_authorized_to_apply": false
+    },
+    {
+      "stage13r_full_source_original_QC1_run_id": 13,
+      "native_start": "2015-10-03T08:30:00",
+      "native_end": "2015-10-03T12:00:00",
+      "original_QC1_native_halfhours": 8,
+      "previously_method_approved_center_records": 2,
+      "additional_QC1_neighbors_requiring_new_operator_authorization": 6,
+      "stage13r_whole_run_max_VPD_30min_jump_hPa_approx": 0.25865,
+      "original_both_QC0_bookends_verified": true,
+      "source_ERA_RH_T_QBOT_fullrun_basic_physics_PASS": true,
+      "currently_authorized_to_apply": false
+    }
+  ],
+  "proposed_aggregate": {
+    "original_full_run_QC1_halfhours": 235,
+    "previously_method_approved_centers": 17,
+    "additional_QC1_to_approve": 218,
+    "original_QC0_anchor_source_changes": 0,
+    "full_runs_all_2015": true
+  },
+  "six_explicit_HOLD_runs_unauthorized": [
+    {
+      "run_id": 12,
+      "native_start": "2015-09-26T05:00:00",
+      "native_end": "2015-09-26T06:30:00",
+      "QC1_native_halfhours": 4,
+      "earlier_approved_centers": 1,
+      "new_neighbour_QC1_unapproved": 3,
+      "HOLD_reason": "VPD_GT4HPA"
+    },
+    {
+      "run_id": 14,
+      "native_start": "2015-11-04T13:00:00",
+      "native_end": "2015-11-14T07:00:00",
+      "QC1_native_halfhours": 469,
+      "earlier_approved_centers": 2,
+      "new_neighbour_QC1_unapproved": 467,
+      "HOLD_reason": "RUN_GT300HH_SOURCE_T_OR_ERA_RH_PHYSICS_HOLD"
+    },
+    {
+      "run_id": 15,
+      "native_start": "2017-06-28T17:00:00",
+      "native_end": "2017-06-30T16:00:00",
+      "QC1_native_halfhours": 95,
+      "earlier_approved_centers": 3,
+      "new_neighbour_QC1_unapproved": 92,
+      "HOLD_reason": "QC0_BOUNDARIES_MISSING_AND_PHYSICS_VPD_HOLD"
+    },
+    {
+      "run_id": 16,
+      "native_start": "2017-06-30T17:00:00",
+      "native_end": "2017-07-01T07:30:00",
+      "QC1_native_halfhours": 30,
+      "earlier_approved_centers": 1,
+      "new_neighbour_QC1_unapproved": 29,
+      "HOLD_reason": "QC0_BOUNDARIES_MISSING_AND_VPD_HOLD"
+    },
+    {
+      "run_id": 17,
+      "native_start": "2017-07-01T12:00:00",
+      "native_end": "2017-07-04T08:00:00",
+      "QC1_native_halfhours": 137,
+      "earlier_approved_centers": 6,
+      "new_neighbour_QC1_unapproved": 126,
+      "HOLD_reason": "QC0_BOUNDARIES_MISSING_OVERLAPS_FIVE_STAGE12AC_APPROVED_T_PHYSICS_VPD_HOLD"
+    },
+    {
+      "run_id": 18,
+      "native_start": "2017-07-04T12:30:00",
+      "native_end": "2017-07-05T11:30:00",
+      "QC1_native_halfhours": 47,
+      "earlier_approved_centers": 3,
+      "new_neighbour_QC1_unapproved": 44,
+      "HOLD_reason": "QC0_BOUNDARIES_MISSING_AND_VPD_HOLD"
+    }
+  ],
+  "held_aggregate": {
+    "QC1_native_halfhours": 782,
+    "new_QC1_neighbours_unapproved": 761,
+    "prior_centers": 16,
+    "previous_Stage12ac_2017_protected_in_held_runs": 5
+  },
+  "conditions": [
+    "Operator must explicitly sign this exact twelve-run native scope; old approval for 33 centers is not authorization for 218 extra neighboring QC1 timestamps",
+    "Stage12g/Stage12ac/Stage13q/Stage13r original source and signed SHA receipts, original local 30-min source VPD_F_QC=1 and original measured TA_F_QC=0 at each candidate time",
+    "Original paired FLUXNET native ERA TA_ERA+VPD_ERA yields 0<RH<100; transfer RH to retained Stage12ac model TA and unchanged site PSRF; reconstructed 0<VPD<es(T) and 0<QBOT<0.08 with tower/ERA T within 8C",
+    "Preserve original source VPD_F_QC=0 tower values and Stage12ac selected VPD at all 24 bookends; full 30min internal + boundary VPD transitions <=4hPa",
+    "Operate only within exact approved 235 original source QC1 site-native 2015 halfhours; never extend to 6 HELD runs, other 761 QC1 neighbours or five Stage12ac already-approved 2017 times",
+    "If any run fails checks HOLD entire run, do not partially patch that run; report exact run fail, and create independent full model forcing shadow only for fully checked and actually user-authorized scopes",
+    "Output original source case never changed; full NOLEAP model forcing field/time differential and signed CSV/receipt; no PFT/ZBOT/model DATM/AD400/Slurm"
+  ],
+  "not_authorized": {
+    "allow_218_extra_now": false,
+    "other_761_original_source_QC1_neighbors": false,
+    "all_2017": false,
+    "Postv5": false,
+    "DATM": false,
+    "AD400": false,
+    "Slurm": false
+  }
+}
