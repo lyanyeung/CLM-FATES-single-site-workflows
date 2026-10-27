@@ -91,10 +91,9 @@ def load_prev():
     x=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(x)
     require(x.VER=="batch03-stage13r-v1-20261027-Me6-original-full-QC1-run-survey"
-            and x.ROOT==ROOT and x.AC==AC and x.RR if hasattr(x,"RR") else
-            x.VER=="batch03-stage13r-v1-20261027-Me6-original-full-QC1-run-survey"
-            and x.ROOT==ROOT and x.AC==AC,
-            "original Stage13r method/site changed")
+            and x.ROOT==ROOT and x.AC==AC and
+            x.Q==ROOT/"reports/stage13q_Me6_33_original_ERA_RH_group_source_review_20261027T002737Z_445444f6",
+            "original Stage13r method/site and source inputs changed")
     return x
 
 def selftest():
