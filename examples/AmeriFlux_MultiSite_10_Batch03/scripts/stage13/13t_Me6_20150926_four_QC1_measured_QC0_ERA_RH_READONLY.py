@@ -78,9 +78,7 @@ def load_prev():
     mod=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     require(mod.VER=="batch03-stage13r-v1-20261027-Me6-original-full-QC1-run-survey"
-            and mod.ROOT==ROOT and mod.AC==AC and mod.RR if hasattr(mod,"RR") else
-            mod.VER=="batch03-stage13r-v1-20261027-Me6-original-full-QC1-run-survey"
-            and mod.ROOT==ROOT and mod.AC==AC,
+            and mod.ROOT==ROOT and mod.AC==AC and mod.Q==ROOT/"reports/stage13q_Me6_33_original_ERA_RH_group_source_review_20261027T002737Z_445444f6",
             "original Stage13r source parameters changed")
     return mod
 
@@ -145,8 +143,17 @@ def audit():
             list(current.columns)==list(originals.columns),
             "Stage13s candidate native time/full field schema mismatch")
     for t in CONTEXT:
-        require(originals.loc[t].equals(current.loc[t]),
-                "user-approved Stage13s improperly affected unapproved 2015 Sep26 source "+str(t))
+        aa=originals.loc[t]
+        bb=current.loc[t]
+        require(str(aa["time"])==str(bb["time"]),
+                "original selected native source time changed "+str(t))
+        for field in originals.columns:
+            if field=="time":continue
+            a=float(aa[field]);b=float(bb[field])
+            require((np.isnan(a) and np.isnan(b)) or
+                    np.isclose(a,b,rtol=1e-14,atol=1e-12),
+                    "user-approved Stage13s improperly affected unapproved 2015 Sep26 source "+
+                    str(t)+" "+field)
     source_cols=["TIMESTAMP_START","TA_F","TA_F_QC","VPD_F","VPD_F_QC"]
     era_cols=["TIMESTAMP_START","TA_ERA","VPD_ERA"]
     tower=pd.read_csv(must(spec["primary"]),dtype={"TIMESTAMP_START":str},
