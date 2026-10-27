@@ -113,8 +113,8 @@ def load_original_stage13r():
     spec.loader.exec_module(mod)
     need(mod.VER=="batch03-stage13r-v1-20261027-Me6-original-full-QC1-run-survey",
          "Stage13r historical source method changed")
-    need(mod.ROOT==ROOT and mod.RR if hasattr(mod,"RR") else mod.ROOT==ROOT,
-         "source site original experiment root changed")
+    need(mod.ROOT==ROOT and mod.Q==Q and mod.AC==AC,
+         "Stage13r original site experiment/QC0 source location changed")
     return mod
 
 def approval(path):
