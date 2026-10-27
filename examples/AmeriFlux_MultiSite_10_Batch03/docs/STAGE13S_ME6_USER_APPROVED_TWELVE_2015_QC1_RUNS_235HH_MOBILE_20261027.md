@@ -1,5 +1,28 @@
 # Stage13s US-Me6 — 12 source-original full 2015 QC1 humidity episodes operator-approved, pending IRIDIS6
 
+## ACTUAL IRIDIS6 STAGE13S APPLIED SUCCESS (operator log, 2026-10-27)
+
+The user executed the Git-pinned mobile Stage13s launcher from `login6001` and provided the full original `--self-test`, `--check`, `--apply` terminal output. **All passed**. Exact final markers:
+
+```text
+STAGE13S READONLY CHECK PASS | all twelve whole QC1 runs, 235 native HH, 24 original QC0 bookends, 2017 protected; NO WRITES
+STAGE13S ALL 12 SOURCE RUNS PASS; 235 ORIGINAL QC1 HH OPERATOR APPROVED RESEARCH SHADOW SUCCESS /iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/science_trials/stage13s_Me6_12x2015_235HH_ERA_RH_operator_approved_20261027T065056Z_6890a105
+STAGE13S 2015 exact 235 native records; SOURCE-VPD/QBOT actual field delta {'VPD_USE': 214, 'QBOT': 214} old H0 fills {'VPD_USE': 18, 'QBOT': 18}
+STAGE13S ORIGINAL Stage12ac 2017 5 VALUES & 6 SOURCE HELD RUNS PRESERVED; NO Slurm/DATM/AD400
+STAGE13S ME6 DONE
+```
+
+Actual source/receipt evidence in execution log:
+- Stage13s user-approved operator JSON SHA256 `a686189a775f51e8e015627bc1152a66ad883415c5a10d953b8fb4cf08b5036e`.
+- Stage13r signed original evidence SHA256 `498a0de192bf982c5751fa0b9dab2fbb7d1b2fa702a50b61b7de51445af1dbcb`; Stage13q receipt `8b52f7c258034f0061cd46116d50feab3957d1f6a4aa1f43afe003643ff1f254`.
+- Last previously approved Stage12ac selected input SHA256 `54bccdadde9ff72c8c60a17bd17c28e5695aad0431fdee6dfca18faff4e2f085`.
+- Original tower FLUXMET `721d87464c70ea38c7ab6206deee6953647709072cde33827a825408970971e0`, native companion ERA `af2be6dce8b9d1310540f29b3a87d57fbac4da7d2f8192434e93217e5079f98f`.
+- Original Me6 selected input: **280,320 full native NOLEAP records** (16 × 17,520). **235 original source QC1 timestamps validated**, but only **214 VPD_USE and 214 QBOT numeric field values actually changed**, with **18 previously absent VPD_USE + 18 QBOT records filled**; these are separate concepts and MUST NOT be conflated. All 24 original VPD QC0 edges retain source tower values, and all original July2017 Stage12ac five corrected halfhours remain identical.
+- Source science maximum full episode 30-minute VPD step among the twelve groups **2.9996543882588456 hPa** (<4hPa); no new original 2017 / other 6 hold runs modified.
+- **This is a new isolated RESEARCH-ONLY candidate, not approved Post-v5/DATM/AD400/Slurm**. Other original humidity science HOLDs remain. These same 235 site-native observations need no repeated operator review.
+
+The pending execution note below is historical and superseded by this logged actual result. Next recommended scientific decision is the **small original Sep26 2015 source VPD QC1 full episode run ID 12**, which previously failed a 4hPa boundary check at 4.800355hPa. Inspect full source/ERA and measured QC0 boundaries read-only first; never silently relax 4hPa or copy unrelated original 2017 values.
+
 ## Operator approval and exact protected scope
 
 The operator explicitly approved **only Stage13r actual science PASS original QC1 full run IDs 1–11 and 13**, total **12** source runs across **235 original 30-minute 2015 humidity timestamps**, including 17 previously method-reviewed centers and **218 additional original source QC1 neighboring native timestamps**. Original sources are site-native FLUXNET tower, original same-native companion FLUXNET ERA, signed Stage12ac operator-approved site selected TA_USE and PSRF. ERA RH is a reanalysis-derived estimate, *not measured tower RH*.
