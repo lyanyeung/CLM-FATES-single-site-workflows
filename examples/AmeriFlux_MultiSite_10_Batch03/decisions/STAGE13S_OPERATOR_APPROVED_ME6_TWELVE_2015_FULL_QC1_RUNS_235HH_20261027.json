@@ -1,0 +1,250 @@
+{
+  "schema": "batch03-stage13s-operator-approved-Me6-12-full-original-QC1-2015-runs-v1",
+  "site": "US-Me6",
+  "operator_approval_date": "2026-10-27",
+  "operator_exact_instruction": "批准 US-Me6 Stage13s：仅限 Stage13r 实际科学检查通过的原始 2015 年完整 QC1 区间编号 1–11 和 13，共 12 段、235 条原始半小时，其中 17 条原有方法授权中心及新增授权 218 条 QC1 邻居。使用原始配对 FLUXNET ERA RH 和保留的 Stage12ac 塔站温度、PSRF 重建 VPD_USE/QBOT。严格复核源 SHA、所有 QC1 时间、每段两端原始实测 QC0、RH/QBOT 物理和 <=4hPa 全段 VPD 连续性；任何一段失败则整段 HOLD、不强制修复。其余 6 段和 761 条未授权 QC1 邻居继续 HOLD。原始塔站数据、Stage12ac 2017 年 7 月 4 日 5 条既有修复、其他站点、PFT/ZBOT 与模型配置不变。仅允许建立新的独立研究 forcing，不提交 DATM/AD400/Slurm。",
+  "source_stage13s_proposal_original_git_blob": "84b8f8a2d228ba2816e7632030fa6e5e0793feeb",
+  "science": "original same-native paired FLUXNET ERA TA_ERA/VPD_ERA gives RH, transfer at retained Stage12ac site TA_USE/PSRF to both VPD_USE and QBOT, do not misrepresent ERA as observed site humidity",
+  "approved_source_native_QC1_full_runs": [
+    {
+      "original_stage13r_full_run_id": 1,
+      "first": "2015-06-03T01:30:00",
+      "last": "2015-06-03T05:30:00",
+      "original_VPD_F_QC_required": 1,
+      "original_native_30min_records": 9,
+      "old_method_approved_center_count": 1,
+      "new_QC1_neighbour_scope_authorized": 8,
+      "before_and_after_original_measured_QC0_required": true,
+      "whole_segment_RH_QBOT_and_VPD_4hPa_gate_required": true
+    },
+    {
+      "original_stage13r_full_run_id": 2,
+      "first": "2015-07-27T02:30:00",
+      "last": "2015-07-27T05:30:00",
+      "original_VPD_F_QC_required": 1,
+      "original_native_30min_records": 7,
+      "old_method_approved_center_count": 1,
+      "new_QC1_neighbour_scope_authorized": 6,
+      "before_and_after_original_measured_QC0_required": true,
+      "whole_segment_RH_QBOT_and_VPD_4hPa_gate_required": true
+    },
+    {
+      "original_stage13r_full_run_id": 3,
+      "first": "2015-08-29T17:00:00",
+      "last": "2015-08-30T10:00:00",
+      "original_VPD_F_QC_required": 1,
+      "original_native_30min_records": 35,
+      "old_method_approved_center_count": 3,
+      "new_QC1_neighbour_scope_authorized": 32,
+      "before_and_after_original_measured_QC0_required": true,
+      "whole_segment_RH_QBOT_and_VPD_4hPa_gate_required": true
+    },
+    {
+      "original_stage13r_full_run_id": 4,
+      "first": "2015-08-30T16:30:00",
+      "last": "2015-08-31T06:00:00",
+      "original_VPD_F_QC_required": 1,
+      "original_native_30min_records": 28,
+      "old_method_approved_center_count": 1,
+      "new_QC1_neighbour_scope_authorized": 27,
+      "before_and_after_original_measured_QC0_required": true,
+      "whole_segment_RH_QBOT_and_VPD_4hPa_gate_required": true
+    },
+    {
+      "original_stage13r_full_run_id": 5,
+      "first": "2015-09-02T05:00:00",
+      "last": "2015-09-02T06:30:00",
+      "original_VPD_F_QC_required": 1,
+      "original_native_30min_records": 4,
+      "old_method_approved_center_count": 1,
+      "new_QC1_neighbour_scope_authorized": 3,
+      "before_and_after_original_measured_QC0_required": true,
+      "whole_segment_RH_QBOT_and_VPD_4hPa_gate_required": true
+    },
+    {
+      "original_stage13r_full_run_id": 6,
+      "first": "2015-09-02T21:30:00",
+      "last": "2015-09-03T06:00:00",
+      "original_VPD_F_QC_required": 1,
+      "original_native_30min_records": 18,
+      "old_method_approved_center_count": 1,
+      "new_QC1_neighbour_scope_authorized": 17,
+      "before_and_after_original_measured_QC0_required": true,
+      "whole_segment_RH_QBOT_and_VPD_4hPa_gate_required": true
+    },
+    {
+      "original_stage13r_full_run_id": 7,
+      "first": "2015-09-04T20:00:00",
+      "last": "2015-09-05T06:00:00",
+      "original_VPD_F_QC_required": 1,
+      "original_native_30min_records": 21,
+      "old_method_approved_center_count": 1,
+      "new_QC1_neighbour_scope_authorized": 20,
+      "before_and_after_original_measured_QC0_required": true,
+      "whole_segment_RH_QBOT_and_VPD_4hPa_gate_required": true
+    },
+    {
+      "original_stage13r_full_run_id": 8,
+      "first": "2015-09-14T23:00:00",
+      "last": "2015-09-15T06:00:00",
+      "original_VPD_F_QC_required": 1,
+      "original_native_30min_records": 15,
+      "old_method_approved_center_count": 1,
+      "new_QC1_neighbour_scope_authorized": 14,
+      "before_and_after_original_measured_QC0_required": true,
+      "whole_segment_RH_QBOT_and_VPD_4hPa_gate_required": true
+    },
+    {
+      "original_stage13r_full_run_id": 9,
+      "first": "2015-09-15T15:30:00",
+      "last": "2015-09-16T06:00:00",
+      "original_VPD_F_QC_required": 1,
+      "original_native_30min_records": 30,
+      "old_method_approved_center_count": 1,
+      "new_QC1_neighbour_scope_authorized": 29,
+      "before_and_after_original_measured_QC0_required": true,
+      "whole_segment_RH_QBOT_and_VPD_4hPa_gate_required": true
+    },
+    {
+      "original_stage13r_full_run_id": 10,
+      "first": "2015-09-16T16:30:00",
+      "last": "2015-09-17T07:30:00",
+      "original_VPD_F_QC_required": 1,
+      "original_native_30min_records": 31,
+      "old_method_approved_center_count": 2,
+      "new_QC1_neighbour_scope_authorized": 29,
+      "before_and_after_original_measured_QC0_required": true,
+      "whole_segment_RH_QBOT_and_VPD_4hPa_gate_required": true
+    },
+    {
+      "original_stage13r_full_run_id": 11,
+      "first": "2015-09-17T16:00:00",
+      "last": "2015-09-18T06:00:00",
+      "original_VPD_F_QC_required": 1,
+      "original_native_30min_records": 29,
+      "old_method_approved_center_count": 2,
+      "new_QC1_neighbour_scope_authorized": 27,
+      "before_and_after_original_measured_QC0_required": true,
+      "whole_segment_RH_QBOT_and_VPD_4hPa_gate_required": true
+    },
+    {
+      "original_stage13r_full_run_id": 13,
+      "first": "2015-10-03T08:30:00",
+      "last": "2015-10-03T12:00:00",
+      "original_VPD_F_QC_required": 1,
+      "original_native_30min_records": 8,
+      "old_method_approved_center_count": 2,
+      "new_QC1_neighbour_scope_authorized": 6,
+      "before_and_after_original_measured_QC0_required": true,
+      "whole_segment_RH_QBOT_and_VPD_4hPa_gate_required": true
+    }
+  ],
+  "approved_scope_aggregate": {
+    "original_VPD_F_QC1_HH": 235,
+    "previously_method_approved_centers": 17,
+    "new_original_QC1_neighbours_authorized": 218,
+    "source_QC0_bookends_that_must_remain": 24,
+    "affected_year": 2015
+  },
+  "excluded_six_source_full_runs": [
+    {
+      "run_id": 12,
+      "native_start": "2015-09-26T05:00:00",
+      "native_end": "2015-09-26T06:30:00",
+      "QC1_native_halfhours": 4,
+      "earlier_approved_centers": 1,
+      "new_neighbour_QC1_unapproved": 3,
+      "HOLD_reason": "VPD_GT4HPA"
+    },
+    {
+      "run_id": 14,
+      "native_start": "2015-11-04T13:00:00",
+      "native_end": "2015-11-14T07:00:00",
+      "QC1_native_halfhours": 469,
+      "earlier_approved_centers": 2,
+      "new_neighbour_QC1_unapproved": 467,
+      "HOLD_reason": "RUN_GT300HH_SOURCE_T_OR_ERA_RH_PHYSICS_HOLD"
+    },
+    {
+      "run_id": 15,
+      "native_start": "2017-06-28T17:00:00",
+      "native_end": "2017-06-30T16:00:00",
+      "QC1_native_halfhours": 95,
+      "earlier_approved_centers": 3,
+      "new_neighbour_QC1_unapproved": 92,
+      "HOLD_reason": "QC0_BOUNDARIES_MISSING_AND_PHYSICS_VPD_HOLD"
+    },
+    {
+      "run_id": 16,
+      "native_start": "2017-06-30T17:00:00",
+      "native_end": "2017-07-01T07:30:00",
+      "QC1_native_halfhours": 30,
+      "earlier_approved_centers": 1,
+      "new_neighbour_QC1_unapproved": 29,
+      "HOLD_reason": "QC0_BOUNDARIES_MISSING_AND_VPD_HOLD"
+    },
+    {
+      "run_id": 17,
+      "native_start": "2017-07-01T12:00:00",
+      "native_end": "2017-07-04T08:00:00",
+      "QC1_native_halfhours": 137,
+      "earlier_approved_centers": 6,
+      "new_neighbour_QC1_unapproved": 126,
+      "HOLD_reason": "QC0_BOUNDARIES_MISSING_OVERLAPS_FIVE_STAGE12AC_APPROVED_T_PHYSICS_VPD_HOLD"
+    },
+    {
+      "run_id": 18,
+      "native_start": "2017-07-04T12:30:00",
+      "native_end": "2017-07-05T11:30:00",
+      "QC1_native_halfhours": 47,
+      "earlier_approved_centers": 3,
+      "new_neighbour_QC1_unapproved": 44,
+      "HOLD_reason": "QC0_BOUNDARIES_MISSING_AND_VPD_HOLD"
+    }
+  ],
+  "excluded_holds": {
+    "QC1_native_halfhours": 782,
+    "new_QC1_neighbours_unapproved": 761,
+    "prior_centers": 16,
+    "previous_Stage12ac_2017_protected_in_held_runs": 5
+  },
+  "source_stage13r_actual_readonly_report": "/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13r_Me6_original_full_QC1_run_and_original_QC0_ERA_RH_READONLY_20261027T004033Z_5eefea7b",
+  "source_stage13q_actual_readonly_report": "/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13q_Me6_33_original_ERA_RH_group_source_review_20261027T002737Z_445444f6",
+  "original_preserved_2017_07_04_Stage12ac_five": [
+    "201707040600",
+    "201707040630",
+    "201707040700",
+    "201707040730",
+    "201707040800"
+  ],
+  "execution_condition": "ALL 12 approved complete source QC1 runs must pass all immutable source and physical tests to produce research-only candidate; if any fails, no candidate is produced and each failed group remains HOLD",
+  "protective_science_gates": [
+    "Operator must explicitly sign this exact twelve-run native scope; old approval for 33 centers is not authorization for 218 extra neighboring QC1 timestamps",
+    "Stage12g/Stage12ac/Stage13q/Stage13r original source and signed SHA receipts, original local 30-min source VPD_F_QC=1 and original measured TA_F_QC=0 at each candidate time",
+    "Original paired FLUXNET native ERA TA_ERA+VPD_ERA yields 0<RH<100; transfer RH to retained Stage12ac model TA and unchanged site PSRF; reconstructed 0<VPD<es(T) and 0<QBOT<0.08 with tower/ERA T within 8C",
+    "Preserve original source VPD_F_QC=0 tower values and Stage12ac selected VPD at all 24 bookends; full 30min internal + boundary VPD transitions <=4hPa",
+    "Operate only within exact approved 235 original source QC1 site-native 2015 halfhours; never extend to 6 HELD runs, other 761 QC1 neighbours or five Stage12ac already-approved 2017 times",
+    "If any run fails checks HOLD entire run, do not partially patch that run; report exact run fail, and create independent full model forcing shadow only for fully checked and actually user-authorized scopes",
+    "Output original source case never changed; full NOLEAP model forcing field/time differential and signed CSV/receipt; no PFT/ZBOT/model DATM/AD400/Slurm"
+  ],
+  "prohibited": {
+    "original_source_overwrite": true,
+    "Stage12ac_overlay_overwrite": true,
+    "other_six_QC1_runs": true,
+    "unapproved_761_extra_QC1_neighbours": true,
+    "US_Kon": true,
+    "US_NR1": true,
+    "PFT": true,
+    "ZBOT": true,
+    "CIME": true,
+    "DATM": true,
+    "AD400": true,
+    "Normal400": true,
+    "Slurm": true
+  },
+  "status": "OPERATOR_APPROVED_EXACT_TWELVE_2015_SOURCE_QC1_RUNS_PENDING_ON_CLUSTER_RECHECK",
+  "postv5_approved": false,
+  "DATM_ready": false,
+  "spinup_authorized": false,
+  "Slurm_jobs_authorized": false
+}
