@@ -90,9 +90,8 @@ def predecessor():
     m=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
     require(m.VER=="batch03-stage13r-v1-20261027-Me6-original-full-QC1-run-survey" and
-            m.ROOT==ROOT and m.RR if hasattr(m,"RR") else
-            m.VER=="batch03-stage13r-v1-20261027-Me6-original-full-QC1-run-survey" and
-            m.ROOT==ROOT and m.Q==ROOT/"reports/stage13q_Me6_33_original_ERA_RH_group_source_review_20261027T002737Z_445444f6",
+            m.ROOT==ROOT and
+            m.Q==ROOT/"reports/stage13q_Me6_33_original_ERA_RH_group_source_review_20261027T002737Z_445444f6",
             "original stage13r time/site/source guard altered")
     return m
 
