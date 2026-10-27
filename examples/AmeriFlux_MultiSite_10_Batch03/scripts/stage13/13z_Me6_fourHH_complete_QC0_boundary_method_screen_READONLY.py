@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 
 sys.dont_write_bytecode = True
-VER = "batch03-stage13z-v1-20261027-Me6-4HH-full-edge-linear-screen"
+VER = "batch03-stage13z-v2-20261027-Me6-source-QC1-NaN-aware-full-edge"
 ROOT = Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 T = ROOT / "reports/stage13t_Me6_20150926_four_QC1_original_QC0_ERA_RH_READONLY_20261027T071247Z_a30c3a4e"
 Y = ROOT / "reports/stage13y_Me6_11subgroups_14T_8QC2_STRICT_HUMAN_GATE_READONLY_20261027T142119Z_e2ee7e1b"
@@ -157,8 +157,20 @@ def audit():
     old = core.unchanged_Stage13s_selected_VPD_hPa.to_numpy(float)
     era = core.HYPOTHETICAL_ERA_RH_at_siteT_VPD_hPa.to_numpy(float)
     linear = core.HYPOTHETICAL_QC0_bookend_linear_VPD_hPa.to_numpy(float)
-    need(np.isfinite([*old, *linear]).all() and np.isfinite(era[1:5]).all(),
-         "non-finite original or proposed site halfhours")
+    # OLD unapproved QC1 selected values can be NaN in the original forcing.
+    # That is why these four HH are under source repair review. Never use
+    # those missing values as a blanket rejection of independently sampled
+    # tower QC0 anchors and complete hypothetical candidate nodes.
+    # Both true QC0 anchors, all six QC0-linear values and four candidate
+    # ERA-RH QC1 values MUST be finite; no relaxation of any 4 hPa edge.
+    old_missing_qc1 = ~np.isfinite(old[1:5])
+    need(np.isfinite(old[[0, 5]]).all()
+         and np.isfinite(linear).all() and np.isfinite(era[1:5]).all(),
+         "non-finite true QC0 bookend or independently calculated candidate VPD")
+    need(np.allclose(old[[0, 5]],
+                     core.original_tower_VPD_F_hPa.to_numpy(float)[[0, 5]],
+                     rtol=0, atol=1e-7),
+         "old selected forcing QC0 bookends do not match original measured tower")
     need(np.allclose(linear[[0,5]], old[[0,5]], atol=1e-9, rtol=0),
          "measured QC0 anchors not exactly preserved")
     era[[0,5]] = old[[0,5]]
@@ -201,6 +213,7 @@ def audit():
     rows["full_edge_QC0_anchor_linear_VPD_hPa"] = linear
     rows["full_edge_QC0_anchor_linear_QBOT_kgkg"] = q
     rows["QC0_linear_physical_at_original_T_P"] = physical
+    rows["original_retained_VPD_missing"] = ~np.isfinite(old)
     rows["new_forcing_approved"] = False
     stats = {
         "version":VER,"site":"US-Me6",
@@ -212,6 +225,9 @@ def audit():
         "ERA_RH_full_boundary_method_status":"REJECT_GT4HPA",
         "QC0_linear_full_six_node_max_step_hPa":float(lin_step.max()),
         "QC0_linear_all_nodes_physically_valid":bool(physical.all()),
+        "original_selected_QC1_VPD_missing_HH":int(old_missing_qc1.sum()),
+        "original_selected_QC1_VPD_missing_accepted_as_source_hold_only":True,
+        "original_measured_QC0_bookends_verified_finite_and_unchanged":True,
         "QC0_linear_method_status":(
             "HUMAN_REVIEW_ONLY_NOT_APPROVED" if eligible
             else "HOLD_PHYSICAL_OR_BOUNDARY_GATE_FAIL"),
