@@ -1,5 +1,25 @@
 # Batch03 US-Me6 Stage13u — batch-first scientific review of six remaining full original QC1 runs
 
+## ACTUAL IRIDIS6 Stage13u read-only source review PASS — 2026-10-27 07:47 UTC
+
+The operator ran the fixed SHA-pinned Stage13u mobile runner on `login6001`. `--self-test`, `--check`, `--run` **PASS**. Original tower, paired ERA, Stage13r, successful Stage13s 280,320-row source and Stage13t original signed receipts verified and preserved; no forcing or model modified. New signed **read-only source triage report**:
+
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13u_Me6_six_held_source_QC1_runs_BATCH_SCIENCE_ONLY_20261027T074748Z_9e23952f`
+
+| Original Stage13r held full-run ID | Original QC1 native HH | Original measured tower QC0 TA preserved | Original paired ERA RH/QBOT + T source physics PASS | Direct original measured VPD QC0 boundaries | ERA candidate max adjacent VPD jump (hPa) |
+|---|---:|---:|---:|---|---:|
+| 12 (2015 Sep26) | 4 | 4 | 4 | YES on both sides | 4.800355; 2 failing edges |
+| 14 (2015 Nov) | 469 | 469 | **464, five HOLD** | YES on both sides | 2.512215 (screen only; five interior source holds) |
+| 15 (2017 Jun) | 95 | 95 | **87, eight HOLD** | NO (both direct QC2) | 5.741840; 2 failing edges |
+| 16 (2017 Jun–Jul) | 30 | 30 | 30 | NO (both direct QC2) | 4.489297; 2 failing edges |
+| 17 (2017 Jul) | 137 | 137 | **136, one HOLD** | NO (both direct QC2) | 4.190815; 1 failing edge; five original approved Stage12ac July04 records stay protected |
+| 18 (2017 Jul) | 47 | 47 | 47 | NO (both direct QC2) | 6.552221; 4 failing edges |
+| **Total** | **782** | **782** | **768; 14 HOLD** | **2/6 groups** | Not a licence to relax the original 4 hPa boundary rule |
+
+Other exact audit status: 16 earlier method-reviewed original QC1 centers and 5 separately user-approved 2017 Stage12ac rows are preserved; **761 other QC1 neighbors are NOT authorized**. Source SHA checks passed for original FLUXMET `721d87464c70ea38c7ab6206deee6953647709072cde33827a825408970971e0`, native companion ERA `af2be6dce8b9d1310540f29b3a87d57fbac4da7d2f8192434e93217e5079f98f`, successful Stage13s candidate `02e80edf89af35874a5cfb2c134e42fbe771b9b2ccc0899bfc4fe19bc2e18565` and Stage13t receipt `66022e2df1f317c7de94b21ed56a564424292336a30e3f94d9f3486c1fdc3631`.
+
+**Scientific conclusion:** 2015 Nov469 QC1 source run has five physic/QBOT exceptions within an otherwise plausible paired original ERA-RH background. Max adjacent VPD of 2.512215 hPa is insufficient to approve the whole run, since five points failed physics; no ten-day blanket interpolation. Four original 2017 source run boundaries are **QC2**, and distant original measured QC0 references (17/233; 113/202; 151/57; 296/2 HH for nearest external QC0) do NOT amount to two immediate observed anchors. All 6 remain HOLD. Do not overwrite 2017 Stage12ac prior five. Next should isolate the **fourteen individual source physics failures and valid contiguous QC1 sub-episodes in a single batch source-science diagnostic**, not request 782 individual votes. Operator explicitly prefers batch repairs and permits later grouped requests for scientific decisions.
+
 **2026-10-27 Stage13u initial IRIDIS6 FAIL-CLOSED SCRIPT BUG, now FIXED IN GITHUB, re-run PENDING:** Operator ran pinned old Stage13u initial mobile SHA checks and `--self-test` PASS on `login6001`, but before any full source audit it stopped with `AttributeError: 'Series' object has no attribute 'month'` in `forcing()` at old source line 121. Root cause: `pd.to_datetime(Series)` returns a **Series**, whose month and day accessors require `.dt`; corrected version explicitly constructs `pd.DatetimeIndex` before `.month` / `.day` and chronological/unique/NOLEAP gates. Added source-free regression selftests for timestamps, leap day and duplicate native time. Main fixed Git blob `aeaa3ce78e32d17ace2f356a660447e3c51e1b77`; fixed phone launcher Git blob `156388dc2f8d2a2e97ee1a11c1d2a3f52173fe16` pinned to commit `dd60db82dfa91f578632f810aca946558225efd7`. **Original 6 source HOLD groups and all original Stage13s successful forcing untouched; old failure was a Python indexing defect, NOT a scientific failure, and no Stage13u read-only result exists until corrected IRIDIS6 execution.** No DATM/Slurm submitted.
 
 ## Actual Stage13s and Stage13t state (verified on IRIDIS6)
