@@ -1,5 +1,23 @@
 # Batch03 US-Me6 Stage13u — batch-first scientific review of six remaining full original QC1 runs
 
+## ACTUAL Stage13v IRIDIS6 operator result, 2026-10-27 08:35 UTC — 14 signed source failures, 11 groups
+
+Actual phone-run Stage13v `--self-test`, `--check`, `--run` PASS. SHA-sealed **read-only original source** report:
+
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13v_Me6_14_source_QC1_failures_BATCH_READONLY_20261027T083537Z_7151cdf8`
+
+Exact original source-native 14 center science failures (Stage13u original per-time ERA RH, tower TA and QBOT physical gate):
+
+- **Stage13r run14, 2015-11-07**: 03:00, 04:00, 04:30, 05:00, 08:00 (**5 original source QC1 halfhours**);
+- **Stage13r run15, 2017-06-29 23:00 through 2017-06-30 02:30** at native 30-minute spacing (**8 contiguous source QC1 halfhours**);
+- **Stage13r run17, 2017-07-03 07:00** (**1 original source QC1 halfhour**).
+
+Existing signed 782 original source QC1 native rows from Stage13u remain exactly **768 paired ERA RH/site T/QBOT original-source physically PASS and 14 HOLD**. The **11 contiguous candidate pieces** after masking physically invalid and 5 protected Stage12ac July04 values are preliminary **internal physics-only groups**, NOT verified original measured QC0-bounded repairs, and require separate full source-edge/QC evidence. Only **1 of 11** is enclosed on both sides by original directly measured VPD QC0, and it is known from Stage13t to have **two 4hPa VPD boundary violations (4.002359 and 4.800355 hPa)**. Hence **zero currently science-releasable original source groups**. User wants batch repair/one approval eventually; do not request approval of all 761 as one unvalidated operation.
+
+Stage13v actual report's signed parent Stage13u receipt SHA256 `432f8ce81348be6ab54d8b0791886481c61e71bf2f945e90a33f23dccf1cd9a4`. Original Stage13s independent forcing untouched, five Stage12ac original 2017 values protected; original tower/ERA/PFT/ZBOT, Postv5/DATM/AD400 and Slurm unchanged.
+
+**Next scientific step:** pinpoint which physical clause failed at each of the 14 times (temperature difference >8°C vs ERA RH 0..100 vs QBOT/saturation vs missing), quantify original source clock and QC2 boundary discontinuities, and distinguish true original QC0 anchors from remote QC0. Use a new exact signed **read-only batch** report, not any new forcing or operator permission. No HPC Stage13w execution yet.
+
 ## Stage13v batch-scoped read-only follow-up (GitHub committed; IRIDIS6 not yet run)
 
 The operator prefers whole-batch decisions. [Stage13v signed Stage13u-ledger 14-exception audit](../scripts/stage13/13v_Me6_14_original_ERA_failure_group_review_READONLY.py) reads the **actual Stage13u 07:47 UTC signed report directory**, verifies each of its four payload SHA256 digests and exact **782/768/14** provenance, then generates a **14-row original-source physics HOLD list** including original timestamps and original paired ERA source anomalies; and groups the **scientifically valid remainder into contiguous 30-minute subepisodes**, excluding the five previously approved Stage12ac July2017 native slots. Each prospective subepisode is labelled original QC0 endpoints confirmed or *unconfirmed* (particularly original 2017 QC2 boundaries), and classified as **NOT OPERATOR APPROVED**. It does not claim that the 2015 Nov 464 individually valid values form a source-coherent full 469-HH replacement.
