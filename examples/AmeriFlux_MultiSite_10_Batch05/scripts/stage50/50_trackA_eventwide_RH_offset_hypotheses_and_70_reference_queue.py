@@ -111,7 +111,7 @@ def feasible_internal(orig,new):
   gt4+=a<=4+1e-9 and b>4+1e-9
  return gt2,gt4
 def offset_grid():
- # Deterministic 0.5 RH-pp increments, including zero.
+ # Deterministic sensitivity offsets of ±20 percentage points, grid step 0.5pp.
  return [i/2 for i in range(-40,41)]
 def context_gate(x):
  return "OBSERVED_QC0_REFERENCE_SCIENCE_HOLD" if x=="JUMP_TO_MEASURED_QC0_NEIGHBOR_REQUIRES_ALTERNATE_RH" else "QC1_NEIGHBOR_SOURCE_SCIENCE_HOLD"
@@ -288,7 +288,7 @@ def main():
       hypothesis_minus_original_ERA_VPD_hPa=round(v-v0,6),
       science_approval="NO",production_DATM_authorized="NO"))
   alternatives.append(dict(site=key[0],episode_id=key[1],
-    method="EVENTWIDE_CONSTANT_RH_OFFSET_SOURCE_ERA_INTERNAL_SENSITIVITY",
+    method="EVENTWIDE_CONSTANT_RH_OFFSET_ERA_TRUE_EXTERNAL_BOUNDARY_TRIAL",
     source_original_HH=len(rs),first_native=rs[0]["native_time"],last_native=rs[-1]["native_time"],
     offset_RH_percentage_points=picked[2] if picked is not None else "",
     all_original_event_HH_covered=True,source_native_QC0_protected=True,
@@ -306,7 +306,7 @@ def main():
     edge_QC0_count=sum(z[1]["original_neighbor_QC_VPD"]=="0" for z in valid_bounds),
     edge_QC1_count=sum(z[1]["original_neighbor_QC_VPD"]=="1" for z in valid_bounds),
     source_reference_status=context_gate(x["boundary_science_lane"]),
-    numerical_screen_status=lane,science_decision="SCIENCE_HOLD_NO_EXTERNAL_EDGE_VERIFICATION",
+    numerical_screen_status=lane,science_decision="SCIENCE_HOLD_INDEPENDENT_OBSERVATIONAL_VALIDATION_REQUIRED",
     production_DATM_authorized="NO"))
  if len(alternatives)!=52 or len(ranked70)!=70:raise ValueError("52/70 original event population no longer conserved")
  for r in alternatives:
@@ -334,7 +334,7 @@ def main():
   raise ValueError("Assistant source events not 375")
  out.mkdir(exist_ok=False)
  write(out/"stage50_70_SOURCE_REFERENCE_SCIENCE_PRIORITY.csv",PRIOR,ranked70)
- write(out/"stage50_52_EVENTWIDE_RH_OFFSET_INTERNAL_SENSITIVITY_NOT_EDGE_VERIFIED.csv",EDGE,alternatives)
+ write(out/"stage50_52_EVENTWIDE_RH_OFFSET_FULL_NATIVE_BOUNDARY_RESEARCH_ONLY.csv",EDGE,alternatives)
  write(out/"stage50_EVENTWIDE_COUNTERFACTUAL_NATIVE_SOURCE_NO_FORCING.csv",NATIVE,counterfactual_native)
  write(out/"stage50_TEN_SITE_ASSISTANT_HOLD_AND_EVIDENCE_COUNTS.csv",SITE,siteout)
  metadata=dict(original_input_SHA256={k:sha(v) for k,v in paths.items()},
