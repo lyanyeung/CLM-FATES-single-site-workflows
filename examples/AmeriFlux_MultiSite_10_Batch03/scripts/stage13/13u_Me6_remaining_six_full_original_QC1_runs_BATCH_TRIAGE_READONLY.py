@@ -111,16 +111,38 @@ def selftest():
     line=np.linspace(p0,p1,6)
     require(near(float(max(abs(np.diff(line)))),.211,1e-10),
             "2015 Sep26 example should be diagnostic only")
+    # Regression test: the exact pandas Series -> DatetimeIndex failure
+    # which previously stopped Stage13u before any source audit.
+    sample=forcing_native_index(pd.Series(
+        ["201509260430", "201509260500", "201509260530"]))
+    require(isinstance(sample,pd.DatetimeIndex) and
+            sample.is_unique and sample.is_monotonic_increasing and
+            (sample.month==9).all() and (sample.day==26).all(),
+            "regression: pandas Series native-time month/day access broken")
+    leap=forcing_native_index(pd.Series(["201602290000"]))
+    require(bool(((leap.month==2)&(leap.day==29)).any()),
+            "regression: detect forbidden leap-day native source record")
+    require(forcing_native_index(pd.Series(
+        ["201509260430","201509260430"])).is_unique is False,
+        "regression: reject duplicate native source timestamps")
     print("STAGE13U SELF-TEST PASS | 6 HOLD groups=782 QC1 including 761 not approved + 5 protected; no forcing writes",flush=True)
+
+def forcing_native_index(time_column):
+    # pandas.to_datetime(Series) returns Series: month/day live on .dt,
+    # not on the Series itself. Convert explicitly to DatetimeIndex BEFORE
+    # checking the NOLEAP clock, uniqueness, ordering and date accessors.
+    parsed=pd.to_datetime(
+        time_column.astype(str).str.replace(r"[^0-9]","",regex=True).str[:12],
+        format="%Y%m%d%H%M",errors="raise")
+    return pd.DatetimeIndex(parsed,name="native_time")
 
 def forcing(p):
     df=pd.read_csv(must(p),dtype={"time":str},low_memory=False)
-    index=pd.to_datetime(df.time.astype(str).str.replace(r"[^0-9]","",regex=True).str[:12],
-                         format="%Y%m%d%H%M",errors="raise")
+    index=forcing_native_index(df["time"])
     require(len(df)==280320 and index.is_unique and index.is_monotonic_increasing and
             not ((index.month==2)&(index.day==29)).any(),
             "original 16y Me6 NOLEAP selected site forcing invalid")
-    df.index=pd.DatetimeIndex(index,name="native_time")
+    df.index=index
     return df
 
 def nearest_qc0(source,index,edge,direction):
