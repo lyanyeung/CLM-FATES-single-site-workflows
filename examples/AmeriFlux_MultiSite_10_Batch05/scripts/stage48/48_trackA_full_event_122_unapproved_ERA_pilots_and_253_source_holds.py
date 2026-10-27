@@ -64,9 +64,15 @@ OUT_HOLD=("site","episode_id","original_event_HH","original_neighbor_risk",
 OUT_SITE=("site","original_source_P2P3_HH","Stage47_ASSISTANT_events",
  "assistant_full_event_ERA_research_candidates",
  "candidate_original_native_HH","previous_Stage43_15_native_overlap",
+ "additional_preliminary_event_gate_holds",
  "source_neighbor_extreme_RH_holds","source_neighbor_QC2_holds",
  "Claude_owned_original_events_unchanged","new_science_approvals",
  "site_full_science_pass")
+OUT_NEW_HOLD=("site","episode_id","source_priority","original_HH",
+ "native_start","native_end","science_hold_reasons",
+ "original_source_QC0_HH","source_new_internal_gt2",
+ "source_new_internal_gt4","source_new_external_gt2",
+ "source_new_external_gt4","science_approval","production_DATM_permission")
 
 def n(x):
  try:
@@ -108,7 +114,7 @@ def selftest():
  assert 217+36+80+42==375 and 375+108==483
  assert abs(sat(0)-6.112)<1e-10
  assert n("-9999") is None
- print("STAGE48 SELF-TEST PASS | 80 QC1+42 numeric original event research pilots, 253 source holds, old Stage43 and native QC0 protected")
+ print("STAGE48 SELF-TEST PASS | 122 PRIORITY options are re-screened per original event; source-new-jump/gap becomes HOLD; zero forcing edits")
 def main():
  p=argparse.ArgumentParser(description=__doc__)
  p.add_argument("--self-test",action="store_true")
@@ -167,40 +173,55 @@ def main():
  select.extend((x["site"],x["episode_id"],LOW) for x in low)
  if len(select)!=122 or len(set((s,e) for s,e,_ in select))!=122:
   raise ValueError("122 unique original lower-numeric source events missing")
- selected=[];candidates=[]
+ selected=[];candidates=[];new_holds=[]
  initial_events={(x["site"],x["episode_id"]):x for x in neighbors}
  for site,eid,lane in sorted(select):
   event=original_events[(site,eid)]
-  if event["source_original_QC0_HH"]!="0" or event["original_full_event_ERA_covered"]!="True":
-   raise ValueError("candidate has original QC0 or incomplete source ERA RH")
-  if event["original_episode_number_of_contiguous_segments"]!="1" or any(
-     int(event[k])>0 for k in ("new_internal_jump_gt2","new_internal_jump_gt4",
-     "new_external_jump_gt2","new_external_jump_gt4")):
-   raise ValueError("source event has gap or ERA trial creates new VPD jump")
+  # Stage47 categories are only PRIORITY lanes: verify every Stage45 gate.
+  reasons=[]
+  if event["source_original_QC0_HH"]!="0":reasons.append("SOURCE_QC0_PROTECT")
+  if event["original_full_event_ERA_covered"]!="True":reasons.append("ERA_EVENT_COVERAGE_INCOMPLETE")
+  if event["original_episode_number_of_contiguous_segments"]!="1":reasons.append("ORIGINAL_NATIVE_TIME_GAP")
+  for field,why in (("new_internal_jump_gt2","NEW_INTERNAL_GT2"),
+                    ("new_internal_jump_gt4","NEW_INTERNAL_GT4"),
+                    ("new_external_jump_gt2","NEW_EXTERNAL_GT2"),
+                    ("new_external_jump_gt4","NEW_EXTERNAL_GT4")):
+   if int(event[field])>0:reasons.append(why)
   peak=n(event["max_abs_VPD_change_hPa"])
-  if peak is None or peak>10:raise ValueError("candidate exceeds >10 hPa source VPD magnitude gate")
+  if peak is None:reasons.append("UNKNOWN_VPD_CHANGE")
+  elif peak>10:reasons.append("VPD_REPAIR_GT10HPA")
   if lane==LOW and event["risk_screen"]!="NUMERIC_SOURCE_NATIVE_SCREEN_NO_SCIENCE_APPROVAL":
    raise ValueError("low-numeric original Stage45 event changed")
   if lane==QC1:
    x=initial_events[(site,eid)]
    if event["risk_screen"]!="ORIGINAL_EXTERNAL_NEIGHBOR_QC_OR_RH_UNCERTAIN":
     raise ValueError("QC1 candidate original Stage45 neighbor risk changed")
-   if (int(x["original_neighbor_QC1_edges"])==0 or
-       any(int(x[k])!=0 for k in (
+   if int(x["original_neighbor_QC1_edges"])==0:
+    reasons.append("NO_QC1_NEIGHBOR")
+   if any(int(x[k])!=0 for k in (
        "original_neighbor_QC2_edges","original_neighbor_other_QC_edges",
        "missing_native_neighbor_edges","neighbor_original_RH_negative_edges",
        "neighbor_original_RH_0to1pct_edges",
        "neighbor_original_RH_1to10pct_edges","neighbor_original_RH_above100_edges",
-       "neighbor_RH_unavailable_edges","adjacent_another_unapproved_P2P3_edges"))):
-    raise ValueError("QC1 source neighbor has more serious physical risks, cannot join 122")
+       "neighbor_RH_unavailable_edges","adjacent_another_unapproved_P2P3_edges")):
+    reasons.append("QC1_NEIGHBOR_ADDITIONAL_UNSAFE_SOURCE")
   rr=sorted(prior[(site,eid)],key=lambda r:r["native_time"])
-  if len(rr)!=int(event["original_HH"]):
-   raise ValueError("original full event halfhours incomplete")
-  if rr[0]["native_time"]!=event["original_start_native"] or rr[-1]["native_time"]!=event["original_end_native"]:
-   raise ValueError("native original source time origin changed")
-  if any(date(b["native_time"])-date(a["native_time"])!=timedelta(minutes=30)
-      for a,b in zip(rr,rr[1:])):
-   raise ValueError("original event contains gap")
+  if len(rr)!=int(event["original_HH"]):reasons.append("ORIGINAL_HH_COVERAGE_MISMATCH")
+  if not rr or rr[0]["native_time"]!=event["original_start_native"] or rr[-1]["native_time"]!=event["original_end_native"]:
+   reasons.append("ORIGINAL_TIME_RANGE_MISMATCH")
+  if any(date(b["native_time"])-date(a["native_time"])!=timedelta(minutes=30) for a,b in zip(rr,rr[1:])):
+   reasons.append("ORIGINAL_30MIN_GAP")
+  if reasons:
+   new_holds.append(dict(site=site,episode_id=eid,source_priority=lane,
+     original_HH=event["original_HH"],native_start=event["original_start_native"],
+     native_end=event["original_end_native"],science_hold_reasons=";".join(reasons),
+     original_source_QC0_HH=event["source_original_QC0_HH"],
+     source_new_internal_gt2=event["new_internal_jump_gt2"],
+     source_new_internal_gt4=event["new_internal_jump_gt4"],
+     source_new_external_gt2=event["new_external_jump_gt2"],
+     source_new_external_gt4=event["new_external_jump_gt4"],
+     science_approval="NO",production_DATM_permission="NO"))
+   continue
   any_prior=0;maxdelta=0.;invalid=0
   for r in rr:
    key=(site,r["native_time"]);oldrow=original.get(key)
@@ -255,10 +276,10 @@ def main():
       "ERA_MDS_ONLY_NO_INDEPENDENT_STATION_OR_ERA5LAND_VALIDATION"),
    Stage43_preexisting_trial_HH=any_prior,
    science_approval="NO",production_DATM_permission="NO"))
- if len(selected)!=122 or len({(x["site"],x["native_time"]) for x in candidates})!=len(candidates):
-  raise ValueError("122 candidate events or unique original site/time identity failed")
- if sum(x["Stage43_preexisting_trial_HH"] for x in selected)!=15:
-  raise ValueError("Stage43 previous 15 trial native rows should be included exactly, not duplicated")
+ if len(selected)+len(new_holds)!=122 or len({(x["site"],x["native_time"]) for x in candidates})!=len(candidates):
+  raise ValueError("122 preliminary events not fully accounted for or native source time duplicate")
+ previous_overlap=sum(x["Stage43_preexisting_trial_HH"] for x in selected)
+ if previous_overlap>15:raise ValueError("previous Stage43 native candidate overlap is duplicated")
  hold=[]
  for r in neighbors:
   if r["triage_priority"]==QC1:continue
@@ -276,8 +297,8 @@ def main():
     "ORIGINAL_QC_AND_REFERENCE_FOR_SUSPICIOUS_RH_NEIGHBOR" if lane==OTHER[0] else
     "ORIGINAL_QC2_NONMEASURED_NEIGHBOR_AND_SOURCE_ERA5LAND_COMPARISON"),
    auto_repaired=False,DATM_modified=False))
- if len(hold)!=253 or len(candidates)<122:
-  raise ValueError("expected 217+36 separate unresolved original neighbor events")
+ if len(hold)!=253 or len(hold)+len(new_holds)+len(selected)!=375:
+  raise ValueError("Assistant 375 event partition lost")
  siteout=[]
  for site in SITES:
   es=[x for x in selected if x["site"]==site]
@@ -288,6 +309,7 @@ def main():
    assistant_full_event_ERA_research_candidates=len(es),
    candidate_original_native_HH=sum(x["site"]==site for x in candidates),
    previous_Stage43_15_native_overlap=sum(x["site"]==site and x["overlaps_existing_Stage43_trial"] for x in candidates),
+   additional_preliminary_event_gate_holds=sum(x["site"]==site for x in new_holds),
    source_neighbor_extreme_RH_holds=sum(x["original_neighbor_risk"]==OTHER[0] for x in nh),
    source_neighbor_QC2_holds=sum(x["original_neighbor_risk"]==OTHER[1] for x in nh),
    Claude_owned_original_events_unchanged=True,new_science_approvals=0,
@@ -295,25 +317,32 @@ def main():
  if sum(x["original_source_P2P3_HH"] for x in siteout)!=1574 or sum(x["Stage47_ASSISTANT_events"] for x in siteout)!=375:
   raise ValueError("site scientific cohorts drifted")
  out.mkdir(exist_ok=False)
- write(out/"stage48_VERSIONED_FULL_EVENT_SOURCE_ERA_122_EVENT_NATIVE_CANDIDATES_UNAPPROVED.csv",OUT_NATIVE,candidates)
- write(out/"stage48_ALL122_COMPLETE_EVENT_SCIENCE_NUMERIC_GATES.csv",OUT_EVENT,selected)
+ write(out/"stage48_ELIGIBLE_SOURCE_ERA_NATIVE_RESEARCH_ONLY.csv",OUT_NATIVE,candidates)
+ write(out/"stage48_ELIGIBLE_FULL_EVENT_SOURCE_ERA_NUMERIC_GATES.csv",OUT_EVENT,selected)
+ write(out/"stage48_INITIAL122_FAILED_SCIENCE_GATE_EVENTS.csv",OUT_NEW_HOLD,new_holds)
  write(out/"stage48_253_ORIGINAL_NEIGHBOR_SOURCE_HOLDS.csv",OUT_HOLD,hold)
  write(out/"stage48_TEN_SITE_ASSISTANT_TRIAL_AND_HOLD_PROGRESS.csv",OUT_SITE,siteout)
  manifest=dict(source_sha256={k:sha(p) for k,p in paths.items()},
-  assistant_source_events=375,assistant_candidate_complete_events=122,
+  assistant_source_events=375,initial_candidate_events=122,
+  assistant_candidate_complete_events=len(selected),
+  newly_screened_hold_events=len(new_holds),
   assistant_source_neighbor_origin_holds=253,
+  assistant_all_source_hold_events=253+len(new_holds),
   candidate_native_original_HH=len(candidates),
-  prior_Stage43_15_unapproved_native_trial_overlap=15,
+  prior_Stage43_15_unapproved_native_trial_overlap=previous_overlap,
+  prior_Stage43_not_present_in_new_candidate=15-previous_overlap,
   Claude_108_science_events_untouched=True,
   original_P2P3_1574_all_still_unapproved=True,
   approved_Stage24_166_P1HOLD46_RHplatform10_unchanged=True,
   source_FLUXMET_DATM_CIME_Slurm_modified=False,new_science_approvals=0)
  (out/"stage48_manifest.json").write_text(json.dumps(manifest,sort_keys=True,indent=2)+"\n",encoding="utf-8")
- md=["# Stage48 — Assistant Track A 122 source-ERA full-event research candidates, 253 source-neighbor HOLDs",
-  "","**THIS IS NOT A PRODUCTION OVERLAY. All 122 source-ERA methods remain unapproved.**",
-  "Event-complete source-native T/VPD/QC and existing 166 approved, 46 P1 HOLD and 10 RH platforms are immutable.",
-  "80 events with no source neighbor <10% RH/QC2 risk beyond original neighboring QC1, and Stage45's 42 already numerically screened event methods,",
-  "make 122 event-complete candidate source-ERA trials. Source processed ERA RH is not independent tower ground truth.",
+ md=["# Stage48 corrected: 122 INITIAL event options separated into eligible numerical research and source-science HOLD",
+  "","**NOT PRODUCTION FORCING. Zero scientific approvals.**",
+  "Stage47 selected 80 QC1 neighbor and 42 Stage45 numeric event priorities, but these 122 are not automatically eligible.",
+  "Eligible complete-event ERA research candidates: {} events and {} source-native HH.".format(len(selected),len(candidates)),
+  "Additional original event source-science gate holds: {} events.".format(len(new_holds)),
+  "Original 253 source-neighbor holds also remain unchanged. Total Assistant holds: {} events.".format(253+len(new_holds)),
+  "Source processed ERA RH is not independent station RH.",
   "","## Assistant initial science event progress",
   "- 80 original source-neighbor-QC1 events: local source VPD edge numeric gate passed but QC1 is not independent scientific confirmation.",
   "- 42 Stage45 source-ERA low-numeric original events: references require explicit evidence, including Stage47 31 ERA only, 9 tower-vs-ERA T>5C, 2 source ERA/MDS >10pp disagreements.",
@@ -327,16 +356,20 @@ def main():
    x["site"],x["original_source_P2P3_HH"],
    x["assistant_full_event_ERA_research_candidates"],
    x["candidate_original_native_HH"],x["source_neighbor_extreme_RH_holds"],x["source_neighbor_QC2_holds"]))
- md+=["","**The previous Stage43 15 native source-ERA research records are present inside, NOT additional repair records.**",
-  "No extra scientific approvals from 122 events; 108 Claude-owned events untouched.",
-  "Next: compare ERA5-Land or genuine station/sensor context with the versioned event-native candidate table and prioritize source neighbor 217/36. Never auto-rewrite DATM.",""]
- (out/"STAGE48_ASSISTANT_122_TRIAL_EVENTS_253_SOURCE_HOLDS.md").write_text("\n".join(md)+"\n")
- print("STAGE48 SUCCESS | ASSISTANT_CANDIDATE_EVENTS",len(selected),"SOURCE_NATIVE_HH",len(candidates),
-       "NEIGHBOR_HOLD_EVENTS",len(hold),"STAGE43_15_PREVIOUS_HH_DEDUPED")
+ md+=["","## Reasons initial candidate events failed additional gates"]
+ for why,count in sorted(Counter(w for r in new_holds for w in r["science_hold_reasons"].split(";")).items()):
+  md.append("- {}: {} events (reasons may overlap)".format(why,count))
+ md+=["","Previous unapproved Stage43 candidate overlap: {} of 15 native HH; others remain untouched.".format(previous_overlap),
+  "Claude 108 events untouched. No new science or DATM approvals.",""]
+ (out/"STAGE48_ASSISTANT_ELIGIBLE_NUMERIC_AND_SCIENCE_HOLDS.md").write_text("\n".join(md)+"\n")
+ print("STAGE48 SUCCESS | INITIAL122",len(select),"ELIGIBLE_RESEARCH_EVENTS",len(selected),
+       "ELIGIBLE_NATIVE_HH",len(candidates),"ADDITIONAL_GATE_HOLDS",len(new_holds),
+       "ORIGINAL_NEIGHBOR_HOLDS",len(hold),"PREVIOUS_STAGE43_HH_OVERLAP",previous_overlap)
+ print("STAGE48 NEW_HOLD_REASONS",json.dumps(dict(Counter(w for r in new_holds for w in r["science_hold_reasons"].split(";"))),sort_keys=True))
  print("STAGE48 SITES",json.dumps({x["site"]:{"events":x["assistant_full_event_ERA_research_candidates"],
     "HH":x["candidate_original_native_HH"],"extreme_RH_holds":x["source_neighbor_extreme_RH_holds"],
     "QC2_holds":x["source_neighbor_QC2_holds"]} for x in siteout},sort_keys=True))
- print("STAGE48_REPORT="+str(out/"STAGE48_ASSISTANT_122_TRIAL_EVENTS_253_SOURCE_HOLDS.md"))
+ print("STAGE48_REPORT="+str(out/"STAGE48_ASSISTANT_ELIGIBLE_NUMERIC_AND_SCIENCE_HOLDS.md"))
  print("STAGE48_OUT="+str(out))
- print("STAGE48 122 SOURCE_CANDIDATES UNAPPROVED | 253 HOLDS | Claude108 UNTOUCHED | NO SOURCE/DATM/SLURM WRITES")
+ print("STAGE48 RESEARCH_ONLY ALL 375 ACCOUNTED | CLAUDE108 UNTOUCHED | NO SOURCE/DATM/SLURM WRITES")
 if __name__=="__main__":main()
