@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 
 sys.dont_write_bytecode = True
-VER = "batch03-stage13z-v2-20261027-Me6-source-QC1-NaN-aware-full-edge"
+VER = "batch03-stage13z-v3-20261027-Me6-explicit-native-time-output"
 ROOT = Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 T = ROOT / "reports/stage13t_Me6_20150926_four_QC1_original_QC0_ERA_RH_READONLY_20261027T071247Z_a30c3a4e"
 Y = ROOT / "reports/stage13y_Me6_11subgroups_14T_8QC2_STRICT_HUMAN_GATE_READONLY_20261027T142119Z_e2ee7e1b"
@@ -93,6 +93,25 @@ def candidate_data_finite(old, linear, era):
                 and np.isfinite(era[1:5]).all())
 
 
+def export_nodes_with_native_time(core):
+    """Explicitly materialize source timestamps, independent of index names.
+
+    Pandas .loc[DatetimeIndex] may drop an index name. This helper never
+    relies on reset_index() inventing a particular column heading.
+    """
+    need(len(core) == len(TIMES) and core.index.is_unique
+         and pd.DatetimeIndex(core.index).equals(pd.DatetimeIndex(TIMES)),
+         "exact original six native timestamps required for CSV/report")
+    nodes = core.reset_index(drop=True).copy()
+    nodes.insert(0, "native_time", [str(t) for t in TIMES])
+    need("native_time" in nodes.columns
+         and nodes.native_time.is_unique
+         and len(nodes) == 6
+         and pd.DatetimeIndex(pd.to_datetime(nodes.native_time)).equals(pd.DatetimeIndex(TIMES)),
+         "explicit original six-node export timestamps changed")
+    return nodes
+
+
 def selftest():
     need(len(TIMES) == 6 and len(TARGET) == 4, "exact original site sequence")
     need(all(TIMES[i + 1] - TIMES[i] == pd.Timedelta(minutes=30)
@@ -114,6 +133,17 @@ def selftest():
                                    [2.0, 2.4, np.nan, 3.2, 3.6, 4.0],
                                    valid_proposed),
          "a missing candidate VPD must never be accepted")
+
+    # Reproduce the IRIDIS6 pandas output crash: .loc[TIMES] may return
+    # an unnamed DatetimeIndex, so reset_index() alone yields 'index'.
+    for index_name in (None, "native_time"):
+        ix = pd.DatetimeIndex(TIMES, name=index_name)
+        probe = pd.DataFrame({"original_test_value": range(6)}, index=ix)
+        exported = export_nodes_with_native_time(probe.loc[TIMES])
+        need(list(exported.columns[:2]) == ["native_time", "original_test_value"]
+             and exported.native_time.iloc[0] == str(TIMES[0])
+             and exported.native_time.iloc[-1] == str(TIMES[-1]),
+             "native_time explicit export regression for named/unnamed index")
 
     print("STAGE13Z SELF-TEST PASS | all 5 boundaries, 4 native QC1, physics, no writes", flush=True)
 
@@ -237,7 +267,7 @@ def audit():
         "QC0_linear_full_edge_le_4hPa":lin_step<=MAX_STEP,
         "method_operator_approved":False,
     })
-    rows = core.reset_index().copy()
+    rows = export_nodes_with_native_time(core)
     rows["full_edge_ERA_RH_VPD_hPa"] = era
     rows["full_edge_QC0_anchor_linear_VPD_hPa"] = linear
     rows["full_edge_QC0_anchor_linear_QBOT_kgkg"] = q
