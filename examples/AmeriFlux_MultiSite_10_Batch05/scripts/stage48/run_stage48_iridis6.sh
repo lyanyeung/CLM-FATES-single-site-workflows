@@ -2,8 +2,8 @@
 set -euo pipefail
 BASE="$HOME/ameriflux_batch05_stage48"
 mkdir -p "$BASE"
-PY_COMMIT="921d7f7c54d6f7847e6f7165c9d74afb0c9c9844"
-PY_BLOB="ebb31061a00efe5de4b33e374f535f65ff2b4fdd"
+PY_COMMIT="30da2fd26999fdb2a8cc88fca6a24cc7a8ac8ae8"
+PY_BLOB="6fd45f6a0c28b60802dc6b6d653b24651b92a5de"
 REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage48/48_trackA_full_event_122_unapproved_ERA_pilots_and_253_source_holds.py"
 PY="$BASE/stage48.py"
 
@@ -11,7 +11,7 @@ curl -fLsS --retry 3 \
   "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$PY_COMMIT/$REL" \
   -o "$PY"
 test "$(git hash-object "$PY")" = "$PY_BLOB"
-echo "STAGE48 SOURCE VERIFIED"
+echo "STAGE48 PATCHED SOURCE VERIFIED: original source gaps and new VPD jumps are event-level HOLD, not all-site abort"
 python3 -B -m py_compile "$PY"
 python3 -B "$PY" --self-test
 
@@ -37,5 +37,5 @@ python3 -B "$PY" \
   --out "$OUT" 2>&1 | tee "$BASE/stage48.log"
 
 echo "STAGE48_REPORTS=$OUT"
-cat "$OUT/STAGE48_ASSISTANT_122_TRIAL_EVENTS_253_SOURCE_HOLDS.md"
+cat "$OUT/STAGE48_ASSISTANT_ELIGIBLE_NUMERIC_AND_SCIENCE_HOLDS.md"
 echo "STAGE48 RESEARCH-ONLY. Stage24 APPROVED166 / P1HOLD46 / 10 RH PLATFORM / 1574 P2P3 / DATM UNCHANGED"
