@@ -1,5 +1,7 @@
 # Stage13q — actual US-Me6 33 original source QC1 humidity points: 33/33 individual PASS, 0/31 boundary PASS
 
+**2026-10-27 00:40 UTC, Stage13r actual IRIDIS6 PASS:** Full original-source QC1 source-run audit grouped the 33 original center records into **18** full runs. **12 original 2015 runs** (235 QC1 native HH total, including 17 previously approved-method centers and **218 other QC1 neighbor HH not yet user-authorized**) pass original source QC0 bookends, original tower TA, paired ERA RH/QBOT and complete ≤4hPa VPD transitions. Other **6 full runs remain HOLD**, including all implicated 2017 intervals and five earlier Stage12ac protected source times. Latest SHA-sealed read-only Stage13r report: `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13r_Me6_original_full_QC1_run_and_original_QC0_ERA_RH_READONLY_20261027T004033Z_5eefea7b`. **No new forcing or scope approval yet.** [Stage13r actual group table and Stage13s proposal](STAGE13R_ACTUAL_ME6_18_QC1_FULL_RUNS_12_SCIENCE_PASS_6_HOLD_20261027.md).
+
 **Actual IRIDIS6 execution, 2026-10-27 00:27 UTC** (login6003): pinned Stage13q one-click script hash PASS, Python `--self-test` PASS, `--check` PASS, `--run` PASS. Stage13q created ONLY a new SHA-signed **read-only original source evidence report**, not any forcing file or model job:
 
 `/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13q_Me6_33_original_ERA_RH_group_source_review_20261027T002737Z_445444f6`
