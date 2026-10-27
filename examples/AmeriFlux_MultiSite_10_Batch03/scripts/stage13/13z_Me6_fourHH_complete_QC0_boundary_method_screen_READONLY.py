@@ -77,6 +77,22 @@ def q_from_vpd(v, temp_c, pressure_pa):
     return .622 * ea_pa / (pressure_pa - .378 * ea_pa)
 
 
+def candidate_data_finite(old, linear, era):
+    """True observed QC0 edges and ALL proposed nodes must be finite.
+
+    Previously unresolved QC1 selected VPD at four interior nodes may be
+    missing, and its missingness must be separately reported, not silently
+    treated as zero or a reason to discard independent candidates.
+    """
+    old = np.asarray(old, dtype=float)
+    linear = np.asarray(linear, dtype=float)
+    era = np.asarray(era, dtype=float)
+    return bool(len(old)==len(linear)==len(era)==6
+                and np.isfinite(old[[0, 5]]).all()
+                and np.isfinite(linear).all()
+                and np.isfinite(era[1:5]).all())
+
+
 def selftest():
     need(len(TIMES) == 6 and len(TARGET) == 4, "exact original site sequence")
     need(all(TIMES[i + 1] - TIMES[i] == pd.Timedelta(minutes=30)
@@ -85,6 +101,20 @@ def selftest():
     need(0 < v < es(t) and 0 < q_from_vpd(v, t, p) < .08,
          "actual water thermodynamics at retained T / PSRF")
     need(4.800355 > MAX_STEP, "full interval source HOLD must not be relaxed")
+    # Regression: absent previously unresolved QC1 forcing is not a
+    # failure of separate full-edge ERA/QC0 interpolation diagnostics.
+    valid_old=[2.0, np.nan, np.nan, np.nan, np.nan, 4.0]
+    valid_proposed=[2.0, 2.4, 2.8, 3.2, 3.6, 4.0]
+    need(candidate_data_finite(valid_old, valid_proposed, valid_proposed),
+         "old unresolved QC1 NaNs must not reject independent candidates")
+    need(not candidate_data_finite([np.nan, *valid_old[1:]],
+                                   valid_proposed, valid_proposed),
+         "observed source QC0 anchor must remain finite")
+    need(not candidate_data_finite(valid_old,
+                                   [2.0, 2.4, np.nan, 3.2, 3.6, 4.0],
+                                   valid_proposed),
+         "a missing candidate VPD must never be accepted")
+
     print("STAGE13Z SELF-TEST PASS | all 5 boundaries, 4 native QC1, physics, no writes", flush=True)
 
 
@@ -164,8 +194,7 @@ def audit():
     # Both true QC0 anchors, all six QC0-linear values and four candidate
     # ERA-RH QC1 values MUST be finite; no relaxation of any 4 hPa edge.
     old_missing_qc1 = ~np.isfinite(old[1:5])
-    need(np.isfinite(old[[0, 5]]).all()
-         and np.isfinite(linear).all() and np.isfinite(era[1:5]).all(),
+    need(candidate_data_finite(old, linear, era),
          "non-finite true QC0 bookend or independently calculated candidate VPD")
     need(np.allclose(old[[0, 5]],
                      core.original_tower_VPD_F_hPa.to_numpy(float)[[0, 5]],
@@ -192,7 +221,7 @@ def audit():
                (pressure>50000) & (pressure<110000)
     need((np.isclose(q[1:5],
               core.HYPOTHETICAL_QC0_bookend_linear_QBOT_kgkg.to_numpy(float)[1:5],
-              atol=1e-9,rtol=0)).all(),
+              atol=1e-9,rtol=0,equal_nan=True)).all(),
          "Stage13T stored linear QBOT and physical calculation differ")
     need(bools(core.HYPOTHETICAL_linear_VPD_QBOT_physics_PASS.iloc[1:5]).tolist()
          == physical[1:5].tolist(),
