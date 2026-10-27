@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Batch05 Stage48: fast consolidation of Assistant-owned Stage47 research.
 
-80 *source-neighbor-QC1 (10-100% original neighbor RH)* events PLUS 42
-Stage45 low-numeric events -> 122 complete original source-ERA hypothetical
-event repairs in ONE standalone UNAPPROVED trial. 217 extreme-low source
-neighbors and 36 QC2/nonmeasured neighbors -> 253 separate provenance HOLDs.
+Stage47's 80 QC1-neighbor and 42 low-numeric event cases are a 122-event
+INITIAL source science priority shortlist: only events that actually satisfy
+strict Stage45 gap/new-jump/QC0/ERA-coverage tests become isolated UNAPPROVED
+research-only VPD candidates. Ineligible candidates receive their own
+event-level HOLD with exact reasons (never abort the entire ten-site run).
+Separately preserve 217 extreme-low source neighbor and 36 QC2/nonmeasured
+neighbor events as 253 existing provenance HOLDs.
 
 Input Stage47/45/44/27/24/43 ORIGINAL output, with strict original T/VPD/QC,
 native event clock, source ERA RH, Stage43 15-HH overlap and QC0/166/46/10
@@ -344,7 +347,7 @@ def main():
   "Original 253 source-neighbor holds also remain unchanged. Total Assistant holds: {} events.".format(253+len(new_holds)),
   "Source processed ERA RH is not independent station RH.",
   "","## Assistant initial science event progress",
-  "- 80 original source-neighbor-QC1 events: local source VPD edge numeric gate passed but QC1 is not independent scientific confirmation.",
+  "- 80 original source-neighbor-QC1 events are INITIAL priority options; any gaps/new >2/>4hPa trial discontinuities are explicitly moved to additional HOLD.",
   "- 42 Stage45 source-ERA low-numeric original events: references require explicit evidence, including Stage47 31 ERA only, 9 tower-vs-ERA T>5C, 2 source ERA/MDS >10pp disagreements.",
   "- 217 very-low original source RH neighbor events: keep separate until neighbor itself is independently evaluated; never interpolate to an implausible neighbor.",
   "- 36 QC2/nonmeasured original source neighbor events: keep separate until original instrumentation and external model/reference have been checked.",
