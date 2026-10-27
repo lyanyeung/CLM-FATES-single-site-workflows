@@ -1,5 +1,18 @@
 # US-Me6 — Stage13s actual success, Stage13t next READ-ONLY 2015-09-26 four-QC1 original source review
 
+## ACTUAL IRIDIS6 Stage13t result — 2026-10-27 07:12 UTC
+
+Original user log from `login6001`: pinned Git SHA PASS, `--self-test`, `--check` and `--run` PASS; source original Stage13s 280320-row output sealed SHA `02e80edf89af35874a5cfb2c134e42fbe771b9b2ccc0899bfc4fe19bc2e18565`, original tower `721d87464c70ea38c7ab6206deee6953647709072cde33827a825408970971e0`, original ERA `af2be6dce8b9d1310540f29b3a87d57fbac4da7d2f8192434e93217e5079f98f`.
+
+**Measured VPD QC0 (must preserve)** `2015-09-26 04:30 VPD 5.413hPa`, `07:00 VPD 6.468hPa`. Four original source QC1 VPD timestamps are 05:00 5.593 (ERA-RH candidate 1.410641); 05:30 5.593 (ERA 1.476824); 06:00 original 13.124 (Stage13s `VPD_USE=NaN`, ERA 1.567620); 06:30 original 9.829 (ERA 1.667645). Companions' ERA RH 88.16%, 87.53%, 86.90%, 86.53% while original **measured** QC0 anchor RH implied by VPD strongly differs from the ERA estimates. Source paired ERA-RH at site TA yields **two** violating edges `04:30–05:00 4.002359hPa` and `06:30–07:00 4.800355hPa`; candidate interior three edges are 0.066183/0.090796/0.100024 hPa and pass.
+
+One hypothetical **not operator-approved, not independently validated** interpolation between exact measured QC0 5.413 and 6.468 would yield five 30-min edges of **0.211 hPa**, but a smooth interpolation is not proof that the intermediate true humidity was linear. **Do not silently approve a source method or relax the 4hPa gate.** All 4 original source QC1 records remain held; original Stage13s successfully repaired 12 other complete 2015 episodes and remains unchanged.
+
+Signed new Stage13t **read-only scientific report**:
+`/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/stage13t_Me6_20150926_four_QC1_original_QC0_ERA_RH_READONLY_20261027T071247Z_a30c3a4e`.
+
+**User strategy update:** prioritise **batch repair and one grouped operator signoff** rather than bringing this one four-HH case for isolated approval. Next analysis should jointly triage **all six remaining originally held Stage13r runs (2015 Sep 4HH, 2015 Nov 469HH and 2017 four runs)**, source-missing/TA-QC, true QC0 anchor proximity and preserved five 2017 Stage12ac updates, and present bounded realistic options; no write or approval of the other 761 original QC1 neighbor records until further explicit signoff.
+
 ## Actual Stage13s verified on user IRIDIS6 (2026-10-27, reported successful 06:50 UTC)
 
 Original operator log from `login6001`: **Git source hash, self-test, check and apply all PASS**, new **independent full 280320-row (16 NOLEAP years) research-only US-Me6 selected model forcing candidate**:
