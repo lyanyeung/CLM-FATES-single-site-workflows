@@ -1,5 +1,13 @@
 # US-Me6 — actual Stage13v results and next Stage13w signed batch physical-source diagnosis
 
+## Next Stage13x original measured tower QC0 empirical validation — GitHub ready, cluster not yet run
+
+The 14 original source science failures all result only from **measured site TA minus companion native ERA TA >8°C**, but the original ERA RH remains between 0 and 100%; do not infer that ERA RH is reliable at site TA or silently relax the temperature tolerance. The 4 original 2017 full-run borders are source QC2 on both immediate sides; far measured QC0 observations are **not** direct anchors.
+
+[Stage13x actual original tower QC0-vs-ERA RH source-skill diagnostic](../scripts/stage13/13x_Me6_6run_tower_QC0_vs_ERA_RH_skill_and_2017_QC2_edge_BATCH_READONLY.py) and [phone one-line launcher](../scripts/stage13/13x_Me6_mobile_QC0_RH_skill_2017_QC2_BATCH_READONLY.sh) SHA-lock the original Stage13r signed source/TIME/ERA and original Stage13s protected research input plus **actual** signed Stage13w 14 event receipt. They look for genuinely measured original source `VPD_F_QC=0` and `TA_F_QC=0` to infer site RH, compare with original same-native companion ERA RH at those native stamps, and calculate median/MAE/P90 original site-minus-ERA RH in ±48h and ±14d windows outside each of six held full original QC1 source runs. A stricter subset retains only original QC0 reference times with |TA_site-TA_ERA|<=8°C. They separately assess **eight immediate original source VPD QC2 neighbors** of four 2017 full-run episodes against retained Stage13s and ERA RH, without treating remote measured QC0 as local bookends. No UTC offset modification, no automatic seasonal QC2 promotion.
+
+**Stage13x --self-test/--check/--run is NOT YET executed on IRIDIS6.** Its `--run` writes only a new independent SHA-sealed report under `reports/stage13x_Me6_QC0_ERA_RH_empirical_skill_and_2017_QC2_edges_*`, never new original/source forcing, DATM, AD400, Slurm or PFT/ZBOT edits. Await true nearby QC0 skills and eight QC2 context before deciding if any operator-scoped **batch** correction is scientifically justified. No authorisation now for other 761 source QC1 neighbours.
+
 ## ACTUAL IRIDIS6 Stage13w source-science PASS (operator terminal 2026-10-27 08:57 UTC)
 
 Operator ran pinned Stage13w `--self-test`, `--check`, and `--run` successfully on IRIDIS6. Full original signed Stage13u SHA256 `432f8ce81348be6ab54d8b0791886481c61e71bf2f945e90a33f23dccf1cd9a4`; Stage13v SHA256 `c8b661f779a3aa4ec6aa01352a2926d69d3704d9adb621c01651cfcb104d7f0c` checked. Signed **READONLY** report:
