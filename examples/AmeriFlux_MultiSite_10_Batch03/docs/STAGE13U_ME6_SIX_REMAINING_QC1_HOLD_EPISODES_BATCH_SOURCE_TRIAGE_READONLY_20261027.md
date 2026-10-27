@@ -1,5 +1,11 @@
 # Batch03 US-Me6 Stage13u — batch-first scientific review of six remaining full original QC1 runs
 
+## Stage13v batch-scoped read-only follow-up (GitHub committed; IRIDIS6 not yet run)
+
+The operator prefers whole-batch decisions. [Stage13v signed Stage13u-ledger 14-exception audit](../scripts/stage13/13v_Me6_14_original_ERA_failure_group_review_READONLY.py) reads the **actual Stage13u 07:47 UTC signed report directory**, verifies each of its four payload SHA256 digests and exact **782/768/14** provenance, then generates a **14-row original-source physics HOLD list** including original timestamps and original paired ERA source anomalies; and groups the **scientifically valid remainder into contiguous 30-minute subepisodes**, excluding the five previously approved Stage12ac July2017 native slots. Each prospective subepisode is labelled original QC0 endpoints confirmed or *unconfirmed* (particularly original 2017 QC2 boundaries), and classified as **NOT OPERATOR APPROVED**. It does not claim that the 2015 Nov 464 individually valid values form a source-coherent full 469-HH replacement.
+
+[Stage13v phone one-liner launcher](../scripts/stage13/13v_Me6_mobile_14_failures_batch_READONLY.sh) SHA-verifies GitHub source code, runs synthetic self-test, reads and SHA-verifies original site Stage13u report and writes only independent signed read-only `reports/stage13v_Me6_14_source_QC1_failures_BATCH_READONLY_*` evidence (four fields + receipt). It never touches the successful Stage13s forcing, old Stage12ac five values, raw tower/ERA, PFT/ZBOT, DATM, AD400 or Slurm. **Actual Stage13v HPC --check / --run have not yet been executed.** Await actual 14 timestamp names before requesting any NEW grouped operator repair scope. No broad 761-row replacement approved.
+
 ## ACTUAL IRIDIS6 Stage13u read-only source review PASS — 2026-10-27 07:47 UTC
 
 The operator ran the fixed SHA-pinned Stage13u mobile runner on `login6001`. `--self-test`, `--check`, `--run` **PASS**. Original tower, paired ERA, Stage13r, successful Stage13s 280,320-row source and Stage13t original signed receipts verified and preserved; no forcing or model modified. New signed **read-only source triage report**:
