@@ -46,3 +46,37 @@ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-sing
 ```
 
 Corrected source/launcher SHA verified through GitHub. An actual IRIDIS6 compilation and execution of the corrected version is required to establish success; the first attempt was syntax-only failure.
+
+## Actual Stage58 IRIDIS6 result — 2026-10-28 22:47 UTC
+
+After the corrected Stage58 source and launcher, the operator reports actual successful execution:
+```
+STAGE58 SOURCE VERIFIED
+STAGE58 SELF-TEST PASS
+STAGE58 SOURCE VERIFIED | original 174 overlay unchanged, 30 held original Wjs HH
+STAGE58 QC0 ANCHOR BIASES RH_pp LEFT 33.237 RIGHT 33.906 LEFT_RH 100.000 RIGHT_RH 92.127 SPAN_HOURS 15.5
+STAGE58 SUCCESS | 30 held HH compared, 174 original overlay SHA preserved; no approvals
+```
+
+Per-method original QC0-adjacent transition results:
+
+| Method | First edge VPD jump hPa | Last edge VPD jump hPa | Maximum consecutive VPD jump hPa | >2 hPa transitions | RH clips |
+|---|---:|---:|---:|---:|---:|
+| Original unchanged | +5.398 | −7.397 | 7.397 | 3 | 0 |
+| RH linear interpolation (15.5 h) | +0.0151 | +0.0786 | 0.0919 | 0 | 0 |
+| AmeriFlux source-processed ERA RH | +1.4076 | −1.2059 | 1.4076 | 0 | 0 |
+| Downloaded ERA5-Land RH at tower T | +1.8950 | −2.3445 | 2.3445 | 1 | 0 |
+| ERA5-Land RH + linearly interpolated QC0 anchor RH bias | 0 | +0.2949 | 0.2949 | 0 | **28/30** |
+
+Result:
+`/home/ly3n24/ameriflux_batch05_stage58/wjs2018_compare_four_methods_20261028T224753Z_551429`.
+
+**Scientific interpretation.** RH-linear interpolation between 19:00 QC0 RH=100% and next-day 10:30 QC0 RH=92.127% is by far the smoothest number series but cannot prove actual humidity stayed nearly saturated across 15 hours. Processed source ERA RH yields numerically valid candidates but shows 19–26pp drier RH than original QC0 tower anchor data. Direct downloaded ERA5-Land RH is 33.2–33.9pp drier at both measured ends, and >2hPa at the trailing edge. ERA5-Land + RH bias correction forces 28/30 source hours above 100% RH to be clipped to exactly 100%, so is scientifically unacceptable as an evidence-derived continuous station humidity series. All 30 half hours remain **science HOLD**; no new approval and the previously approved 174 overlay is unchanged.
+
+Next Stage59 checks the **original FLUXMET humidity field availability, original sensor/filled provenance and weather context**, rather than approving 15h interpolation from boundary smoothness. It requires no new CDS download and produces only new reports. [Stage59 Python](../scripts/stage59/59_Wjs2018_original_humidity_and_weather_field_provenance_READONLY.py) immutable commit `0ed28039bc79f9a7dfd02dc75e946d98908af14c`, blob `786ca0cde9ab6245634e7c49a39ac7f21f001902`; [Stage59 launcher](../scripts/stage59/run_stage59_iridis6.sh) immutable commit `644317d9a45757c7f50772f61e3d77f1720ba36b`, blob `b9009d8a7611d8eb8dd691924eb95716358f8235`.
+
+```bash
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/644317d9a45757c7f50772f61e3d77f1720ba36b/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage59/run_stage59_iridis6.sh" -o "$HOME/run_stage59.sh" && test "$(git hash-object "$HOME/run_stage59.sh")" = "b9009d8a7611d8eb8dd691924eb95716358f8235" && bash "$HOME/run_stage59.sh"
+```
+
+Stage59 GitHub code hash verified. Actual Stage59 IRIDIS6 compile/self-test and run pending. Stage59 does **not** modify any approved or original model inputs.
