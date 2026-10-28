@@ -158,7 +158,6 @@ def verify():
          np.allclose(reconstructed-orig.VPD_F.to_numpy(float),
           dd.donor_minus_original_measured_VPD_error_hPa.to_numpy(float),rtol=0,atol=1e-7),
          "source joint-QC0 residuals do not match original native observations")
-    need(sha(AL_REPORT/AL_REC) if False else True,"unused")
     return al,raw,site,info,dd,specific.iloc[0]
 def inspect():
     al,raw,site,summary,donor,binrow=verify()
