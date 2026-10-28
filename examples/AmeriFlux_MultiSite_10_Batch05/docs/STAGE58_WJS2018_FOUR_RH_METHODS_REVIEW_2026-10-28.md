@@ -80,3 +80,32 @@ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-sing
 ```
 
 Stage59 GitHub code hash verified. Actual Stage59 IRIDIS6 compile/self-test and run pending. Stage59 does **not** modify any approved or original model inputs.
+
+## Actual Stage59 operator PASS, new original VPD_MDS science-priority evidence (28 October 2026)
+
+```
+STAGE59 SELF-TEST PASS
+STAGE59 SUCCESS | 49 raw original FLUXMET HH inspected, 30 Wjs-2018 QC1 HOLD unchanged, 174 approved unchanged
+STAGE59 SATURATED_SOURCE_QC0_LEFT_PLATEAU 9 HH 201803111500 201803111900
+STAGE59 FIELD VPD_F_MDS 30 /30
+STAGE59 FIELD VPD_F_MDS_QC 30 /30
+STAGE59 FIELD RH 0 /30
+```
+
+Original source file:
+`/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE/US-Wjs/forcing/raw/AMF_US-Wjs_FLUXNET_2007-2025_v1.3_r1/AMF_US-Wjs_FLUXNET_FLUXMET_HH_2007-2025_v1.3_r1.csv`
+SHA256 `9b23ab803b719dcb55d2525e4c084c53659e9dea42164fe2382507c97f28bdd6`.
+Original Stage59 report:
+`/home/ly3n24/ameriflux_batch05_stage59/wjs2018_original_49HH_weather_source_20261028T233732Z_861557`.
+
+At the original 2018-03-11 19:00→19:30 boundary, T changed from −0.057 to −0.401°C, wind from 3.687 to 3.858 m/s, pressure from 81.271 to 81.288 kPa, measured-selected VPD jumped from 0 to 5.398 hPa while the RH original field went from 100% to missing and VPD QC from 0 to 1. Demonstrates a likely VPD observation-to-filled-source transition, but cannot independently establish a sensor defect or 15 h near-saturation humidity. Source precipitation `P_F` was zero in printed key records, but zero precipitation does not exclude fog/dew nor demonstrate no sensor platform issue. The 9 original QC0 saturated half hours precede the 30 held VPD-QC1 half hours.
+
+**Critical new lead:** original source includes `VPD_F_MDS` and its QC at all 30 held half hours. Their **values and QC distribution have not been shown yet**. The next decision must examine whether `VPD_F` simply inherits MDS gap-filled VPD; MDS is model/gap-fill provenance, never independent measured tower RH.
+
+Stage60 read-only source/QC comparison script: [Stage60 Python](../scripts/stage60/60_Wjs2018_original_VPD_MDS_QC_49HH_READONLY.py) commit `e3a8032b9e21d6ade1475e7caa2b3d93b81ecf6d`, blob `3a7cf4365b7168620c758992e7c33e0faee0a1b2`; [launcher](../scripts/stage60/run_stage60_iridis6.sh) commit `c5e2c156bc95fcb925d2e5f897638bc12f5acb79`, blob `0c6c050e0fb05f09a1153030b6df21c5efca83c5`.
+
+```bash
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/c5e2c156bc95fcb925d2e5f897638bc12f5acb79/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage60/run_stage60_iridis6.sh" -o "$HOME/run_stage60.sh" && test "$(git hash-object "$HOME/run_stage60.sh")" = "0c6c050e0fb05f09a1153030b6df21c5efca83c5" && bash "$HOME/run_stage60.sh"
+```
+
+Stage60 code and immutable source SHA are GitHub verified; actual IRIDIS6 Stage60 compile, self-test and execution are **pending**. Earlier Stage56 174 and Stage59 original 30 HH HOLD remain unchanged; this step does no external downloads or Slurm submission.
