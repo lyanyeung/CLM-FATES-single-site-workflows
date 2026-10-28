@@ -16,7 +16,7 @@ Stage12j validated on **all** cold QC0 data, and most of those records have a sm
 
 ## What MtB01 does
 
-[Script](../scripts/mtb/MtB01_regime_matched_QC0_humidity_census_READONLY.py). It re-verifies its inputs through the pinned Stage12j → 12i → 12h → 12g chain and covers the full release record, not only 2020/2022/2024. It has seven parts:
+[Script](../scripts/mtb/MtB01_regime_matched_QC0_humidity_census_READONLY.py). It reads its inputs through the pinned Stage12g module (`sources()` re-verifies Stage12e/12f and returns every currently verified MtB ERA5-Land year). It also checks the Stage12g timeline folder named in the handoff (`…083234Z_e168f29f`) against its own receipt. The analysis covers the full release record, not only 2020/2022/2024. It has seven parts:
 
 - **A. Census of every Stage12g MtB humidity gap.** The breakdown is by year, ledger reason, QC, hour, month, dT = `TA_F − TA_ERA` bin and gap length, with QC0 anchors within ± 2 h.
 - **B. Measured truth by regime.** `VPD_F_QC=0` and `TA_F_QC=0`, counted per year × dT bin.
@@ -58,3 +58,9 @@ python3 -B "$M" --self-test
 python3 -B "$M" --check 2>&1 | tee ~/mtb01_check.txt
 python3 -B "$M" --run   2>&1 | tee ~/mtb01_run.txt      # only after --check succeeds
 ```
+
+## v1 fix (28 Oct, first IRIDIS `--check`)
+
+The first `--check` stopped in Stage12h `evidence()` with `Expected exactly three validated US-MtB source years`. The Stage12g `sources()` catalog is built live from the Stage12f download status, and more MtB years have been verified since Stage12h/12i/12j ran. Those stages hard-code 2020/2022/2024, so they are historical snapshots, and their own `--check` would now refuse too. Nothing was written.
+
+MtB01 now uses the pinned Stage12g module directly: Git blob `14eabe09`, the same pin as Stage12h. It uses all verified MtB years and takes `--stage12g` to name the timeline folder, which is receipt-checked.

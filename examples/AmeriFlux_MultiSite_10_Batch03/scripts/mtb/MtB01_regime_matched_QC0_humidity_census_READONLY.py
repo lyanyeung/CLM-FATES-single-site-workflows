@@ -7,8 +7,12 @@ at the same place: at the remaining US-MtB humidity gaps the measured tower TA_F
 on ALL cold QC0 humidity, most of which has small tower-ERA temperature differences. This
 stage asks whether measured tower truth exists in the TARGET regime and how methods behave there.
 
-Sections (one pass over the SHA-verified original release; inputs re-verified through the
-pinned Stage12j -> 12i -> 12h -> 12g chain):
+Sections (one pass over the SHA-verified original release). Inputs come straight from the
+pinned Stage12g module (Git blob), whose sources() re-verifies Stage12e/12f and returns EVERY
+currently verified US-MtB ERA5-Land year. The Stage12h/12i/12j chain is NOT used: it hard-codes
+exactly three MtB years (2020/2022/2024) and refuses once more years have been verified.
+The Stage12g timeline folder (default: the one named in the 2026-10-28 handoff) is checked
+against its own receipt (version, INCOMPLETE marker, output SHA256).
  A  Census of every US-MtB humidity gap in the sealed Stage12g timeline: year, Stage12g
     ledger reason, original TA_F_QC / VPD_F_QC, local hour, month, dT = TA_F - TA_ERA bin,
     gap run length, QC0 humidity anchors within +-2 h.
@@ -57,8 +61,11 @@ VERSION = "batch03-MtB01-v1-20261028-regime-matched-QC0-humidity-READONLY"
 ROOT = Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 BASE = Path.home() / "CLM-FATES-single-site-workflows/examples/AmeriFlux_MultiSite_10_Batch03"
 CTSM = Path("/iridisfs/scratch/ly3n24/CLM_FATES/CTSM")
-J_SCRIPT = BASE / "scripts/stage12/12j_us_mtb_elevation_aware_QC0_humidity_crossvalidation.py"
-J_BLOB = "92ac1fed33967d5a6af24cbd3bbab0e7b150c499"
+G_SCRIPT = BASE / "scripts/stage12/12g_apply_new_year_ERA5Land_RH_shadow.py"
+G_BLOB = "14eabe09a56614808d6186d88fa5576233ed240b"
+STAGE12G_DEFAULT = ROOT / "science_trials/stage12g_six_site_new_year_gridRH_science_20261025T083234Z_e168f29f"
+TIMELINE = "US-MtB_STAGE12G_INCOMPLETE_NOLEAP.csv"
+LEDGER = "2810_original_missing_year_source_review_after_stage12g.csv"
 SITE = "US-MtB"
 METHODS = ("COMPANION_RH", "COMPANION_E", "EMP_BIN_RH", "EMP_ADJ_RH")
 DT_EDGES = (-np.inf, -8, -5, -2, 2, 5, np.inf)
@@ -359,30 +366,47 @@ def context(df, e, gapmask, reasons, land, windows):
 
 
 # ----------------------------------------------------------------- HPC inputs
+def stage12g_folder(folder):
+    folder = Path(folder)
+    if not folder.is_dir() or folder.is_symlink(): raise ValueError("Stage12g folder missing: " + str(folder))
+    regular(folder / "INCOMPLETE_DO_NOT_USE_FOR_DATM_OR_SPINUP")
+    rec = json.loads(regular(folder / "stage12g_research_only_sha_receipt.json").read_text())
+    if not str(rec.get("version", "")).startswith("batch03-stage12g-"): raise ValueError("Stage12g receipt version unexpected")
+    outs = rec.get("output_sha256", {})
+    for need in (TIMELINE, LEDGER):
+        if need not in outs: raise ValueError(f"Stage12g receipt does not list {need}")
+    for name, dig in outs.items():
+        if sha(folder / name) != dig: raise ValueError("Stage12g output SHA mismatch: " + name)
+    return folder, rec
+
+
 def upstream():
-    if gitblob(J_SCRIPT) != J_BLOB: raise ValueError("Pinned Stage12j Git blob mismatch (update the clone): " + str(J_SCRIPT))
-    spec = importlib.util.spec_from_file_location("stage12j_for_mtb01", J_SCRIPT)
-    j = importlib.util.module_from_spec(spec); spec.loader.exec_module(j)
-    h, src, specinfo, catalog, held, original_1038 = j.upstream()
-    return j, src, specinfo, catalog, held
+    if gitblob(G_SCRIPT) != G_BLOB: raise ValueError("Pinned Stage12g Git blob mismatch (update the clone): " + str(G_SCRIPT))
+    spec = importlib.util.spec_from_file_location("stage12g_for_mtb01", G_SCRIPT)
+    g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
+    stage10, specs, holds, missing, catalog, unavailable = g.sources()
+    if SITE not in specs: raise ValueError("US-MtB source spec missing from Stage12g sources()")
+    mtb = {k: v for k, v in catalog.items() if k[0] == SITE}
+    return stage10, specs[SITE], mtb, [x for x in unavailable if x.get("site") == SITE]
 
 
-def load_inputs():
-    j, src, spec, catalog, held = upstream()
+def load_inputs(stage12g=STAGE12G_DEFAULT):
+    src, spec, catalog, unavailable = upstream()
+    G, grec = stage12g_folder(stage12g)
     hdr = set(pd.read_csv(regular(spec["primary"]), nrows=0).columns)
     want = ["TIMESTAMP_START", "TA_F", "TA_F_QC", "VPD_F", "VPD_F_QC", "PA_F"] + [c for c in ("WS_F", "SW_IN_F", "LW_IN_F") if c in hdr]
     flux = pd.read_csv(regular(spec["primary"]), usecols=want, dtype={"TIMESTAMP_START": str}, low_memory=False)
     era = pd.read_csv(regular(spec["era"]), usecols=["TIMESTAMP_START", "TA_ERA", "VPD_ERA", "PA_ERA"],
                       dtype={"TIMESTAMP_START": str}, low_memory=False)
     df = frame_from(flux, era)
-    g = pd.read_csv(regular(j.G / "US-MtB_STAGE12G_INCOMPLETE_NOLEAP.csv"), low_memory=False)
+    g = pd.read_csv(regular(G / TIMELINE), low_memory=False)
     gk = pd.to_datetime(g.time, format="%Y-%m-%d %H:%M:%S", errors="raise").dt.strftime("%Y%m%d%H%M")
     if len(g) != len(df) or not np.array_equal(gk.to_numpy(), df.native_key.to_numpy()):
         raise ValueError("Stage12g timeline differs from the original native clock")
     if not np.allclose(g.TA_USE.to_numpy(float), df.TA_F.to_numpy(), atol=1e-6, rtol=0, equal_nan=True):
         raise ValueError("Stage12g TA_USE differs from original TA_F")
     gap = (~np.isfinite(g.QBOT.to_numpy(float))) | (~np.isfinite(g.VPD_USE.to_numpy(float)))
-    led = pd.read_csv(regular(j.G / "2810_original_missing_year_source_review_after_stage12g.csv"),
+    led = pd.read_csv(regular(G / LEDGER),
                       dtype={"site": str, "native_key": str}, low_memory=False)
     reasons = dict(led.loc[led.site.eq(SITE), ["native_key", "reason"]].itertuples(index=False, name=None))
     land, era5l = {}, []
@@ -402,9 +426,11 @@ def load_inputs():
                       "has_geopotential": "z" in nc_variables(meta["path"])})
     info = {"primary": str(spec["primary"]), "primary_sha256": sha(spec["primary"]), "era": str(spec["era"]),
             "era_sha256": sha(spec["era"]), "native_minutes": int(spec["native_minutes"]),
-            "BIF_UTC_offset_h": float(src.BIF_OFFSET[SITE]), "Stage12g": str(j.G),
-            "Stage12g_timeline_sha256": sha(j.G / "US-MtB_STAGE12G_INCOMPLETE_NOLEAP.csv"),
-            "Stage12j_blob": J_BLOB, "stage12j_held_1035": int(len(held))}
+            "BIF_UTC_offset_h": float(src.BIF_OFFSET[SITE]), "Stage12g": str(G),
+            "Stage12g_version": grec.get("version"), "Stage12g_timeline_sha256": sha(G / TIMELINE),
+            "Stage12g_module_blob": G_BLOB,
+            "verified_ERA5Land_years": sorted(int(y) for _, y in catalog),
+            "unverified_ERA5Land_years": sorted(int(x["year"]) for x in unavailable)}
     return df, gap, reasons, land, pd.DataFrame(era5l), info
 
 
@@ -527,11 +553,12 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     g = ap.add_mutually_exclusive_group(required=True)
     for a in ("--self-test", "--check", "--run"): g.add_argument(a, action="store_true")
+    ap.add_argument("--stage12g", default=str(STAGE12G_DEFAULT), help="Stage12g science-trial folder (receipt-checked)")
     a = ap.parse_args()
     print("MtB01 US-MtB REGIME-MATCHED QC0 HUMIDITY EVIDENCE | " + VERSION, flush=True)
     self_test()
     if a.self_test: return
-    df, gap, reasons, land, era5l, info = load_inputs()
+    df, gap, reasons, land, era5l, info = load_inputs(a.stage12g)
     res = compute(df, gap, reasons, land)
     code = code_evidence()
     show(res, gap, info, era5l)
