@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage55"
+mkdir -p "$BASE"
+PY_COMMIT="07ca3c5b1d93697c29e329eb775a3444d3b61072"
+PY_BLOB="dbf4aa222bd0020073609b6d3fd5b74aead48202"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage55/55_approved_UMB_twoHH_and_Wjs_early_original_context.py"
+SCRIPT="$BASE/stage55.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$PY_COMMIT/$REL" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "$PY_BLOB"
+echo "STAGE55 SOURCE VERIFIED"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+D53="$HOME/ameriflux_batch05_stage53/actual_tower_and_source_ERA_three_events_20261028T171202Z_2496835"
+D52="$HOME/ameriflux_batch05_stage52/original_three_event_humidity_provenance_20261028T162951Z_2137755"
+test -d "$D53" && test -d "$D52"
+OUT="$BASE/umb_user_approved_2HH_wjs_earlier_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SCRIPT" --stage53-dir "$D53" --stage52-dir "$D52" --out "$OUT" 2>&1 | tee "$BASE/stage55.log"
+echo "STAGE55_REPORTS=$OUT"
+echo "STAGE55 ORIGINALS/166/WJS/DATM/SLURM UNCHANGED"
