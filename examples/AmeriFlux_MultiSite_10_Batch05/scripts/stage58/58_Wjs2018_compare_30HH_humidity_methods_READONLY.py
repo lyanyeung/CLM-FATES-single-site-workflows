@@ -203,7 +203,7 @@ def main():
  write(fstats,STATS,stats)
  manifest=dict(original_stage57_sha256=hashfile(f57),
   original_stage56_174_sha256=hashfile(f56),original_174_unchanged=True,
-  2018_original_HOLD_HH=30,scientific_approvals_new=0,
+  Wjs_2018_original_HOLD_HH=30,scientific_approvals_new=0,
   tower_RH_sensor_validated_inside_gap=False,ERA5Land_is_grid_reanalysis=True,
   ERA5Land_RH_anchor_bias_left_pp=biasL,ERA5Land_RH_anchor_bias_right_pp=biasR,
   science_note="RH interpolation 15.5h and gridded bias-correction are not independent original tower measurements",
