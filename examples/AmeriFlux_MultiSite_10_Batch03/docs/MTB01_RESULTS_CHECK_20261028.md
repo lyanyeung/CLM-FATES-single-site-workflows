@@ -78,3 +78,27 @@ Whether these four points exceed the cap depends on the exact ice formula in `da
    - Exclude the 27 suspect −39 °C records from the truth.
    - Report the remaining HOLD: the 28 gaps outside the regime and any non-formable ones.
 4. **User decision** on the 27 suspect −39 °C TA_F values.
+
+## User criterion and MtB02 (28 Oct 19:50)
+
+The user's criterion: a cold value can be real only if the same period of the record has comparable values **and** the reading is not constant.
+
+The 2022 values fail both tests:
+- **Constant:** 27 HH lie within about 0.05 °C of −39.3 °C, including 22 consecutive HH.
+- **No analogue:** the other 15 years have minima of −7 to −24 °C.
+
+Decision (Claude, delegated by the user):
+- Classify these rows as an instrument fault.
+- Remove them, and their VPD (which comes from the same probe), from the validation truth.
+- Do not carry −39 °C into the forcing; produce a validated replacement candidate instead.
+
+[MtB02](../scripts/mtb/MtB02_temperature_fault_bridge_and_humidity_confirmation_READONLY.py) predeclares the following rules:
+
+| Part | Rule |
+| --- | --- |
+| Fault | FLATLINE = ≥ 4 HH with range ≤ 0.1 °C and \|TA_F − TA_ERA\| > 10 °C |
+| Review | REVIEW = below the other years' same-month minimum by more than 5 °C. These rows are reported with context and not excluded; the February 2011 cold event is expected to fall here. |
+| Floor check | Histogram of TA_F near −10 °C |
+| Replacement candidate | ERA-shape bridge anchored on tower QC0 ± 2 h. It is validated on 2000 synthetic gaps of 5 and 22 HH, and passes if MAE ≤ 1.5 °C, \|bias\| ≤ 0.5 °C and ≤ 10 % of errors exceed 3 °C. |
+| Humidity confirmation | COMPANION_E, with EMP_ADJ_RH as runner-up, on QC0 truth with TA_F − TA_ERA ≤ −5 °C. It must pass the five Stage12j thresholds pooled and in every year with N ≥ 50, with at least 5 such years. |
+| Coverage | Every gap (plus the fault rows) is classed as `CANDIDATE_IF_APPROVED` or one of the `HOLD_*` reasons. |
