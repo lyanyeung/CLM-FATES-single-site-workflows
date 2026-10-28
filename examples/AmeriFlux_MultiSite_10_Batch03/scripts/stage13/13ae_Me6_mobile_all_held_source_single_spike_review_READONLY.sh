@@ -6,13 +6,13 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate clm_fates_env
 BASE="$HOME/ameriflux_batch03_stage13ae"
 mkdir -p "$BASE"
-PIN="aced432514f861e20e7960e61843f9660dbbcb0e"
+PIN="09692df08b19e5b272716cd4ab38dc95b3de684c"
 ROOT="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$PIN/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage13"
 while read -r DIGEST NAME; do
   curl -fLsS --retry 3 "$ROOT/$NAME" -o "$BASE/$NAME"
   test "$(git hash-object "$BASE/$NAME")" = "$DIGEST"
 done <<'SOURCES'
-04a88cb3bfd559552f09cc520aa6daa08a486583 13ae_Me6_all_five_held_runs_isolated_original_spike_screen_READONLY.py
+c560812006239731372ee1456045eacdbc14613d 13ae_Me6_all_five_held_runs_isolated_original_spike_screen_READONLY.py
 de62b7f6d1001fafa923163e565b2945bb2a8816 13_validation_Me6_six_run_repair_candidates.py
 734a9d988f45c9628131e77b669913d9b0f4e8ae 13x_Me6_6run_tower_QC0_vs_ERA_RH_skill_and_2017_QC2_edge_BATCH_READONLY.py
 5a8dc69f5fb65015a9b7c9096153935684f466a8 13r_Me6_33_full_original_QC1_runs_QC0_ERA_RH_OPERATOR_SCOPE_READONLY.py
