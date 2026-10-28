@@ -14,7 +14,7 @@ from uuid import uuid4
 import numpy as np
 import pandas as pd
 sys.dont_write_bytecode=True
-VER="batch03-stage13ae-v1-20261028-Me6-five-run-source-spike-5node-screen"
+VER="batch03-stage13ae-v2-20261028-Me6-SHA-locked-full-Stage13S-explicit-source"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 HERE=Path(__file__).resolve().parent
 VALIDATE=HERE/"13_validation_Me6_six_run_repair_candidates.py"
@@ -26,6 +26,11 @@ AA=ROOT/"science_trials/stage13aa_Me6_Run12_4HH_QC0_LINEAR_APPROVED_RESEARCH_ONL
 AACSV="US-Me6_STAGE13AA_Run12_4HH_APPROVED_QC0_LINEAR_RESEARCH_ONLY_NOLEAP.csv"
 AASHA="0da1d24f9b84d4c4a126d9a9d39ed107023d24914ed9ab122a10de0345e8ee80"
 SSHA="02e80edf89af35874a5cfb2c134e42fbe771b9b2ccc0899bfc4fe19bc2e18565"
+# Do not look for S / S_CSV attributes in the 13_validation module:
+# Stage13s lives in its Stage13x predecessor. Pin the original complete
+# Stage13s source and verify its full-file SHA before loading all columns.
+S=ROOT/"science_trials/stage13s_Me6_12x2015_235HH_ERA_RH_operator_approved_20261027T065056Z_6890a105"
+S_CSV="US-Me6_STAGE13S_12x2015_QC1_235HH_ERA_RH_OPERATOR_APPROVED_RESEARCH_ONLY_NOLEAP.csv"
 COUNTS={14:469,15:95,16:30,17:137,18:47}
 HH=pd.Timedelta(minutes=30)
 PREVIOUS=set(pd.date_range("2015-09-26 05:00",periods=4,freq="30min")) | \
@@ -94,7 +99,8 @@ def verified():
     # Validation preprocessor reads only five fields; the research shadow
     # is a full native forcing CSV. Reload complete SHA-sealed Stage13S here
     # so every original variable/column can be differential-checked.
-    old=pd.read_csv(must(mod.S/mod.S_CSV),dtype={"time":str},low_memory=False)
+    need(sha(S/S_CSV)==SSHA, "original full Stage13S CSV source SHA changed")
+    old=pd.read_csv(must(S/S_CSV),dtype={"time":str},low_memory=False)
     old.index=native(old.time)
     need(meta.get("Stage13s_input_SHA256")==SSHA,
          "original certified Stage13S source SHA mismatch")
