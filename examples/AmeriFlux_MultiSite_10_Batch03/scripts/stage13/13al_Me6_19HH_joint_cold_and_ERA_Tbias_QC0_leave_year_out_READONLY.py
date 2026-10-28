@@ -143,8 +143,8 @@ def analyze():
     with np.errstate(divide="ignore",invalid="ignore"):
         evap=100*(esT-trial)
         q=.622*evap/(p-.378*evap)
-    valid=(raw.TA_F_QC.to_numpy(float)==0)&
-          (raw.VPD_F_QC.to_numpy(float)==0)
+    valid=((raw.TA_F_QC.to_numpy(float)==0)&
+           (raw.VPD_F_QC.to_numpy(float)==0))
     valid=(valid&np.isfinite([t,vt,te,ve,st,sv,p,q]).all(axis=0)&
            np.isclose(t,st,rtol=0,atol=1e-7)&
            np.isclose(vt,sv,rtol=0,atol=1e-7)&
