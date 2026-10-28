@@ -2,8 +2,8 @@
 set -euo pipefail
 BASE="$HOME/ameriflux_batch05_stage58"
 mkdir -p "$BASE"
-PY_COMMIT="87b511c9e5efbc68c8ef7393b71afa085ed74997"
-PY_BLOB="e600e0c0e65519053100043c839a6d376e9ae517"
+PY_COMMIT="36b69555042813317de01d6dd57c71f44eff6795"
+PY_BLOB="eaee8cffe61a53b59b5fd0223fad1bf9e89d693d"
 REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage58/58_Wjs2018_compare_30HH_humidity_methods_READONLY.py"
 PY="$BASE/stage58.py"
 curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$PY_COMMIT/$REL" -o "$PY"
