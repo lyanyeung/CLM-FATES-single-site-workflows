@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage58"
+mkdir -p "$BASE"
+PY_COMMIT="87b511c9e5efbc68c8ef7393b71afa085ed74997"
+PY_BLOB="e600e0c0e65519053100043c839a6d376e9ae517"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage58/58_Wjs2018_compare_30HH_humidity_methods_READONLY.py"
+PY="$BASE/stage58.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$PY_COMMIT/$REL" -o "$PY"
+test "$(git hash-object "$PY")" = "$PY_BLOB"
+echo "STAGE58 SOURCE VERIFIED"
+python3 -B -m py_compile "$PY"
+python3 -B "$PY" --self-test
+D57="$HOME/ameriflux_batch05_stage57/wjs2018_actual_ERA5Land_20261028T195055Z_4119241"
+D56="$HOME/ameriflux_batch05_stage56/eight_user_approved_interpolations_20261028T193428Z_4078597"
+test -d "$D57" && test -d "$D56"
+OUT="$BASE/wjs2018_compare_four_methods_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$PY" --stage57-dir "$D57" --stage56-dir "$D56" --out "$OUT" 2>&1 | tee "$BASE/stage58.log"
+echo "STAGE58_REPORTS=$OUT"
+echo "STAGE58 no changes to 2018 HOLD, previous 174, originals, DATM, Slurm"
