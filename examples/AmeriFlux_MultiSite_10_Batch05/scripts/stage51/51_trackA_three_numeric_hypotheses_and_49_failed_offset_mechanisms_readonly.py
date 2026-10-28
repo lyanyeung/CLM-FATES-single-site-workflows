@@ -41,7 +41,7 @@ SITE_FIELDS=("site","source_original_P2P3_HH","Assistant_events",
     "previous_70_source_reference_pending",
     "Stage50_three_numerical_hypotheses",
     "Stage50_49_offset_grid_no_feasible",
-    "253_original_neighbor_science_HOLD",
+    "original_253_neighbor_science_HOLD",
     "Claude_events_untouched","new_science_approvals","full_site_forcing_pass")
 EXACT_FIELDS=("site","episode_id","original_event_native_HH",
     "first_original_native","last_original_native","source_ERA_RH_offset_pp",
@@ -319,7 +319,7 @@ def main():
   per_site.append(dict(site=site,source_original_P2P3_HH="FROM_STAGE45_PREVIOUS",
    Assistant_events=int(x["Assistant_original_events"]),
    previous_70_source_reference_pending=ev70,Stage50_three_numerical_hypotheses=ev3,
-   Stage50_49_offset_grid_no_feasible=ev49,253_original_neighbor_science_HOLD=held,
+   Stage50_49_offset_grid_no_feasible=ev49,original_253_neighbor_science_HOLD=held,
    Claude_events_untouched=True,new_science_approvals=0,full_site_forcing_pass=False))
  out.mkdir(exist_ok=False)
  write(out/"stage51_THREE_NUMERIC_EVENT_HYPOTHESES_NEED_TOWER_VALIDATION.csv",EXACT_FIELDS,three)
