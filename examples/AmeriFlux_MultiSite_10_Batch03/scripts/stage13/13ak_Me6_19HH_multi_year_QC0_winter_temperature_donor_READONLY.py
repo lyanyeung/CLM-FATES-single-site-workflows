@@ -16,7 +16,7 @@ from uuid import uuid4
 import numpy as np
 import pandas as pd
 sys.dont_write_bytecode=True
-VER="batch03-stage13ak-v1-20261028-Me6-19HH-16year-original-QC0-temperature-donor"
+VER="batch03-stage13ak-v2-20261028-Me6-19HH-16year-original-QC0-temperature-donor-syntax"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 HERE=Path(__file__).resolve().parent
 AJ_CODE=HERE/"13aj_Me6_19HH_winter_2015_source_ERA_water_ice_QC0_validation_READONLY.py"
@@ -124,8 +124,8 @@ def run():
     sv=site.VPD_USE.to_numpy(float)
     goodt=(np.isfinite(ta)&(tq==0)&np.isfinite(et)&
          np.isfinite(st)&np.isclose(ta,st,atol=1e-7,rtol=0))
-    nqc0=goodt&(vqc==0)&np.isfinite(vpd)&np.isfinite(ev)&
-         np.isfinite(sv)&np.isclose(vpd,sv,atol=1e-7,rtol=0)
+    nqc0=(goodt&(vqc==0)&np.isfinite(vpd)&np.isfinite(ev)&
+          np.isfinite(sv)&np.isclose(vpd,sv,atol=1e-7,rtol=0))
     esobs=mod.ew(ta)
     esera=mod.ew(et)
     rh_raw=np.divide(ev,esera,out=np.full(len(ev),np.nan),
