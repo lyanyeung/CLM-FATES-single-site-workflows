@@ -10,12 +10,12 @@ mkdir -p "$BASE"
 PY="$BASE/13ad_Me6_isolated_QC2_single_spike_user_conditional_shadow.py"
 POL="$BASE/US-Me6_conditional_isolated_spike_interpolation_20261028.json"
 curl -fLsS --retry 3 \
- "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/39b768b1e233b7f7b62b2ac28fe8fd8200fec1e5/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage13/13ad_Me6_isolated_QC2_single_spike_user_conditional_shadow.py" \
+ "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/eda999a4254c6eeb29fb78d29c835cdef3c6f4b5/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage13/13ad_Me6_isolated_QC2_single_spike_user_conditional_shadow.py" \
  -o "$PY"
 curl -fLsS --retry 3 \
  "https://raw.githubusercontent.com/lyanyeung/Non-Competition-CLM-experiment/04a563e6ef463c935ddd207f4f4ffa974e256008/examples/AmeriFlux_Batch03_10/decisions/US-Me6_conditional_isolated_spike_interpolation_20261028.json" \
  -o "$POL"
-test "$(git hash-object "$PY")" = "b27a5c258817924ac5e0776d6d2ccfe82d70afc2"
+test "$(git hash-object "$PY")" = "00d2844d5e2be75ac5ff4c998c3378d09f38bce2"
 test "$(git hash-object "$POL")" = "a8b70432719798b15898039d4a4e6600dc18f533"
 echo "STAGE13AD SCIENCE PYTHON AND USER POLICY SOURCE HASH VERIFIED"
 python3 -B - "$PY" <<'PYTHON'
