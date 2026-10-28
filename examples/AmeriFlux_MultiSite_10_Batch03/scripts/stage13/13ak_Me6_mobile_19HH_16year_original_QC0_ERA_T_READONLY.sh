@@ -6,13 +6,13 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate clm_fates_env
 BASE="$HOME/ameriflux_batch03_stage13ak"
 mkdir -p "$BASE"
-PIN="3c662eb2a16640d3033376bb3e9d2ef2a2ae6ada"
+PIN="4f1c638f2c513e903b369e9970e1a18b18d13816"
 RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$PIN/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage13"
 while read -r BLOB FILE; do
  curl -fLsS --retry 3 "$RAW/$FILE" -o "$BASE/$FILE"
  test "$(git hash-object "$BASE/$FILE")" = "$BLOB"
 done <<'SIX_PINNED_ORIGINAL_SOURCES'
-a8b2556cc880d3ed3bab9fac56246d4a4921c9ab 13ak_Me6_19HH_multi_year_QC0_winter_temperature_donor_READONLY.py
+5e82bd31484a3949a43829264f3ceb4d6c0f7832 13ak_Me6_19HH_multi_year_QC0_winter_temperature_donor_READONLY.py
 62fb8b5225157f989d58c7a31d6a0a61237d4646 13aj_Me6_19HH_winter_2015_source_ERA_water_ice_QC0_validation_READONLY.py
 c0b7f0429d352c82a10becf8d59d8a5d62987edf 13ah_Me6_46_remaining_native_missing_source_ERA_context_READONLY.py
 de62b7f6d1001fafa923163e565b2945bb2a8816 13_validation_Me6_six_run_repair_candidates.py
