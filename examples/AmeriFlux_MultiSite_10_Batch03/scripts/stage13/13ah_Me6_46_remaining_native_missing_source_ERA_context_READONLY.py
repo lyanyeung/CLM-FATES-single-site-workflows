@@ -15,7 +15,7 @@ from uuid import uuid4
 import numpy as np
 import pandas as pd
 sys.dont_write_bytecode=True
-VER="batch03-stage13ah-v2-20261028-Me6-all46-noleap-safe-source-context"
+VER="batch03-stage13ah-v3-20261028-Me6-independent-tower-ERA-calendar-coverage"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 HERE=Path(__file__).resolve().parent
 VALIDATE=HERE/"13_validation_Me6_six_run_repair_candidates.py"
@@ -69,7 +69,65 @@ def ts_index(series):
     x=pd.DatetimeIndex(pd.to_datetime(z,format="%Y%m%d%H%M",errors="raise"))
     need(x.is_unique and x.is_monotonic_increasing,"source time duplicates/nonmonotonic")
     return x
+def align_original_sources(tower,era,site_key):
+    """Exact native-time join; NO positional merging, offsets, or imputation.
+
+    Source tower and companion ERA releases need not have identical
+    historical coverage. Preserve each individual original observation
+    and explicit presence masks on the existing 280320 NOLEAP site key.
+    """
+    chunks=[]
+    evidence={}
+    for role,frame in (("tower",tower),("era",era)):
+        z=frame.copy()
+        z.index=ts_index(z.TIMESTAMP_START)
+        leap=(z.index.month==2)&(z.index.day==29)
+        z=z.loc[~leap].drop(columns=["TIMESTAMP_START"])
+        expected=set(site_key)
+        all_src=set(z.index)
+        outside=all_src-expected
+        present=site_key.isin(z.index)
+        missing=site_key[~present]
+        row=z.reindex(site_key)
+        row["_source_"+role+"_present"]=present
+        chunks.append(row)
+        evidence[role]={
+           "raw_native_source_rows":len(frame),
+           "original_leap_day_rows_ignored_for_NOLEAP":int(leap.sum()),
+           "source_2009_2024_NOLEAP_rows":len(z),
+           "unique_source_keys_outside_selected_NOLEAP_clock":len(outside),
+           "matching_native_rows":int(present.sum()),
+           "missing_native_rows_in_original_source":len(missing),
+           "missing_native_year_counts":{
+               str(int(y)):int((missing.year==y).sum())
+               for y in np.unique(missing.year)},
+           "example_native_source_extra_times":[str(x) for x in sorted(outside)[:12]],
+           "example_original_source_missing_times":[str(x) for x in missing[:12]]
+        }
+    out=pd.concat(chunks,axis=1)
+    need(out.index.equals(site_key) and
+         {"_source_tower_present","_source_era_present"}.issubset(out.columns),
+         "one-to-one native source alignment on original AF time coordinate")
+    need(out.columns.is_unique,
+         "overlap between original independently read tower/ERA fields")
+    return out,evidence
 def selftest():
+    # Different tower/ERA row counts or historical year availability are
+    # not themselves bad-source observations. Missing companion remains
+    # explicitly missing, never positionally matched to a tower reading.
+    key=pd.DatetimeIndex(pd.to_datetime(["2015-11-12 13:00","2015-11-12 13:30",
+                                          "2015-11-12 14:00"]))
+    tower=pd.DataFrame({"TIMESTAMP_START":["201511121300","201511121330","201511121400"],
+                        "TA_F":[5.8,5.5,4.9]})
+    era=pd.DataFrame({"TIMESTAMP_START":["201511121300","201511121400"],
+                      "TA_ERA":[5.1,5.4]})
+    joined,report=align_original_sources(tower,era,key)
+    need(len(joined)==3 and joined._source_tower_present.all()
+         and joined._source_era_present.tolist()==[True,False,True]
+         and np.isnan(joined.loc[key[1],"TA_ERA"])
+         and joined.loc[key[2],"TA_ERA"]==5.4
+         and report["era"]["missing_native_rows_in_original_source"]==1,
+         "synthetic unmatched source timestamps MUST remain missing and unshifted")
     need(sum(COUNTS.values())==778 and len(APPROVED)==11,
          "exact 778 original held QC1 and 11 separate existing protected HH")
     need(q_calc(7.513,5.54,95000)[1] and not q_calc(-1,5.54,95000)[1],
@@ -133,18 +191,18 @@ def read_confirmed():
                       dtype={"TIMESTAMP_START":str},low_memory=False)
     era=pd.read_csv(must(src["era"]),usecols=ecols,
                     dtype={"TIMESTAMP_START":str},low_memory=False)
-    need(len(tower)==len(era) and
-         tower.TIMESTAMP_START.tolist()==era.TIMESTAMP_START.tolist(),
-         "original full 2009–2024 native tower and same-release ERA time mismatch")
-    raw=tower.merge(era,on="TIMESTAMP_START",validate="one_to_one")
-    raw.index=ts_index(raw.TIMESTAMP_START)
-    keep=~((raw.index.month==2)&(raw.index.day==29))
-    raw=raw.loc[keep].copy()
+    # Stage13x verified identical native records in 2015 and 2017 only.
+    # The FULL 2009-2024 original tower and companion ERA time inventories
+    # are NOT identical; matching them by row number is scientifically wrong.
+    # Join each independently to the SHA-pinned Stage13AF native model key.
+    raw,coverage=align_original_sources(tower,era,latest.index)
     for col in tcols[1:]+ecols[1:]:
         raw[col]=pd.to_numeric(raw[col],errors="coerce")
         raw.loc[raw[col]<=-9990,col]=np.nan
     need(raw.index.equals(latest.index),
-         "original source 16-year clock does not exactly match AF NOLEAP chronology")
+         "joined tower/ERA must preserve the exact AF NOLEAP native key")
+    print("STAGE13AH ORIGINAL FULL-SOURCE TIME COVERAGE (no shifts/repairs)",
+          json.dumps(coverage,indent=2),flush=True)
     # Independently cross-check original 2015/2017 upstream 35040 keys and values
     need(raw_small.index.isin(raw.index).all() and
          len(raw_small)==35040 and
@@ -152,9 +210,9 @@ def read_confirmed():
                      raw_small[["TA_F","VPD_F","TA_ERA","VPD_ERA"]],
                      equal_nan=True,atol=1e-10,rtol=0),
          "original full source and independently audited 2015/17 source disagree")
-    return raw,latest,runs,provenance
+    return raw,latest,runs,provenance,coverage
 def analyze():
-    raw,site,runs,prov=read_confirmed()
+    raw,site,runs,prov,coverage=read_confirmed()
     for col in ("TA_USE","PSRF"):
         need(np.isfinite(site[col].to_numpy(float)).all(),
              "previously verified full site tower temp or pressure now missing")
@@ -200,7 +258,9 @@ def analyze():
         src=raw.loc[t];now=site.loc[t]
         isinside=(t in inside)
         around=[t+k*H for k in range(-4,5)]
-        context_complete=all(a in raw.index for a in around)
+        tower_context_complete=all(a in raw.index and bool(raw.at[a,"_source_tower_present"]) for a in around)
+        era_context_complete=all(a in raw.index and bool(raw.at[a,"_source_era_present"]) for a in around)
+        context_complete=tower_context_complete and era_context_complete
         # At 2009/2024 edges or a fixed NOLEAP February boundary,
         # record missing neighbor provenance as NaN: never invent an
         # original source observation and never interpolate across it.
@@ -263,6 +323,10 @@ def analyze():
           "native_time":str(t),"run_scope":runname(t),"is_one_of_17_within_five_runs":isinside,
           "missing_cluster_id":gapid,"missing_cluster_native_HH":ng,
           "full_original_plusminus_2h_source_context":context_complete,
+          "original_tower_time_exists":bool(src._source_tower_present),
+          "original_companion_ERA_time_exists":bool(src._source_era_present),
+          "full_original_tower_plusminus_2h_context":tower_context_complete,
+          "full_original_ERA_plusminus_2h_context":era_context_complete,
           "source_tower_TA_F_C":float(src.TA_F),"source_tower_TA_F_QC":float(src.TA_F_QC),
           "source_tower_VPD_F_hPa":float(src.VPD_F),
           "source_tower_VPD_F_QC":float(src.VPD_F_QC),
@@ -293,6 +357,8 @@ def analyze():
               "missing_cluster_id":gapid,"center_native_time":str(t),
               "neighbor_native_time":str(a),"relative_30min_steps":i-4,
               "original_source_time_exists":a in raw.index,
+              "original_tower_time_exists":bool(z._source_tower_present) if a in raw.index else False,
+              "original_companion_ERA_time_exists":bool(z._source_era_present) if a in raw.index else False,
               "tower_TA_F_C":float(z.TA_F),"tower_TA_F_QC":float(z.TA_F_QC),
               "tower_VPD_F_hPa":float(z.VPD_F),"tower_VPD_F_QC":float(z.VPD_F_QC),
               "paired_source_ERA_TA_C":float(z.TA_ERA),
@@ -323,6 +389,9 @@ def analyze():
       "within_five_held_original_QC1_runs_missing_HH":17,
       "outside_five_held_original_QC1_runs_missing_HH":29,
       "missing_clusters":len(clusters),
+      "original_source_time_coverage":coverage,
+      "missing_HH_without_original_tower_native_row":int((~tab.original_tower_time_exists).sum()),
+      "missing_HH_without_original_companion_ERA_native_row":int((~tab.original_companion_ERA_time_exists).sum()),
       "isolated_linear_only_research_review_count":
           int(tab.hypothetical_single_center_linear_gate_PASS.sum()),
       "companion_ERA_RH_only_numeric_review_count":
