@@ -14,7 +14,7 @@ from uuid import uuid4
 import numpy as np
 import pandas as pd
 sys.dont_write_bytecode=True
-VER="batch03-stage13ao-v1-20261028-Me6-19HH-QC2-T-vapour-e-QBOT-edges"
+VER="batch03-stage13ao-v2-20261028-Me6-correct-signed-stage13an-paths-and-output"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 HERE=Path(__file__).resolve().parent
 AM_CODE=HERE/"13am_Me6_19HH_joint_QC0_bias_corrected_ERA_RH_event_PREVIEW_READONLY.py"
@@ -28,8 +28,8 @@ AM_YEAR="165_actual_measured_QC0_donor_residual_bias_by_year.csv"
 AM_FLAG="NO_PRODUCTION_FORCING_OR_SHADOW_REPAIR_APPROVED"
 AM_NAMES={AM_SUM, AM_EVENT, AM_EDGE, AM_YEAR, AM_FLAG}
 AM_VER="batch03-stage13am-v1-20261028-Me6-19HH-joint-QC0-calibrated-donor-PREVIEW"
-AN_DIR=ROOT/"reports/stage13ao_Me6_19HH_QC2_vapour_e_QBOT_RH_source_READONLY_20261028T234506Z_1ed4316a"
-AN_REC="stage13ao_source_science_READONLY_sha_receipt.json"
+AN_DIR=ROOT/"reports/stage13an_Me6_19HH_QC2_boundary_QC0_anchor_source_READONLY_20261028T234506Z_1ed4316a"
+AN_REC="stage13an_source_science_READONLY_sha_receipt.json"
 AN_SUM="stage13an_original_19HH_boundary_QC0_science_summary.json"
 AN_CONTEXT="original_19HH_QC2_flanks_plusminus2h_tower_ERA_water_physics.csv"
 AN_NEAREST="nearest_original_measured_QC0_tower_T_VPD_each_side.csv"
@@ -45,7 +45,7 @@ EVENT=pd.date_range(START, END, freq="30min")
 LEFT=START-STEP
 RIGHT=END+STEP
 def require(ok,msg):
-    if not bool(ok):raise RuntimeError("STAGE13AN SIGNED ORIGINAL SOURCE HOLD: "+str(msg))
+    if not bool(ok):raise RuntimeError("STAGE13AO SIGNED ORIGINAL SOURCE HOLD: "+str(msg))
 def must(p):
     p=Path(p)
     require(p.is_file() and not p.is_symlink(), "file missing/symlink "+str(p))
@@ -361,7 +361,7 @@ def review():
     print(nearest.to_string(index=False))
     print("STAGE13AN EXACT 11 ORIGINAL QC0 WHOLE-YEAR-WITHHELD BIAS STABILITY")
     print(stability.to_string(index=False))
-    print("STAGE13AN SCIENCE HOLD SUMMARY",json.dumps(verdict,indent=2))
+    print("STAGE13AO SCIENCE HOLD SUMMARY",json.dumps(verdict,indent=2))
     return boundary,nearest,stability,physics,edges,verdict
 def main():
     ap=argparse.ArgumentParser()
@@ -374,7 +374,7 @@ def main():
     if args.check:
         print("STAGE13AO 19HH WATER VAPOUR SOURCE QC2 EDGE DECOMPOSITION READONLY CHECK PASS; NO WRITES")
         return
-    out=ROOT/"reports"/("stage13an_Me6_19HH_QC2_boundary_QC0_anchor_source_READONLY_"+
+    out=ROOT/"reports"/("stage13ao_Me6_19HH_QC2_vapour_e_QBOT_RH_source_READONLY_"+
          datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")+"_"+uuid4().hex[:8])
     out.mkdir(parents=True,exist_ok=False)
     docs={
@@ -387,12 +387,12 @@ def main():
     summ="stage13ao_original_19HH_boundary_QC2_physics_summary.json"
     flag="NO_19HH_HUMIDITY_SOURCE_OR_QC2_BORDER_REPAIR_OR_MODEL_APPROVAL"
     (out/summ).write_text(json.dumps(summary,indent=2)+"\n")
-    (out/flag).write_text("Stage13AO vapour physics explanatory audit only. Original tower/ERA and"
-       " research shadow, model or scientific acceptance modification.\n")
+    (out/flag).write_text("Stage13AO vapour physics explanatory audit only. NO original tower/ERA,"
+       " prior research shadow, model forcing or scientific acceptance changes.\n")
     receipt={"version":VER,"site":"US-Me6","original_science_method_approved":False,
       "source_or_forcing_written":False,
       "outputs_SHA256":{name:digest(out/name) for name in [*docs,summ,flag]}}
-    (out/"stage13an_source_science_READONLY_sha_receipt.json").write_text(
+    (out/"stage13ao_source_science_READONLY_sha_receipt.json").write_text(
       json.dumps(receipt,indent=2)+"\n")
     print("STAGE13AO READONLY SCIENCE REPORT DIR:",out)
     print("STAGE13AO 19HH QC2 VAPOUR PRESSURE AND QBOT EDGE DECOMPOSITION COMPLETE | NO REPAIR/DATM/SLURM")
