@@ -15,7 +15,7 @@ from uuid import uuid4
 import numpy as np
 import pandas as pd
 sys.dont_write_bytecode=True
-VER="batch03-stage13ah-v1-20261028-Me6-all46-source-and-group-review"
+VER="batch03-stage13ah-v2-20261028-Me6-all46-noleap-safe-source-context"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 HERE=Path(__file__).resolve().parent
 VALIDATE=HERE/"13_validation_Me6_six_run_repair_candidates.py"
@@ -200,10 +200,13 @@ def analyze():
         src=raw.loc[t];now=site.loc[t]
         isinside=(t in inside)
         around=[t+k*H for k in range(-4,5)]
-        need(all(a in raw.index for a in around),
-             "original ±2h source context incomplete "+str(t))
-        prev=raw.loc[t-H];nxt=raw.loc[t+H]
-        prev_sel=site.loc[t-H];next_sel=site.loc[t+H]
+        context_complete=all(a in raw.index for a in around)
+        # At 2009/2024 edges or a fixed NOLEAP February boundary,
+        # record missing neighbor provenance as NaN: never invent an
+        # original source observation and never interpolate across it.
+        prev=raw.reindex([t-H]).iloc[0];nxt=raw.reindex([t+H]).iloc[0]
+        prev_sel=site.reindex([t-H]).iloc[0]
+        next_sel=site.reindex([t+H]).iloc[0]
         zt=float(now.TA_USE);pp=float(now.PSRF)
         er_t=float(src.TA_ERA);er_v=float(src.VPD_ERA)
         rh_era=100*(1-er_v/es(er_t)) if np.isfinite([er_t,er_v]).all() else np.nan
@@ -223,8 +226,9 @@ def analyze():
           and np.isclose(nv,selection[1],atol=1e-7,rtol=0)
           and all(q_calc(vv,float(tmp.TA_USE),float(tmp.PSRF))[1]
                   for vv,tmp in ((pv,prev_sel),(nv,next_sel))))
-        window=raw.loc[[t+k*H for k in (-2,-1,0,1,2)]]
-        tw=site.loc[[t+k*H for k in (-2,-1,0,1,2)]]
+        context5=[t+k*H for k in (-2,-1,0,1,2)]
+        window=raw.reindex(context5)
+        tw=site.reindex(context5)
         t_tower=window.TA_F.to_numpy(float)
         t_qc=window.TA_F_QC.to_numpy(float)
         trust_t=(np.isfinite(t_tower).all() and np.all(t_qc==0) and
@@ -247,7 +251,8 @@ def analyze():
                    donor_ok and np.isfinite(selection).all()) else np.nan
         era_screen=bool(donor_ok and not adjacent_missing and
                         np.isfinite(era_steps) and era_steps<=4)
-        if np.isfinite(src.VPD_F_QC) and float(src.VPD_F_QC)==0:status="HOLD_PROTECT_ORIGINAL_VPD_QC0_NO_REPLACEMENT"
+        if not context_complete:status="HOLD_SOURCE_CHRONOLOGY_EDGE_NO_IMMEDIATE_CONTEXT"
+        elif np.isfinite(src.VPD_F_QC) and float(src.VPD_F_QC)==0:status="HOLD_PROTECT_ORIGINAL_VPD_QC0_NO_REPLACEMENT"
         elif adjacent_missing:status="HOLD_MULTI_OR_NEIGHBOR_MISSING_SOURCE"
         elif isolated:status="REVIEW_ISOLATED_LINEAR_ONLY_NO_APPROVAL"
         elif era_screen:status="REVIEW_COMPANION_ERA_RH_ONLY_NO_APPROVAL"
@@ -257,6 +262,7 @@ def analyze():
         events.append({
           "native_time":str(t),"run_scope":runname(t),"is_one_of_17_within_five_runs":isinside,
           "missing_cluster_id":gapid,"missing_cluster_native_HH":ng,
+          "full_original_plusminus_2h_source_context":context_complete,
           "source_tower_TA_F_C":float(src.TA_F),"source_tower_TA_F_QC":float(src.TA_F_QC),
           "source_tower_VPD_F_hPa":float(src.VPD_F),
           "source_tower_VPD_F_QC":float(src.VPD_F_QC),
@@ -281,11 +287,12 @@ def analyze():
           "science_review_category":status,
           "operator_new_approval":False})
         for i,a in enumerate(around):
-            z=raw.loc[a];y=site.loc[a]
+            z=raw.reindex([a]).iloc[0];y=site.reindex([a]).iloc[0]
             neighbors.append({
               "missing_center":str(t),"run_scope":runname(t),
               "missing_cluster_id":gapid,"center_native_time":str(t),
               "neighbor_native_time":str(a),"relative_30min_steps":i-4,
+              "original_source_time_exists":a in raw.index,
               "tower_TA_F_C":float(z.TA_F),"tower_TA_F_QC":float(z.TA_F_QC),
               "tower_VPD_F_hPa":float(z.VPD_F),"tower_VPD_F_QC":float(z.VPD_F_QC),
               "paired_source_ERA_TA_C":float(z.TA_ERA),
