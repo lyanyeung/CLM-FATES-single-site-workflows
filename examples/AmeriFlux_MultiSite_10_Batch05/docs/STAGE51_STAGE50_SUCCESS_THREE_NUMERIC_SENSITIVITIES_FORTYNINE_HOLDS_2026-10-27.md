@@ -1,3 +1,27 @@
+## Stage51 execution correction — 28 October 2026
+
+The user ran the original Stage51 launcher on IRIDIS6. Download and Git SHA passed (`STAGE51 SOURCE VERIFIED`), then Python compilation failed before the self-test or science analysis:
+
+```text
+File "/home/ly3n24/ameriflux_batch05_stage51/stage51.py", line 322
+Stage50_49_offset_grid_no_feasible=ev49,253_original_neighbor_science_HOLD=held,
+SyntaxError: invalid decimal literal
+```
+
+This is a **Python syntax bug in Stage51**, not a scientific finding or failed source-data validation. The new revision uses `original_253_neighbor_science_HOLD=held` consistently in the output header and per-site dictionary; it does **not** change the original Stage50 input field `original_253_neighbor_science_HOLD`, source RH calculations, 81-point offset sensitivity, or the expected 3/49 source-event denominators. It has been reviewed for further digit-leading keyword assignments and structural delimiters; **actual corrected Python compilation and Stage51 IRIDIS6 execution are still pending**.
+
+Updated immutable Python source: commit `5778c165f100fe0d11b684c3d8cc5e1685ace479`, Git blob `734d94e6b3d29232aa606d16c9d09c4cf40eb05c`. Corrected launcher: commit `a3c80fbb35e53181c7fc25b1de24b00b8946d4e7`, Git blob `36f6a09485dc6169cdec84162244c9484f929734`.
+
+Run this *one-line mobile-safe* replacement without editing the original Stage50 outputs:
+
+```bash
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/a3c80fbb35e53181c7fc25b1de24b00b8946d4e7/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage51/run_stage51_iridis6.sh" -o "$HOME/run_stage51.sh" && test "$(git hash-object "$HOME/run_stage51.sh")" = "36f6a09485dc6169cdec84162244c9484f929734" && bash "$HOME/run_stage51.sh"
+```
+
+If successful, return `STAGE51 SUCCESS`, `STAGE51 THREE_EVENTS`, `STAGE51 49_NEAREST_FAILURES`. Science approval and original production forcing edits remain zero.
+
+---
+
 # Stage51 | AmeriFlux Batch05, verified Stage50 science screening and remaining work
 
 ## Actual IRIDIS6 Stage50 result (27 October 2026)
@@ -17,9 +41,9 @@ The remaining Assistant Track A population is **375 original events**: 70 previo
 
 ## Next exact source-science check, Stage51
 
-[Source-only Stage51 candidate verification and failed-constraint triage](../scripts/stage51/51_trackA_three_numeric_hypotheses_and_49_failed_offset_mechanisms_readonly.py). Fixed original GitHub commit `36da8349e3ba95ab4729a2b6b9eab04b8c63abc1`, blob SHA `fd7a1a25501f893bf35e219e33d9702bd0c944e7`.
+[Source-only Stage51 candidate verification and failed-constraint triage](../scripts/stage51/51_trackA_three_numeric_hypotheses_and_49_failed_offset_mechanisms_readonly.py). Fixed original GitHub commit `5778c165f100fe0d11b684c3d8cc5e1685ace479`, blob SHA `734d94e6b3d29232aa606d16c9d09c4cf40eb05c`.
 
-[IRIDIS6 one-click launcher](../scripts/stage51/run_stage51_iridis6.sh). Fixed commit `0fe30e5a15ca87c0477fc2acb117fdef8e8f2d52`, blob SHA `241e8a09a7a0c19735aa7bbcf36533598264b58d`.
+[IRIDIS6 one-click launcher](../scripts/stage51/run_stage51_iridis6.sh). Fixed commit `a3c80fbb35e53181c7fc25b1de24b00b8946d4e7`, blob SHA `36f6a09485dc6169cdec84162244c9484f929734`.
 
 1. Read **actual original** Stage50/49/45/44/27 SHA provenance and full source-native event half-hours. Recompute all Stage50 81 constant RH-offset hypotheses on each of 52 held original source-ERA event methods. Preserve original non-QC0 site T/VPD, native source timestamps, and source ERA RH from the recorded Stage27/44 values.
 2. Verify exactly the **3 numerical hypotheses** reported by Stage50 against their source-native hypothesis rows, no new internal and external >2 / >4 hPa threshold crossings, no >10 hPa VPD modifications, true original signed-neighbor source VPD and QC, and no original edge worsened >0.5 hPa. Each is explicitly marked `NUMERIC_ONLY_MUST_VALIDATE_ORIGINAL_STATION_METEO`, not scientifically approved.
@@ -38,7 +62,7 @@ Expected source-local new outputs:
 ### Mobile-compatible immutable source command
 
 ```bash
-curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/0fe30e5a15ca87c0477fc2acb117fdef8e8f2d52/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage51/run_stage51_iridis6.sh" -o "$HOME/run_stage51.sh" && test "$(git hash-object "$HOME/run_stage51.sh")" = "241e8a09a7a0c19735aa7bbcf36533598264b58d" && bash "$HOME/run_stage51.sh"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/a3c80fbb35e53181c7fc25b1de24b00b8946d4e7/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage51/run_stage51_iridis6.sh" -o "$HOME/run_stage51.sh" && test "$(git hash-object "$HOME/run_stage51.sh")" = "36f6a09485dc6169cdec84162244c9484f929734" && bash "$HOME/run_stage51.sh"
 ```
 
 **Status: script/launcher/docs committed and their immutable GitHub SHA verified; Stage51 has not yet been executed on the user's IRIDIS6.**
