@@ -210,10 +210,10 @@ def analyze():
         raw_era_v=es(zt)*(1-rh_era/100) if np.isfinite(rh_era) else np.nan
         era_q,era_phys=q_calc(raw_era_v,zt,pp) if np.isfinite(raw_era_v) else (np.nan,False)
         original_t_ok=(np.isfinite([zt,float(src.TA_F)]).all() and
-                       int(src.TA_F_QC)==0 and abs(zt-float(src.TA_F))<1e-7)
+                       np.isfinite(src.TA_F_QC) and float(src.TA_F_QC)==0 and abs(zt-float(src.TA_F))<1e-7)
         donor_ok=(np.isfinite([er_t,er_v,rh_era]).all() and
                   0<rh_era<100 and abs(zt-er_t)<=8 and original_t_ok
-                  and era_phys and int(src.VPD_F_QC)!=0)
+                  and era_phys and (np.isfinite(src.VPD_F_QC) and float(src.VPD_F_QC)!=0))
         pv=float(prev.VPD_F);nv=float(nxt.VPD_F)
         qcs=[float(prev.VPD_F_QC),float(src.VPD_F_QC),float(nxt.VPD_F_QC)]
         selection=[float(prev_sel.VPD_USE),float(next_sel.VPD_USE)]
@@ -242,12 +242,12 @@ def analyze():
              np.isfinite(interp) and np.isfinite(outer).all()) else np.nan
         isolated=(not adjacent_missing and good_neighbors and trust_t and pattern and
                   iphys and np.isfinite(local_steps) and local_steps<=4 and
-                  int(src.VPD_F_QC) in (1,2))
+                  (np.isfinite(src.VPD_F_QC) and float(src.VPD_F_QC) in (1,2)))
         era_steps=max(abs(raw_era_v-selection[0]),abs(raw_era_v-selection[1])) if (
                    donor_ok and np.isfinite(selection).all()) else np.nan
         era_screen=bool(donor_ok and not adjacent_missing and
                         np.isfinite(era_steps) and era_steps<=4)
-        if int(src.VPD_F_QC)==0:status="HOLD_PROTECT_ORIGINAL_VPD_QC0_NO_REPLACEMENT"
+        if np.isfinite(src.VPD_F_QC) and float(src.VPD_F_QC)==0:status="HOLD_PROTECT_ORIGINAL_VPD_QC0_NO_REPLACEMENT"
         elif adjacent_missing:status="HOLD_MULTI_OR_NEIGHBOR_MISSING_SOURCE"
         elif isolated:status="REVIEW_ISOLATED_LINEAR_ONLY_NO_APPROVAL"
         elif era_screen:status="REVIEW_COMPANION_ERA_RH_ONLY_NO_APPROVAL"
