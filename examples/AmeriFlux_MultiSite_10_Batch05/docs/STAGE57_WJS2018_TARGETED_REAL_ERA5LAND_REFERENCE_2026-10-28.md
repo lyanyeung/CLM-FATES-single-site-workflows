@@ -20,3 +20,24 @@ GitHub:
 - [Stage57 launcher](../scripts/stage57/run_stage57_iridis6.sh) at commit `120e8c829d87a21431a5db33fba2f7e7d7eefdc5`; launcher hash is verified by fetching its GitHub file.
 
 Expected outputs: `stage57_34_NATIVE_HH_TOWER_VS_REAL_ERA5L_30HH_HOLD.csv`, `STAGE57_WJS_2018_REAL_ERA5LAND_TOWER_COMPARISON.md`, and `stage57_manifest.json` alongside original CDS payload. Operator execution is required; no actual March 2018 ERA5-Land values are asserted by this document.
+
+## Stage57 operator compile/self-test PASS then parser-hash failure (28 October 2026)
+
+Actual operator log:
+```
+STAGE57 TWO SOURCE SCRIPTS SHA VERIFIED
+STAGE57 SELF-TEST PASS | 30 exact held HH and four original neighbor HH, -7h provisional UTC, no forcing writes
+ValueError: Stage31 original NetCDF interpreter SHA drift
+```
+
+**Root cause: code-only integrity comparison mismatch.** The Stage57 launcher successfully verified `git hash-object` of the exact Stage31 parser against `a28bde14dadcaf87abaaa2d52f2eaa785e16c89f` (Git blob SHA-1). The Stage57 Python then erroneously compared `hashlib.sha256(file)` (raw-file SHA256) against that 40-character SHA-1. This was guaranteed to fail regardless of file correctness. It happened **before any CDS download and before the new output directory was created**. It was not a data-quality failure.
+
+Fixed Stage57 source: commit `75c558020ec650f1eeeeca8ba72c156c5eb8c2f3`, Git blob `1f1d747277109853448d33f21127de985f268a23`. It now computes actual Git blob SHA-1 (prefix `blob <byte-size>\0` + file bytes) against the original pinned Git blob, and independently records raw-file SHA256 in the manifest. No meteorological logic or source scientific approvals changed.
+
+Fixed Stage57 launcher: commit `cfd20d17563c01709c254ec8026361bd261b4080`, blob `fe841e658a21145daeed2c0cfc79e27cee2e1a88`. Use the corrected one-line command:
+
+```bash
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/cfd20d17563c01709c254ec8026361bd261b4080/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage57/run_stage57_iridis6.sh" -o "$HOME/run_stage57.sh" && test "$(git hash-object "$HOME/run_stage57.sh")" = "fe841e658a21145daeed2c0cfc79e27cee2e1a88" && bash "$HOME/run_stage57.sh"
+```
+
+Status of corrected version: GitHub source and pinned blob checks verified by the assistant. **IRIDIS6 actual corrected execution and real March 2018 CDS retrieval pending**. Previously approved Stage56 174-row overlay and 2018 30-HH HOLD remain unchanged.
