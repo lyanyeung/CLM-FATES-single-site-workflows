@@ -150,16 +150,22 @@ def runs(mask):
 
 
 # ----------------------------------------------------------------- frame construction
-def frame_from(flux, era):
-    """Merge original FLUXMET and release-paired ERA columns on the native clock; NOLEAP."""
+def frame_from(flux, era, first=None, last=None):
+    """FLUXMET native clock (optionally limited to the site's first..last source year) with the
+    release-paired ERA columns joined on it; the ERA file may span a longer period, but every
+    retained FLUXMET timestamp must exist in it exactly once. NOLEAP."""
     for need, d, nm in ((("TIMESTAMP_START", "TA_F", "TA_F_QC", "VPD_F", "VPD_F_QC", "PA_F"), flux, "FLUXMET"),
                         (("TIMESTAMP_START", "TA_ERA", "VPD_ERA", "PA_ERA"), era, "ERA")):
         miss = [c for c in need if c not in d]
         if miss: raise ValueError(f"{nm} columns missing: {miss}")
     if flux.TIMESTAMP_START.duplicated().any() or era.TIMESTAMP_START.duplicated().any():
         raise ValueError("duplicated native timestamps")
-    df = flux.merge(era, on="TIMESTAMP_START", how="inner", validate="one_to_one")
-    if len(df) != len(flux) or len(df) != len(era): raise ValueError("FLUXMET and ERA native clocks differ")
+    fy = pd.to_datetime(flux.TIMESTAMP_START, format="%Y%m%d%H%M", errors="raise").dt.year
+    if first is not None: flux = flux.loc[fy.between(int(first), int(last))].reset_index(drop=True)
+    df = flux.merge(era, on="TIMESTAMP_START", how="left", validate="one_to_one", indicator=True)
+    lost = int((df._merge != "both").sum())
+    if lost: raise ValueError(f"{lost} FLUXMET native timestamps have no release-paired ERA row")
+    df = df.drop(columns="_merge")
     ts = pd.to_datetime(df.TIMESTAMP_START, format="%Y%m%d%H%M", errors="raise")
     keep = ~((ts.dt.month == 2) & (ts.dt.day == 29))
     df = df.loc[keep].reset_index(drop=True); ts = ts.loc[keep].reset_index(drop=True)
@@ -398,7 +404,7 @@ def load_inputs(stage12g=STAGE12G_DEFAULT):
     flux = pd.read_csv(regular(spec["primary"]), usecols=want, dtype={"TIMESTAMP_START": str}, low_memory=False)
     era = pd.read_csv(regular(spec["era"]), usecols=["TIMESTAMP_START", "TA_ERA", "VPD_ERA", "PA_ERA"],
                       dtype={"TIMESTAMP_START": str}, low_memory=False)
-    df = frame_from(flux, era)
+    df = frame_from(flux, era, spec.get("first_year"), spec.get("last_year"))
     g = pd.read_csv(regular(G / TIMELINE), low_memory=False)
     gk = pd.to_datetime(g.time, format="%Y-%m-%d %H:%M:%S", errors="raise").dt.strftime("%Y%m%d%H%M")
     if len(g) != len(df) or not np.array_equal(gk.to_numpy(), df.native_key.to_numpy()):
