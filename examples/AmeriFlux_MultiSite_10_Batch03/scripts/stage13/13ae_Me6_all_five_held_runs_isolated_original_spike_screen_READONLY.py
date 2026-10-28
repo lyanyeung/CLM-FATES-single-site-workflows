@@ -90,7 +90,12 @@ def verified():
     mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
     need(mod.VER=="batch03-stage13_validation-v1-20261027-Me6-six-run-validated-repair-candidates",
          "13-method original provenance version mismatch")
-    raw,old,runs,meta=mod.load_inputs()
+    raw,selected_subset,runs,meta=mod.load_inputs()
+    # Validation preprocessor reads only five fields; the research shadow
+    # is a full native forcing CSV. Reload complete SHA-sealed Stage13S here
+    # so every original variable/column can be differential-checked.
+    old=pd.read_csv(must(mod.S/mod.S_CSV),dtype={"time":str},low_memory=False)
+    old.index=native(old.time)
     need(meta.get("Stage13s_input_SHA256")==SSHA,
          "original certified Stage13S source SHA mismatch")
     doc=json.loads(must(AD/ADREC).read_text())
