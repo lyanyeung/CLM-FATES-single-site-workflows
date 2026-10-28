@@ -30,6 +30,7 @@ OUTPUT=("site","episode_id","native_time","source_product_type",
         "product_exact_timestamp_matched","product_humidity_column",
         "product_original_value","product_column_class",
         "possible_QC_column","original_QC_value",
+        "raw_product_match_original_T_VPD_QC",
         "stage51_original_T_C","stage51_original_VPD_hPa",
         "stage51_original_VPD_QC","stage51_source_ERA_RH_pct",
         "stage51_RH_offset_hypothesis_pct","validated_original_observed_humidity",
@@ -37,6 +38,7 @@ OUTPUT=("site","episode_id","native_time","source_product_type",
 FILES=("site","source_file","source_member","source_file_SHA256",
        "source_kind","timestamp_column","target_times_matched",
        "target_times_total","original_RH_or_humidity_fields",
+       "source_native_T_VPD_QC_matched_HH",
        "observed_candidate_field_count",
        "product_validated_station_ground_truth",
        "science_recommendation")
@@ -74,13 +76,27 @@ def write(p,cols,data):
   rd.writeheader();rd.writerows(data)
 def classify(field):
  u=field.upper()
- if u in ("RH","RH_F","RH_PI","RH_PI_F") or re.fullmatch(r"RH_[0-9]+",u):
-  return "ORIGINAL_RH_POTENTIALLY_OBS_OR_FILLED_QC_NOT_YET_VALIDATED"
  if "_ERA" in u or u.endswith("ERA"):
   return "REANALYSIS_PROCESSED_NOT_INDEPENDENT_OBS"
- if "MDS" in u or "_F_" in u or u.endswith("_F"):
-  return "FILLED_OR_DERIVED_NOT_NATIVE_UNFILLED_OBS"
+ if "MDS" in u or u in ("RH_F","RH_PI_F") or "_F_" in u or u.endswith("_F"):
+  return "FILLED_OR_DERIVED_NOT_DIRECT_TOWER_OBSERVATION"
+ if u=="RH" or u=="RH_PI" or re.fullmatch(r"RH_[0-9]+",u):
+  return "POSSIBLE_UNFILLED_RH_REQUIRES_ORIGINAL_FIELD_METADATA_AND_QC"
  return "ORIGINAL_OTHER_MET_OR_QC_CONTEXT_NO_VERIFIED_RH"
+def n(v):
+ try:
+  x=float(v)
+  if x==x and abs(x)<1e10 and x not in (-9999,-6999):return x
+ except (ValueError,TypeError):pass
+ return None
+def source_match(row,info):
+ need=("TA_F","VPD_F","VPD_F_QC")
+ if any(k not in row for k in need):return "INSUFFICIENT_FIELD_PROVENANCE"
+ a,b,c=n(row["TA_F"]),n(row["VPD_F"]),row["VPD_F_QC"]
+ T,V=n(info["original_T_C"]),n(info["original_VPD_hPa"])
+ if None in (a,b,T,V):return "NONNUMERIC_OR_MISSING_SOURCE_FIELDS"
+ return ("EXACT_ORIGINAL_T_VPD_QC_MATCH" if abs(a-T)<=.002 and abs(b-V)<=.002
+         and c==info["original_VPD_QC"] else "CONFLICTS_WITH_VERIFIED_ORIGINAL_STAGE51")
 def wanted_fields(names):
  found=[]
  for field in names:
@@ -117,6 +133,7 @@ def read_product(fh,need,site,filename,sha256,member,kind,expected_rows):
    source_file_SHA256=sha256,source_kind=kind,timestamp_column="MISSING",
    target_times_matched=0,target_times_total=len(need),
    original_RH_or_humidity_fields="",observed_candidate_field_count=0,
+   source_native_T_VPD_QC_matched_HH=0,
    product_validated_station_ground_truth=False,
    science_recommendation="NO_SOURCE_TIMESTAMP_OR_DUPLICATE_COLUMNS")
  found=wanted_fields(cols);rows={};seen=0
@@ -138,6 +155,7 @@ def read_product(fh,need,site,filename,sha256,member,kind,expected_rows):
     product_exact_timestamp_matched=False,product_humidity_column="",
     product_original_value="",product_column_class="NO_EXACT_NATIVE_TIMESTAMP",
     possible_QC_column="",original_QC_value="",
+    raw_product_match_original_T_VPD_QC="NO_TIMESTAMP_MATCH",
     stage51_original_T_C=info["original_T_C"],
     stage51_original_VPD_hPa=info["original_VPD_hPa"],
     stage51_original_VPD_QC=info["original_VPD_QC"],
@@ -157,6 +175,7 @@ def read_product(fh,need,site,filename,sha256,member,kind,expected_rows):
     product_original_value=values.get(field,""),
     product_column_class=classify(field),
     possible_QC_column=qc or "",original_QC_value=values.get(qc,"") if qc else "",
+    raw_product_match_original_T_VPD_QC=source_match(values,info),
     stage51_original_T_C=info["original_T_C"],
     stage51_original_VPD_hPa=info["original_VPD_hPa"],
     stage51_original_VPD_QC=info["original_VPD_QC"],
@@ -168,7 +187,8 @@ def read_product(fh,need,site,filename,sha256,member,kind,expected_rows):
   source_file_SHA256=sha256,source_kind=kind,timestamp_column=tcol,
   target_times_matched=seen,target_times_total=len(need),
   original_RH_or_humidity_fields=";".join(found),
-  observed_candidate_field_count=sum(classify(c).startswith("ORIGINAL_RH_POTENTIALLY") for c in found),
+  source_native_T_VPD_QC_matched_HH=sum(source_match(rows[t],expected_rows[t])=="EXACT_ORIGINAL_T_VPD_QC_MATCH" for t in rows),
+  observed_candidate_field_count=sum(classify(c).startswith("POSSIBLE_UNFILLED_RH") for c in found),
   product_validated_station_ground_truth=False,
   science_recommendation="CHECK_SOURCE_FIELD_METADATA_AND_RH_QC_BEFORE_SCIENCE_APPROVAL")
  return row_out,file_out
@@ -194,12 +214,13 @@ def inspect_source(p,site,need,reference):
     source_file_SHA256=digest,source_kind="ORIGINAL_ZIP_UNREADABLE",
     timestamp_column="",target_times_matched=0,target_times_total=len(need),
     original_RH_or_humidity_fields="",observed_candidate_field_count=0,
+    source_native_T_VPD_QC_matched_HH=0,
     product_validated_station_ground_truth=False,science_recommendation=str(e)[:200])]
  return result,files
 def selftest():
- assert classify("RH")=="ORIGINAL_RH_POTENTIALLY_OBS_OR_FILLED_QC_NOT_YET_VALIDATED"
+ assert classify("RH")=="POSSIBLE_UNFILLED_RH_REQUIRES_ORIGINAL_FIELD_METADATA_AND_QC"
  assert classify("RH_ERA")=="REANALYSIS_PROCESSED_NOT_INDEPENDENT_OBS"
- assert classify("RH_F")=="ORIGINAL_RH_POTENTIALLY_OBS_OR_FILLED_QC_NOT_YET_VALIDATED"
+ assert classify("RH_F")=="FILLED_OR_DERIVED_NOT_DIRECT_TOWER_OBSERVATION"
  assert sum(EXPECTED.values())==8 and len(TARGETS)==2
  print("STAGE52 SELF-TEST PASS | exact original 3 events/8 native HH, raw FULLSET/FLUXMET field inventory, zero source/model writes")
 def main():
@@ -295,7 +316,7 @@ def main():
  lines=["# Stage52: Batch05 original raw humidity provenance for three mathematically feasible RH offsets",
   "","All science/HOLD statuses unchanged. **No station humidity has been approved**.",
   "The three Stage51 mathematical hypotheses span 8 original half-hours, not 8 validated repairs.",
-  "Original FULLSET/FLUXMET raw fields have ambiguous provenance until their field metadata and matching QC are reviewed.",
+  "Original FULLSET/FLUXMET raw fields require exact original tower T/VPD/QC provenance matches, field definitions and humidity QC before scientific use.",
   "ERA/MDS/filled RH and ERA5-Land are not independent original tower humidity evidence.","",
   "## Source product exact-native matches"]
  for x in three_report:
