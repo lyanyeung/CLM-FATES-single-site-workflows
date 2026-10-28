@@ -61,7 +61,7 @@ def keys(s):
     return k
 def selftest():
     predict=(VALS[1]+VALS[3])/2.
-    need(len(TIMES)==5 and predict==29.0665
+    need(len(TIMES)==5 and np.isclose(predict,29.0665,rtol=0,atol=1e-10)
          and abs(predict-VALS[2])>6.0
          and np.max(abs(np.diff([VALS[0],VALS[1],predict,VALS[3],VALS[4]])))<=2.0,
          "synthetic isolation source 5-node VPD pattern")
