@@ -6,13 +6,13 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate clm_fates_env
 BASE="$HOME/ameriflux_batch03_stage13ao"
 mkdir -p "$BASE"
-PIN="50f86a341c87583d402e0da173a868f93f2b9a6d"
+PIN="4c431adfae917f4d3f2ae3fb0115462d693836bd"
 RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$PIN/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage13"
 while read -r HASH NAME; do
   curl -fLsS --retry 3 "$RAW/$NAME" -o "$BASE/$NAME"
   test "$(git hash-object "$BASE/$NAME")" = "$HASH"
 done <<'TEN_EXACT_SOURCE_PINS'
-897f37b91c76b0200df2e120656b924700fea500 13ao_Me6_19HH_QC2_temperature_vapour_e_QBOT_edge_decomposition_READONLY.py
+4fc20599bd7a0b2fd17c488f87d45b19c947f868 13ao_Me6_19HH_QC2_temperature_vapour_e_QBOT_edge_decomposition_READONLY.py
 ade4f4fce3dc9e1e64a09b0e32baf80240a60481 13an_Me6_19HH_2015_QC2_edges_nearest_QC0_bias_stability_READONLY.py
 df561eb8904b0147fc4a5aa0f977a5ec66545477 13am_Me6_19HH_joint_QC0_bias_corrected_ERA_RH_event_PREVIEW_READONLY.py
 440e02cd7fd54d2a3fc9661a977d55125c513dde 13al_Me6_19HH_joint_cold_and_ERA_Tbias_QC0_leave_year_out_READONLY.py
