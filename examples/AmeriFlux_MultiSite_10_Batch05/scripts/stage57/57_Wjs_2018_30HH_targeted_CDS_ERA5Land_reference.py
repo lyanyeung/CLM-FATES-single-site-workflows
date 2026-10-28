@@ -110,7 +110,7 @@ def check_sources(d52,d53,d56):
  if stage56p.get(SITE)!=filehash:raise ValueError("Stage56 original Wjs source SHA does not match Stage53")
  clock=clocks.pop()
  # Original Wjs source is a FLUXMET CSV verified in Stage53; refuse unexpected source.
- if p.suffix.lower()!=".csv" or member!=p.name:
+ if p.suffix.lower()!=".csv" or member not in ("",p.name) or "FLUXMET_HH" not in p.name:
   raise ValueError("US-Wjs source product no longer the verified source FLUXMET CSV")
  wanted=set(sequence(BEFORE,AFTER))
  values={}
