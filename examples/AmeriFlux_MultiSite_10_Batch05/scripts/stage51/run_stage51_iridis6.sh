@@ -2,13 +2,13 @@
 set -euo pipefail
 BASE="$HOME/ameriflux_batch05_stage51"
 mkdir -p "$BASE"
-PY_COMMIT="36da8349e3ba95ab4729a2b6b9eab04b8c63abc1"
-PY_BLOB="fd7a1a25501f893bf35e219e33d9702bd0c944e7"
+PY_COMMIT="5778c165f100fe0d11b684c3d8cc5e1685ace479"
+PY_BLOB="734d94e6b3d29232aa606d16c9d09c4cf40eb05c"
 REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage51/51_trackA_three_numeric_hypotheses_and_49_failed_offset_mechanisms_readonly.py"
 PY="$BASE/stage51.py"
 curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$PY_COMMIT/$REL" -o "$PY"
 test "$(git hash-object "$PY")" = "$PY_BLOB"
-echo "STAGE51 SOURCE VERIFIED"
+echo "STAGE51 PATCHED SOURCE VERIFIED | invalid numeric-prefixed output keyword fixed"
 python3 -B -m py_compile "$PY"
 python3 -B "$PY" --self-test
 
