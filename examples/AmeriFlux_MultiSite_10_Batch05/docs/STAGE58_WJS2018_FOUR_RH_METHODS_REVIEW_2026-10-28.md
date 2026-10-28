@@ -23,3 +23,26 @@ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-sing
 ```
 
 Status: GitHub source/launcher committed, pins checked; Stage58 still requires operator runtime validation. The script requires no CDS download and no Slurm submission, and cannot touch original sources, prior 174, or production DATM.
+
+## First operator attempt and syntax-only patch (2026-10-28)
+
+Operator verified the launcher/source SHA; `python3 -B -m py_compile` stopped **before data reading or any output directory write**:
+
+```text
+STAGE58 SOURCE VERIFIED
+File ".../stage58.py", line 206
+  2018_original_HOLD_HH=30,scientific_approvals_new=0,
+      ^
+SyntaxError: invalid decimal literal
+```
+
+Python keyword argument names cannot begin with a number. Replaced ONLY this invalid manifest-key identifier with `Wjs_2018_original_HOLD_HH=30`. This is metadata naming only; the four candidate method formulas, 30 source HOLDs and original 174 overlay are unchanged.
+
+- Corrected Stage58 Python source commit `36b69555042813317de01d6dd57c71f44eff6795`, Git blob SHA `eaee8cffe61a53b59b5fd0223fad1bf9e89d693d`.
+- Corrected launcher commit `02abb45713b3cbd0f5c2258640bd8da9d82611b5`, Git blob SHA `fa670f6b3d2d318f14440036704f0aa45633560b`.
+
+```bash
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/02abb45713b3cbd0f5c2258640bd8da9d82611b5/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage58/run_stage58_iridis6.sh" -o "$HOME/run_stage58.sh" && test "$(git hash-object "$HOME/run_stage58.sh")" = "fa670f6b3d2d318f14440036704f0aa45633560b" && bash "$HOME/run_stage58.sh"
+```
+
+Corrected source/launcher SHA verified through GitHub. An actual IRIDIS6 compilation and execution of the corrected version is required to establish success; the first attempt was syntax-only failure.
