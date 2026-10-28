@@ -63,6 +63,13 @@ def sha(p):
  with p.open("rb") as f:
   for b in iter(lambda:f.read(1<<20),b""):h.update(b)
  return h.hexdigest()
+def git_blob_sha1(p):
+ """Compute Git blob SHA-1 (the same as git hash-object), not file SHA256."""
+ h=hashlib.sha1()
+ h.update(b"blob "+str(p.stat().st_size).encode("ascii")+b"\0")
+ with p.open("rb") as f:
+  for chunk in iter(lambda:f.read(1<<20),b""): h.update(chunk)
+ return h.hexdigest()
 def read(p):
  if p.is_symlink() or not p.is_file():raise ValueError("source file missing "+str(p))
  with p.open(newline="",encoding="utf-8-sig") as f:
@@ -171,9 +178,10 @@ def main():
   p.error("refuse to place download in original folder")
  if not source_parser.is_file() or source_parser.is_symlink():
   raise ValueError("trusted Stage31 parser unavailable")
+ parser_blob=git_blob_sha1(source_parser)
+ if parser_blob!="a28bde14dadcaf87abaaa2d52f2eaa785e16c89f":
+  raise ValueError("Stage31 original NetCDF interpreter Git blob SHA1 drift")
  parserhash=sha(source_parser)
- if parserhash!="a28bde14dadcaf87abaaa2d52f2eaa785e16c89f":
-  raise ValueError("Stage31 original NetCDF interpreter SHA drift")
  source,sources=check_sources(d52,d53,d56)
  print("STAGE57 SOURCE PASS | Stage56 original 174 approved rows SHA checked, US-Wjs 2018 30-HH HOLD unchanged",flush=True)
  print("STAGE57 CDS REQUEST",json.dumps(CDS_REQ,sort_keys=True),flush=True)
@@ -253,6 +261,7 @@ def main():
    payload_SHA256=sha(payload),payload_bytes=payload.stat().st_size,
    decoded_container_type=container,decoded_members=metadata,grid_coordinates=coords,
    original_source_SHA256=sources,stage31_parser_SHA256=parserhash,
+   stage31_parser_git_blob_SHA1=parser_blob,
    original_native_to_UTC_offset_hours=UTC_OFFSET,
    BIF_UTC_OFFSET_DATE_END="MISSING_PROVISIONAL_LST_NO_DST",
    actual_2018_science_HOLD_native_HH=30,adjacent_QC0_anchor_HH=2,
