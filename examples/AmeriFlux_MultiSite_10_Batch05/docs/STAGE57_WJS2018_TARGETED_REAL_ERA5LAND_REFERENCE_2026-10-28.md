@@ -41,3 +41,31 @@ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-sing
 ```
 
 Status of corrected version: GitHub source and pinned blob checks verified by the assistant. **IRIDIS6 actual corrected execution and real March 2018 CDS retrieval pending**. Previously approved Stage56 174-row overlay and 2018 30-HH HOLD remain unchanged.
+
+## Confirmed actual IRIDIS6 Stage57 execution (2026-10-28 19:51 UTC)
+
+```
+STAGE57 TWO SOURCE SCRIPTS SHA VERIFIED
+STAGE57 SELF-TEST PASS
+STAGE57 SOURCE PASS | Stage56 original 174 approved rows SHA checked, US-Wjs 2018 30-HH HOLD unchanged
+CDS request 43503174-f95c-4c30-b634-9a2833950c4c: successful
+STAGE57 SUCCESS | 34 original HH, 30 Wjs-2018 HOLD, 2 QC0 anchors; 1 actual CDS ERA5-Land download
+```
+
+Actual result:
+`/home/ly3n24/ameriflux_batch05_stage57/wjs2018_actual_ERA5Land_20261028T195055Z_4119241`.
+
+| Native source timestamp | Original tower VPD hPa | Tower RH % | source ERA RH (derived) % | independent-downloaded ERA5-Land RH % | ERA5-Land RH to tower temperature VPD hPa |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 2018-03-11 19:00 (QC0) | 0 | 100 | 73.528964 | 66.762685 | 2.02307736 |
+| 2018-03-11 19:30 (QC1) | 5.398 | missing | 76.288720 | 68.078134 | 1.89501702 |
+| 2018-03-12 06:00 (QC1) | 5.322 | missing | 86.577430 | 79.748184 | 1.21339554 |
+| 2018-03-12 09:00 (QC1) | 7.709 | missing | 79.887949 | 67.135164 | 2.08517419 |
+| 2018-03-12 10:00 (QC1) | 8.069 | missing | 75.890788 | 61.273691 | 3.01646413 |
+| 2018-03-12 10:30 (QC0) | 0.672 | 92.127 | 72.618856 | 58.221250 | 3.56227871 |
+
+At the two verified tower RH QC0 anchors, ERA5-Land grid RH is **33.237315 and 33.905750 percentage points lower** than original source tower RH, respectively; source processed ERA RH is also much lower. Direct ERA5-Land RH at original tower TA yields VPD 2.023 hPa at the left anchor versus original measured 0 hPa, and 3.562 hPa at the right anchor versus original measured 0.672 hPa. These are substantive boundary and tower/grid-representativeness disagreements; blindly assigning grid RH to original tower T is NOT science-approved.
+
+Only the grid ERA5-Land data are freshly downloaded; the AmeriFlux products' `TA_ERA` and `VPD_ERA` remain processed reanalysis companion data. Gridded observations are not independent in-situ tower humidity measurements.
+
+**Stage57 user-verified PASS; 30-HH 2018 science HOLD unchanged.** Next Stage58 is a reproducible side-by-side *read-only comparison*, not an automated approval.
