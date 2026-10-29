@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 US-MOz Stage14G ACTUAL PASS:** [One QC1→QC1 native 19:30 T/e interpolation succeeded; the 5.885°C boundary was split into two 2.886°C edges; actual 27 ERA5-Land research trial and 40 operator-approved source repairs preserved; full 315360 water/VPD/QBOT model numerics PASS](docs/US_MOZ_STAGE14G_ACTUAL_SUCCESS_JAN09_LAST_ONEPASS_20261029.md). Source-science remains unapproved: the remaining Jan09 original QC1 source-negative T/ERA divergence can be **classified once** through [Stage14H final original raw QC0/QC1/QC2 one-pass read-only script](scripts/stage14/14h_US_MOz_Jan09_original_QC_onepass_final_triage_READONLY.py). No Post-v5, DATM, AD400 or Slurm permission.
+
+
 > **2026-10-29 US-NC2 actual Stage14E PASS; now US-MOz next:** [US-NC2 confirmed 367920 fully finite signed Stage11Q source, all four March2025 suspect VPD jumps below 4hPa; 11 RHwater<5% and 1003 ice RH>100% warnings retained, no Post-v5](docs/US_NC2_STAGE14E_ACTUAL_367920_ONEPASS_MANUAL_DECISION_20261029.md). Next [US-MOz first 27 original Jan2005 QC1 region isolated reanalysis numerical sensitivity, preserve existing 40 operator-approved Stage13L slots](docs/US_MOZ_NEXT_FIRST27_QC1_ONEPASS_EXPLORATORY_20261029.md) via [signed-data one-pass script](scripts/stage14/14f_US_MOz_27QC1_onepass_isolated_ERA5Land_sensitivity.py). This new method is research-only, unapproved as measured tower source; no automatic CIME/DATM/AD400 or Slurm.
 
 
