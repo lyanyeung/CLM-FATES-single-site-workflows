@@ -35,7 +35,7 @@ The complete US-MtB research shadow timeline has been built under each decision 
 | 3 | Humidity validated against tower QC0 | Done in MtB01–03: all years, by temperature-difference regime, season, 3-hour block, temperature bin and VPD bin, plus runs of errors above 2 hPa. |
 | 4 | Terrain-aware humidity alternatives | Done: COMPANION_E, two block-excluded empirical methods, and 24/16 m level transfer. |
 | 5 | Four frozen-phase events against installed code | Done. CDEPS `datm_eSat` caps specific humidity at ice saturation, so GRID_RH would be capped. These points now take COMPANION_E, which is not supersaturated. |
-| 6 | ± 2 h context tables | These are printed by MtB01/MtB02 `--check`. Running their `--run` saves them as SHA-sealed reports. |
+| 6 | ± 2 h context tables | Done, saved as SHA-sealed reports: `reports/mtb01_US-MtB_regime_matched_QC0_humidity_20261029T034346Z_fefd1c18/E_context_pm2h.csv` (frozen-phase events and cold episodes) and `reports/mtb02_US-MtB_T_fault_bridge_regime_humidity_20261029T034408Z_b77a2dc7/X_context_pm2h.csv` (fault and review runs). |
 | 7 | Decision package | [MTB02 package](MTB02_RESULTS_AND_DECISION_PACKAGE_20261028.md), [BASE evidence and decisions](MTB_BASE_5-5_MULTILEVEL_EVIDENCE_20261029.md). Each decision was the user's. |
 
 ## Additional findings outside the original brief
@@ -45,3 +45,48 @@ The complete US-MtB research shadow timeline has been built under each decision 
 - The 2011-02-02/03 reading of −24 °C matches the documented Southwest cold outbreak; Tucson recorded a low of 18 °F. It was kept.
 
 Scripts: `scripts/mtb/MtB01`–`MtB04`, each pinned to the one before.
+
+## Read-only verification for the Batch03 workstream (Codex/ChatGPT)
+
+The following read-only check (no writes) runs on IRIDIS6. It verifies:
+- the SHA receipt of all four MtB folders;
+- the shadow's shape, columns and NaN count;
+- unchanged rows against Stage12g;
+- the change counts.
+
+```bash
+python3 - <<'PY'
+import json, hashlib, pandas as pd, numpy as np
+from pathlib import Path
+R=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
+F={"mtb01":R/"reports/mtb01_US-MtB_regime_matched_QC0_humidity_20261029T034346Z_fefd1c18/mtb01_receipt.json",
+   "mtb02":R/"reports/mtb02_US-MtB_T_fault_bridge_regime_humidity_20261029T034408Z_b77a2dc7/mtb02_receipt.json",
+   "mtb03":R/"reports/mtb03_US-MtB_multilevel_fill_candidates_20261029T031536Z_50d84498/mtb03_receipt.json",
+   "mtb04":R/"science_trials/mtb04_US-MtB_research_shadow_20261029T034057Z_ed54796b/mtb04_research_shadow_receipt.json"}
+sha=lambda p: hashlib.sha256(Path(p).read_bytes()).hexdigest()
+for k,f in F.items():
+    rec=json.loads(f.read_text()); bad=[n for n,d in rec["output_sha256"].items() if sha(f.parent/n)!=d]
+    print(k,"receipt",rec["version"],"| files",len(rec["output_sha256"]),"| SHA mismatches",bad or "NONE")
+S=F["mtb04"].parent; s=pd.read_csv(S/"US-MtB_MTB04_RESEARCH_SHADOW_NOLEAP.csv")
+g=pd.read_csv(R/"science_trials/stage12g_six_site_new_year_gridRH_science_20261025T083234Z_e168f29f/US-MtB_STAGE12G_INCOMPLETE_NOLEAP.csv")
+print("rows",len(s),"| columns equal Stage12g",list(s)==list(g),"| NaN",int(s.drop(columns="time").isna().sum().sum()))
+prov=pd.read_csv(S/"MTB04_change_provenance.csv",dtype={"native_key":str})
+key=pd.to_datetime(g.time).dt.strftime("%Y%m%d%H%M"); ch=key.isin(set(prov.native_key))
+same=all(((g[c]==s[c])|(g[c].isna()&s[c].isna()))[~ch].all() for c in g.columns)
+print("changed rows",int(ch.sum()),"| unchanged rows identical to Stage12g",same)
+print(pd.read_csv(S/"MTB04_change_counts.csv").to_string(index=False))
+q=0.622*(s.TA_USE.pipe(lambda t:6.112*np.exp(17.67*t/(t+243.5)))-s.VPD_USE)*100; q=q/(s.PSRF-0.378*q)
+print("QBOT closure max rel err",float(np.nanmax(np.abs(q/s.QBOT-1))),"| TBOT-TA_USE-273.15 max",float(np.nanmax(np.abs(s.TBOT-s.TA_USE-273.15))))
+PY
+```
+
+Expected output:
+- SHA mismatches: NONE for all four folders;
+- rows: 280320, with columns equal to Stage12g;
+- NaN: 0;
+- unchanged rows identical to Stage12g: True;
+- the change counts in the table above;
+- QBOT closure error near 1e-15;
+- TBOT offset near 1e-13.
+
+The decision still open for the user: whether to admit this shadow to Post-v5, build the DATM forcing and enter the Batch03 AD400. Until then the `INCOMPLETE_DO_NOT_USE_FOR_DATM_OR_SPINUP` marker stays in place.
