@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage91_T"
+mkdir -p "$BASE"
+SCRIPT="$BASE/stage91_seven_T.py"
+COMMIT="72774bf81d2160e177aa5c463cdf300eaf4ec895"
+BLOB="7606d740f80b79d68add0f37795cd6b67e63f564"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage91/91_batch05_seven_T_source_exceptions_QC0_anchor_sensitivity_READONLY.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "$BLOB"
+echo "STAGE91 GITHUB ORIGINAL AUDIT SOURCE SHA VERIFIED"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+D84="$HOME/ameriflux_batch05_stage84_Vcp/Vcp_direct582_20261029T062857Z_2211876"
+D89="$HOME/ameriflux_batch05_stage89_Whs/Whs_51_T_plus_four_VPD_20261029T070333Z_2322432"
+D90="$HOME/ameriflux_batch05_stage90/ten_site_remaining_risks_20261029T070834Z_2339016"
+OUT="$BASE/seven_T_original_QC0_source_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SCRIPT" --stage84 "$D84" --stage89 "$D89" --stage90 "$D90" --out "$OUT" 2>&1 | tee "$BASE/stage91_seven_T.log"
+echo "STAGE91_REPORTS=$OUT"
+echo "STAGE91 SOURCE SENSITIVITY ONLY | ORIGINAL/QC/PRIOR1675/STAGE89/DATM/CIME/SLURM UNCHANGED"
