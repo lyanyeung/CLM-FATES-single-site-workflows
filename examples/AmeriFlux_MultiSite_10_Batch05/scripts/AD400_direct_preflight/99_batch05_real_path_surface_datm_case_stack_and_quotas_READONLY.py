@@ -34,6 +34,15 @@ EXPECTED_SITES={
  "US-UiD":2008,"US-UMB":2007,"US-UMd":2007,"US-Var":2000,
  "US-Vcm":2007,"US-Vcp":2007,"US-WCr":1999,"US-Whs":2007,
  "US-Wjs":2007,"US-Wkg":2004}
+# Stage90 rehashed only the five sites with 63 actual historical risk HH.
+# It did NOT rehash the other five (UiD/UMB/UMd/Var/Whs). Do not
+# misrepresent the narrower Stage90 science evidence as a ten-site SHA audit.
+STAGE90_RISK_SITE_SHA={
+ "US-Vcm":"c12437170ddb54630f87859bb33398994d9eb3f1c84686336e18a26d457e841c",
+ "US-Vcp":"eece5582523be1f875799751cef9d6b55a4635bfde2ebb008afba31a9a208a42",
+ "US-WCr":"f20fbb064ff68668693f8dc04eb72034d98fc4e6e25d4dfb64c7f201a30bb506",
+ "US-Wjs":"9b23ab803b719dcb55d2525e4c084c53659e9dea42164fe2382507c97f28bdd6",
+ "US-Wkg":"f0359fe0a40a413c15e79a30d1e6264e6e2d36717d7d394db40e818c4e684829"}
 REQUIRED_MET=("TBOT","QBOT","PSRF","FSDS","FLDS","WIND","PRECTmms")
 SOURCE_MET=("TA_F","TA_F_QC","VPD_F","VPD_F_QC",
  "PA_F","SW_IN_F","LW_IN_F","WS_F","P_F")
@@ -181,13 +190,27 @@ def main():
   raise ValueError("stage98 ten original Batch05 sites source cohort drift")
  f90=d90/"stage90_FINAL_HISTORICAL_RELEASE_RISK_EVIDENCE_MANIFEST.json"
  m90=json.loads(f90.read_text())
- if (m90.get("distinct_release_risk_source_HH")!=63 or
+ f90risk=d90/"stage90_UNIQUE_HISTORICAL_SCIENCE_RELEASE_RISK_SOURCE_EVIDENCE.csv"
+ if (m90.get("stage")!=90 or m90.get("site_count")!=10 or
+     m90.get("distinct_release_risk_source_HH")!=63 or
      m90.get("historical_P1_HOLD_HH")!=46 or
      m90.get("historical_RH_platform_HOLD_HH")!=10 or
      m90.get("historical_source_T_exception_HH")!=7 or
-     len(m90.get("original_source_verified_SHA256_by_site",{}))!=10):
-  raise ValueError("original Stage90 ten-site SHA-verified source science status drift")
+     m90.get("overlapping_risk_categories_source_HH")!=0 or
+     m90.get("missing_original_source_native_risk_HH")!=0 or
+     m90.get("source_risks_overlapping_main_1675")!=7 or
+     m90.get("source_risks_overlapping_separate_Stage89_51")!=0 or
+     m90.get("output_SHA256",{}).get(f90risk.name)!=sha(f90risk) or
+     m90.get("original_source_verified_SHA256_by_site")!=STAGE90_RISK_SITE_SHA):
+  raise ValueError("Stage90 exact five affected-site original source SHA or 63-risk science provenance drift")
  original_sha=m90["original_source_verified_SHA256_by_site"]
+ risks=load(f90risk,("site","native_time","source_risk_categories"))
+ if (len(risks)!=63 or len({(r["site"],r["native_time"]) for r in risks})!=63
+     or {r["site"] for r in risks}!=set(STAGE90_RISK_SITE_SHA)):
+  raise ValueError("Stage90 risk categories/source-site scope changed")
+ print("STAGE99 STAGE90 SHA VERIFIED AFFECTED_SITES",len(original_sha),
+   "UNVERIFIED_BY_STAGE90_SITES",len(EXPECTED_SITES)-len(original_sha),
+   "SOURCE_RISKS",len(risks))
  baseline={r["site"]:r for r in sites}
  references={}
  for name in TEMPLATE_NAMES:
@@ -256,7 +279,7 @@ def main():
      valid_count==1 and all(c in peek_first_line(interesting[0]) for c in SOURCE_MET)),
    source_raw_missing_source_fields=";".join(
      c for c in SOURCE_MET if valid_count==1 and c not in peek_first_line(interesting[0])),
-   raw_source_SHA_verified_prior_Stage90=original_sha[site],
+   raw_source_SHA_verified_prior_Stage90=original_sha.get(site,"NOT_HASHED_IN_STAGE90_NO_ORIGINAL_RISK"),
    possible_DATM_NC_paths_unverified=";".join(datm_candidates[:15]),
    possible_surface_NC_paths_unverified=";".join(surfaces[:15]),
    possible_Batch05_CIME_cases_unverified=";".join(case_list),
@@ -278,6 +301,8 @@ def main():
   ancillary_inputs=assets,
   scratch_and_RFS_filesystem_observation=qdata,
   site_original_sha_verified_Stage90=original_sha,
+  Stage90_SHA_reverified_site_count=5,
+  Stage90_without_original_risk_not_SHA_reverified_sites=sorted(set(EXPECTED_SITES)-set(original_sha)),
   stage98_operator_report_SHA256=sha(f98),
   stage90_source_manifest_SHA256=sha(f90),
   requirement_notes=list(PATH_HINTS),
@@ -301,7 +326,7 @@ def main():
  checklist.write_text("BATCH05 DIRECT AD400: do not run independent AD5 smoke\n\n"+
   "\n".join(f"{i}. {x}" for i,x in enumerate(PATH_HINTS,1))+
   "\n\nSubmission gate remains BLOCKED until science + DATM + site PFT + CIME all PASS.\n")
- print("STAGE99 SUCCESS | actual 10-site source paths, stack/Slurm and historical model template inputs inventoried; no Slurm/CIME/source writes")
+ print("STAGE99 SUCCESS | 10-site source path inventory, Stage90 EXACT FIVE affected-site SHA audit, stack/Slurm and reference templates; no Slurm/CIME/source writes")
  print("STAGE99 STACK",json.dumps(live.get("stack",live.get("stack_error")),sort_keys=True))
  print("STAGE99 SLURM_STACK_PROPAGATION",json.dumps(live.get("slurm",live.get("slurm_error")),sort_keys=True))
  print("STAGE99 ANCILLARY_INPUTS",json.dumps(assets,sort_keys=True))
