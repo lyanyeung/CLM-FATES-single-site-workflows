@@ -58,3 +58,16 @@ The canopy is about 10 m high. FLUXMET `TA_F` equals `TA_1_1_1` (31 m) at the ch
 2. Measured RH at 24 m, then 16 m, applied at the 31 m temperature, validated on the overlap with 31 m.
 3. Otherwise `COMPANION_E`.
 4. Otherwise HOLD.
+
+## MtB03 (user approved both orders, 2026-10-29 03:01)
+
+[MtB03](../scripts/mtb/MtB03_multilevel_BASE_T_and_humidity_fill_candidates_READONLY.py) implements both orders and writes **candidates only**.
+
+**Local dry run (temperature part only, on the BASE file alone; FLUXMET and ERA are on IRIDIS)**
+- The 31 m readings are flagged in 36 HH:
+  - 30 HH in 2022 (both −39.3 °C episodes plus the 12-04 15:00 and 12-05 04:30/05:00 transients);
+  - 6 isolated spikes in 2013–2018.
+- 63 HH are clipped below −10 °C (2015–2020).
+- The 16 m level transfer, on synthetic 31 m gaps of 1, 5 and 22 HH (2000 each), gives MAE 0.13 / 0.18 / 0.27 °C, bias ≤ 0.10 °C and ≤ 0.03 % of errors above 2 °C. This passes the predeclared gate.
+- A first draft flagged 31 m as faulty whenever it was 5 °C warmer than the 16/8.75 m consensus. That draft would have flagged the real night inversions of 2022-01-02 and 2024-02-12, when 24 m was missing; one hour earlier on 2022-01-02, 24 m agreed with 31 m.
+- The rule was therefore changed **before the IRIDIS run** so that a warm-side fault needs the 24 m sensor to disagree as well. A cold-side fault, with 31 m colder than the levels below by more than 5 °C, is unphysical in any regime and needs no 24 m.
