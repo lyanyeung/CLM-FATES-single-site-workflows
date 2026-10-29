@@ -135,6 +135,19 @@ def assess():
     guard(len(old)==len(s) and old.time.equals(s.time),
           "latest selected science source cannot align to Stage11L")
     old_v=old.VPD_USE.to_numpy(float)
+    # Existing operator-approved Jan-2019 4 tower temperature repairs are
+    # immutable; Stage11Q must not silently undo or change them.
+    guard(np.allclose(s.TA_USE.to_numpy(float),old.TA_USE.to_numpy(float),
+                      atol=1e-10,rtol=0,equal_nan=True) and
+          np.allclose(s.TBOT.to_numpy(float),old.TBOT.to_numpy(float),
+                      atol=1e-10,rtol=0,equal_nan=True),
+          "existing original corrected tower temperature changed in selected trial")
+    known_2019={"201901031300":13.3525,"201901040330":9.3935,
+                "201901041630":9.5665,"201901080330":7.5215}
+    for native,approved in known_2019.items():
+        guard(native in idmap and
+              abs(float(s.TA_USE.iloc[idmap[native]])-approved)<0.00051,
+              "Jan2019 prior user-approved T value changed: "+native)
     # Stage11L/Stage11Q SHA receipts already pin the prior source lineage; do not
     # re-read a redundant 367920-row Stage07 selected file to decide provenance.
     need_raw=set()
