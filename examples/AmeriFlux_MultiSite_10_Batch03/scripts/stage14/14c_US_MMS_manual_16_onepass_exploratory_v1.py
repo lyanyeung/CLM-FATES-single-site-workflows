@@ -128,3 +128,56 @@ def main():
             ensure(int(source.at[k,'VPD_F_QC'])==2 and base.at[k,'TA_USE']<0,
                    'cold source QC2/tower T changed '+k)
             f=float((pd.Timestamp(base.at[k,'time'])-start)/(end-start))
+            rr=float(rhi[l]*(1-f)+rhi[r]*f)
+            rh=float(np.clip(rr,0.01,0.98))
+            ev=float(esi(base.at[k,'TA_USE'])*rh)
+            vv=float(esw(base.at[k,'TA_USE'])-ev)
+            put(k,vv,'COLD_INTERPOLATED_ICE_RH_LOW_CONFIDENCE',
+                dict(left_key=trial.index[l],right_key=trial.index[r],
+                     left_VPD_QC=int(source.at[trial.index[l],'VPD_F_QC']),
+                     right_VPD_QC=int(source.at[trial.index[r],'VPD_F_QC']),
+                     RHice_unbounded_pct=100*rr,RHice_bounded=abs(rr-rh)>1e-12))
+    log=pd.DataFrame(edits)
+    mask=base.index.isin(set(log.native_key))
+    ensure(len(log)==58 and log.native_key.nunique()==58 and
+           int(log.original_VPD.isna().sum())==16 and
+           int(log.original_VPD.notna().sum())==42, 'exact 58 edit scope drift')
+    for col in FIELDS:
+        a=base[col].to_numpy(); b=trial[col].to_numpy()
+        allowed=np.ones(len(a),dtype=bool) if col not in ('VPD_USE','QBOT') else ~mask
+        ensure(np.array_equal(a[allowed],b[allowed],equal_nan=True),
+               'off-target selected field changed '+col)
+    ensure(not trial[FIELDS[1:]].isna().any().any(), 'numerical gaps remain')
+    t=trial.TA_USE.to_numpy(float); p=trial.PSRF.to_numpy(float)
+    v=trial.VPD_USE.to_numpy(float); q=trial.QBOT.to_numpy(float)
+    e=esw(t)-v
+    physical=(np.isfinite(e)&np.isfinite(q)&(e>0)&(v>=0)&(v<esw(t))&
+              np.isclose(q,qcalc(e,p),atol=1e-8,rtol=1e-5))
+    ensure(bool(physical.all()),'whole 219000 site water/QBOT closure')
+    out=ROOT/'science_trials'/('US_MMS_MANUAL_16H_ISOLATED_SENSITIVITY_'+
+         datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'_'+uuid4().hex[:8])
+    out.mkdir(parents=True,exist_ok=False)
+    files={'US_MMS_219000_HR_NUMERIC_SCENARIO_NOT_DATM.csv':trial,
+           'US_MMS_58_EDITS_MANUAL_PROVENANCE.csv':log}
+    hashes={}
+    for filename,df in files.items():
+        df.to_csv(out/filename,index=False)
+        hashes[filename]=digest(out/filename)
+    (out/'NOT_APPROVED_FOR_DATM').write_text('Exploratory humidity; not independently measured or production approved. No Slurm.\n')
+    hashes['NOT_APPROVED_FOR_DATM']=digest(out/'NOT_APPROVED_FOR_DATM')
+    summary=dict(site='US-MMS',native_hourly_rows=219000,old_missing=16,new_missing=0,
+                 old_finite_QC1_changed=42,QC1_2014_replaced=47,total_changed=58,
+                 selected_parent_sha256=digest(OLD/FN),output_sha256=hashes,
+                 method_validated=False,DATM=False,Postv5=False,Slurm=False)
+    (out/'US_MMS_SHA_receipt.json').write_text(json.dumps(summary,indent=2)+'\n')
+    print('US-MMS ACTUAL 16 ORIGINAL GAPS RECONSTRUCTED (EXPLORATORY ONLY)')
+    print(log[log.native_key.isin(GAPS)][['native_key','method','new_VPD','new_QBOT']].to_string(index=False))
+    print('US-MMS 16/16 NUMERICALLY FILLED; 47 ORIGINAL QC1 RECONSTRUCTED; ALL 219000 WATER/QBOT PASS')
+    print('US-MMS ISOLATED NEW RESEARCH DIR:',out)
+    print('US-MMS SUCCESS — ORIGINAL SOURCE/SHADOW UNCHANGED, NO SLURM')
+
+if __name__=='__main__':
+    try:main()
+    except Exception as exc:
+        print('US-MMS FAIL CLOSED:',exc,file=sys.stderr)
+        raise
