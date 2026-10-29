@@ -211,7 +211,7 @@ def main():
  write(frows,AUDIT_COLUMNS,rows);write(fev,EP_COLUMNS,events)
  write(fexc,AUDIT_COLUMNS,[r for r in rows if r["source_T_numerically_suspect"]=="True"
                                or r["source_ERA_internally_nonphysical"]=="True"])
- report=dict(stage=81,site=SITE,source_SHA256=SOURCE_SHA,
+ report=dict(stage=83,site=SITE,source_SHA256=SOURCE_SHA,
   previous_1093_SHA256=PRIOR_SHA,original_historical_source_HH=626,
   original_existing_covered_by_prior_overlay=0,
   original_pending_HH=626,original_pending_events=len(events),
@@ -224,7 +224,7 @@ def main():
   output_SHA256={x.name:sha(x) for x in (frows,fev,fexc)})
  (out/"stage83_manifest.json").write_text(json.dumps(report,indent=2,sort_keys=True)+"\n")
  print("STAGE83 ORIGINAL SOURCE SHA VERIFIED",SOURCE_SHA)
- print("STAGE83 STAGE27 SOURCE 626/626; STAGE63 REMAINING 626/626; PRIOR1093 WJS APPROVALS SHA VERIFIED",PRIOR_SHA)
+ print("STAGE83 STAGE27 SOURCE 626/626; STAGE63 REMAINING 626/626; PRIOR1093 SHA VERIFIED; ZERO VCP PRE-APPROVED P2P3 RECORDS",PRIOR_SHA)
  print("STAGE83 SUMMARY EVENTS",len(events),"ORIGINAL_REMAINING_HH",626,
        "NEGATIVE_RH",neg,"NONNEGATIVE_RH",pos)
  print("STAGE83 QC_PAIRS",json.dumps(report["original_source_QC_pairs"],sort_keys=True))
