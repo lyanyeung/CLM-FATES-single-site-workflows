@@ -113,7 +113,6 @@ def main():
  remaining63=indexed(load(d63/"stage63_REMAINING_ORIGINAL_P2P3_NATIVE_HH.csv",
   ["site","native_time","episode_id","original_tier","TA_F_QC","VPD_F_QC"]))
  if (len(source27)!=1574 or len(remaining63)!=1565 or
-     set(source27)-set(remaining63)!=set(source27)-set(remaining63) or
      not set(remaining63).issubset(source27) or
      {k[0] for k in source27}-set(SITES)):
   raise ValueError("original Stage27/63 P2P3 native crosswalk drift")
@@ -161,9 +160,8 @@ def main():
  # Confirm every Stage63 source HH is scientifically disposed by exact source
  # RH sign and exact approved overlay key. No manual blanket approval.
  bysite=defaultdict(lambda:Counter())
- original_pass=[];failed=[];methods=Counter();science=[]
+ original_pass=[];methods=Counter()
  for key,base in sorted(remaining63.items()):
-  t=num(base.get("TA_F_C")) # Stage63 does not expose original TA, use Stage27
   origin=source27[key]
   T,V=num(origin["TA_F_C"]),num(origin["VPD_F_hPa"])
   R=rh(T,V)
