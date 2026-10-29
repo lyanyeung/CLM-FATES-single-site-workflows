@@ -1,5 +1,11 @@
 # AmeriFlux MultiSite 10 — Batch 05
 
+## Stage77 source result and Stage78 US-Var direct repair (29 October 2026)
+
+Actual operator Stage77 read-only result: **US-Var original 37 events / 62 HH verified, 55 RH<0, 7 RH>=0; all TA_F_QC0 and VPD_F_QC1, zero flagged temperature jump exceptions**. Source FLUXMET ZIP SHA256 `2e0ff6fe7f7de6dfde3ebfd2e822266e899bd80f1ad0377f78fde34efcb410f2`.
+
+Under the investigator's established rule, [Stage78 source repair](scripts/stage78/78_US_Var_55_negative_RH_direct_approved_378.py) directly corrects 55 negative-RH source VPD at unchanged QC0 temperature using bounded two-sided original source RH; measured VPD QC0 donors preferred where available. Seven original positive RH half-hours (0.19–0.92%) pass unchanged but carry QC1 humidity-science caveats. [Pinned Stage78 launcher](scripts/stage78/run_stage78_US_Var_iridis6.sh). After successful operator execution **323+55=378** versioned approved records; the original Stage63 P2/P3 queue drops from 1444 to **1382 HH** (US-Vcp 626, US-Wjs 393, US-Vcm 362, US-Whs 1). **Stage78 execution has not yet been confirmed**; existing Stage76 323 output is verified complete. Prior overlay, originals, QC, DATM/CIME and Slurm unchanged.
+
 ## CURRENT Stage76 success / outstanding sites / Stage77 US-Var next (29 October 2026)
 
 **Actually observed operator Stage76:** original US-WCr SHA `f13c3a26a051bbe351fe5aa66a2cd7eef3849b33645732810bfc74a34c5e6f75`, 24/24 original episodes, 62/62 original source HH verified; original RH<0 **61 HH directly repaired**, source RH>=0 **one passed unchanged**. Of the 61, 59 RH/VPD-only replacements retain original TA and two original-flagged 2016 temperature faults are corrected in TA instead. A further three nonflagged, clearly corrupt native 2016 temperature HH are repaired as narrowly scoped local exceptions. Prior approved **259 rows preserved exactly**, new **64 versioned approved rows = 323**. Exact approved overlay SHA256 `494cfe0d92a376a796687a9d6a61d0e6133b750775dd851602c51dc71bee4f37`, reports `/home/ly3n24/ameriflux_batch05_stage76_WCr/WCr_direct61_Tplus3_20261029T043428Z_2423219/`. No source QC, original files, DATM/CIME, production forcing or Slurm jobs modified. **Stage76 actually succeeded, no longer merely expected.**
