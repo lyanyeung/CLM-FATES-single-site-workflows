@@ -35,3 +35,21 @@ It evaluates adjacent finite original source values only when their actual sourc
 Reports **matched before/after warning counts at all 68 original candidate-contact joins**, plus all extended-edge warnings, actual QC names and each proposed original-finite neighbour replacement. If this method cannot improve source science without crossing QC0 or approved inputs, do not invent a temperature/humidity correction merely to pass thresholds. Reanalysis-to-reanalysis or derived-QC2 continuity is not independent validation.
 
 **No automatic production approval**, no rewrite of previous successful source or model jobs. The user will review actual number of proposed neighbour edits, exact still-flagged groups and method limits, then decide whether to retain alternative or keep earlier Stage14K as uncertain research sensitivity.
+
+
+## Latest fixed code and single IRIDIS6 command
+
+Stage14L source at **commit `773252e67a54b60c2a92d621bfd77cd01635508f`**, Git blob SHA `c916059e87f11eee9d225657a315cd50a7a97d8f`. It explicitly compares **both** 30min interfaces before accepting any additional native QC1/QC2 ERA-RH neighbour: reject any new warning on an originally passing side and require an overall reduction of threshold violations. **Stage14L has not yet been executed on IRIDIS6**. A raw source equality/QC0/historical scientific gate failure will STOP closed without touching earlier inputs.
+
+```bash
+(
+ set -euo pipefail
+ F="$HOME/US_Kon_QC_neighbor_onepass.py"
+ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/773252e67a54b60c2a92d621bfd77cd01635508f/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage14/14l_US_Kon_68_QC_neighbor_connected_ERA_RH_sensitivity.py" -o "$F"
+ test "$(git hash-object "$F")" = "c916059e87f11eee9d225657a315cd50a7a97d8f"
+ python3 -B -c 'import pathlib,sys; p=pathlib.Path(sys.argv[1]); compile(p.read_text(),str(p),"exec"); print("SYNTAX PASS")' "$F"
+ python3 -B "$F" --run 2>&1 | tee "$HOME/US_Kon_QC_neighbor_onepass.log"
+)
+```
+
+Expected result: real original-signed 68 missing centres and 9 still missing, new count of original-finite QC1/2 humidity neighbour candidates, before/after original 68-seed native-edge warnings and all newly exposed edge warnings, new isolated research-only output directory. Do NOT infer success before actual HPC run.
