@@ -170,7 +170,7 @@ def review():
                 "candidate_delta_e_in_p05p95":stats["candidate_inside_p05p95"],
                 "no_source_or_model_approval":True})
     result=pd.DataFrame(rows);peryear=pd.DataFrame(years);loyo=pd.DataFrame(folds)
-    need(len(result)==24 and len(loyo)==49 and
+    need(len(result)==24 and len(loyo)==53 and
          peryear.source_year.nunique()==16 and
          result.scientific_method_approved.eq(False).all(),
          "expected 4 match bins x 6 independent screens and 49 leave-year-out folds")
@@ -207,7 +207,7 @@ def main():
         datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")+"_"+uuid4().hex[:8])
     out.mkdir(parents=True,exist_ok=False)
     docs={"24_aggregation_and_native_clock_conditional_QC0_source_screens.csv":result,
-          "49_source_year_leaveout_daily_QC0_e_percentiles.csv":folds,
+          "53_source_year_leaveout_daily_QC0_e_percentiles.csv":folds,
           "per_year_QC0_source_date_weighted_e_QBOT.csv":years}
     for n,d in docs.items():d.to_csv(out/n,index=False,float_format="%.17g")
     summ="stage13ar_source_QC0_day_year_clock_robustness_summary.json"
