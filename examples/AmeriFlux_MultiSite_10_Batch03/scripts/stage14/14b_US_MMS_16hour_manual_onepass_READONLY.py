@@ -147,7 +147,7 @@ def load():
     for key in target | set(anomalies.key):
         dt=pd.to_datetime(key,format="%Y%m%d%H%M")
         for offset in (-2,-1,0,1,2):context.add((dt+offset*STEP).strftime("%Y%m%d%H%M"))
-    raw=source[source.TIMESTAMP_START.isin(context)].copy()
+    raw=source.loc[source.TIMESTAMP_START.isin(context),sorted(must1)].copy()
     exact=era[era.TIMESTAMP_START.isin(context)][list(must2)].copy()
     raw=raw.merge(exact,on="TIMESTAMP_START",how="left",validate="one_to_one")
     raw["dt"]=pd.to_datetime(raw.TIMESTAMP_START,format="%Y%m%d%H%M")
