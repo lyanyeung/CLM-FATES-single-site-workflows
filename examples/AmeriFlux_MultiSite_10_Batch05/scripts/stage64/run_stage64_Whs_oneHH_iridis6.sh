@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage64_Whs"
+mkdir -p "$BASE"
+SRC_COMMIT="30a0dc9ef01b32ac388a289af5b7a03cfdd0c25c"
+SRC_BLOB="a1e818105c008648eec8062265cdc23285ff82a7"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage64/64_US_Whs_one_anomaly_original_before_after_manual_review_READONLY.py"
+SCRIPT="$BASE/stage64_Whs.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$SRC_COMMIT/$REL" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "$SRC_BLOB"
+echo "STAGE64 WHS SOURCE VERIFIED"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+D63="$HOME/ameriflux_batch05_stage63/exact10_site_204_crosswalk_20261029T025331Z_1904396"
+D27="$HOME/ameriflux_batch05_stage27/source_comparison_20261026T040257Z_1589604"
+test -d "$D63" && test -d "$D27"
+OUT="$BASE/Whs_one_original_HH_manual_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SCRIPT" --stage63-dir "$D63" --stage27-dir "$D27" --out "$OUT" 2>&1 | tee "$BASE/stage64_Whs.log"
+echo "STAGE64_WHS_REPORTS=$OUT"
+echo "STAGE64_WHS NO ORIGINAL/204/DATM/SLURM CHANGES"
