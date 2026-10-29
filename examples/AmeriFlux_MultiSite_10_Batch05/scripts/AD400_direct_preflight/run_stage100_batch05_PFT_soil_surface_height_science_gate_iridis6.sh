@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_directAD400_PFT_soil_surface"
+mkdir -p "$BASE"
+PY="$BASE/stage100_PFT_soil_source.py"
+CSV="$BASE/RECOMMENDED_50_SITE_CLM_FATES_INPUT_PFT_20261026.csv"
+COMMIT="1259277c49081a0c0f20ba4b93676c7d869372c7"
+RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT"
+curl -fLsS --retry 3 "$RAW/examples/AmeriFlux_MultiSite_10_Batch05/scripts/AD400_direct_preflight/100_batch05_PFT_soil_surface_height_source_gate_READONLY.py" -o "$PY"
+test "$(git hash-object "$PY")" = "54cecad3bf582568191dbb1f35692621e0db2a71"
+curl -fLsS --retry 3 "$RAW/examples/Ameriflux_Site/Ameriflux_PFT/RECOMMENDED_50_SITE_CLM_FATES_INPUT_PFT_20261026.csv" -o "$CSV"
+test "$(git hash-object "$CSV")" = "26fdfda6f1c88c9a134e7853bd70234685665031"
+echo "STAGE100 SOURCE CODE AND ORIGINAL 50 SITE PFT MODEL HYPOTHESIS REGISTER SHA VERIFIED"
+python3 -B -m py_compile "$PY"
+python3 -B "$PY" --self-test
+D99="$HOME/ameriflux_batch05_AD400_full_preparation/preparation_20261029T082510Z_3687870"
+OUT="$BASE/pft_soil_surface_scan_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$PY" --pft "$CSV" --stage99 "$D99" --out "$OUT" 2>&1 | tee "$BASE/stage100.log"
+echo "STAGE100_REPORTS=$OUT"
+echo "STAGE100 RESEARCH PFT CANDIDATE AUDIT ONLY | NO ORIGINAL/APPROVED/SURFACE/DATM/CIME/SLURM WRITES"
