@@ -29,3 +29,14 @@ Without the BASE file, CL01 still produces the ledger and reanalysis-only classe
 - `sites/MY_EC_SITE/US-NR1/forcing/raw/AMF_US-NR1_BASE_HH_26-5.csv`
 
 `--base` can point elsewhere.
+
+## First IRIDIS `--check`, v1 (2026-10-29 04:17)
+
+| Site | MEASURED_SUPPORTED | ERA_RH_SENSITIVITY_ONLY | PHYSICS_CONFLICT_HOLD | Total gaps |
+| --- | --- | --- | --- | --- |
+| US-Me6 | 0 | 27 | 18 (13 of the 19 HH winter event) | 45 |
+| US-NR1 | 65 (8 m RH 50, 2 m RH 15) | 81 | 88 (1998: 43, 2009: 28) | 234 |
+
+**US-Me6.** BASE RH passes validation (MAE 0.22 hPa, 16/16 years), but it is present at none of the 45 gaps. IRGA H2O passes pooled but only 9/13 years, and it is present at only 3 gaps (1 of the 19 HH).
+
+**v2 change.** v2 adds `ERA:COMPANION_E` and `ERA:COMPANION_RH` to the validation table, so that reanalysis-only rows carry each site's own QC0 error. They are never classed as measured. v2 also prints the HOLD rows with the BASE and sonic temperatures.

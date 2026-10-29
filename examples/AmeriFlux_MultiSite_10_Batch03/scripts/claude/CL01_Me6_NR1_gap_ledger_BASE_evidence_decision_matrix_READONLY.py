@@ -41,7 +41,7 @@ import numpy as np
 import pandas as pd
 
 sys.dont_write_bytecode = True
-VERSION = "batch03-CL01-v1-20261029-Me6-NR1-ledger-BASE-decision-READONLY"
+VERSION = "batch03-CL01-v2-20261029-Me6-NR1-ledger-BASE-decision-READONLY"
 HERE = Path(__file__).resolve().parent
 M_SCRIPT = HERE.parent / "mtb" / "MtB01_regime_matched_QC0_humidity_census_READONLY.py"
 M_BLOB = "3bcead9445dca3ec3485f390d51264492f40cdf0"
@@ -202,7 +202,7 @@ def ledger(df, src, summ, cols):
     T = df.S_TA_USE.to_numpy(float); P = df.S_PSRF.to_numpy(float); Te = df.TA_ERA.to_numpy(float)
     with np.errstate(invalid="ignore"):
         e_c = M.esw(Te) - df.VPD_ERA.to_numpy(float)
-    passing = list(summ.loc[summ.SOURCE_PASS & ~summ.SAME_AS_FLUXMET, "source"]) if len(summ) else []
+    passing = list(summ.loc[summ.SOURCE_PASS & ~summ.SAME_AS_FLUXMET & ~summ.source.str.startswith("ERA:"), "source"]) if len(summ) else []
     idx = np.flatnonzero(gap); rows = []
     ep = np.zeros(len(df), int); eplen = np.zeros(len(df), int)
     for n, (st, ln) in enumerate(M.runs(gap), 1): ep[st:st + ln] = n; eplen[st:st + ln] = ln
@@ -277,9 +277,18 @@ def rootcause(L):
     return pd.DataFrame(rows)
 
 
+def era_sources(df):
+    """Reanalysis-only references, validated the same way but never classed as measured."""
+    Te, Ve, T = df.TA_ERA.to_numpy(float), df.VPD_ERA.to_numpy(float), df.TA_F.to_numpy(float)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        e = M.esw(Te) - Ve; rh = e / M.esw(Te)
+    ok = np.isfinite(e) & (e > 0) & (rh <= 1.0)
+    return {"ERA:COMPANION_E": np.where(ok, e, np.nan), "ERA:COMPANION_RH": np.where(ok, rh * M.esw(T), np.nan)}
+
+
 def compute(df, cols, expected):
     src, meta = sources(df, cols)
-    vy, vs = validate(df, src)
+    vy, vs = validate(df, {**src, **era_sources(df)})
     gap, L = ledger(df, src, vs, cols)
     if expected is not None and int(gap.sum()) != expected:
         raise ValueError(f"shadow has {int(gap.sum())} missing VPD_USE/QBOT rows, handoff states {expected}")
@@ -298,6 +307,12 @@ def show(res, info):
     if len(res["episodes"]): print(res["episodes"].to_string(index=False))
     print("\n=== E root cause by year ===")
     if len(res["rootcause"]): print(res["rootcause"].to_string(index=False))
+    L = res["ledger"]
+    if len(L):
+        keep = [c for c in ("native_key", "class", "TA_USE_C", "TA_F_QC", "BASE_TA_median_C", "T_SONIC_C", "TA_ERA_C", "VPD_F_hPa", "VPD_F_QC",
+                            "VPD_ERA_hPa", "companion_e_hPa", "BASE_sources_present", "proposed_VPD_hPa") if c in L]
+        print("\n=== HOLD rows (first 60) ===")
+        print(L.loc[L["class"].str.endswith("HOLD"), keep].head(60).round(3).to_string(index=False))
 
 
 def self_test():
