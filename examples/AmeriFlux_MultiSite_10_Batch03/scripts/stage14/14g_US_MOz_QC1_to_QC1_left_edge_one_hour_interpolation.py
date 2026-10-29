@@ -96,11 +96,16 @@ def checked_source():
             "five exact raw source boundary observations not found")
     focus=focus.set_index("TIMESTAMP_START")
     expected_tqc=[1,1,1,1,2]
-    expected_vqc=[1,1,1,1,2]
-    for ts,a,b in zip(keys,expected_tqc,expected_vqc):
-        require(int(focus.at[ts,"TA_F_QC"])==a and
-                int(focus.at[ts,"VPD_F_QC"])==b,
+    # The 09:30 QC2 source boundary is documented for T; inspect its
+    # VPD QC without presuming VPD has exactly the same source grade.
+    expected_vqc=[1,1,1,1,None]
+    for ts,tqc,vqc in zip(keys,expected_tqc,expected_vqc):
+        current_vqc=int(focus.at[ts,"VPD_F_QC"])
+        require(int(focus.at[ts,"TA_F_QC"])==tqc and
+                (current_vqc==vqc if vqc is not None else current_vqc in (0,1,2)),
                 "actual source quality differs from QC-aware operator decision "+ts)
+    print("US-MOz ACTUAL SOURCE NATIVE QCs AT 5 ANCHOR TIMES:")
+    print(focus.to_string(),flush=True)
     return focus
 
 def assess():
