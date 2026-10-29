@@ -47,3 +47,17 @@ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-sing
 ```
 
 **As authored:** stage74 script GitHub commit exists and launcher source SHA was verified. Actual IRIDIS6 Stage72/74 outputs are not yet reported in this conversation, thus "259 approved" is a post-run expected versioned state, not an already executed fact.
+
+## Stage74 first-run TypeError and verified GitHub fix (29 October 2026)
+
+Actual operator terminal evidence:
+- Stage72 completed successfully; `219+21=240` versioned approved rows, preserving previous 219. SHA256 `b274ab45cbf3deb740faddbe26970a1d5c518d9feb5b5f2556694cd7ce609882`; reports `/home/ly3n24/ameriflux_batch05_stage72_UMB/UMB_240_20261029T041816Z_2340008/`.
+- Immediately after Stage72, original Stage74 script encountered `TypeError: '_io.TextIOWrapper' object is not callable` in `source_processed_ERA_RH_derived_pct=f(er)` before creating any 259-row output. It was an **implementation variable shadowing bug**, not an input-science or SHA failure: the local CSV handle named `f` masked the numeric formatter function named `f`.
+- Code fix: rename numeric formatter to `format_float` and all numeric formatter calls; add explicit unit self-test for formatting, no meteorological policy or original data changes. Fixed [Stage74 Python source](../scripts/stage74/74_US_Wkg_19_negative_RH_direct_approved_259.py) commit `ea27a85043521921449df75ed7cd6dd8d4e0e032`, Git blob `9c4f85dd636c52bb482b64f35e631e3ce9329924`. Updated [Stage74 SHA-pinned launcher](../scripts/stage74/run_stage74_Wkg_19_negative_RH_direct_approve_iridis6.sh) commit `5c798847cdb736dd52928a13479292efa62c9c40`, Git blob `4ba72efb09ac4db8c887609f4fd57d209b0636d3`. GitHub source/blob SHA verified, but **updated script has not yet been run on the operator IRIDIS6 cluster**.
+- Stage74 launcher reuses the successful 240-row Stage72 output rather than recreating it, and creates a new output directory for the 259 expected version. The original 240 approved rows and source data are untouched.
+
+```bash
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/5c798847cdb736dd52928a13479292efa62c9c40/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage74/run_stage74_Wkg_19_negative_RH_direct_approve_iridis6.sh" -o "$HOME/run_stage74_Wkg_fixed.sh" && test "$(git hash-object "$HOME/run_stage74_Wkg_fixed.sh")" = "4ba72efb09ac4db8c887609f4fd57d209b0636d3" && bash "$HOME/run_stage74_Wkg_fixed.sh"
+```
+
+**Policy recorded separately** in [Batch05 README](../README.md): suspicious TA QC0→QC1 repairs use both QC0 bracketing observations for the whole QC1 run; QC1→QC2 repairs use original QC1 bracketing values for the whole QC2 run, maintaining original QC flags in source and an auditable versioned corrected overlay. This is the operator's general forward-looking Batch05 rule; it does not mean US-Wkg 2020 source QC0 zero-temperature corruption is a QC0→QC1 transition.
