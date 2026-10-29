@@ -71,3 +71,22 @@ No original source/ERA/previous shadow, no model input, no GitHub earlier scienc
 **Operator-supplied final source result:** 2014 original 48-hour data: 0 VPD_QC0, 47 VPD_QC1, 0 MDS_QC0, 5 selected missing and 16 QC1 calculated RH<15%; current selected original Stage10D 18 raw-negative event overlay water-closure **17/18 PASS**, 1 originally protected 2015-02-24 07:00 remains missing. No source or Slurm writes.
 
 Next lower-friction Batch03 site to review: **US-Mpj**, current research source numerically complete but still pending PFT, original VPD physics and formal production scientific admission. US-NR3 is separately reserved for advanced reasoning and US-MtB for Claude.
+
+
+## 2026-10-29 explicit operator-requested isolated numerical scenario (GitHub Stage14C; NOT YET RUN on IRIDIS6)
+
+Operator requested a **single-run numerical repair research scenario**, rather than indefinitely retaining all source gaps. [Versioned complete Stage14C Python script](../scripts/stage14/14c_US_MMS_manual_16_onepass_exploratory_v1.py), Git commit `be61f6c3f0e8a3743ca2d9b8064a6f310fbf3559`, exact Git blob `56db800ff7684de6f3a0d9c6ec29774a4b1fe79a`. The full source was matched byte-for-byte to the locally Python syntax-compiled copy. The actual IRIDIS6 execution **has not yet been verified**.
+
+Selected research-scenario methods (manual choices, **not empirical truth**): (a) 2014-09-22 to 09-23, reconstruct **all 47 original VPD_F_QC1 native hourly** values from exact-paired companion ERA RH evaluated at retained site T/P rather than introduce 5 artificial VPD spikes; the remaining one original QC2 hour is not directly overwritten. (b) March 2000 exact 6 missing use ERA RH with original tower T QC1 and very large temperature mismatch, high uncertainty. (c) Feb 2015 1 and Jan 2019 4 QC2 negative original-ERA cases use existing physically valid two-sided site ice-relative humidity anchor interpolation, flag interpolation bounds explicitly. Exactly 16 missing (old), 42 previously finite QC1 in same 47HR block (old), **58 target hours total** for VPD and QBOT only. No pressure, temperature, precipitation, native clock, other sites, original source or prior shadow modified. Missing=0, full 219000-row water/QBOT closure and hash receipts are **expected only if actual run passes**. Stage14C will stop without writing any output on source drift, paired ERA invalid, unavailable cold anchors or physics failure. Isolation folder carries `NOT_APPROVED_FOR_DATM`; still no Post-v5, DATM, AD400, Slurm approval. Review the exact per-edit output and large native hour boundary discontinuities before any science/production decision.
+
+Single run with SHA-fixed version:
+```bash
+(
+ set -euo pipefail
+ F="$HOME/us_mms_16_onepass.py"
+ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/be61f6c3f0e8a3743ca2d9b8064a6f310fbf3559/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage14/14c_US_MMS_manual_16_onepass_exploratory_v1.py" -o "$F"
+ test "$(git hash-object "$F")" = "56db800ff7684de6f3a0d9c6ec29774a4b1fe79a"
+ python3 -B -m py_compile "$F"
+ python3 -B "$F" 2>&1 | tee "$HOME/US_MMS_MANUAL_16H_ONEPASS.log"
+)
+```
