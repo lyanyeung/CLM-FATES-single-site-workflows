@@ -169,3 +169,22 @@ Grid dewpoint is interpreted over water. Ice-relative RH at retained air
 temperature is a separate diagnostic; true ice supersaturation must not be
 described as negative vapour pressure. The inherited ice HOLD remains in
 force. See [ECMWF near-surface humidity documentation](https://confluence.ecmwf.int/pages/viewpage.action?pageId=177484060).
+
+## Stage03 BASE bridge and Stage04 pending recheck (2026-10-29)
+
+See [the SHA-linked operator evidence and manual HOLD record](../../docs/US_NR3_STAGE03_BASE_VERIFIED_STAGE04_PENDING_20261029.md).
+The combined read-only script is [nr3_03_04_BASE_bridge_READONLY.py](nr3_03_04_BASE_bridge_READONLY.py).
+It supersedes the uncommitted/unverified standalone \`nr3_03_BASE_source_bridge_READONLY.py\` draft, without changing Stage01/02.
+
+Stage03 was **run by the operator** on the original BASE v6-5 + FLUXNET v1.3_r1: both SHA256 passed; 315,600/315,600 exact joins; year-by-year BASE observed TA/RH/PA/sonic coverage and uncalibrated sonic-vs-QC0 errors are transcribed in the report. BASE_TA nearly equals FLUXNET QC0 TA by common source lineage; this is not independent validation. There is no original dual-QC0 T/VPD in 2017, 2018 or 2023.
+
+The **first Stage04 inline command STOPPED** because its expected BASE digest was accidentally written without the final \`b\`. No original data failure is implied. Its results are **not** verified and have not been reported as completed. The consolidated script pins the correct 64-digit SHA and does not use the earlier defective expected value.
+
+On IRIDIS6, in \`clm_fates_env\`, run the version committed with this report:
+
+\`\`\`bash
+python3 -B examples/AmeriFlux_MultiSite_10_Batch03/scripts/us_nr3_science/nr3_03_04_BASE_bridge_READONLY.py --self-test
+python3 -B examples/AmeriFlux_MultiSite_10_Batch03/scripts/us_nr3_science/nr3_03_04_BASE_bridge_READONLY.py --stage04
+\`\`\`
+
+The second command rechecks source/Stage12G SHA, groups simultaneous 2017 BASE RH+sonic+pressure observations, compares raw/processed PA provenance, and joins the Stage12G 238 missing keys without approving any replacements. Use \`--stage03\` only if repeating the Stage03 verification is necessary. No downloads, output files, research shadow, DATM, AD400 or Slurm are produced. **Approved repairs: 0; HOLD: 238.**
