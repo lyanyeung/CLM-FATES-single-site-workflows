@@ -71,3 +71,34 @@ The canopy is about 10 m high. FLUXMET `TA_F` equals `TA_1_1_1` (31 m) at the ch
 - The 16 m level transfer, on synthetic 31 m gaps of 1, 5 and 22 HH (2000 each), gives MAE 0.13 / 0.18 / 0.27 °C, bias ≤ 0.10 °C and ≤ 0.03 % of errors above 2 °C. This passes the predeclared gate.
 - A first draft flagged 31 m as faulty whenever it was 5 °C warmer than the 16/8.75 m consensus. That draft would have flagged the real night inversions of 2022-01-02 and 2024-02-12, when 24 m was missing; one hour earlier on 2022-01-02, 24 m agreed with 31 m.
 - The rule was therefore changed **before the IRIDIS run** so that a warm-side fault needs the 24 m sensor to disagree as well. A cold-side fault, with 31 m colder than the levels below by more than 5 °C, is unphysical in any regime and needs no 24 m.
+
+## MtB03 IRIDIS results and user decisions (2026-10-29 03:15–03:22)
+
+The MtB03 `--run` report is at `reports/mtb03_US-MtB_multilevel_fill_candidates_20261029T031536Z_50d84498`.
+
+**Temperature:** 103 targets, all with a candidate.
+- 44 `FAULT_31M`, including FLUXMET MDS fills that disagree with three measured levels by more than 5 °C (2015-12-26, 2016-07-01, 2019-12-20).
+- 59 `CLIP_31M` (2016–2020).
+- Gate PASS.
+
+**Humidity level transfer, validated against FLUXMET QC0:**
+
+| Level | MAE | Bias | Errors > 2 hPa | Years passing |
+| --- | --- | --- | --- | --- |
+| 24 m | 0.23 hPa | −0.23 hPa | 0.6 % | 12/12 |
+| 16 m | 0.13 hPa | −0.10 hPa | 0.05 % | 9/9 |
+
+**Humidity fill of the 2840 gaps plus the 44 fault rows:**
+
+| Source | HH |
+| --- | --- |
+| L24 measured transfer | 94 |
+| L16 measured transfer | 54 |
+| COMPANION_E | 2668 |
+| HOLD | 67 (60 out of regime, 7 not formable) |
+
+**User decision (03:22):**
+- The 60 out-of-regime gaps take COMPANION_E, labelled out of the validated regime.
+- The 7 non-formable gaps are set to saturation using DATM's own `datm_eSat`. The written QBOT then equals the cap DATM would apply anyway. Supersaturated e would be capped by DATM, COMPANION_RH is about 1.4 hPa too dry in this regime, and HOLD leaves a forcing gap.
+
+[MtB04](../scripts/mtb/MtB04_build_US-MtB_research_shadow_timeline.py) builds the complete research shadow as a new folder. Where only the temperature changed, the vapour pressure is kept and VPD is recomputed. The script checks that the TBOT/QBOT conventions match the existing timeline, and that every new QBOT is at or below the DATM saturation value. The folder keeps the `INCOMPLETE_DO_NOT_USE_FOR_DATM_OR_SPINUP` marker.
