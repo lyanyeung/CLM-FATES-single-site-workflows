@@ -1,5 +1,13 @@
 # AmeriFlux MultiSite 10 — Batch 05
 
+## Stage78 success and Stage79 US-Vcm next (29 October 2026)
+
+**Stage78 actually succeeded on IRIDIS6.** Original US-Var 37 events / 62 selected P2/P3 half-hours: 55 original negative RH repaired directly using source native two-sided inferred-RH donors at unchanged QC0 tower T (**46 both original VPD QC0 donors; nine both mixed-QC RH donors**); seven original positive but very-low RH source HH passed unchanged with science caution. Prior **323** versioned approved rows verified exact SHA and preserved. New **378 versioned approved** overlay SHA256 `400757c166d03fa8d7e7b72aa39879c14c2d9db5ada818d930c647c71d06f7b5`, exact report `/home/ly3n24/ameriflux_batch05_stage78_Var/Var_378_20261029T044442Z_2477410`. Original source, QC, DATM/CIME forcing and Slurm remain unchanged.
+
+**Remaining original Stage63 P2/P3** `1382` native flagged HH after US-Var full disposition: US-Vcp 626, US-Wjs 393, **US-Vcm 362**, US-Whs 1. This excludes separate P1 46 historical HOLD and 10 source RH-platform windows; a final integrated release reconciliation is still necessary. The `378` tally is approved versioned *repair rows*, not the count of P2/P3 original scientifically disposed time points.
+
+**Next, Stage79 US-Vcm original source-science audit**, [Python](scripts/stage79/79_US_Vcm_362HH_original_QC_temperature_RH_event_audit_READONLY.py) and [verified pinned launcher](scripts/stage79/run_stage79_US_Vcm_original_362HH_iridis6.sh). US-Vcm original Stage05 FLUXMET CSV SHA256 `c12437170ddb54630f87859bb33398994d9eb3f1c84686336e18a26d457e841c` will be checked against original Stage27/Stage63 362 time-specific T/VPD/QC/episode values before classifying (i) RH negative for direct approved VPD/RH repair under operator rule, (ii) RH nonnegative to preserve original, and (iii) source T spikes or original source ERA internal nonphysical humidity as narrow exceptions. Unlike US-Var, US-Vcm has historical source QC0/0 low-saturation and QC2/2 source-ERA pathologies; do not blindly apply a uniform RH/VPD correction to such source exceptions. This Stage79 audit writes **only new HOME report files**, with no source, prior 378 overlay, DATM/CIME or Slurm mutations. **Stage79 actual run not yet verified**.
+
 ## Stage77 source result and Stage78 US-Var direct repair (29 October 2026)
 
 Actual operator Stage77 read-only result: **US-Var original 37 events / 62 HH verified, 55 RH<0, 7 RH>=0; all TA_F_QC0 and VPD_F_QC1, zero flagged temperature jump exceptions**. Source FLUXMET ZIP SHA256 `2e0ff6fe7f7de6dfde3ebfd2e822266e899bd80f1ad0377f78fde34efcb410f2`.
