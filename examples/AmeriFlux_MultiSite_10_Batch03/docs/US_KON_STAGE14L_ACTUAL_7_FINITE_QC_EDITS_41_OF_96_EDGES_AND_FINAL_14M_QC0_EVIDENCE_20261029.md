@@ -54,3 +54,30 @@ Pinned source Git commit `77b6f36cfd450344a53d55cd2c27239213dd47e9`, blob `1e305
  python3 -B "$F" --run 2>&1 | tee "$HOME/US_Kon_last_QC0_provenance.log"
 )
 ```
+
+
+## 2026-10-29 06:19 UTC — Stage14M false year guard fail, corrected
+
+**Actual operator execution of original commit 77b6f36... Stage14M:**
+```
+SYNTAX PASS
+US-Kon STAGE14M QC0 ORIGINAL EVIDENCE SELF-TEST PASS
+US-Kon STAGE14M STOP READONLY: original site year/clock changed
+```
+It failed at Python line 68–70 **before** source QC0 evidence classification because the script incorrectly hardcoded manifest `first_year=2005,last_year=2020`. Earlier Stage14J/L did NOT require those years; 280,320 native selected NOLEAP half-hours alone do **not** establish original release bounds. Neither Stage14K nor Stage14L source inputs changed; no reports/model jobs executed from the failed run.
+
+**Correction on GitHub commit `35ce6de07407477646a29cc21f119961d16dfa8f`**, Git blob `bb25b2aafc8ad73c665ee6d1c84b048e167e0013`: use the real SHA-verified original site manifest `first_year/last_year` as metadata and print them; assert only original native interval = 30min, an exactly contiguous 16-year `280320` selected time tape with all leap days omitted, and actual published original FLUXMET + companion-ERA timestamps and SHA. Do NOT conflate original release bounds with selected forcing years. Correct source has been inspected for balanced quotes/brackets but still needs actual HPC run.
+
+The user can rerun ONLY Stage14M with this pinned command:
+```bash
+(
+ set -euo pipefail
+ F="$HOME/US_Kon_last_QC0_provenance.py"
+ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/35ce6de07407477646a29cc21f119961d16dfa8f/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage14/14m_US_Kon_QC0_evidence_for_9HOLD_and_44_edges_READONLY.py" -o "$F"
+ test "$(git hash-object "$F")" = "bb25b2aafc8ad73c665ee6d1c84b048e167e0013"
+ python3 -B -c 'import pathlib,sys; f=pathlib.Path(sys.argv[1]); compile(f.read_text(),str(f),"exec"); print("SYNTAX PASS")' "$F"
+ python3 -B "$F" --run 2>&1 | tee "$HOME/US_Kon_last_QC0_provenance.log"
+)
+```
+
+Stage14M remains **read-only except creation of its separate SHA-receipted report** and cannot authorize production DATM/AD400. Exact nine protected scientific holds and 44 actual expanded QC warning edges are unchanged.
