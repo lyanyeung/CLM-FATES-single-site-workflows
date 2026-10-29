@@ -10,7 +10,7 @@ Checks Stage84 overlay SHA, Stage86 ten-site release-gate report, Stage67
 candidate/manifest SHA and original immutable Stage05 source-native CSV
 SHA. For all 51 candidate half-hours, calculate original/source-ERA RH,
 candidate T + original VPD RH and two explicitly counterfactual VPDs.
-For the four scientifically inconsistent times, output full ±3-hour
+For the four scientifically inconsistent or unassessable times, output full ±3-hour
 original native T,VPD,QC, RH, processed-source ERA and any original
 measured-QC0 physical RH anchors. All outputs are new HOME audits only.
 """
@@ -176,8 +176,10 @@ def main():
   oldT=num(c["original_source_TA_F_C"])
   newT=num(c["candidate_TA_F_C"])
   oldV=num(c["source_VPD_F_hPa_unchanged"])
-  if (any(x is None for x in (T,V,oldT,newT,oldV)) or
-      abs(T-oldT)>0.002 or abs(V-oldV)>0.002 or
+  if (T is None or oldT is None or newT is None or
+      abs(T-oldT)>0.002 or
+      (V is None)!=(oldV is None) or
+      (V is not None and abs(V-oldV)>0.002) or
       o["TA_F_QC"]!=c["source_QC_unchanged"] or
       o["VPD_F_QC"]!=c["source_VPD_F_QC_unchanged"]):
    raise ValueError("Stage67 candidate-original T/VPD/native QC provenance drift "+t)
@@ -208,9 +210,9 @@ def main():
     candidate_VPD_hPa_IF_keeping_original_RH=fmt(preserveRH_vpd),
     candidate_VPD_hPa_IF_using_processed_source_ERA_RH=fmt(proxy_vpd),
     original_implied_absolute_vapor_pressure_hPa=fmt(
-      es(T)-V if es(T) is not None else None),
+      es(T)-V if es(T) is not None and V is not None else None),
     candidate_implied_absolute_vapor_pressure_hPa=fmt(
-      es(newT)-V if es(newT) is not None else None),
+      es(newT)-V if es(newT) is not None and V is not None else None),
     candidate_implied_RH_nonphysical=str(isbad),reason=issue,
     production_disposition=("BLOCK_COMBINED_T_VPD_UNTIL_RH_OR_VPD_METHOD_VALIDATED"
       if isbad else "TA_CANDIDATE_SEPARATE_VERSIONED_RESEARCH_ONLY_NOT_FORCE_APPROVED"))
