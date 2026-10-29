@@ -40,3 +40,44 @@ Without the BASE file, CL01 still produces the ledger and reanalysis-only classe
 **US-Me6.** BASE RH passes validation (MAE 0.22 hPa, 16/16 years), but it is present at none of the 45 gaps. IRGA H2O passes pooled but only 9/13 years, and it is present at only 3 gaps (1 of the 19 HH).
 
 **v2 change.** v2 adds `ERA:COMPANION_E` and `ERA:COMPANION_RH` to the validation table, so that reanalysis-only rows carry each site's own QC0 error. They are never classed as measured. v2 also prints the HOLD rows with the BASE and sonic temperatures.
+
+## CL02 `--run` results (2026-10-29 04:33, commit 3776753)
+
+Reports:
+- `reports/cl02_US-Me6_alternatives_decision_20261029T043239Z_873b540f`
+- `reports/cl02_US-NR1_alternatives_decision_20261029T043321Z_89ce56f5`
+
+Methods:
+- CEC: COMPANION_E capped at DATM saturation.
+- EMP: block-excluded QC0 RH climatology.
+- SAT: DATM saturation.
+- MEAS: validated BASE level transfer.
+
+**QC0 validation by tower-T bin** (MAE in hPa; ✓ means the bin passes all five gates with N ≥ 100):
+
+| T bin | Me6 CEC | Me6 EMP | NR1 CEC | NR1 EMP |
+| --- | --- | --- | --- | --- |
+| ≤ −15 | 0.45 ✓ | 0.05 ✓ | 0.79 ✗ | 0.14 ✓ |
+| −15:−10 | 0.47 ✓ | 0.12 ✓ | 0.78 ✗ | 0.28 ✓ |
+| −10:−5 | 0.54 ✓ | 0.24 ✓ | 0.79 ✗ | 0.53 ✓ |
+| −5:0 | 0.69 ✓ | 0.51 ✓ | 0.76 ✓ | 0.88 ✓ |
+| 0:5 | 0.69 ✓ | 0.81 ✓ | 0.81 ✓ | 1.06 ✗ |
+| 5:15 | 0.92 ✓ | 1.39 ✗ | 1.19 ✗ | 1.81 ✗ |
+| > 15 | 1.31 ✗ | 2.50 ✗ | 1.52 ✗ | 1.91 ✗ |
+
+**Predeclared recommendation counts:**
+
+| Site | MEAS | EMP | CEC | HOLD | Total |
+| --- | --- | --- | --- | --- | --- |
+| US-Me6 | 0 | 27 | 11 | 7 | 45 |
+| US-NR1 | 65 | 83 | 70 | 16 | 234 |
+
+**Me6.**
+- The 19 HH winter event goes to EMP: VPD 0.28–0.32 hPa against ice saturation 0.24–0.25, so just below ice saturation.
+- 2017-01-05 (4 HH) and 2017-12-23 (4 HH) also go to EMP. There CEC is far too dry: the companion is about 10 °C colder than the tower.
+- The 7 HOLD rows are all isolated single HH in summer at 17.7–24.5 °C.
+
+**NR1.**
+- **1998.** Jan–Oct 1998 is 100 % ERA-filled for TA, VPD, SW and LW, and BASE has no data. November is 67 % measured and December is 100 % measured, so the tower started in Nov 1998. All 43 gaps in 1998 have reanalysis tower T.
+- **2004-12-03 22:30–23:30 root cause.** The companion ERA record is corrupt: TA_ERA is −111.7, −216.8 and −111.8 °C, and PA_ERA = PA_F is 30.87, −8.20 and 30.86 kPa. VPD_F is QC0 (3.19–3.45 hPa), and the independent 2 m RH gives 3.28–3.53 hPa.
+- **HOLD rows.** All 16 are 1–3 HH warm-season gaps in the 5:15 bin. They fall in 2001-06-15, 2002, 2010, 2012, 2017-06-30, 2018-05-20 and 2021-06-21.
