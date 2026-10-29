@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """US-NR3 first-pass source reconciliation. Read-only; stdout only.
 
-Modes: --self-test; --raw-zip PATH (local original-package audit); --check
+Modes: --self-test; --raw-zip PATH (local original-package audit); --check;
+--science (inventory plus grid, QC0 validation and installed-source review).
 (IRIDIS6 SHA-linked Stage07/10/12G inventory). Optional --emit-missing and
 --emit-anomalies print CSV to stdout. No --run/output/download/model mode.
 
@@ -14,6 +15,7 @@ import hashlib
 import io
 import json
 import os
+import re
 from pathlib import Path
 import sys
 import zipfile
@@ -22,7 +24,7 @@ sys.dont_write_bytecode = True
 import numpy as np
 import pandas as pd
 
-VERSION = "nr3-01-v1.1-20261029"
+VERSION = "nr3-01-v2-20261029"
 SITE = "US-NR3"
 RELEASE = "AMF_US-NR3_FLUXNET_2007-2024_v1.3_r1"
 ROOT = Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
@@ -46,6 +48,10 @@ RAW_COLS = ["TIMESTAMP_START", "TIMESTAMP_END", "TA_F", "TA_F_QC",
             "VPD_F_MDS", "VPD_F_MDS_QC", "PA_F", "PA_F_QC"]
 ERA_COLS = ["TIMESTAMP_START", "TA_ERA", "VPD_ERA", "PA_ERA"]
 READS = {}
+COMPACT = False
+COMPACT_OMIT = {"NR3_RELEASE_METADATA", "NR3_VARIABLE_METADATA", "NR3_RAW_YEAR_INVENTORY",
+                "NR3_ANOMALY_YEAR", "NR3_ANOMALY_PRIORITIES", "NR3_MISSING_EPISODES",
+                "NR3_EXTERNAL_RECEIPTS", "NR3_READ_SHA256", "NR3_SCIENCE_LIMIT"}
 
 
 def require(ok, message):
@@ -99,6 +105,8 @@ def linked_csv(folder, receipt, name):
 
 
 def emit(label, value):
+    if COMPACT and label in COMPACT_OMIT:
+        return
     print(label, json.dumps(value, ensure_ascii=True, allow_nan=False, default=str), flush=True)
 
 
@@ -364,12 +372,370 @@ def audit(root, args):
     emit("NR3_HOLD_REASON_COUNTS", missing.groupby(["HOLD_class", "Stage12B_reason", "Stage12E_reason", "Stage12G_reason"], dropna=False).size().rename("n").reset_index().to_dict("records"))
     emit("NR3_MISSING_EPISODES", missing.groupby("episode").agg(start=("native_key", "first"),
         end=("native_key", "last"), n=("native_key", "size"), anomaly_overlap=("in_1484_source_anomalies", "sum")).reset_index().to_dict("records"))
-    emit("NR3_EXTERNAL_RECEIPTS", grid_receipts(root))
+    external = grid_receipts(root)
+    emit("NR3_EXTERNAL_RECEIPTS", external)
     if args.emit_missing:
         emit_csv("NR3_238_MISSING_LEDGER", missing)
     if args.emit_anomalies:
         emit_csv("NR3_1484_ORIGINAL_ANOMALIES", verified)
     emit("NR3_SCIENCE_LIMIT", "No independent QC0 validation, grid CF/orography verification, installed CTSM/CDEPS constraint audit or repair acceptance has yet been performed by this inventory. All original HOLDs remain; candidate/repair counts are not inferred from physical passes.")
+    return raw, selected, missing, verified, external
+
+
+def q_from_e(e_hpa, pressure_pa):
+    epa = 100 * np.asarray(e_hpa, dtype=float)
+    return .622 * epa / (np.asarray(pressure_pa, dtype=float) - .378 * epa)
+
+
+def e_from_q(q, pressure_pa):
+    q = np.asarray(q, dtype=float)
+    return q * np.asarray(pressure_pa, dtype=float) / (.622 + .378 * q) / 100
+
+
+def grid_values(t, p, tg, dg, pg):
+    """Fixed uncalibrated hypotheses; no clipping, fitting or replacement."""
+    water_grid_e = esw(dg)
+    grid_rh = water_grid_e / esw(tg)
+    return {"A_ABSOLUTE_E": water_grid_e,
+            "B_WATER_RH": esw(t) * grid_rh,
+            "C_SPECIFIC_Q": e_from_q(q_from_e(water_grid_e, pg), p)}
+
+
+def reference_datm_esat(t_c):
+    """Diagnostic only: public CDEPS blob 181eac30..., not assumed installed."""
+    t = np.clip(np.asarray(t_c, dtype=float), -50., 50.)
+    a = [6.107799961, .4436518521, .01428945805, .0002650648471,
+         .000003031240396, .00000002034080948, .00000000006136820929]
+    b = [6.109177956, .5034698970, .01886013408, .0004176223716,
+         .000005824720280, .00000004838803174, .0000000001838826904]
+    return np.where(np.asarray(t_c) < 0, np.polynomial.polynomial.polyval(t, b),
+                    np.polynomial.polynomial.polyval(t, a))
+
+
+def read_grid(record):
+    # netCDF4 is already used by the historical Stage09/10 environment.
+    # Import only for --science, so inventory/self-test needs no NetCDF IO.
+    from netCDF4 import Dataset, num2date
+    year = int(record["year"])
+    expected = pd.date_range(f"{year-1}-12-29", f"{year+1}-01-03 23:00:00", freq="h")
+    values, coords, static, attrs = {}, [], [], []
+
+    def read_one(ds):
+        timevar = ds.variables.get("valid_time")
+        if timevar is None:
+            timevar = ds.variables.get("time")
+        require(timevar is not None and hasattr(timevar, "units"), "Missing CF time units")
+        calendar = getattr(timevar, "calendar", "standard")
+        require(calendar in {"standard", "gregorian", "proleptic_gregorian"}, "Unexpected grid calendar")
+        times = num2date(timevar[:], timevar.units, calendar=calendar,
+            only_use_cftime_datetimes=False, only_use_python_datetimes=True)
+        actual = pd.DatetimeIndex(pd.to_datetime([str(x) for x in times]))
+        require(actual.equals(expected), "Grid UTC hours differ from original padded year")
+        lat = np.asarray(ds.variables["latitude"][:], dtype=float).reshape(-1)
+        lon = np.asarray(ds.variables["longitude"][:], dtype=float).reshape(-1)
+        require(len(lat) == len(lon) == 1, "Expected single grid coordinate")
+        point = (float(lat[0]), float(lon[0]))
+        location = record["request"]["location"]
+        require(abs(point[0] - float(location["latitude"])) <= .151 and
+                abs(point[1] - float(location["longitude"])) <= .151,
+                "Grid coordinate differs from original request")
+        coords.append(point)
+        for field, unit in (("t2m", "K"), ("d2m", "K"), ("sp", "Pa")):
+            if field not in ds.variables:
+                continue
+            var = ds.variables[field]
+            require(field not in values and getattr(var, "units", "") == unit,
+                    "Duplicate grid field or incorrect units: " + field)
+            arr = np.asarray(np.ma.asarray(var[:]).filled(np.nan), dtype=float).reshape(-1)
+            require(len(arr) == len(expected) and np.isfinite(arr).all(), "Nonfinite/wrong-length grid field")
+            values[field] = arr
+            attrs.append(dict(field=field, units=unit, dimensions=list(var.dimensions)))
+        for name in ("z", "orog", "orography", "geopotential", "surface_geopotential"):
+            if name in ds.variables:
+                var = ds.variables[name]
+                arr = np.asarray(np.ma.asarray(var[:]).filled(np.nan), dtype=float).reshape(-1)
+                static.append(dict(name=name, units=getattr(var, "units", ""),
+                    minimum=float(np.nanmin(arr)), maximum=float(np.nanmax(arr))))
+
+    path = pin(Path(record["file"]), record["sha256"])
+    if zipfile.is_zipfile(path):
+        with zipfile.ZipFile(path) as z:
+            members = [x for x in z.infolist() if x.filename.endswith(".nc")]
+            require(1 <= len(members) <= 6, "Unexpected count of NetCDF ZIP members")
+            for item in members:
+                require(item.file_size <= 100_000_000 and not item.filename.startswith("/")
+                        and ".." not in Path(item.filename).parts, "Unsafe NetCDF member")
+                # No extraction and no diskless writable dataset.
+                with Dataset("readonly-memory.nc", "r", memory=z.read(item)) as ds:
+                    read_one(ds)
+    else:
+        with Dataset(str(path), "r") as ds:
+            read_one(ds)
+    require(set(values) == {"t2m", "d2m", "sp"}, "Incomplete T/dewpoint/pressure grid")
+    require(all(np.allclose(x, coords[0], rtol=0, atol=1e-6) for x in coords), "Grid members disagree on point")
+    emit("NR3_GRID_CF", dict(year=year, utc_hours=len(expected), grid_point=coords[0],
+        grid_T_C_range=[float(values["t2m"].min()-273.15), float(values["t2m"].max()-273.15)],
+        grid_P_Pa_range=[float(values["sp"].min()), float(values["sp"].max())],
+        dewpoint_gt_T_plus_0p1K=int((values["d2m"] > values["t2m"]+.1).sum()),
+        fields=attrs, static_orography=static,
+        orography_status="AVAILABLE_REQUIRES_SPATIAL_INTERPRETATION" if static else "NOT_IN_EXISTING_FILE_DO_NOT_INFER_FROM_PRESSURE"))
+    return expected, values
+
+
+def interpolate_grid(times, values, native):
+    # Exact legacy Stage10B convention: native interval midpoint, LST UTC-7.
+    # This is a documented alignment hypothesis, not a model-clock approval.
+    target = native + pd.Timedelta(hours=7, minutes=15)
+    x = times.asi8.astype(float) / 1e9
+    y = pd.DatetimeIndex(target).asi8.astype(float) / 1e9
+    require(len(y) == 0 or (y.min() >= x[0] and y.max() <= x[-1]), "Grid extrapolation is forbidden")
+    result = {field: np.interp(y, x, value) for field, value in values.items()}
+    result["t2m"] -= 273.15
+    result["d2m"] -= 273.15
+    return result
+
+
+def error_summary(frame):
+    if frame.empty:
+        return dict(n_HH=0, dates=0, years=0)
+    error = frame.error_VPD_hPa.to_numpy(dtype=float)
+    daily = frame.groupby("date").error_VPD_hPa.agg(
+        bias="mean", mae=lambda x: np.abs(x).mean())
+    result = dict(n_HH=len(frame), dates=len(daily), years=int(frame.year.nunique()),
+        MAE_hPa=float(np.abs(error).mean()), bias_hPa=float(error.mean()),
+        RMSE_hPa=float(np.sqrt(np.mean(error**2))), abs_error_P95_hPa=float(np.quantile(np.abs(error), .95)),
+        abs_error_gt1hPa_share=float((np.abs(error) > 1.).mean()),
+        equal_date_MAE_hPa=float(daily.mae.mean()), equal_date_bias_hPa=float(daily.bias.mean()),
+        e_MAE_hPa=float(np.abs(frame.error_e_hPa).mean()))
+    if "prediction_water_pass" in frame:
+        result["prediction_water_failure_share"] = float((~frame.prediction_water_pass).mean())
+        result["prediction_ice_caution_share"] = float(frame.prediction_ice_caution.mean())
+    return result
+
+
+def temp_bin(t):
+    return pd.cut(t, [-np.inf, -20, -10, 0, np.inf], right=False,
+                  labels=["LT_MINUS20", "MINUS20_TO_MINUS10", "MINUS10_TO_ZERO", "GE_ZERO"]).astype(str)
+
+
+def evaluate_qc0(raw_grid):
+    # Ground truth is only simultaneous original tower QC0 T and VPD.
+    # Do not screen truth by the proposed method's T-delta/ice conditions.
+    truth = raw_grid.loc[raw_grid.TA_F_QC.eq(0) & raw_grid.VPD_F_QC.eq(0)].copy()
+    truth["truth_e"] = esw(truth.TA_F) - truth.VPD_F
+    truth = truth.loc[truth.TA_F.between(-80, 65) & truth.VPD_F.ge(0)
+                      & truth.truth_e.gt(0)].copy()
+    truth["date"] = truth.native_key.str[:8]
+    truth["T_regime"] = temp_bin(truth.TA_F)
+    methods = grid_values(truth.TA_F, truth.PA_F*1000, truth.grid_T, truth.grid_D, truth.grid_P)
+    all_methods = []
+    for method, e in methods.items():
+        part = truth[["native_key", "year", "month", "date", "T_regime"]].copy()
+        part["method"] = method
+        part["error_e_hPa"] = e - truth.truth_e
+        part["error_VPD_hPa"] = -part.error_e_hPa
+        proposed_q = q_from_e(e, truth.PA_F*1000)
+        part["prediction_water_pass"] = np.isfinite(e) & (e > 0) & (e <= esw(truth.TA_F)) & (proposed_q > 0) & (proposed_q < .08)
+        part["prediction_ice_caution"] = truth.TA_F.lt(0).to_numpy() & (e > esi(truth.TA_F))
+        all_methods.append(part)
+        for year, group in part.groupby("year"):
+            emit("NR3_QC0_YEAR_TEST", dict(method=method, held_out_source_year=int(year),
+                no_fitted_parameters=True, **error_summary(group)))
+        for regime, group in part.groupby("T_regime"):
+            emit("NR3_QC0_T_REGIME_TEST", dict(method=method, regime=regime, **error_summary(group)))
+        yearly = [error_summary(g) for _, g in part.groupby("year")]
+        emit("NR3_QC0_EQUAL_YEAR_TEST", dict(method=method, n_years=len(yearly),
+            equal_year_MAE_hPa=float(np.mean([x["MAE_hPa"] for x in yearly])) if yearly else None,
+            equal_year_bias_hPa=float(np.mean([x["bias_hPa"] for x in yearly])) if yearly else None,
+            validation_type="FIXED_UNCALIBRATED_METHOD_WHOLE_YEAR_TEST_BLOCKS_NO_RANDOM_HH_SPLIT"))
+    # Two genuine QC0 variables still do not make ERA-corrected companion
+    # fields out-of-sample: their product fitting may already use those data.
+    emit("NR3_VALIDATION_BOUNDARY", dict(years_without_truth=[2017, 2018, 2023],
+        no_reanalysis_QC2_as_truth=True, companion_ERA_fit_independence="NOT_ESTABLISHED_NOT_SCORED_AS_INDEPENDENT",
+        QBOT_truth="Derived_e_with_PA_F_is_not_independently_measured_QBOT; report VPD/e errors",
+        clock="NATIVE_INTERVAL_MIDPOINT_PLUS_7H_NO_TIME_SHIFT_OPTIMISATION"))
+    return pd.concat(all_methods, ignore_index=True) if all_methods else pd.DataFrame()
+
+
+def candidate_flags(t, p, tg, dg, pg, e):
+    t, p, tg, dg, pg, e = [np.asarray(x, dtype=float) for x in (t, p, tg, dg, pg, e)]
+    vpd = esw(t) - e
+    q = q_from_e(e, p)
+    rh = esw(dg) / esw(tg)
+    site = np.isfinite(t) & np.isfinite(p) & (t >= -80) & (t <= 65) & (p >= 50000) & (p <= 110000)
+    grid = np.isfinite(tg) & np.isfinite(dg) & np.isfinite(pg) & (dg <= tg+.1) & (rh > 0) & (rh <= 1) & (pg >= 50000) & (pg <= 110000)
+    water = np.isfinite(vpd) & (vpd >= 0) & (vpd < esw(t)) & np.isfinite(q) & (q > 0) & (q < .08)
+    ice = (t >= 0) | (e <= esi(t))
+    delta_t = np.abs(t-tg) <= 5.
+    delta_p = np.abs(p-pg) <= 15000.
+    return dict(VPD=vpd, QBOT=q, water_pass=site & grid & water,
+        ice_pass=ice, T_delta_pass=delta_t, P_delta_pass=delta_p,
+        legacy_screen_pass=site & grid & water & ice & delta_t & delta_p,
+        public_CDEPS_reference_would_cap=q > q_from_e(reference_datm_esat(t), p))
+
+
+def reject_jumps(selected, target, proposed, eligible):
+    """Evaluate all proposed missing slots jointly, in memory only."""
+    selected_values = selected.VPD_USE.to_numpy(dtype=float).copy()
+    accepted = np.asarray(eligible, dtype=bool).copy()
+    proposed = np.asarray(proposed, dtype=float)
+    for _ in range(len(target)+1):
+        current = selected_values.copy()
+        current[target[accepted]] = proposed[accepted]
+        reject = np.zeros(len(target), dtype=bool)
+        for j in np.flatnonzero(accepted):
+            k = target[j]
+            for neighbour in (k-1, k+1):
+                if 0 <= neighbour < len(current) and np.isfinite(current[neighbour]) and abs(current[k]-current[neighbour]) > 4.:
+                    reject[j] = True
+        if not reject.any():
+            return accepted
+        accepted[reject] = False
+    raise ValueError("In-memory legacy adjacent-jump test did not converge")
+
+
+def installed_source_review(model_root):
+    if not model_root.is_dir():
+        emit("NR3_INSTALLED_MODEL_SOURCE", dict(root=str(model_root), status="NOT_FOUND_ACTIVE_CASE_UNVERIFIED"))
+        return
+    names = {"datm_datamode_clmncep_mod.F90", "datm_comp_mod.F90"}
+    found = [x for x in model_root.rglob("datm*.F90") if x.name in names]
+    require(len(found) <= 10, "Ambiguous installed DATM source inventory")
+    for path in sorted(found):
+        text = pin(path).read_text(encoding="utf-8", errors="strict")
+        lines = text.splitlines()
+        chosen = set()
+        for j, line in enumerate(lines):
+            if re.search(r"function\s+datm_esat", line, re.I):
+                chosen.update(range(max(0, j-1), min(len(lines), j+55)))
+            if re.search(r"qsat\s*<.*shum|shum.*=\s*qsat", line, re.I):
+                chosen.update(range(max(0, j-5), min(len(lines), j+6)))
+        emit("NR3_INSTALLED_MODEL_SOURCE", dict(path=str(path), sha256=digest(path),
+            source_excerpt=[f"{j+1}: {lines[j]}" for j in sorted(chosen)],
+            status="SOURCE_ONLY_ACTIVE_CASE_DATAMODE_AND_BUILD_NOT_VERIFIED"))
+    if not found:
+        emit("NR3_INSTALLED_MODEL_SOURCE", dict(root=str(model_root), status="DATM_SOURCE_NOT_FOUND"))
+
+
+def science_review(root, data, args):
+    raw, selected, missing, anomalies, external = data
+    raw = raw.copy()
+    for col in ("grid_T", "grid_D", "grid_P"):
+        raw[col] = np.nan
+    for record in external:
+        require("year" in record, "NR3 external evidence directory unavailable")
+        times, values = read_grid(record)
+        index = raw.index[raw.year.eq(int(record["year"]))]
+        grid = interpolate_grid(times, values, native_times(raw.loc[index], "TIMESTAMP_START"))
+        raw.loc[index, ["grid_T", "grid_D", "grid_P"]] = np.column_stack([grid["t2m"], grid["d2m"], grid["sp"]])
+    # Pressure comparison only at genuine measured site pressure.
+    grid_ok = raw[["grid_T", "grid_D", "grid_P"]].notna().all(axis=1)
+    for year, group in raw.loc[grid_ok & raw.TA_F_QC.eq(0)].groupby("year"):
+        delta = group.TA_F - group.grid_T
+        emit("NR3_MEASURED_T_VS_GRID", dict(year=int(year), n=len(group),
+            mean_site_minus_grid_C=float(delta.mean()), MAE_C=float(delta.abs().mean()),
+            abs_delta_P95_C=float(delta.abs().quantile(.95)), abs_delta_gt5C_share=float(delta.abs().gt(5).mean())))
+    for year, group in raw.loc[grid_ok & raw.PA_F_QC.eq(0)].groupby("year"):
+        delta = group.PA_F*1000 - group.grid_P
+        emit("NR3_MEASURED_PRESSURE_VS_GRID", dict(year=int(year), n=len(group),
+            median_site_minus_grid_Pa=float(delta.median()), abs_delta_P95_Pa=float(delta.abs().quantile(.95)),
+            inference="Pressure difference is not a measured grid elevation"))
+    validation = evaluate_qc0(raw.loc[grid_ok])
+    selected_keys = keys(selected, "time")
+    indexed = raw.set_index("native_key")
+    selected_index = selected.assign(native_key=selected_keys).set_index("native_key")
+    anomaly_grid = anomalies[["native_key", "source_csv_row", "TA_F", "TA_F_QC", "VPD_F", "VPD_F_QC",
+        "TA_ERA", "VPD_ERA", "ERA_e_water_hPa"]].copy()
+    anomaly_grid = anomaly_grid.join(indexed[["grid_T", "grid_D", "grid_P"]], on="native_key", validate="one_to_one")
+    anomaly_grid = anomaly_grid.join(selected_index[["TA_USE", "PSRF", "VPD_USE", "QBOT"]], on="native_key", validate="one_to_one")
+    emit("NR3_ANOMALY_CURRENT_SELECTION", dict(original_cohort=len(anomaly_grid),
+        current_finite_VPD=int(anomaly_grid.VPD_USE.notna().sum()), current_missing_VPD=int(anomaly_grid.VPD_USE.isna().sum()),
+        note="Existing finite values remain research candidates; finite count is not a repair-validation result"))
+    anomaly_methods = grid_values(anomaly_grid.TA_USE, anomaly_grid.PSRF, anomaly_grid.grid_T, anomaly_grid.grid_D, anomaly_grid.grid_P)
+    anomaly_rows = []
+    for method, e in anomaly_methods.items():
+        flags = candidate_flags(anomaly_grid.TA_USE, anomaly_grid.PSRF, anomaly_grid.grid_T, anomaly_grid.grid_D, anomaly_grid.grid_P, e)
+        emit("NR3_ANOMALY_METHOD_SCREEN", dict(method=method, original_cohort=len(anomaly_grid),
+            water_pass=int(flags["water_pass"].sum()), ice_cautions=int((~flags["ice_pass"]).sum()),
+            T_delta_fail=int((~flags["T_delta_pass"]).sum()),
+            combined_legacy_screen_pass=int(flags["legacy_screen_pass"].sum()),
+            public_CDEPS_reference_cap_flags=int(flags["public_CDEPS_reference_would_cap"].sum()),
+            approvals=0, status="DIAGNOSTIC_ONLY_NO_1484_AUTOFILL"))
+        if args.emit_anomaly_science_rows:
+            part = anomaly_grid.copy()
+            part["method"] = method
+            part["candidate_e_hPa"] = e
+            part["candidate_RH_water_pct"] = 100*e/esw(part.TA_USE)
+            part["candidate_RH_ice_pct"] = 100*e/esi(part.TA_USE)
+            for key, value in flags.items():
+                part[key] = value
+            part["APPROVED_FOR_NEW_VERSION"] = False
+            anomaly_rows.append(part)
+    if anomaly_rows:
+        emit_csv("NR3_1484_METHOD_PHYSICS", pd.concat(anomaly_rows, ignore_index=True))
+    targets = missing[["native_key", "episode", "missing_fields", "TA_USE", "PSRF",
+                       "HOLD_class", "Stage12B_reason", "Stage12E_reason", "Stage12G_reason"]].copy()
+    targets = targets.join(indexed[["grid_T", "grid_D", "grid_P", "TA_F_QC", "VPD_F_QC", "RH", "year", "month"]], on="native_key", validate="one_to_one")
+    targets["T_regime"] = temp_bin(targets.TA_USE)
+    targets["scientific_disposition"] = np.where(
+        targets.Stage12E_reason.eq("NO_VERIFIED_ERA5LAND_SOURCE_FOR_SITE_YEAR"),
+        "EVIDENCE_INSUFFICIENT_HOLD", "PHYSICS_CONFLICT_HOLD")
+    emit("NR3_SCIENCE_DISPOSITION", dict(inherited_238_preserved=True,
+        reason_counts=targets.groupby(["scientific_disposition", "Stage12E_reason"], dropna=False).size().rename("n").reset_index().to_dict("records"),
+        note="Retains inherited HOLD_class separately; the 41 T-delta and 19 ice failures are explicit screening conflicts, not simply unavailable evidence"))
+    position = {key: j for j, key in enumerate(selected_keys)}
+    locations = np.array([position[key] for key in targets.native_key], dtype=int)
+    methods = grid_values(targets.TA_USE, targets.PSRF, targets.grid_T, targets.grid_D, targets.grid_P)
+    potential = []
+    for method, e in methods.items():
+        flags = candidate_flags(targets.TA_USE, targets.PSRF, targets.grid_T, targets.grid_D, targets.grid_P, e)
+        final = reject_jumps(selected, locations, flags["VPD"],
+            flags["legacy_screen_pass"] & targets.VPD_F_QC.isin([1, 2]).to_numpy())
+        emit("NR3_MISSING_METHOD_SCREEN", dict(method=method, cohort=238,
+            external_year_available=int(targets.grid_T.notna().sum()), water_pass=int(flags["water_pass"].sum()),
+            water_ice_T_P_pass=int(flags["legacy_screen_pass"].sum()), with_legacy_jump_pass=int(final.sum()),
+            pass_in_protected172=int((final & targets.HOLD_class.eq("PHYSICS_CONFLICT_HOLD").to_numpy()).sum()),
+            remaining_screen_fail=int((~final).sum()), public_CDEPS_reference_cap_flags=int(flags["public_CDEPS_reference_would_cap"].sum()),
+            scientifically_approved_repairs=0, actual_remaining_HOLD=238,
+            interpretation="Sensitivity counts only; original protected172 never promoted or written"))
+        for j, row in targets.iterrows():
+            group = validation.loc[validation.method.eq(method) & validation.month.eq(row.month)
+                                   & validation.T_regime.eq(row.T_regime)]
+            potential.append(dict(native_key=row.native_key, source_csv_row=int(indexed.loc[row.native_key, "source_csv_row"]),
+                method=method, numeric_screen_pass=bool(final[j]), proposed_VPD_hPa=float(flags["VPD"][j]) if np.isfinite(flags["VPD"][j]) else None,
+                same_month_T_regime_QC0_n=len(group), QC0_dates=int(group.date.nunique()), QC0_years=int(group.year.nunique()),
+                same_regime_MAE_hPa=float(group.error_VPD_hPa.abs().mean()) if len(group) else None,
+                same_regime_bias_hPa=float(group.error_VPD_hPa.mean()) if len(group) else None,
+                target_year_has_no_dual_QC0=int(row.year) in {2017, 2018, 2023}, APPROVED_FOR_NEW_VERSION=False))
+    # Small exact target cohort: print its original QC and nearest true QC0
+    # brackets. Do not interpolate or label a distant anchor a repair.
+    truth_e = esw(raw.TA_F) - raw.VPD_F
+    truth = raw.loc[raw.TA_F_QC.eq(0) & raw.VPD_F_QC.eq(0) & truth_e.gt(0) & raw.VPD_F.ge(0)].copy()
+    truth["native_dt"] = native_times(truth, "TIMESTAMP_START")
+    for _, episode in missing.groupby("episode"):
+        dt = native_times(episode, "native_key")
+        left = truth.loc[truth.native_dt < dt.min()].tail(1)
+        right = truth.loc[truth.native_dt > dt.max()].head(1)
+        emit("NR3_EPISODE_QC0_BRACKETS", dict(episode=int(episode.episode.iloc[0]), start=str(dt.min()), end=str(dt.max()),
+            n=len(episode), left_hours=float((dt.min()-left.native_dt.iloc[0]).total_seconds()/3600) if len(left) else None,
+            right_hours=float((right.native_dt.iloc[0]-dt.max()).total_seconds()/3600) if len(right) else None))
+    for year in (2017, 2018, 2023):
+        group = raw.loc[raw.year.eq(year)]
+        emit("NR3_UNOBSERVED_YEAR_SOURCE", dict(year=year,
+            RH_numeric=int(group.RH.notna().sum()), TA_MDS_QC_counts={str(k): int(v) for k, v in group.TA_F_MDS_QC.value_counts(dropna=False).items()},
+            VPD_MDS_QC_counts={str(k): int(v) for k, v in group.VPD_F_MDS_QC.value_counts(dropna=False).items()},
+            status="NO_DUAL_QC0_TRUTH; RH availability alone does not supply a measured temperature pair"))
+    if args.emit_science_rows:
+        emit_csv("NR3_238_METHOD_SUPPORT", pd.DataFrame(potential))
+    else:
+        emit("NR3_METHOD_SUPPORT_SUMMARY", pd.DataFrame(potential).groupby("method").agg(
+            target_rows=("native_key", "size"), with_any_matched_QC0_dates=("QC0_dates", lambda x: int(x.gt(0).sum())),
+            matched_QC0_years_min=("QC0_years", "min"), matched_QC0_dates_min=("QC0_dates", "min")).reset_index().to_dict("records"))
+    installed_source_review(args.model_root)
+    emit("NR3_SCIENCE_GATE", dict(status="METHOD_COMPARISON_ONLY_NO_REPAIR_ACCEPTANCE", actual_remaining_HOLD=238,
+        original_anomalies=1484, missing_overlap=172, approvals=0,
+        grid_orography_required=True, BASE_sensor_QA_still_required=True,
+        model_case_build_unverified=True, no_thresholds_relaxed=True))
 
 
 def self_test():
@@ -412,6 +778,24 @@ def self_test():
     q = .622 * epa / (66000 - .378 * epa)
     recovered = q * 66000 / (.622 + .378 * q)
     require(abs(recovered - epa) < 1e-10, "QBOT vapour pressure closure")
+    hypotheses = grid_values(np.array([-20., 5.]), np.array([66000., 66000.]),
+        np.array([-18., 7.]), np.array([-25., -1.]), np.array([70000., 70000.]))
+    require(np.allclose(hypotheses["A_ABSOLUTE_E"], esw(np.array([-25., -1.]))), "Absolute-e hypothesis")
+    require(np.allclose(hypotheses["B_WATER_RH"]/esw(np.array([-20., 5.])),
+        esw(np.array([-25., -1.]))/esw(np.array([-18., 7.]))), "Grid-RH hypothesis")
+    require(np.allclose(hypotheses["C_SPECIFIC_Q"], hypotheses["A_ABSOLUTE_E"]*66000/70000),
+        "Specific-Q pressure transfer")
+    stats_frame = pd.DataFrame({"date": ["20170101", "20170101", "20170102"],
+        "year": [2017, 2017, 2017], "error_VPD_hPa": [1., 1., 3.], "error_e_hPa": [-1., -1., -3.]})
+    metrics = error_summary(stats_frame)
+    require(np.isclose(metrics["MAE_hPa"], 5/3) and np.isclose(metrics["equal_date_MAE_hPa"], 2.),
+        "Equal-date errors must differ from pseudo-independent halfhour weighting")
+    jumps = reject_jumps(pd.DataFrame({"VPD_USE": [1., np.nan, np.nan, 1.]}),
+        np.array([1, 2]), np.array([2., 8.]), np.array([True, True]))
+    require(jumps.tolist() == [False, False], "Adjacent proposed-pair jump rejection")
+    f = candidate_flags(np.array([-20.]), np.array([66000.]), np.array([-20.]),
+        np.array([-25.]), np.array([66000.]), np.array([-1.]))
+    require(not f["legacy_screen_pass"].any(), "Negative e cannot pass candidate physics")
     # Exercise the actual 238=172+66 reconciliation, with the narrower six
     # source-year rows nested inside 66; these are synthetic, not site data.
     dt = pd.date_range("2017-01-01", periods=238, freq="30min")
@@ -445,29 +829,43 @@ def self_test():
         else:
             raise AssertionError("Read-only guard failed")
     deny_writes("open", ("unused", "r", 0))
-    emit("NR3_SELF_TEST", "PASS: historical ISO-T/space equivalence, timezone/off-grid/duplicate rejection, exact joins, unequal spans, CSV row IDs, phase/QBOT algebra, 238/172/66/6 nested counts, overlaps, filled-protected-HOLD rejection and mutation guard; no files created")
+    emit("NR3_SELF_TEST", "PASS: ISO-T/space and exact clocks, source joins, phase/QBOT algebra, A/B/C humidity transfers, date-weighted errors, joint-candidate jump rejection, 238/172/66/6 nested counts, protected HOLDs and mutation guard; no files created")
 
 
 def main():
+    global COMPACT
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--self-test", action="store_true")
     mode.add_argument("--check", action="store_true")
+    mode.add_argument("--science", action="store_true")
     mode.add_argument("--raw-zip", type=Path)
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--emit-missing", action="store_true")
     parser.add_argument("--emit-anomalies", action="store_true")
+    parser.add_argument("--emit-science-rows", action="store_true")
+    parser.add_argument("--emit-anomaly-science-rows", action="store_true")
+    parser.add_argument("--compact", action="store_true")
+    parser.add_argument("--model-root", type=Path,
+        default=ROOT.parent.parent / "CTSM")
     args = parser.parse_args()
+    COMPACT = args.compact
     sys.addaudithook(deny_writes)
     emit("NR3_AUDIT_VERSION", VERSION)
     self_test()
     if args.raw_zip:
         raw_zip(args.raw_zip)
-    elif args.check:
-        audit(args.root, args)
+    elif args.check or args.science:
+        result = audit(args.root, args)
+        if args.science:
+            science_review(args.root, result, args)
     for path, expected in READS.items():
         require(digest(path) == expected, "Input changed during audit: " + path)
     emit("NR3_READ_SHA256", READS)
+    if COMPACT:
+        emit("NR3_PRESERVATION", dict(sha_checked_before_and_after=len(READS),
+            Stage12G_selected_sha=READS.get(str(args.root / G / (SITE + "_STAGE12G_INCOMPLETE_NOLEAP.csv"))),
+            source_manifest_sha=READS.get(str(args.root / S07 / "exact_input_manifest.json"))))
     emit("NR3_COMPLETE", "READONLY_PASS; stdout only; no data/shadow/report/model writes or approvals")
 
 

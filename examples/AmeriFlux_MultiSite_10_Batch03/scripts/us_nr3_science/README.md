@@ -101,3 +101,71 @@ genuine simultaneous tower QC0 using held-out dates and source years.
 
 No threshold relaxation, automatic QC2 filling, source/shadow overwrite,
 DATM, AD400 or Slurm is authorised.
+
+## Second pass: grid physics and genuine QC0 tests (v2)
+
+```bash
+python -B examples/AmeriFlux_MultiSite_10_Batch03/scripts/us_nr3_science/nr3_01_source_inventory_READONLY.py --science --compact
+```
+
+This rechecks the inventory before comparing fixed, uncalibrated hypotheses
+using existing NR3 ERA5-Land files only. It needs the same `netCDF4` package
+already used by Stage09/10. ZIP NetCDFs are opened in read-only memory,
+without extraction or downloads. The first operator-returned successful
+inventory established 238 missing across 53 episodes, intersection 172 with
+the 1,484 source anomalies, and 66 other gaps (41 temperature-difference,
+19 ice-screen failures and six missing external-year rows). These are
+operator-returned, SHA-linked results, not a new remotely executed run here.
+
+The science mode:
+
+- Checks the exact padded UTC hourly coordinates, units, point consistency,
+  finite T2m/D2m/SP and available static/orography variables for all existing
+  NR3 years. Absent grid elevation remains explicitly unresolved; pressure
+  differences are not converted into a claimed measured grid altitude.
+- Uses only the documented native midpoint +7-hour alignment. It does not
+  optimise time shifts or approve a DATM clock.
+- Compares **A: absolute vapour pressure**, **B: water-relative humidity**,
+  and **C: specific humidity** transferred from grid to retained tower T/P.
+  C is computed by converting grid e/P to q, then q to e at retained site P.
+  No method is fitted or bias-corrected after seeing the observations.
+- Validates against original simultaneous tower TA/VPD QC0, with basic
+  water-physical truth checks. It retains observed ice-supersaturation and
+  site-grid-temperature conflicts in the truth cohort rather than filtering
+  away difficult cases according to the proposed method. Reports VPD/e MAE,
+  bias, RMSE, P95 absolute error and >1 hPa error share, by whole source year
+  and temperature regime, plus equal-date and equal-year weighted summaries.
+  The 1 hPa level is a reported error diagnostic, not an admission threshold.
+  These fixed methods have no training folds; full-year test blocks and
+  complete-date summaries avoid random-halfhour splits. The downscaled
+  companion may have used tower observations in its original fit and is
+  therefore not scored as an independently withheld prediction.
+- Evaluates all three methods separately on the original 1,484 anomalies
+  and current 238 missing slots. Existing water/ice/T/P/QBOT limits and the
+  4 hPa adjacency guard are retained. Proposed adjoining values are screened
+  jointly in memory. Numerical passes are **sensitivity counts**, never
+  repaired counts or permission to fill the protected 172. Actual HOLD=238
+  and approved repairs=0 throughout this workflow.
+- Reports matched month/temperature-regime QC0 support without inventing a
+  scientific sample-size cutoff. No truth in 2017/2018/2023 is inferred from
+  ERA-derived QC2. Original RH/MDS availability and true QC0 brackets are
+  shown separately, without interpolating any event.
+- Prints a public CDEPS saturation/cap sensitivity using reference Git blob
+  `181eac30acb63214204fd54476a599827e886bfa` from
+  [datm_datamode_clmncep_mod.F90](https://github.com/ESCOMP/CDEPS/blob/8b51a06b7e1633f640983d619bc9c7d34de34b84/datm/datm_datamode_clmncep_mod.F90).
+  The formula is a reference, not assumed to be the installed/active model.
+  It also reads DATM source excerpts under the existing project `CTSM`
+  directory (override with `--model-root PATH`). Installed source alone does
+  not prove the active case datamode or executable build.
+
+`--compact` omits repetitive baseline metadata and the long hash dictionary;
+it still verifies those files before and after the run and prints the source
+manifest and selected-shadow hashes. `--emit-science-rows` prints the 238x3
+method-support table, and `--emit-anomaly-science-rows` prints the 1484x3
+physics table. Both are terminal-only and should be requested separately
+because they produce substantial output. Neither switch writes a report.
+
+Grid dewpoint is interpreted over water. Ice-relative RH at retained air
+temperature is a separate diagnostic; true ice supersaturation must not be
+described as negative vapour pressure. The inherited ice HOLD remains in
+force. See [ECMWF near-surface humidity documentation](https://confluence.ecmwf.int/pages/viewpage.action?pageId=177484060).
