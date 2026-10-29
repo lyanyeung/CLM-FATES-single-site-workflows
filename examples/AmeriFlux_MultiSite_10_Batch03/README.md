@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 03:56 UTC US-Mpj actual Stage14D full-site result:** [315,360 native HH all finite, water VPD/QBOT and TBOT conversion PASS; 17 signed Stage13O 2014 source repairs preserved; 610 RHwater<5% provenance warnings and 3,791 subfreezing RHice>100% phase-model cautions retained WITHOUT mass-clipping or forcing edits](docs/US_MPJ_STAGE14D_ACTUAL_FULL_SITE_PASS_MANUAL_DECISION_20261029.md). **Manual disposition:** meteorology numerical source QC closed; Post-v5/DATM/AD400 not yet admitted pending PFT, native time, ZBOT and actual DATM saturation/cap compatibility. US-Me6 and US-NR1 delegated study documents remain available; US-NR3 separately reserved.
+
+
 > **2026-10-29 new station ownership and next run:** **Claude** scientific-workstream handoffs: [US-Me6 45 missing HH / 19HH winter source-QC2](docs/US_ME6_CLAUDE_DIFFICULT_SITE_HANDOFF_20261029.md) and [US-NR1 234 missing HH after signed Stage13P](docs/US_NR1_CLAUDE_DIFFICULT_SITE_HANDOFF_20261029.md). **US-NR3** stays reserved for independent advanced-model review. **ChatGPT/operator** takes lowest-friction **US-Mpj**: [one-pass Stage13O signed 315360 full meteorology and model physics screen](docs/US_MPJ_FASTEST_ONEPASS_SCIENCE_GATE_20261029.md), with pinned [read-only executable](scripts/stage14/14d_US_Mpj_final_315360_science_gate_READONLY.py). **US-MMS** Stage14C and **US-MtB** MtB04 are now numerically complete isolated research candidates, still not admitted for Post-v5/DATM/AD400. Claude handoff documents are saved to GitHub, **not automatically sent** to any Claude service.
 
 
