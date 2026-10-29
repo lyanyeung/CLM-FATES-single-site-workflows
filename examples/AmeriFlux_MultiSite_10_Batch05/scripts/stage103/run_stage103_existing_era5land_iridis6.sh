@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage103"
+mkdir -p "$BASE"
+RUN="$(mktemp -d "$BASE/run_$(date -u +%Y%m%dT%H%M%SZ)_XXXXXXXX")"
+ROOT="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows"
+PATH_IN_REPO="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage103/crosswalk_existing_era5land.py"
+curl -fLsS --retry 3 "$ROOT/79beb2fd0fd065c7d7f26da80fdf45f0fedf94cf/$PATH_IN_REPO" -o "$RUN/stage103.py"
+test "$(git hash-object "$RUN/stage103.py")" = "3bc4e14fa1f483e77a5455cf4e354bc9ba37ecde"
+python3 -B -m py_compile "$RUN/stage103.py"
+D102="$HOME/ameriflux_batch05_stage102_evidence/run_20261029T085107Z_GyQ3z3Wf/results"
+D31="$HOME/ameriflux_batch05_stage31/H01_external_reference_20261026T120354Z_3242355"
+D34="$HOME/ameriflux_batch05_stage34/reference_validation_20261026T131903Z_715715"
+python3 -B "$RUN/stage103.py" --stage102 "$D102" --stage31 "$D31" --stage34 "$D34" --out "$RUN/results" 2>&1 | tee "$RUN/stage103.log"
+echo "COPY BACK: all STAGE103 output above, or the whole $RUN/stage103.log"
+echo "STAGE103 RUN DIRECTORY=$RUN"
