@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage81_Wjs"
+mkdir -p "$BASE"
+SCRIPT="$BASE/stage81_Wjs.py"
+COMMIT="79733c2176f439e9851afa738d553b3e7b01c360"
+BLOB="4f8e4072d1dcebf11e7aff98badd04363bb4982f"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage81/81_US_Wjs_393_original_HH_QC_RH_T_audit_READONLY.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "$BLOB"
+echo "STAGE81 SOURCE SCRIPT EXACT GITHUB SHA VERIFIED"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+D27="$HOME/ameriflux_batch05_stage27/source_comparison_20261026T040257Z_1589604"
+D63="$HOME/ameriflux_batch05_stage63/exact10_site_204_crosswalk_20261029T025331Z_1904396"
+D80="$HOME/ameriflux_batch05_stage80_Vcm/Vcm_direct336_20261029T045457Z_2529299"
+OUT="$BASE/Wjs_original393_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SCRIPT" --stage27 "$D27" --stage63 "$D63" --stage80 "$D80" --out "$OUT" 2>&1 | tee "$BASE/stage81_Wjs_original.log"
+echo "STAGE81_REPORTS=$OUT"
+echo "STAGE81 AUDIT ONLY: ORIGINAL/QC/PRIOR714/DATM/CIME/SLURM UNCHANGED"
