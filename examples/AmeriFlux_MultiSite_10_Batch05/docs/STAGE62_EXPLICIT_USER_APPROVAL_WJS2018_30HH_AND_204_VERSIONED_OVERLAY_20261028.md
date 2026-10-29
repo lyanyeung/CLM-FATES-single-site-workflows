@@ -69,3 +69,33 @@ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-sing
 ```
 
 Corrected immutable GitHub SHA/pins verified. The corrected version has **not yet been executed on IRIDIS6**, so a 204-row output is not claimed until operator PASS. Model forcing and Slurm remain unauthorised.
+
+
+## CONFIRMED: actual Stage62 IRIDIS6 operator PASS, 2026-10-29 00:17 UTC
+
+**This verified run supersedes the earlier pending/compile-failure status above.** The investigator re-ran corrected, SHA-pinned Stage62 on IRIDIS6 `login6003` and provided the actual terminal output:
+
+```text
+STAGE62 SOURCE VERIFIED
+STAGE62 SELF-TEST PASS | explicit Wjs2018 30HH approval, strict 174+30 to 204, original/prod write forbidden
+STAGE62 SUCCESS | ORIGINAL_174_VERIFIED_UNCHANGED + WJS_2018_30_EXPLICIT_USER_APPROVED = VERSIONED_204
+STAGE62 NEW_30 FIRST 201803111930 LAST 201803121000 SOURCE_VPD_QC1_MDS_QC1=30 ORIGINAL_NEGATIVE_RH=4
+STAGE62 APPROVED_2018_BOUNDS 31 MAX_ADJACENT_ABS_VPD_JUMP 0.09194391 GT2=0
+STAGE62 COUNTS OLD=174 NEW=30 TOTAL=204 SOURCE_ORIGINAL_UNCHANGED=True
+STAGE62 USER_APPROVED_CANDIDATE_ONLY; DATM_NOT_AUTHORIZED; NO_SLURM_JOBS
+STAGE62 NO SOURCE/PRIOR_174/DATM/CIME/SLURM MODIFICATIONS
+```
+
+Full actual operator report directory:
+`/home/ly3n24/ameriflux_batch05_stage62/wjs2018_30HH_approved_versioned_204_20261029T001706Z_431668`
+(resolves to `/iridisfs/home/ly3n24/...`).
+
+**Verified versioned candidate output:**
+`/iridisfs/home/ly3n24/ameriflux_batch05_stage62/wjs2018_30HH_approved_versioned_204_20261029T001706Z_431668/stage62_VERSIONED_204_APPROVED_RH_VPD_native_overlay.csv`
+
+**Exact SHA256:**
+`7d2b0b3c8018b9cc28c6d8a7ea2f28dd593204f96e2f279433b61d721689a5a7`.
+
+Interpretation: **204 exact user-approved versioned RH/VPD candidate half-hours** (174 original, 30 new Wjs2018). Source RH during the 2018 30-HH gap is reconstructed by 15.5-hour QC0-endpoint interpolation, **not measured**. All prior approvals and original FLUXMET, historical QC fields, source MDS, existing Stage56 174 overlay, and unapproved P1/P2/P3 holds remain separate and unchanged. This operator run did **not** modify DATM forcing/CIME cases or schedule Slurm jobs. This is not a blanket science approval for other Batch05 events.
+
+**Next suggested action:** an independent **read-only, exact-SHA inventory** of the new 204-row overlay versus all remaining source HOLD cohorts. Only after resolving relevant residual scientific holds and explicitly authorizing a forcing-specific operation should production DATM be modified.
