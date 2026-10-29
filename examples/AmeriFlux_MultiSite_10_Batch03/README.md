@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 US-NC2 actual Stage14E PASS; now US-MOz next:** [US-NC2 confirmed 367920 fully finite signed Stage11Q source, all four March2025 suspect VPD jumps below 4hPa; 11 RHwater<5% and 1003 ice RH>100% warnings retained, no Post-v5](docs/US_NC2_STAGE14E_ACTUAL_367920_ONEPASS_MANUAL_DECISION_20261029.md). Next [US-MOz first 27 original Jan2005 QC1 region isolated reanalysis numerical sensitivity, preserve existing 40 operator-approved Stage13L slots](docs/US_MOZ_NEXT_FIRST27_QC1_ONEPASS_EXPLORATORY_20261029.md) via [signed-data one-pass script](scripts/stage14/14f_US_MOz_27QC1_onepass_isolated_ERA5Land_sensitivity.py). This new method is research-only, unapproved as measured tower source; no automatic CIME/DATM/AD400 or Slurm.
+
+
 > **2026-10-29 ten-site numeric state and next action:** [5 completed numerical research forcings, 4 with quantified remaining VPD/QBOT gaps, 1 (US-Me2) without comparable completed input; next easiest US-NC2, one SHA-signed complete 367920HH source/2025-March QC review](docs/BATCH03_TEN_SITE_PROGRESS_AND_US_NC2_NEXT_ONEPASS_20261029.md), [pinned one-pass source code](scripts/stage14/14e_US_NC2_next_onepass_site_march2025_QC_READONLY.py). Stage11Q is selected ONLY if its actual signed output exists; otherwise use verified Stage11L. Claude studies US-Me6/US-NR1; US-NR3 is reserved; no production Post-v5/DATM/AD400 approval.
 
 
