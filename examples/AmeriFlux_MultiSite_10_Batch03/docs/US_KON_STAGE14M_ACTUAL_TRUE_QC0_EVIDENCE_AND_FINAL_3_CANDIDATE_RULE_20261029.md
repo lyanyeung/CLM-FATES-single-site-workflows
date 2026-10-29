@@ -40,3 +40,23 @@ All these are adjacent-source/sensitivity scientific warnings, **not** proof the
 Use the existing signed Stage14M report and Stage14K primary source as parent. For ONLY three exact source T-QC0/VPD-QC1 missing slots `201110230730`, `201202251030`, `201208050900`, evaluate: (i) the 14M actual previous and next paired observed QC0-RH anchors, (ii) linear source-native time weighted interpolation of measured **water RH** between those endpoints, (iii) original selected tower T and site PSRF to recover VPD, QBOT, (iv) original candidate versus source companion ERA-RH contrast, (v) full **both** 30min selected source joins, requiring ≤4 hPa VPD, ≤20 pp RHwater, ≤0.003 kg/kg QBOT, (vi) physical water/ice bounds, exact prior SHA checks and source QCs. If a candidate fails ANY check, preserve it as HOLD; no auto-repair of neighbours. Do not release the other six holds, including the full Feb22 three-time event. Write only an independent research sensitivity if numerical checks pass and label it NOT Post-v5/DATM/AD400/Slurm approved.
 
 **Decision pending actual test:** Keep original Stage14K as preferred incomplete numerical research dataset; Stage14L as isolated seven-neighbour alternative; Stage14M purely QC0 provenance. The script's actual numerical candidate values and two-edge RH/VPD/QBOT checks must be observed before final approval.
+
+
+## Source-controlled Stage14N single action (unexecuted)
+
+[Stage14N exact three true-QC0-bracketed native missing-hour scientific candidate evaluator](../scripts/stage14/14n_US_Kon_three_nearby_QC0_RH_candidates_ONEPASS.py), pinned Git commit `7b107a88ed74d5bb1d9c189c9260afd1d063eb95`, blob `985d0f93f517e13053d7669c905b85ac6dabeff1`. Written and source-delimiter-reviewed in GitHub; **not executed on IRIDIS6** at publication.
+
+Unlike blind imputation, only source original target `TA_F_QC0/VPD_F_QC1` with original **both-QC0** RH anchors within 3h each, ≤20 percentage-point observed anchor difference, unchanged real original QC0 T at target, original selected T−ERA ≤5°C, valid water/ice and BOTH adjacent 30-minute ΔVPD≤4 hPa, ΔRH≤20pp and ΔQBOT≤0.003 kg/kg are allowed as **numerically complete research-only trials**. Failed candidate time(s) remain original protected NaN. It compares interpolated RH with contemporary companion ERA RH but neither is a new observed humidity measurement. The other six exact source held native times, 11 original severe >10hPa source edges and all previous signed Stage14K/L sources remain unchanged. The new file's exact missing count is determined by real IRIDIS6 results, not assumed to be six.
+
+```bash
+(
+ set -euo pipefail
+ F="$HOME/US_Kon_3_QC0_final_candidates.py"
+ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/7b107a88ed74d5bb1d9c189c9260afd1d063eb95/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage14/14n_US_Kon_three_nearby_QC0_RH_candidates_ONEPASS.py" -o "$F"
+ test "$(git hash-object "$F")" = "985d0f93f517e13053d7669c905b85ac6dabeff1"
+ python3 -B -c 'import pathlib,sys; f=pathlib.Path(sys.argv[1]); compile(f.read_text(),str(f),"exec"); print("SYNTAX PASS")' "$F"
+ python3 -B "$F" --run 2>&1 | tee "$HOME/US_Kon_3_QC0_final_candidates.log"
+)
+```
+
+If no candidate passes the strict source/QC/physical/two-interface gates, the original nine missing science holds remain and the study proceeds with that transparent methodological limitation; **do not** silently loosen the thresholds, interpolate Feb22's anomalous T or auto-authorize DATM/AD400.
