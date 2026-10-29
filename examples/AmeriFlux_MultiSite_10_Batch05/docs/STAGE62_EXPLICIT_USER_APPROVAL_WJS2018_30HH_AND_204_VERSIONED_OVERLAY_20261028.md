@@ -46,3 +46,26 @@ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-sing
 ```
 
 Status: Stage62 code and immutable launcher SHA verified on GitHub, **actual IRIDIS6 syntax/self-test/source checks and 204-row output still require operator execution**. No Slurm submission or official forcing change is part of Stage62.
+
+## Stage62 first operator attempt: compile-only numeric-identifier failure
+
+Operator logged:
+```
+STAGE62 SOURCE VERIFIED
+File ".../stage62.py", line 320
+    2018_new_boundary_count=len(boundary),
+        ^
+SyntaxError: invalid decimal literal
+```
+
+Root cause is **two** invalid manifest `dict(...)` keyword identifiers that begin with a number. Both were fixed together: `Wjs_2018_new_boundary_count` and `Wjs_2018_new_abs_jump_gt2hPa`. GitHub source was re-fetched; no remaining direct numeric-leading keyword assignment was found in the script. The first attempt stopped at Python compilation, **before opening original reports or creating the Stage62 output**, therefore the original 174-row overlay and other source files were untouched.
+
+Corrected Stage62 Python source: commit `fef79c2e8e2386550871ca9700686875f13dbe3e`, Git blob `cd6bf50688faaa6300b0386ebccded2a95b3a902`.
+
+Corrected Stage62 launcher: commit `59ba0d5ae1fe89b7f0ba172498b9b76f822ada94`, Git blob `8e4998008362de1fb4e8ecfc169a9188bbad3af2`, retains compulsory `python3 -B -m py_compile` and `--self-test` before any data writes.
+
+```bash
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/59ba0d5ae1fe89b7f0ba172498b9b76f822ada94/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage62/run_stage62_iridis6.sh" -o "$HOME/run_stage62.sh" && test "$(git hash-object "$HOME/run_stage62.sh")" = "8e4998008362de1fb4e8ecfc169a9188bbad3af2" && bash "$HOME/run_stage62.sh"
+```
+
+Corrected immutable GitHub SHA/pins verified. The corrected version has **not yet been executed on IRIDIS6**, so a 204-row output is not claimed until operator PASS. Model forcing and Slurm remain unauthorised.
