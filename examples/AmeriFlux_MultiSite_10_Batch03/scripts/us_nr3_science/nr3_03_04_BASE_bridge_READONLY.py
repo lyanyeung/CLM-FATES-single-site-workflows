@@ -17,7 +17,7 @@ sys.dont_write_bytecode = True
 import numpy as np
 import pandas as pd
 
-VERSION = "nr3-03-04-v1-20261029"
+VERSION = "nr3-03-04-v1.1-20261029"
 BASE_SHA = "85db3e85463aaf300f326c0766f24c8a228b174f679968265e97b69bd619a35b"
 FLUX_SHA = "dbc365368a492285ea73193b1ff1dbb0336673f9448c18d734e82fb7717087a2"
 STAGE12G_SHA = "b16f81d125944c47cf6d1886d51461053091cd819cb3d5048cea49247bccc48f"
@@ -99,9 +99,21 @@ def sonic_inverse(ts, rh, p):
             "sonic humidity inverse did not converge")
     return t
 
+def base_column_map():
+    """One source of truth for BASE column aliases used in both stages."""
+    return {x: ("BASE_SONIC" if x == "T_SONIC" else "BASE_" + x)
+            for x in B if x not in ("TIMESTAMP_START", "TIMESTAMP_END")}
+
 def self_test():
     require(len(BASE_SHA)==64 and len(FLUX_SHA)==64 and len(STAGE12G_SHA)==64,
             "expected digest length")
+    aliases = base_column_map()
+    require(aliases["T_SONIC"] == "BASE_SONIC", "T_SONIC alias regression")
+    require(set(aliases.values()) == {"BASE_" + x for x in B[2:] if x!="T_SONIC"} | {"BASE_SONIC"},
+            "BASE aliases incomplete or conflicting")
+    probe = pd.DataFrame({"T_SONIC": [1.25], "RH": [50.0], "PA": [65.0]}).rename(columns=aliases)
+    require({"BASE_SONIC","BASE_RH","BASE_PA"} <= set(probe.columns) and
+            np.isfinite(probe["BASE_SONIC"].iat[0]), "BASE rename smoke-test")
     x = np.array([-20., 0., 15.])
     require(np.all(esw(x)>0), "esw")
     require(np.all(esi(x)>0), "esi")
@@ -139,8 +151,9 @@ def load_sources(base_path, manifest_path):
         ends = pd.to_datetime(frame.TIMESTAMP_END, format="%Y%m%d%H%M", errors="raise")
         require((ends-clock).eq(pd.Timedelta(minutes=30)).all(),
                 "non-30min source interval")
-    b = b.rename(columns={x:"BASE_"+x for x in B if x not in
-                           ("TIMESTAMP_START", "TIMESTAMP_END")})
+    b = b.rename(columns=base_column_map())
+    require({"BASE_SONIC", "BASE_PA", "BASE_RH", "BASE_TA"} <= set(b.columns),
+            "BASE exact source alias schema is incomplete")
     f = f.rename(columns={"PA":"FLUX_PA", "RH":"FLUX_RH"})
     d = f.merge(b.drop(columns="TIMESTAMP_END"), on="TIMESTAMP_START",
                 how="left", validate="one_to_one", indicator=True)
