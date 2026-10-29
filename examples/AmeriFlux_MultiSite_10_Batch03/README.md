@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 US-Kon original site T observation audit ACTUAL:** [Stage14S shows 192 consecutive HALF-HOURLY original TA_F_QC1 between May22 11:00 and May26 10:30, nearest true T QC0 before is Apr27 08:00 (690h) and after May26 11:00; original 02:00 17.521°C/QC1 vs verified ERA5-Land13.126°C; apparent 4.407°C Stage14R 02:00→02:30 jump is unvalidated *source mixing*, not measured event](docs/US_KON_STAGE14S_ACTUAL_QC1_192HH_AND_FINAL_STAGE14T_BOUNDED_RESEARCH_20261029.md). Stage14R **1 true original humidity HOLD remains**; next [Stage14T SINGLE final May26 source-QC1 ERA5-Land+paired ERA bounded left-interface research-only trial](scripts/stage14/14t_US_Kon_May26_last_QC1_plateau_ERA5_bounded_research.py) not yet run, cannot claim zero missing or DATM/AD400 approval.
+
+
 > **2026-10-29 07:08 UTC ACTUAL US-Kon Stage14Q 2/2 bounded science groups PASS — numerical humidity gaps now 2/280320:** [2011 Oct15 one low-confidence QC1-endpoint RH and 2012 Aug05 five VPD-QC1 plus four T-QC1 corrections, all group-level T/VPD/RH/QBOT/30min joins checked, all original QC0 immutable](docs/US_KON_STAGE14Q_ACTUAL_2_HOLDS_REMAIN_AND_14R_FINAL_SOURCE_SCIENCE_20261029.md). Two historical source HOLDs remain: 201105261100 original T QC0/VPD QC1 with nearby T-QC1 spikes, and 201109291830 original T QC1/VPD QC2 ERA absolute VPD mismatch. Next [Stage14R single isolated dual-source ERA5-Land/companion ERA RH bounded group sensitivity](scripts/stage14/14r_US_Kon_final_two_connected_dual_ERA_sensitivity.py), **NOT YET run on IRIDIS6**; no originals, DATM or AD400 jobs, regardless whether 0-NaN hypothetical research output emerges.
 
 
