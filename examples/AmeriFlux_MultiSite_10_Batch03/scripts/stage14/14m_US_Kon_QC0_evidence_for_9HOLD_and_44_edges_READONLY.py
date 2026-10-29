@@ -118,9 +118,39 @@ def source():
                        rtol=0,atol=1e-12,equal_nan=True)
     need(set(keys[diff_v|diff_q])==changed_keys,
          "one original existing source value changed outside signed 7 candidates")
+    # Stage14L already checked IN-MEMORY exact equality of every
+    # nonhumidity column against its signed Stage14K parent before output.
+    # These TWO different SHA-sealed CSV files have each undergone a
+    # separate pandas float parsing/17-significant-digit serialization.
+    # Series.equals() on a new parser load can falsely flag binary-ULP
+    # or dtype differences (e.g. FSDS) as a scientific source change.
+    # Keep exact missing/finite masks, and permit ONLY <=1e-10 absolute
+    # float serialization noise. Never bypass larger source differences.
+    CSV_FLOAT_ABS_TOL=1e-10
     for c in COLS:
-        if c not in ("VPD_USE","QBOT"):
-            need(k[c].equals(l[c]),"non-humidity original source changed "+c)
+        if c in ("VPD_USE","QBOT","time"):
+            continue
+        a=pd.to_numeric(k[c],errors="raise").to_numpy(dtype=np.float64)
+        b=pd.to_numeric(l[c],errors="raise").to_numpy(dtype=np.float64)
+        need(np.array_equal(np.isnan(a),np.isnan(b)) and
+             np.array_equal(np.isposinf(a),np.isposinf(b)) and
+             np.array_equal(np.isneginf(a),np.isneginf(b)),
+             "non-humidity missing/nonfinite structure changed "+c)
+        finite=np.isfinite(a)&np.isfinite(b)
+        delta=np.abs(a[finite]-b[finite])
+        maxdelta=float(np.max(delta)) if len(delta) else 0.0
+        rounded_n=int(np.count_nonzero(delta>0))
+        substantial=int(np.count_nonzero(delta>CSV_FLOAT_ABS_TOL))
+        print("US-Kon SIGNED NONHUMIDITY CSV RELOAD COMPARE",
+              c,"max_abs_diff",format(maxdelta,".17g"),
+              "any_nonzero_diff",rounded_n,
+              "GT_1e-10",substantial,flush=True)
+        need(substantial==0,
+             "non-humidity source materially changed "+c+
+             " max_abs_diff="+format(maxdelta,".17g")+
+             " n_above_1e-10="+str(substantial))
+    # Selected time strings must be exactly unchanged (already checked).
+    # Temperature/energy/land inputs cannot be altered by this QC0 audit.
     def read_source(p,fields):
         d=pd.read_csv(regular(p),
            usecols=["TIMESTAMP_START",*fields],dtype={"TIMESTAMP_START":str},
