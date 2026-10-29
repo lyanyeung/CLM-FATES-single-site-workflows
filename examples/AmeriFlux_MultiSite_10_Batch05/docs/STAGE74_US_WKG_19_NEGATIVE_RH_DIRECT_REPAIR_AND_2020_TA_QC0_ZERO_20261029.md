@@ -61,3 +61,14 @@ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-sing
 ```
 
 **Policy recorded separately** in [Batch05 README](../README.md): suspicious TA QC0→QC1 repairs use both QC0 bracketing observations for the whole QC1 run; QC1→QC2 repairs use original QC1 bracketing values for the whole QC2 run, maintaining original QC flags in source and an auditable versioned corrected overlay. This is the operator's general forward-looking Batch05 rule; it does not mean US-Wkg 2020 source QC0 zero-temperature corruption is a QC0→QC1 transition.
+
+## Actual Stage74 operator success and latest default-acceptance policy
+
+Actual IRIDIS6 Stage74 rerun from the corrected immutable GitHub source **SUCCEEDED**. The source original 10 events/22HH were handled as **19 direct RH-negative repair** (13 VPD-only at original TA, six correction of objectively corrupted 2020 native QC0 temperature zeros while VPD unchanged) plus **3 original RH>=0 HH passed unchanged**. Prior 240 approved records retained, new 259 total versioned approvals. SHA256 `c94e0adc96df846b682f69e3c85d2be8247d23ba7debed686a3462bb5927fc6f` at `/home/ly3n24/ameriflux_batch05_stage74_Wkg/Wkg_direct_19_negative_RH_20261029T042245Z_2362992/stage74_VERSIONED_259_APPROVED_RH_VPD_TA_native_overlay.csv`. Source ZIP, historical original QC, prior 240, DATM, CIME and Slurm unchanged. The earlier Stage74 formatter bug is fully resolved.
+
+**Later investigator confirmation:** Accept routine negative RH corrections and suspect `QC0→QC1`/`QC1→QC2` contiguous-block repairs automatically using the existing original-source QC-priority rule; only source intervals with **obviously suspect original temperature or meteorology** receive a focused exception review. No repeated HOLD by default. Two outstanding native-source temperature *exceptions* (not automatic revocation of accepted 259 numerical overlay rows):
+
+1. `2025-03-07 12:00–13:00`: source QC0 TA fell +6.315 to −1.708 then −4.120°C with product processed TA_ERA around +10°C; Stage74 numerical RH at 12:30 98.87% was obtained using the suspicious original −4.120°C and corrected VPD 0.051 hPa. Check local source temperature specifically before forcing promotion.
+2. `2025-09-10 13:00`: source QC0 TA=12.890°C between 29.520°C and 23.470°C source QC0 native neighbors; source `TA_ERA`≈29.396°C; source original rainfall was recorded around the episode. Stage74 numerical negative RH correction gave VPD 8.404 hPa and RH 43.44% at **unchanged** suspect TA=12.890°C. Investigate this original T excursion locally without reopening all routine RH corrections.
+
+This is a precisely scoped source-temperature scientific caveat, not proof that either source tower anomaly was meteorologically impossible, not permission to replace original QC0 by an arbitrary reanalysis product, and not a new site-wide HOLD.
