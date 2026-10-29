@@ -130,3 +130,44 @@ The flagged rows are only the part of those outages where MDS VPD exceeds esw(TA
 - (a) HOLD.
 - (b) `CEC_LOW_CONFIDENCE` fallback, the same fallback the user approved for US-NR1/US-Me6. Expected error is about 2 hPa.
 - (c) Treat the whole outages as one block in the future US-Me2 shadow.
+
+## CL07 site-calibrated ERA vapour pressure for the 243 (user rule 2026-10-29 07:14; operator run 07:16)
+
+**Method.** `scripts/claude/CL07_Me2_site_calibrated_ERA_vapour_pressure_READONLY.py`, commit `e131a2e`. Report `reports/cl07_US-Me2_ERA_E_calibrated_20261029T071618Z_3480c075`.
+- Two models, each fitted on Me2 dual-QC0 for every (month, 3-h) block, leaving out the predicted year:
+  - **M1**: e_tower = a + b·e_ERA
+  - **M2**: e_tower = a + b·e_ERA + c·(TA_F − TA_ERA)
+- e is capped at DATM saturation at TA_F. The tower temperature is unchanged.
+
+**Leave-one-year-out validation on 344,294 dual-QC0 HH.**
+
+| Method | Pooled MAE / bias | Jun–Oct, TA > 5 °C | Warm mornings 04–12 h | Share > 2 hPa (warm) |
+| --- | --- | --- | --- | --- |
+| M2 | **1.33 / −0.01** | 1.75 / −0.06 | 1.74 / −0.07 | 37 % |
+| M1 | 1.38 / −0.09 | 1.75 / −0.12 | 1.73 / −0.12 | 37 % |
+| raw companion ERA (CEC) | 2.02 / −1.20 | 2.21 / −0.99 | 2.01 / −0.44 | 46 % |
+
+- Calibration removes the ERA dry bias and cuts the error by about 15–35 %.
+- In warm conditions it still fails the Stage12j tail gate. Under the user rule it is used and labelled low confidence.
+- The warm-morning error by year is 1.37–2.08 hPa (M1) and 1.45–2.08 hPa (M2).
+
+**Result.** 243 / 243 rows filled: `ERA_E_CAL_M2_LOW_CONFIDENCE` 224, `ERA_E_CAL_M1_LOW_CONFIDENCE` 19.
+- The new VPD is 1.0–17.4 hPa with RH 33–85 %.
+- The original MDS VPD was 6.7–25.0 hPa, above saturation at the tower temperature.
+
+## Complete US-Me2 humidity ledger (research only, 0 approved)
+
+| Population | HH | Source | Confidence |
+| --- | --- | --- | --- |
+| Four legacy events (2014-12-31 20:30–22:00) | 4 | EMP_LOYO, QC0 climatology (ERA5-Land agrees within 0.05 hPa) | validated (cold MAE 0.32 hPa) |
+| Other CL05 targets: 2008 winter, 2014-12-31, 2022 | 118 | EMP_LOYO | validated in stratum |
+| CL05 HOLD (2006, 2008, 2011, 2017 warm-season RH outages) | 243 | ERA_E_CAL M1/M2 | low confidence (~1.7 hPa) |
+| QC0 measured non-physical row | 1 | unchanged | needs PI/source review |
+
+**What is still needed for a US-Me2 forcing.**
+- No Me2 shadow exists yet. The ledger above is ready to be applied when it is built.
+- That build still needs user decisions on:
+  - the 2020-08-20 Green Ridge Fire and the 2021 salvage logging (PFT / surface);
+  - the 2022-08-25 move to a new, shorter tower (year range);
+  - the whole-outage treatment of the other MDS rows;
+  - and, if possible, the Me2 BASE data to check the 2015-01-01 midnight TA step.
