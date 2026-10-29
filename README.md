@@ -1,5 +1,9 @@
 # CLM-FATES single-site workflows
 
+## Batch05 active source QC interpolation policy — 29 October 2026
+
+For AmeriFlux Batch05, the investigator's priority order for repairing suspicious **air-temperature source QC transitions** is: **QC0→QC1: interpolate the entire contiguous QC1 block using the QC0 measurements immediately before and after it; QC1→QC2: interpolate the contiguous QC2 block using the original QC1 values immediately before and after it**. Preserve source QC provenance and the original meteorological records; document all approved corrections in a versioned overlay. Missing two-sided same-grade anchors are recorded as `PASS_KEEP_ORIGINAL` unchanged, not fabricated. Independently, derived RH<0% receives direct numerical repair under the user's rule. See the [Batch05 README: active QC transition and negative-RH policy](examples/AmeriFlux_MultiSite_10_Batch05/README.md#active-batch05-operator-rule--temperature-source-qc-transitions-and-contiguous-blocks-29-october-2026). This policy is **Batch05-specific**, not a silent rewrite of previous Batch01–04 decisions or permission to modify DATM/CIME.
+
 ## AmeriFlux 50-site PFT composition — 26 October 2026
 
 [**Ameriflux_Site: five batches and all 50 tower stations**](examples/Ameriflux_Site/) now has a central [PFT composition index and master CSV](examples/Ameriflux_Site/Ameriflux_PFT/). It reuses existing Batch01 evidence and adds primary-source research across all five batches: **33 sites with numerical composition/cover leads, 17 with qualitative composition, LAI/density or model-only evidence**. Measured denominators, survey periods, spatial scope and uncertainty remain explicit. Eleven published ORCHIDEE configurations are listed separately as model precedents. Existing experiment paths and model files are unchanged.
