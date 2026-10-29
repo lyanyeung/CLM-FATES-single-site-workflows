@@ -1,5 +1,9 @@
 # AmeriFlux MultiSite 10 — Batch 05
 
+## 2026-10-29 09:37 UTC — Batch05 FIXNC direct AD400 80×5 SUBMITTED 10/10 (Non-Competition repo B5_01)
+
+Forcing built from the Stage05-pinned releases + Stage84 1,675 + Stage89 Whs 51 + Stage104 holds (36 QC2 → ERA5-Land scenario A, 20 QC0 kept; 1 Wkg T spike → bracket) + Batch03 P/SW rules (dead-gauge months → P_ERA, ERA-only P at UiD/UMd scaled to BIF MAP, SW fault months → SW_ERA, 1 WCr LW out-of-range → ERA). ERA alignment passed at all ten sites; full-record QC PASS 10/10; CTSM year-2000 point surfaces created (`subset_data_batch05_surf2000`); 10 cases verified; jobs **4758110–4758134**. Full record: [https://github.com/lyanyeung/Non-Competition-CLM-experiment/blob/main/examples/AmeriFlux_Batch05_10/docs/B5_01_FORCING_SURFACES_AND_AD400_SUBMISSION_20261029.md](https://github.com/lyanyeung/Non-Competition-CLM-experiment/blob/main/examples/AmeriFlux_Batch05_10/docs/B5_01_FORCING_SURFACES_AND_AD400_SUBMISSION_20261029.md). Note: US-UiD FSDS lags TOA by 29 min (possible 30-min label offset, within the 45-min gate).
+
 ## Stage101 Batch05 DATM source-selection preparation (after actual Stage100): pinned ten-site source and unresolved risk mapping
 
 **Operator decision following Stage100:** Do not re-review previously selected PFT and CLM10 soil input hypotheses. Advance directly toward construction of **ten complete site-specific DATM forcing NetCDF** and then site surfaces and CIME **PREPARE-only**. Eventual model submission will be **DIRECT AD400**, one initial submission per site with `STOP_N=REST_N=5, RESUBMIT=79`, without standalone AD5 trial.
