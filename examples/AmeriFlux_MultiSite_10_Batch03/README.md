@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 US-MOz actual Stage14H Jan09 final original-QC review:** [Original Jan09 45 QC1/3 QC2/0 measured QC0, 27 negative T−ERA >5°C QC1 anomalies, 10 Jan08–10 >4°C selected T jumps; current Stage14G stays intact](docs/US_MOZ_STAGE14H_ACTUAL_JAN09_FINAL_QC_AND_14I_TWO_SOURCE_20261029.md). Next [bounded one-run Stage14I original 49 QC1 (6+3+40) FLUXNET companion ERA versus previously downloaded CDS ERA5-Land dual isolated research scenarios](scripts/stage14/14i_US_MOz_Jan09_49QC1_two_source_isolated_onepass.py); explicitly protect Jan09 3 QC2/Jan10 original QC0 and earlier 27+1+40 source corrections. This is a research numerical alternative, no Post-v5, DATM, AD400 or Slurm authorization.
+
+
 > **2026-10-29 US-MOz Stage14G ACTUAL PASS:** [One QC1→QC1 native 19:30 T/e interpolation succeeded; the 5.885°C boundary was split into two 2.886°C edges; actual 27 ERA5-Land research trial and 40 operator-approved source repairs preserved; full 315360 water/VPD/QBOT model numerics PASS](docs/US_MOZ_STAGE14G_ACTUAL_SUCCESS_JAN09_LAST_ONEPASS_20261029.md). Source-science remains unapproved: the remaining Jan09 original QC1 source-negative T/ERA divergence can be **classified once** through [Stage14H final original raw QC0/QC1/QC2 one-pass read-only script](scripts/stage14/14h_US_MOz_Jan09_original_QC_onepass_final_triage_READONLY.py). No Post-v5, DATM, AD400 or Slurm permission.
 
 
