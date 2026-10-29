@@ -123,8 +123,8 @@ def main():
  if any(x is None for x in (a.pft,a.stage99,a.out)):
   p.error("require pinned original 50-site PFT CSV, actual Stage99 report directory, NEW out")
  d=a.stage99.expanduser().resolve();out=a.out.expanduser().resolve()
- if not d.is_dir() or out.exists() or not out.parent.is_dir() or
-    d==out or out in d.parents or d in out.parents:
+ if (not d.is_dir() or out.exists() or not out.parent.is_dir() or
+     d==out or out in d.parents or d in out.parents):
   p.error("stage99 missing or output not fresh and disjoint")
  stage99=d/"Batch05_DIRECT_AD400_STACK_SLURM_TEMPLATE_QUOTA_AND_SCIENCE_MANIFEST.json"
  s99=json.loads(stage99.read_text())
