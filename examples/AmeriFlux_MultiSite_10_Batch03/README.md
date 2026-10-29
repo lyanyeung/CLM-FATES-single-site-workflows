@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 06:50 UTC US-Kon Stage14O ACTUAL verified tower QC+both ERA sources all 9 missing:** [complete original 2011/2012 ±2h published tower QC0/1/2, paired FLUXNET ERA and independently SHA-verified ERA5-Land T2m/D2m/RH](docs/US_KON_STAGE14O_ACTUAL_9_NATIVE_EVENTS_TOWER_ERA5LAND_HUMAN_DECISION_20261029.md). Source manual review identifies **3 original observed-QC0 RH contiguous group candidates**: 2011-Feb22 3 missing, 2011-Oct23 5 VPD QC1 including 1 missing, 2012-Feb25 3 VPD QC1 incl 1 missing + 2 original T QC1 candidate repairs. [Stage14P three exact original-QC0-endpoint bounded, per-group atomic research-only 11-VPD-HH/2-T-HH test](scripts/stage14/14p_US_Kon_three_QC0_connected_blocks_5of9_research.py), not yet IRIDIS6 executed; **if** all groups pass, 9 science missing may fall to 4, not zero. Other four (May26, Sep29, Oct15 2011, Aug05 2012) remain source-science HOLD; never alter original data or submit AD400.
+
+
 > **2026-10-29 — US-Kon FINAL nine manual observation/ERA5-Land source-context task:** [9 exact original source TA_F/VPD_F QC0/QC1/QC2 and available Stage14M true-QC0 bracketing evidence](docs/US_KON_NINE_HOLD_FINAL_MANUAL_NATIVE_TOWER_PAIRED_ERA_ERA5LAND_CONTEXT_20261029.md); next [single Stage14O read-only script](scripts/stage14/14o_US_Kon_FINAL_nine_original_tower_ERA5Land_pm2h_READONLY.py) prints all nine actual native center and seven grouped ±2h FLUXMET tower/paired ERA/independently SHA-verified **ERA5-Land T2m/D2m/RH/SP**, explicitly unavailable if no verified local site-year archive. Current Stage14N 0/3 science passes; nine protected NaNs unchanged; no automatic source edits or DATM/AD400 submission.
 
 
