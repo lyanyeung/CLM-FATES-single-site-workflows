@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage82_Wjs"
+mkdir -p "$BASE"
+SCRIPT="$BASE/stage82_Wjs.py"
+COMMIT="10497d857f84f8083b28d2c4a4fce8c3af9b8fcb"
+BLOB="47b7c13a23449ed27aed831116001b976ef395c2"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage82/82_US_Wjs_379_negative_RH_direct_approved_1093.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "$BLOB"
+echo "STAGE82 EXACT SOURCE GITHUB BLOB VERIFIED"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+D27="$HOME/ameriflux_batch05_stage27/source_comparison_20261026T040257Z_1589604"
+D63="$HOME/ameriflux_batch05_stage63/exact10_site_204_crosswalk_20261029T025331Z_1904396"
+D80="$HOME/ameriflux_batch05_stage80_Vcm/Vcm_direct336_20261029T045457Z_2529299"
+D81="$HOME/ameriflux_batch05_stage81_Wjs/Wjs_original393_20261029T045811Z_2546054"
+OUT="$BASE/Wjs_direct379_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SCRIPT" --stage27 "$D27" --stage63 "$D63" --stage80 "$D80" --stage81 "$D81" --out "$OUT" 2>&1 | tee "$BASE/stage82_Wjs.log"
+echo "STAGE82_REPORTS=$OUT"
+echo "STAGE82 APPROVED OUTPUT VERSIONED ONLY | ORIGINAL/QC/PRIOR714/DATM/CIME/SLURM UNCHANGED"
