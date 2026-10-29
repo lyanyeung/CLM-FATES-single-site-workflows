@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage84_Vcp"
+mkdir -p "$BASE"
+SCRIPT="$BASE/stage84_Vcp.py"
+COMMIT="e2d0a1268340f368bb183fbb6b7671e73145991f"
+BLOB="8360470c33ccbbe6679a3bbb528ca957cebdca70"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage84/84_US_Vcp_582_negative_RH_direct_approved_1675.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "$BLOB"
+echo "STAGE84 ORIGINAL SOURCE AND GITHUB SHA VERIFIED"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+D27="$HOME/ameriflux_batch05_stage27/source_comparison_20261026T040257Z_1589604"
+D63="$HOME/ameriflux_batch05_stage63/exact10_site_204_crosswalk_20261029T025331Z_1904396"
+D82="$HOME/ameriflux_batch05_stage82_Wjs/Wjs_direct379_20261029T061912Z_2183874"
+D83="$HOME/ameriflux_batch05_stage83_Vcp/Vcp_original626_20261029T062235Z_2193625"
+OUT="$BASE/Vcp_direct582_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SCRIPT" --stage27 "$D27" --stage63 "$D63" --stage82 "$D82" --stage83 "$D83" --out "$OUT" 2>&1 | tee "$BASE/stage84_Vcp.log"
+echo "STAGE84_REPORTS=$OUT"
+echo "STAGE84 PREVIOUS 1093/ORIGINAL/QC/DATM/CIME/SLURM UNCHANGED"
