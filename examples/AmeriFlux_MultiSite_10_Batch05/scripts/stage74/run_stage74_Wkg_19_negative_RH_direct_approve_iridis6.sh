@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage74_Wkg"
+mkdir -p "$BASE"
+SRC="$BASE/stage74_Wkg.py"
+SCRIPT_COMMIT="63c89683b350edcd36084c8a46df98d72910a706"
+SCRIPT_BLOB="be5cccabad5855fced375f8bd44d09b496363e82"
+SCRIPT_REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage74/74_US_Wkg_19_negative_RH_direct_approved_259.py"
+RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows"
+curl -fLsS --retry 3 "$RAW/$SCRIPT_COMMIT/$SCRIPT_REL" -o "$SRC"
+test "$(git hash-object "$SRC")" = "$SCRIPT_BLOB"
+echo "STAGE74 ORIGINAL GH SOURCE AND SHA VERIFIED"
+python3 -B -m py_compile "$SRC"
+python3 -B "$SRC" --self-test
+D63="$HOME/ameriflux_batch05_stage63/exact10_site_204_crosswalk_20261029T025331Z_1904396"
+D27="$HOME/ameriflux_batch05_stage27/source_comparison_20261026T040257Z_1589604"
+D72="$(find "$HOME/ameriflux_batch05_stage72_UMB" -mindepth 2 -maxdepth 2 -type f -name 'stage72_manifest.json' -printf '%h\n' 2>/dev/null | LC_ALL=C sort | tail -n 1 || true)"
+if test -z "$D72"; then
+  echo "STAGE74 PRECONDITION | Stage72 UMB 240 not yet run, running verified prior Stage72 first"
+  UP="$BASE/run_stage72_UMB.sh"
+  curl -fLsS --retry 3 "$RAW/5cee54e707ea8afa5a44e6e185882f532ba6a2e2/examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage72/run_stage72_UMB_21_direct_approve_iridis6.sh" -o "$UP"
+  test "$(git hash-object "$UP")" = "c7831ce788e330939b6bc7dbc0ab8310b1e533fd"
+  bash "$UP"
+  D72="$(find "$HOME/ameriflux_batch05_stage72_UMB" -mindepth 2 -maxdepth 2 -type f -name 'stage72_manifest.json' -printf '%h\n' | LC_ALL=C sort | tail -n 1)"
+fi
+test -d "$D72"
+test -f "$D72/stage72_VERSIONED_240_USER_APPROVED_RH_VPD_native_overlay.csv"
+OUT="$BASE/Wkg_direct_19_negative_RH_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SRC" --stage63-dir "$D63" --stage27-dir "$D27" --stage72-dir "$D72" --out "$OUT" 2>&1 | tee "$BASE/stage74.log"
+echo "STAGE74_REPORTS=$OUT"
+echo "STAGE74 259 VERSIONED APPROVED ROWS; NO ORIGINAL / PREVIOUS240 / QC / DATM / CIME / SLURM CHANGES"
