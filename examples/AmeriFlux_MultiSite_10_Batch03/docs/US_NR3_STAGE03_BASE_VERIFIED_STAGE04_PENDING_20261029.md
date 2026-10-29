@@ -10,6 +10,33 @@
 - Existing source-to-selected reconciliation (Stage01/02): **238 Stage12G NOLEAP missing in 53 episodes** = **172 original protected physics HOLD + 66 other gaps** (41 site–grid |ΔT|>5°C, 19 ice-saturation screen failures, 6 no external-year grid evidence). **172** overlap the **1,484** source-VPD QC2 physics events. These are different populations; do not add their totals.
 - Existing QC0-evaluated gridded VPD methods (10 equal-weight source years): A transfer absolute e: MAE **0.811 hPa**, 8/238 numerical screen passes; B grid RH: **1.234 hPa**, 4/238; C grid q: **0.736 hPa**, 20/238. Numerically passing is **not** independent source-supported repair; approved count remains **zero**.
 
+## Full 2007–2024 original BASE coverage (operator-returned Stage03)
+
+All values below are numeric counts, not independent sensor QC designations. \`dual_QC0\` is the same-release original FLUXNET TA_F/VPD_F simultaneous QC0 count; \`PA_QC2_with_BASE\` is the count of BASE pressure observations for which the processed PA_F flag was 2.
+
+| Year | BASE TA | BASE RH | BASE VPD_PI | BASE PA | BASE T_SONIC | FLUXNET dual_QC0 | PA_QC2_with_BASE |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 2007 | 8,899 | 8,890 | 8,899 | 8,900 | 9,222 | 8,890 | 8,900 |
+| 2008 | 17,513 | 17,265 | 17,483 | 17,513 | 17,252 | 17,265 | 17,513 |
+| 2009 | 17,453 | 17,384 | 17,401 | 17,453 | 17,312 | 17,384 | 17,453 |
+| 2010 | 17,144 | 16,261 | 16,271 | 17,144 | 16,987 | 16,261 | 17,144 |
+| 2011 | 11,263 | 10,861 | 11,134 | 12,177 | 12,068 | 10,861 | 12,177 |
+| 2012 | 3,609 | 3,609 | 3,609 | 14,512 | 14,377 | 3,609 | 14,512 |
+| 2013 | 17,381 | 17,135 | 17,380 | 17,385 | 17,216 | 17,135 | 17,385 |
+| 2014 | 14,776 | 14,752 | 14,753 | 14,787 | 14,509 | 14,752 | 14,787 |
+| 2015 | 11,651 | 11,638 | 11,647 | 11,651 | 11,553 | 11,638 | 11,651 |
+| 2016 | 2,813 | 8,029 | 2,813 | 8,029 | 7,954 | 2,813 | 8,029 |
+| 2017 | 0 | 6,329 | 0 | 6,340 | 6,170 | 0 | 6,340 |
+| 2018 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 2019 | 5,878 | 6,483 | 5,875 | 8,943 | 8,865 | 5,857 | 8,943 |
+| 2020 | 9,147 | 9,107 | 9,146 | 6,554 | 7,849 | 9,107 | 6,554 |
+| 2021 | 14,728 | 14,632 | 14,727 | 14,730 | 14,383 | 14,632 | 14,730 |
+| 2022 | 3,794 | 3,789 | 3,793 | 3,794 | 3,763 | 3,789 | 3,794 |
+| 2023 | 0 | 0 | 0 | 3,623 | 3,515 | 0 | 3,623 |
+| 2024 | 14,584 | 14,566 | 14,584 | 14,940 | 15,815 | 14,566 | 14,940 |
+
+**Source rule:** presence of BASE_PA while processed PA_F_QC is 2 does *not* establish the exact PA_F numerical lineage or the original raw PA QA. Distinguish \`FLUX_PA\`, \`PA_F\`, \`BASE_PA\` in the unrun Stage04 check.
+
 ## Missing-source years: exact operator-returned coverage
 
 | Year | BASE TA | BASE RH | BASE VPD_PI | BASE PA | BASE T_SONIC | original simultaneous dual QC0 TA/VPD |
