@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage86"
+mkdir -p "$BASE"
+SCRIPT="$BASE/stage86_ten_site.py"
+COMMIT="858bdb1a1c9c01853dfd29d19ec972cebe3664e9"
+BLOB="e3cb8a4b906ad985675f169385de8e0fe8bb1267"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage86/86_ten_site_final_P2P3_reconciliation_release_gates_READONLY.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "$BLOB"
+echo "STAGE86 GITHUB SCIENCE AUDIT SOURCE EXACT SHA VERIFIED"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+D27="$HOME/ameriflux_batch05_stage27/source_comparison_20261026T040257Z_1589604"
+D63="$HOME/ameriflux_batch05_stage63/exact10_site_204_crosswalk_20261029T025331Z_1904396"
+D67="$HOME/ameriflux_batch05_stage67_Whs/Whs_selected_TA_reconstruction_20261029T034158Z_2150672"
+D84="$HOME/ameriflux_batch05_stage84_Vcp/Vcp_direct582_20261029T062857Z_2211876"
+D85="$HOME/ameriflux_batch05_stage85_Whs/Whs_last_1HH_20261029T063406Z_2227405"
+OUT="$BASE/ten_site_final_QC_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SCRIPT" --stage27 "$D27" --stage63 "$D63" --stage67 "$D67" --stage84 "$D84" --stage85 "$D85" --out "$OUT" 2>&1 | tee "$BASE/stage86_ten_site.log"
+echo "STAGE86_REPORTS=$OUT"
+echo "STAGE86 AUDIT READONLY | ORIGINAL/QC/APPROVED1675/DATM/CIME/SLURM UNCHANGED"
