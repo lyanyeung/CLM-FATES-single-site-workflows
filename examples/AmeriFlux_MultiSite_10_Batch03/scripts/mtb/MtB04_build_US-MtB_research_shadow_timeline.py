@@ -158,7 +158,9 @@ def build(g, df, tcand, hcand):
     capped = pd.DataFrame(capped)
     for i in np.flatnonzero(sel):
         prov.append(dict(native_key=key[i], field="VPD_USE/QBOT", old=V_old[i], new=V[i], source=src[i]))
-    out["TA_USE"] = T; out["TBOT"] = T + TKFRZ; out["VPD_USE"] = V; out["QBOT"] = Q
+    out["TA_USE"] = np.where(tchg, T, g.TA_USE.to_numpy(float))
+    out["TBOT"] = np.where(tchg, T + TKFRZ, g.TBOT.to_numpy(float))       # untouched rows keep their stored bits
+    out["VPD_USE"] = np.where(sel, V, g.VPD_USE.to_numpy(float)); out["QBOT"] = np.where(sel, Q, g.QBOT.to_numpy(float))
     # untouched-row guard
     touched = tchg | sel
     for c in out.columns:
@@ -180,6 +182,7 @@ def self_test():
                       "TBOT": t + TKFRZ, "QBOT": q_of(M.esw(t) - v, p), "PSRF": p, "FSDS": 0.0, "FLDS": 300.0, "WIND": 2.0,
                       "PRECTmms": 0.0, "TA_USE": t, "VPD_USE": v})
     g.loc[5:9, ["QBOT", "VPD_USE"]] = np.nan
+    g["TBOT"] = g.TBOT + 3e-14                                   # stored-value float noise must survive untouched
     check_conventions(g)
     df = pd.DataFrame({"native_key": pd.to_datetime(g.time).dt.strftime("%Y%m%d%H%M"), "TA_ERA": t + 6, "VPD_ERA": M.esw(t + 6) * 0.2})
     tcand = pd.DataFrame({"native_key": [df.native_key[20], df.native_key[30]], "class": ["FAULT_31M", "CLIP_31M"],
