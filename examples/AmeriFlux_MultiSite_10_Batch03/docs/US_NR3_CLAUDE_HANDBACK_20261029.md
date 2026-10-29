@@ -208,3 +208,24 @@ for nm in ("MAIN", "SENSITIVITY"):
 print("\nVERIFY", "ALL PASS" if bad == 0 else f"{bad} FAIL")
 PY
 ```
+
+### v2 result (operator run 2026-10-29 07:02), VERIFY ALL PASS
+
+**Folder.** `science_trials/nr3_10_claude_research_shadow_v2_20261029T070254Z_63df7497`
+
+**Gate.**
+- 1–2 HH pseudo-holes in Dec–Mar (N 17,556): T MAE **0.175 °C**, e MAE **0.051 hPa**. The gate passed.
+- All seasons: T MAE 0.18–0.23 °C, e MAE 0.08–0.10 hPa.
+
+**Changes.**
+- 84 holes, 97 rows. 4 of them are among the 238; 11 were capped to DATM saturation.
+- Window edges dropped from 198 to 30. Steps above 3 °C dropped from 123 to **15**. The maximum step went from 12.42 to 10.18 °C.
+- The largest remaining step, 2019-01-02 10:00, is a genuine window start: ERA −15.3 °C against T\* −5.1 °C.
+- Example: 2016-12-08 07:30 changed from ERA −27.65 °C to −18.26 °C.
+
+**Independent v2 verifier: ALL PASS** for both MAIN and SENSITIVITY.
+- Untouched rows are bit-identical to Stage12G: 303,092 in MAIN, 240,240 in SENSITIVITY.
+- All 11,981 measured-pair rows match T\* recomputed from BASE.
+- All 97 hole rows equal the linear interpolation of the bounding T\*.
+
+**Current recommended US-NR3 research input.** The v2 MAIN shadow. DATM / Post-v5 still need a separate user decision.

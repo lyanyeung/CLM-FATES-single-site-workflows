@@ -109,3 +109,24 @@ Report: `reports/cl05_US-Me2_nonphysical_scan_20261029T065536Z_25495c8d`. It cov
   - The QC0 climatology fails the gates in warm bins.
 
 **Proposed next step (not run).** Validate the companion-ERA vapour pressure capped at DATM saturation (CEC, as for US-Me6/NR1) and longer-gap INTERP on Me2 QC0 by month × TA_F bin, for the 243 HOLD rows.
+
+## CL06 alternatives for the 243 HOLD rows (operator run 2026-10-29 07:10)
+
+**Run.** Report `reports/cl06_US-Me2_HOLD_alternatives_20261029T071028Z_ff5a48c4`. It reproduced CL05 exactly (243 HOLD, 122 EMP).
+
+**Result: still 243 HOLD.**
+- **CEC** (companion-ERA e with the tower TA_F, capped) fails the warm strata: MAE 1.6–2.6 hPa, gate fail.
+- **INTERP_L** validates very well for every run length L = 1–14 HH and every T bin (MAE 0.02–0.22 hPa). It is **not formable** here: no dual-QC0 anchor lies within 4 HH of these runs.
+
+**Root cause.** The runs sit inside multi-day to multi-week RH outages with MDS-filled VPD (QC1/QC2):
+- June–August 2006 (93 HH);
+- October 2008 (16);
+- August–October 2011 (96);
+- July 2017 (38).
+
+The flagged rows are only the part of those outages where MDS VPD exceeds esw(TA_F), mostly summer and autumn mornings when the tower is cooler than the MDS analogues. The remaining physically admissible MDS rows of the same outages are also low-confidence.
+
+**Options for the user.**
+- (a) HOLD.
+- (b) `CEC_LOW_CONFIDENCE` fallback, the same fallback the user approved for US-NR1/US-Me6. Expected error is about 2 hPa.
+- (c) Treat the whole outages as one block in the future US-Me2 shadow.
