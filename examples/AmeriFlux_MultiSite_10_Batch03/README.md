@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 US-MOz Stage14I ACTUAL 49 QC1 dual variant PASS, meteorological numeric stage closed:** [49 FLUXNET-companion ERA primary vs existing CDS ERA5-Land sensitivity, original 27+1+40 source edits untouched and selected 315360 thermodynamics PASS](docs/US_MOZ_STAGE14I_ACTUAL_49QC1_TWO_SOURCE_CHOICE_20261029.md); two pre-existing Jan08 original QC1→QC1 T jumps retained as original-source warnings, not fabricated QC0 interpolation. **Next active workstream is US-Kon** [77 exact remaining source-native humidity gaps (68 routine, 9 protected hard scientific HOLDs) with full signed Stage12AY/FLUXMET original QC one-pass provenance and ERA-RH *candidates only*, no forcing writes](scripts/stage14/14j_US_Kon_77_missing_source_QC_onepass_decision_READONLY.py). Claude retains US-Me6/US-NR1, advanced model US-NR3. No Post-v5, DATM, AD400, Slurm approval.
+
+
 > **2026-10-29 US-MOz actual Stage14H Jan09 final original-QC review:** [Original Jan09 45 QC1/3 QC2/0 measured QC0, 27 negative T−ERA >5°C QC1 anomalies, 10 Jan08–10 >4°C selected T jumps; current Stage14G stays intact](docs/US_MOZ_STAGE14H_ACTUAL_JAN09_FINAL_QC_AND_14I_TWO_SOURCE_20261029.md). Next [bounded one-run Stage14I original 49 QC1 (6+3+40) FLUXNET companion ERA versus previously downloaded CDS ERA5-Land dual isolated research scenarios](scripts/stage14/14i_US_MOz_Jan09_49QC1_two_source_isolated_onepass.py); explicitly protect Jan09 3 QC2/Jan10 original QC0 and earlier 27+1+40 source corrections. This is a research numerical alternative, no Post-v5, DATM, AD400 or Slurm authorization.
 
 
