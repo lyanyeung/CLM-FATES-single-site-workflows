@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage87_Whs"
+mkdir -p "$BASE"
+SCRIPT="$BASE/stage87_Whs_four_T_VPD.py"
+COMMIT="db2495bd6c73fb1b381eca28e5a449249da836e0"
+BLOB="fe668c4cdf1ae1c1e6a7017a4daf9b83d9b0bd99"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage87/87_US_Whs_four_stage67_T_candidate_VPD_physics_diagnosis_READONLY.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "$BLOB"
+echo "STAGE87 ORIGINAL CODE SOURCE EXACT GITHUB SHA VERIFIED"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+D67="$HOME/ameriflux_batch05_stage67_Whs/Whs_selected_TA_reconstruction_20261029T034158Z_2150672"
+D84="$HOME/ameriflux_batch05_stage84_Vcp/Vcp_direct582_20261029T062857Z_2211876"
+D86="$HOME/ameriflux_batch05_stage86/ten_site_final_QC_20261029T064013Z_2246464"
+OUT="$BASE/Whs_four_T_VPD_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SCRIPT" --stage67 "$D67" --stage84 "$D84" --stage86 "$D86" --out "$OUT" 2>&1 | tee "$BASE/stage87_Whs_four.log"
+echo "STAGE87_REPORTS=$OUT"
+echo "STAGE87 ONLY RESEARCH AUDIT; ORIGINAL/QC/PRIOR1675/STAGE67/DATM/CIME/SLURM UNCHANGED"
