@@ -1,0 +1,27 @@
+# US-Kon Stage14O ACTUAL source/manual science audit — 2026-10-29 06:50 UTC
+
+**Actual user IRIDIS6 output from SHA-pinned Stage14O:** original 2011 and 2012 source-year ERA5-Land ZIP files verified at downloaded `external_evidence/era5land_timeseries_stage12f_missing_years/US-Kon/{2011,2012}/`; both original tower and FLUXNET companion ERA SHA sources also verified; seven full ±2h native source tables printed. Site BIF local source clock is UTC−6 and source half-hour interval-midpoint is 15min later, not production DATM clock signoff. No source or model files changed.
+
+**Nine native humidity source HOLDs remain NaN in signed Stage14K**. Unlike the earlier 0/3 *single-point* Stage14N attempt, Stage14O reveals that several center-level failures are due to independently **gapfilled QC1 neighbours**, not an observed QC0 disagreement. Read QC0 per field: source `TA_F_QC=0` is measured T, but `VPD_F_QC=1` is not measured VPD; inferred RH from same-time `TA_F/VPD_F` is independent of observed RH only when both grades QC0, and is still RH mathematically derived rather than a separate RH sensor.
+
+| Original native time | Original TA_F (°C) | Original TA/VPD QC | Original VPD (hPa) | Paired ERA RH % | independent ERA5-Land RH % | Human evidence decision |
+|---|---:|---:|---:|---:|---:|---|
+| 2011-02-22 08:30 | 7.860 | 1/1 | 5.568 | 33.073 | 41.440 | Joint 3-HH QC0-RH bounded scientific sensitivity |
+| 2011-02-22 09:00 | -1.754 | 0/1 | 7.477 | 31.680 | 39.593 | Same 3-HH joint case, T QC0 protected |
+| 2011-02-22 09:30 | 8.623 | 1/1 | 8.013 | 31.691 | 38.000 | Joint 3-HH case, keep prior approved source T corrections |
+| 2011-05-26 11:00 | 16.777 | 0/1 | 20.573 | 50.034 | 49.218 | Hold: original 09–10:30 gapfilled warm T anomalies 22.7–25.9°C; reanalysis two-product RH agrees but would require bounded joint temperature provenance |
+| 2011-09-29 18:30 | 15.617 | 1/2 | 19.933 | 24.536 | 24.851 | Hold: source T QC1 discrepancy −6.374°C to paired ERA, VPD QC2 equals paired ERA directly, connected ERA-source VPD/QC2 review required |
+| 2011-10-15 07:30 | 8.344 | 0/1 | 12.032 | 64.375 | 70.384 | Hold for next bounded source QC1 humidity group; adjacent 08:00/08:30 VPD QC1 also suspect, no paired QC0 RH endpoints near |
+| 2011-10-23 07:30 | 9.801 | 0/1 | 16.751 | 72.849 | 90.916 | Joint 5-HH QC0-RH bounded sensitivity; exact 05:30/08:30 two real both-QC0 RH endpoints ~67.55/66.77%; original intervening 06:00–08:00 VPD QC1 all five and T QC0 |
+| 2012-02-25 10:30 | 0.626 | 0/1 | 8.564 | 48.867 | 54.697 | Joint 3-HH T+VPD sensitivity: 11:00/11:30 source T QC1 implausible 8.627/9.016°C compared with 10:30/12:00 QC0 T 0.626/4.185°C |
+| 2012-08-05 09:00 | 25.986 | 0/1 | 37.465 | 60.775 | 41.694 | Hold for connected source 09:30–11:00 QC1 T/VPD (T 30.916–31.607°C versus grid 26.8–29.1°C); independent ERA5 RH 41.694 close to 08:30–11:30 original QC0 RH interpolation 38.340%, unlike companion ERA 60.775%; still need actual next 11:30 QC0 T anchor and full 09:00–11:30 group |
+
+## Exact three grouped QC0-bracketed research hypotheses, calculated from actual source values
+
+**Group A Feb22, three target halfhours**: true both-QC0 RH `08:00 60.513%` -> `10:00 35.925%`. Already operator-approved selected source T at `08:30 -3.167°C, 09:00 -1.754°C, 09:30 -0.562°C`. Interpolate RH along the original continuous event to `54.366%,48.219%,42.072%`, giving water VPD `2.210,2.784,3.399 hPa`; VPD outer anchors `1.720,4.099 hPa`. All resulting 30min changes VPD <=0.701 hPa. Original source 09:00 raw QC1 VPD 7.477 hPa exceeds water saturation at measured -1.754°C; never restore original VPD.
+
+**Group B Oct23, five adjacent QC1-VPD target halfhours**: exact true both-QC0 original `05:30 RH 67.554440% VPD 3.610` -> `08:30 RH 66.774508% VPD 5.083`. T at 06:00/06:30/07:00/07:30/08:00 **all original QC0** `8.281,8.295,8.252,9.801,11.921°C`. Linear RH `67.42445%,67.29446%,67.16447%,67.03449%,66.90450%`; VPD `3.560,3.578,3.582,3.992,4.614 hPa`, all 30min jumps <=0.623 hPa. Paired ERA RH at center ~72.85%, moderately consistent, but independent ERA5-Land center RH90.92% is much wetter than actually observed both-QC0 endpoints; do not select grid solely for RH.
+
+**Group C Feb25, three adjacent QC1 VPD halfhours and TWO original QC1 T halfhours**: original 10:00 RH54.959440%/VPD2.611 and12:00 RH46.349255%/VPD4.420 are both-QC0 observed; original 10:30 T QC0 =0.626°C and 12:00 T QC0 =4.185°C, source 11:00/11:30 T QC1 spikes to 8.627/9.016°C; locally linear QC0-T candidates 11:00 `1.812333°C`, 11:30 `2.998667°C`; water-RH linear source candidates at 10:30/11:00/11:30 `52.80689%,50.65435%,48.50180%`, water-VPD `3.018,3.437,3.902 hPa`, versus outer VPD2.611/4.420 hPa. All 30min VPD jumps <=0.518 hPa. This is a **conditional research** joint T+VPD correction, not independently measured 11:00 T and not yet scientifically operator-approved.
+
+**Disposition:** Stage14O is evidence only; all actual Stage14K original 9 protected missing stay NaN. Prefer ONE strict, SHA-scoped, separately written **11-HH humidity, 2-HH temperature** low-confidence research candidate with per-group atomic acceptance after original QC0 source and both-edge VPD/RH/QBOT/phase physics checks; any failed group stays exactly unchanged. Keep four still special held native centers `201105261100`, `201109291830`, `201110150730`, `201208050900` until analogous independently sourced connected-event scope checks. No in-place overwrites, CIME/AD400/Slurm or false station approval.
