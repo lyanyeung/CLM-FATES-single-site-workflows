@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 04:57 UTC US-Kon Stage14L ACTUAL research result and final science-evidence step:** [7 extra original QC1/QC2 finite neighbours changed, 46→41 warnings across same 96 original routine-source contact edges but 44 warnings still across 103 expanded edges; 68 old numerical routine fills and 9 protected NaNs unchanged](docs/US_KON_STAGE14L_ACTUAL_7_FINITE_QC_EDITS_41_OF_96_EDGES_AND_FINAL_14M_QC0_EVIDENCE_20261029.md). **Keep Stage14K as the preferred least-modified *incomplete* research scenario**, Stage14L as an unapproved sensitivity. Do not iterate blind source smoothing. [Stage14M one-pass original truly paired tower QC0 support of all nine source hard HOLDs and 44 remaining flagged source edges](scripts/stage14/14m_US_Kon_QC0_evidence_for_9HOLD_and_44_edges_READONLY.py) is only READONLY original science, not new humidity repair or production DATM/AD400 approval.
+
+
 > **2026-10-29 04:49 UTC US-Kon Stage14K ACTUAL PASS but science edge issues:** [all 68 routine missing source VPD/QBOT transferred from paired ERA RH, 9 hard science missing protected, 280320-site T/VPD/QBOT physics pass; however 62/112 original native source joins flagged, including 43 VPD>4hPa, 18 RH>20pp, 8 QBOT>0.003](docs/US_KON_STAGE14K_ACTUAL_68_NUMERIC_SUCCESS_62_BOUNDARY_WARNINGS_AND_14L_QC_POLICY_20261029.md). **Next isolated research-only [Stage14L QC1/QC2 bounded finite neighbour source sensitivity](scripts/stage14/14l_US_Kon_68_QC_neighbor_connected_ERA_RH_sensitivity.py):** actual published FLUXMET source grade, source unchanged finite QC1/QC2, original QC0 protected, signed 9 hard HOLDs untouched; compare warning counts before/after, no production Post-v5, DATM, AD400 or Slurm.
 
 
