@@ -229,9 +229,8 @@ def h2o_year_coverage(d):
             date_equal_MAE_e_hPa=float(days.mean()),
             source_lineage="H2O and RH/VPD may share instrumentation; no independent validation claim"))
     if len(matched):
-        m=matched.groupby("year").apply(
-            lambda g: g.groupby("date").abs_error.mean().mean(),
-            include_groups=False)
+        m=np.asarray([float(g.groupby("date").abs_error.mean().mean())
+                      for _,g in matched.groupby("year")], dtype=float)
         emit("NR3_STAGE05_H2O_YEAR_BLOCK_SUMMARY",dict(
             valid_years=len(m), equal_year_of_equal_date_MAE_hPa=float(m.mean()),
             warning="No fitted parameters or absent-year measured truth inferred"))
