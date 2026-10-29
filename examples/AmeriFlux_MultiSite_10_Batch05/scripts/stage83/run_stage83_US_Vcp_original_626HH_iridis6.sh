@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage83_Vcp"
+mkdir -p "$BASE"
+SCRIPT="$BASE/stage83_Vcp.py"
+COMMIT="01d3408e6b5a535097393909af4bc67315e5dd58"
+BLOB="687bc51b52998c9480bd9461b39e703c9d81124b"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage83/83_US_Vcp_626_original_QC_RH_T_audit_READONLY.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "$BLOB"
+echo "STAGE83 ORIGINAL SOURCE CODE EXACT SHA VERIFIED"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+D27="$HOME/ameriflux_batch05_stage27/source_comparison_20261026T040257Z_1589604"
+D63="$HOME/ameriflux_batch05_stage63/exact10_site_204_crosswalk_20261029T025331Z_1904396"
+D82="$HOME/ameriflux_batch05_stage82_Wjs/Wjs_direct379_20261029T061912Z_2183874"
+OUT="$BASE/Vcp_original626_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SCRIPT" --stage27 "$D27" --stage63 "$D63" --stage82 "$D82" --out "$OUT" 2>&1 | tee "$BASE/stage83_Vcp.log"
+echo "STAGE83_REPORTS=$OUT"
+echo "STAGE83 ORIGINAL/QC/PRIOR1093/DATM/CIME/SLURM UNCHANGED"
