@@ -75,7 +75,7 @@ key=pd.to_datetime(g.time).dt.strftime("%Y%m%d%H%M"); ch=key.isin(set(prov.nativ
 same=all(((g[c]==s[c])|(g[c].isna()&s[c].isna()))[~ch].all() for c in g.columns)
 print("changed rows",int(ch.sum()),"| unchanged rows identical to Stage12g",same)
 print(pd.read_csv(S/"MTB04_change_counts.csv").to_string(index=False))
-q=0.622*(s.TA_USE.pipe(lambda t:6.112*np.exp(17.67*t/(t+243.5)))-s.VPD_USE)*100; q=q/(s.PSRF-0.378*q)
+e=(6.112*np.exp(17.67*s.TA_USE/(s.TA_USE+243.5))-s.VPD_USE)*100; q=0.622*e/(s.PSRF-0.378*e)
 print("QBOT closure max rel err",float(np.nanmax(np.abs(q/s.QBOT-1))),"| TBOT-TA_USE-273.15 max",float(np.nanmax(np.abs(s.TBOT-s.TA_USE-273.15))))
 PY
 ```
