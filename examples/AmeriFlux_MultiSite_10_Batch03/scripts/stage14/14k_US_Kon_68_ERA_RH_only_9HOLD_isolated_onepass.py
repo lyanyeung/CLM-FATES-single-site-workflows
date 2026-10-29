@@ -221,8 +221,8 @@ def analyze():
            scientific_approval=False),rows
     boundaries=[]
     for idx in ordered[1:]+[None]:
-        if idx is not None and idx==prev+1 and
-           dt.iat[idx]-dt.iat[prev]==pd.Timedelta(minutes=30):
+        if (idx is not None and idx==prev+1 and
+            dt.iat[idx]-dt.iat[prev]==pd.Timedelta(minutes=30)):
             prev=idx;continue
         ep,ed=make_episode(start,prev)
         episode.append(ep)
