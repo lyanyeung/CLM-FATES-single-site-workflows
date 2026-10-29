@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage90"
+mkdir -p "$BASE"
+SCRIPT="$BASE/stage90_science_risks.py"
+COMMIT="245993f8ccd9c089c4e5891a617a11987cda5fbd"
+BLOB="8fc7473cd4abdb48c9911c0fb1ad4a89fcdc5c5e"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage90/90_batch05_remaining_science_risks_original_source_evidence_READONLY.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "$BLOB"
+echo "STAGE90 GITHUB ORIGINAL CODE SHA VERIFIED"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+D84="$HOME/ameriflux_batch05_stage84_Vcp/Vcp_direct582_20261029T062857Z_2211876"
+D86="$HOME/ameriflux_batch05_stage86/ten_site_final_QC_20261029T064013Z_2246464"
+D89="$HOME/ameriflux_batch05_stage89_Whs/Whs_51_T_plus_four_VPD_20261029T070333Z_2322432"
+OUT="$BASE/ten_site_remaining_risks_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SCRIPT" --stage84 "$D84" --stage86 "$D86" --stage89 "$D89" --out "$OUT" 2>&1 | tee "$BASE/stage90_science_risks.log"
+echo "STAGE90_REPORTS=$OUT"
+echo "STAGE90 READONLY SCIENCE EVIDENCE | ORIGINAL/QC/1675/STAGE89/DATM/CIME/SLURM UNCHANGED"
