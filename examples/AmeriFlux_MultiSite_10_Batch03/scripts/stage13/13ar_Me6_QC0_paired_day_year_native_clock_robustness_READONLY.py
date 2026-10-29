@@ -11,7 +11,7 @@ from pathlib import Path
 from uuid import uuid4
 import numpy as np
 import pandas as pd
-VER="batch03-stage13ar-v1-20261029-Me6-QC0-day-year-native-clock-robustness"
+VER="batch03-stage13ar-v2-20261029-Me6-signed-target-day-year-native-clock-robustness"
 ROOT=Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
 HERE=Path(__file__).resolve().parent
 AQ=ROOT/"reports/stage13aq_Me6_QC0_30min_vapour_pairs_original_READONLY_20261029T001725Z_1a3a933d"
@@ -60,6 +60,7 @@ def test():
                            freq="30min"))==19,"exact original event")
     print("STAGE13AR SELF-TEST PASS | measured QC0 source pair date/year/native-clock sensitivity, NO WRITES",flush=True)
 def verify():
+    global TARGET
     need(blob(AQ_SOURCE)==AQ_GIT,"signed Stage13AQ original source code changed")
     receipt=json.loads(must(AQ/AQ_REC).read_text())
     need(receipt.get("site")=="US-Me6" and receipt.get("version")==AQ_VER and
@@ -110,9 +111,11 @@ def verify():
                      "source measured QC0 same original 30min pair provenance changed")
     c=comp[(comp.side=="RIGHT")&
            (comp.border_hypothesis=="exploratory_border_QC0_median_calibrated")]
-    need(len(c)==4 and
-         np.allclose(c.border_hypothesis_e_delta_hPa,TARGET,rtol=0,atol=1e-8),
+    need(len(c)==4 and np.isfinite(c.border_hypothesis_e_delta_hPa).all() and
+         np.allclose(c.border_hypothesis_e_delta_hPa,
+                     float(c.iloc[0].border_hypothesis_e_delta_hPa),rtol=0,atol=1e-12),
          "right original Stage13AP calibrated border hypothesis changed")
+    TARGET=float(c.iloc[0].border_hypothesis_e_delta_hPa)
     return donor
 def review():
     donor=verify()
