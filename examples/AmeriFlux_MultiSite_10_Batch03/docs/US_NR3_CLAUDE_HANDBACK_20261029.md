@@ -111,3 +111,20 @@ PY
 ```
 
 The last line must be `VERIFY ALL PASS`.
+
+## Verification result (operator, 2026-10-29)
+
+The independent verifier above was run on IRIDIS and returned **VERIFY ALL PASS** for both MAIN and SENSITIVITY. In detail:
+- receipt SHA: 6 files;
+- Stage12G and BASE inputs unchanged;
+- 238/238 gaps filled, NaN 0;
+- untouched rows bit-identical: 303,185 in MAIN, 240,244 in SENSITIVITY;
+- QBOT closure holds and QBOT ≤ DATM saturation;
+- TBOT = TA_USE + 273.15;
+- for all 11,981 measured-pair rows, T\* recomputed from the original BASE matches.
+
+**Edge steps.** The largest temperature steps are mostly **isolated ERA rows inside measured windows**, i.e. single half-hours where the BASE triplet is missing:
+- 2017-02-26 00:30: ERA −24.66 °C between T\* −12.64 and −12.24 °C;
+- 2016-12-08 06:30 and 07:30: ERA −28.08 and −27.65 °C between T\* ≈ −18.6 °C.
+
+Filling such short holes (≤ 2 HH) by interpolating the measured pair (T\* and e) would remove most of these steps. This is a proposed follow-up and is not applied.

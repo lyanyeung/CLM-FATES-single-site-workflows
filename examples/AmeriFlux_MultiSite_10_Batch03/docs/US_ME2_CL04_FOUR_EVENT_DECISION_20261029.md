@@ -91,3 +91,21 @@ Relevant site facts it does record:
 | Disturbance | Green Ridge Fire on **2020-08-20** (surface to full crown fire); salvage logging late March to April 2021 |
 
 Instrument history needs the AmeriFlux BASE-BADM data package or the PI.
+
+## CL05 full-record scan (operator run 2026-10-29 06:55)
+
+Report: `reports/cl05_US-Me2_nonphysical_scan_20261029T065536Z_25495c8d`. It covers 368,160 rows, 344,983 of them dual-QC0.
+
+**Flagged rows.**
+- 291 have e ≤ 0 (non-physical) and 75 have RH below 5 % (implausibly dry).
+- 1 is a QC0 measured row; it is counted only and never targeted.
+- The **365** QC1/QC2 targets fall in 71 runs, all in 2006, 2008, 2011, 2014, 2017 and 2022.
+
+**Results.**
+- The four CL04 events reproduced exactly.
+- **EMP_LOYO 122** (stratum-validated): 2008 winter (76), the whole of 2014-12-31 (45) and 2022 (1).
+- **HOLD 243.** Almost all are warm-season morning runs of 8–14 HH at 3–21 °C, in 2006, 2011 and 2017 (plus 16 HH in 2008).
+  - INTERP validates well (MAE 0.03–0.20 hPa) but is not formable for these runs (longer than 4 HH, no QC0 anchors).
+  - The QC0 climatology fails the gates in warm bins.
+
+**Proposed next step (not run).** Validate the companion-ERA vapour pressure capped at DATM saturation (CEC, as for US-Me6/NR1) and longer-gap INTERP on Me2 QC0 by month × TA_F bin, for the 243 HOLD rows.
