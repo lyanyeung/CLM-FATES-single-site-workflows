@@ -211,3 +211,46 @@ git show f79b2ac5a29c2457ef1af9e403a6380af57e456b:examples/AmeriFlux_MultiSite_1
 ```
 
 Read-only terminal output only; unchanged 238 HOLD, 0 approved repairs.
+
+
+## Stage04 completed: Stage05 wet-air water-vapour evidence (2026-10-29)
+
+The operator successfully ran pinned \`f79b2ac5a29c2457ef1af9e403a6380af57e456b\`
+with \`--stage04\`. All BASE, FLUXNET and Stage12G SHA256 checks passed.
+See the [verified Stage04 source-cocoverage memo](../../docs/US_NR3_STAGE04_VERIFIED_2017_OBSERVATION_COCOVERAGE_20261029.md).
+
+Stage04 established exactly **44/238** Stage12G missing halfhours with original
+BASE RH+T_SONIC+PA triplets (2016: 11, 2017: 33); no candidate is approved.
+The 2017 full-source triplet coverage is **6,160 HH in 53 contiguous source
+windows, Jan–May only**. The FLUXMET and BASE original 2017 RH columns are
+**exactly identical** at 6,329 timestamps and not independent truth.
+FLUXMET raw PA is absent while PA_F_QC is 2; BASE PA differs from processed
+PA_F and must be source/height/QC assessed. Original T QC0 with VPD QC1
+yielded negative implied e at one timestamp in each of 2011 and 2021.
+
+The next script,
+[\`nr3_05_H2O_44_event_science_READONLY.py\`](nr3_05_H2O_44_event_science_READONLY.py),
+is a **new, not-yet-operator-run** read-only audit. BASE H2O is defined
+by AmeriFlux as wet-air water vapour mole fraction, **mmol H2O/mol wet air**,
+not dry-air mixing ratio. It converts to e_hPa using BASE PA_kPa, checks
+full year availability (including 2017), reports QC0 T/VPD observational
+comparisons by year/day (with explicit same-lineage caveat), prints the
+**44** exact Stage12G records and source-QC/Stage10 anomaly overlap, and
+investigates the 2011/2021 pair-physics exceptions.
+
+Run only after verifying commit on the cluster. This produces terminal output
+only; the first command is a synthetic/unit self-test, not proof of cluster
+data consistency:
+
+\`\`\`bash
+REV="6cd03b2d47c421136881f44183f9001eb5a2c2d9"
+S="examples/AmeriFlux_MultiSite_10_Batch03/scripts/us_nr3_science/nr3_05_H2O_44_event_science_READONLY.py"
+git show "$REV:$S" | python3 -B - --self-test
+git show "$REV:$S" | python3 -B - --audit
+\`\`\`
+
+Original datasets, selected NOLEAP/shadows, forcing and Slurm jobs remain untouched.
+The exact 44 triplets are **not** validated direct absolute temperature;
+any BASE H2O count is unknown until Stage05 actually runs and the original
+sensor provenance is checked. All **238 remain HOLD**, with
+**APPROVED_FOR_NEW_VERSION=false**.
