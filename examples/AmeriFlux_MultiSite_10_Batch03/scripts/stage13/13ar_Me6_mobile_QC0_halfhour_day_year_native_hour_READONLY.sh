@@ -6,13 +6,13 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate clm_fates_env
 B="$HOME/ameriflux_batch03_stage13ar"
 mkdir -p "$B"
-PIN="a040720e976340507792d613d5a4077dbc0bfd8b"
+PIN="d607c59d23c4f2b8a860aa19c6996228af5f5d2d"
 RAW="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$PIN/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage13"
 while read -r BLOB FILE; do
   curl -fLsS --retry 3 "$RAW/$FILE" -o "$B/$FILE"
   test "$(git hash-object "$B/$FILE")" = "$BLOB"
 done <<'ELEVEN_IMMUTABLE_GIT_SOURCES'
-0e68f8a33b9ecbe31bb49b55120062af2b2b8528 13ar_Me6_QC0_paired_day_year_native_clock_robustness_READONLY.py
+aae417608fb8c6a894c7b02b798efcfb7ea863ad 13ar_Me6_QC0_paired_day_year_native_clock_robustness_READONLY.py
 ff9bc87a9bd56e1365f2b93a55edc6d2b5a71aa4 13aq_Me6_2015_QC0_measured_30min_edge_vapour_transition_READONLY.py
 0c03987a8ef9324826beb809cafab438b9dbf7c6 13ap_Me6_2015_original_QC2_ERA_RH_border_donor_skill_READONLY.py
 df561eb8904b0147fc4a5aa0f977a5ec66545477 13am_Me6_19HH_joint_QC0_bias_corrected_ERA_RH_event_PREVIEW_READONLY.py
