@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage89_Whs"
+mkdir -p "$BASE"
+SCRIPT="$BASE/stage89_Whs.py"
+COMMIT="362cbe1d4d17bb623a90a4355fa899ac2b67840a"
+BLOB="afe4bd77c56d32cda3823049315b2a8a21f444b8"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage89/89_US_Whs_51_T_plus_four_VPD_integration_PREVIEW_READONLY.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "$BLOB"
+echo "STAGE89 GITHUB ORIGINAL AUDIT SCRIPT SHA VERIFIED"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+D67="$HOME/ameriflux_batch05_stage67_Whs/Whs_selected_TA_reconstruction_20261029T034158Z_2150672"
+D84="$HOME/ameriflux_batch05_stage84_Vcp/Vcp_direct582_20261029T062857Z_2211876"
+D86="$HOME/ameriflux_batch05_stage86/ten_site_final_QC_20261029T064013Z_2246464"
+D88="$HOME/ameriflux_batch05_stage88_Whs/Whs_QC0_four_cross_variable_20261029T065626Z_2301104"
+OUT="$BASE/Whs_51_T_plus_four_VPD_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SCRIPT" --stage67 "$D67" --stage84 "$D84" --stage86 "$D86" --stage88 "$D88" --out "$OUT" 2>&1 | tee "$BASE/stage89_Whs.log"
+echo "STAGE89_REPORTS=$OUT"
+echo "STAGE89 READONLY PREVIEW ONLY | ORIGINAL/QC/1675/67_51/88_FOUR/DATM/CIME/SLURM UNCHANGED"
