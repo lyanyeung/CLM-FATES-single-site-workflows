@@ -81,3 +81,21 @@ Methods:
 - **1998.** Jan–Oct 1998 is 100 % ERA-filled for TA, VPD, SW and LW, and BASE has no data. November is 67 % measured and December is 100 % measured, so the tower started in Nov 1998. All 43 gaps in 1998 have reanalysis tower T.
 - **2004-12-03 22:30–23:30 root cause.** The companion ERA record is corrupt: TA_ERA is −111.7, −216.8 and −111.8 °C, and PA_ERA = PA_F is 30.87, −8.20 and 30.86 kPa. VPD_F is QC0 (3.19–3.45 hPa), and the independent 2 m RH gives 3.28–3.53 hPa.
 - **HOLD rows.** All 16 are 1–3 HH warm-season gaps in the 5:15 bin. They fall in 2001-06-15, 2002, 2010, 2012, 2017-06-30, 2018-05-20 and 2021-06-21.
+
+## User decisions after CL02 (2026-10-29 04:37) and CL03
+
+The user approved all of the recommendations ("按照你的建议搞"):
+
+1. **Adopt the CL02 predeclared recommendation** for every gap that has one: MEASURED, EMP or CEC.
+2. **NR1 2004-12-03 22:30–23:30: restore the source QC0 `VPD_F`.** The values are not changed. QBOT uses the approved shadow PSRF.
+3. **NR1 forcing starts on 1999-01-01.** See `US_NR1_FORCING_START_1999_DECISION_20261029.md`.
+4. **The 23 HOLD rows** (Me6 7, NR1 16):
+   - use time interpolation of `e` between QC0 anchors no more than 4 HH from the gap, when the gap is no longer than 3 HH;
+   - use it only where the 3-HH pseudo-gap validation passes the Stage12j gates in that row's T bin;
+   - otherwise use `CEC_LOW_CONFIDENCE`.
+
+`scripts/claude/CL03_Me6_NR1_final_fill_and_research_shadow.py` applies these rules:
+- `--check` writes nothing;
+- `--run` writes one `science_trials/cl03_<site>_research_shadow_*` folder with the INCOMPLETE marker.
+
+CL03 is the last evidence step for these two sites. Next comes the handback.
