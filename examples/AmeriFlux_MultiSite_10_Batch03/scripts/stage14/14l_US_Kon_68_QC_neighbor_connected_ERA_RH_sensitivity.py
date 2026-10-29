@@ -81,7 +81,7 @@ def signed():
             ensure(hashfile(folder/fn)==h,"original signed source SHA changed "+str(folder/fn))
     manifest=json.loads(safe(MAN).read_text())
     site=[x for x in manifest["sites"] if x["site"]=="US-Kon"]
-    ensure(len(site)==1 and site[0].get("native_minutes")==30,"Kon original native site identity")
+    ensure(len(site)==1 and int(site[0]["native_minutes"])==30,"Kon original native site identity")
     for name in ("primary","era"):
         p=safe(site[0][name])
         ensure(hashfile(p)==manifest["input_sha256"].get(str(p.resolve())),
@@ -218,8 +218,8 @@ def assess():
             if key in missing or key in HARD9:
                 rejected["ADJACENT_OTHER_MISSING_OR_HARD_HOLD"]+=1;continue
             raw_v=float(src.VPD_F.iat[j]);rawqc=float(src.VPD_F_QC.iat[j])
-            if not np.isfinite([raw_v,rawqc,v[j]]).all() or
-               not np.isclose(v[j],raw_v,rtol=0,atol=1e-5):
+            if (not np.isfinite([raw_v,rawqc,v[j]]).all() or
+                not np.isclose(v[j],raw_v,rtol=0,atol=1e-5)):
                 rejected["PRIOR_SELECTED_REPAIR_OR_UNMATCHED_SOURCE"]+=1;continue
             cand,why=candidate(j,b,src,era)
             if cand is None:rejected[why]+=1;continue
