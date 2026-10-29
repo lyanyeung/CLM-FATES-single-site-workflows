@@ -71,7 +71,7 @@ def evidence():
     s=json.loads(file(K/KREC).read_text())
     need(s.get("version")=="batch03-stage13k-v1-20261026-QC0-source-edge-ERA5Land-evidence",
          "signed Stage13K original report version drift")
-    for k,checksum in s["output_sha256"].items():
+    for k,checksum in s["output_SHA256"].items():
         need(sha(K/k)==checksum,"Stage13K original evidence SHA differs "+k)
     need(sha(K/KREC)==lrec["original_Stage13k_report_receipt_SHA256"],
          "Stage13L ancestry to original Stage13K altered")
