@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 04:44 UTC US-Kon Stage14J ACTUAL PASS:** [77 exact remaining paired humidity NaNs across 35 native events, 68 routine ERA-RH scenarios individually water/ice physically feasible, 9 independently protected hard source science holds retained, source SHA verified](docs/US_KON_STAGE14J_ACTUAL_77_SOURCE_AND_STAGE14K_NEXT_20261029.md). Next [Stage14K isolate exactly 68 low-confidence humidity reconstructions and keep 9 original NaNs, with all source/QA fields unchanged and all boundary diagnostics](scripts/stage14/14k_US_Kon_68_ERA_RH_only_9HOLD_isolated_onepass.py). The research output will remain **incomplete and not DATM / AD400-ready**; no Slurm jobs. US-MOz Stage14I numeric 49 source repairs completed separately; original Jan08 QC1 caution preserved.
+
+
 > **2026-10-29 US-MOz Stage14I ACTUAL 49 QC1 dual variant PASS, meteorological numeric stage closed:** [49 FLUXNET-companion ERA primary vs existing CDS ERA5-Land sensitivity, original 27+1+40 source edits untouched and selected 315360 thermodynamics PASS](docs/US_MOZ_STAGE14I_ACTUAL_49QC1_TWO_SOURCE_CHOICE_20261029.md); two pre-existing Jan08 original QC1→QC1 T jumps retained as original-source warnings, not fabricated QC0 interpolation. **Next active workstream is US-Kon** [77 exact remaining source-native humidity gaps (68 routine, 9 protected hard scientific HOLDs) with full signed Stage12AY/FLUXMET original QC one-pass provenance and ERA-RH *candidates only*, no forcing writes](scripts/stage14/14j_US_Kon_77_missing_source_QC_onepass_decision_READONLY.py). Claude retains US-Me6/US-NR1, advanced model US-NR3. No Post-v5, DATM, AD400, Slurm approval.
 
 
