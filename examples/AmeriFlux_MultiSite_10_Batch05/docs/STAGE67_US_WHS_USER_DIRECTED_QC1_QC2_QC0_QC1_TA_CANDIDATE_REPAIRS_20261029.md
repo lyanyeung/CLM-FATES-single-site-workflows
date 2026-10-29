@@ -48,3 +48,19 @@ Produces:
 - `stage67_manifest.json` immutable source hashes, selected rules, and count reconciliation.
 
 **Stage67 GitHub code/launcher Git SHA verified; on-cluster run not yet reported.** No original source changes, no existing 204-user-approved RH/VPD overlay changes, no VPD recalculation, no DATM/CIME or Slurm submission. Before any model-forcing action, explicitly review relevant humidity/VPD physical consistency and the new candidate values. This is a bounded science candidate workflow, not an automatic assertion that the whole US-Whs site is now scientifically finished.
+
+## Post-run operator science decision: PASS all 30 targeted edge reviews
+
+**Actual IRIDIS6 Stage67 execution on 2026-10-29 succeeded.** Output source:
+`/home/ly3n24/ameriflux_batch05_stage67_Whs/Whs_selected_TA_reconstruction_20261029T034158Z_2150672`.
+
+- 4 original QC1→QC2 trigger edges: 4 successfully interpolated runs, 19 candidate HH.
+- 26 original QC0→QC1 trigger edges: 16 successfully interpolated runs, 32 candidate HH; 10 source runs failed the conservative QC-bracket/12-HH screen.
+- **The operator explicitly approves all 51 bounded interpolation candidate temperature HH** for the new versioned TA overlay; selected original source QC0 values and original source QC labels must remain unchanged.
+- **The operator explicitly passes all 10 otherwise-held trigger runs *unchanged***. They do NOT get new interpolated TA values. They are `PASS_KEEP_ORIGINAL_NOT_TARGETED_FOR_REPAIR`, **not** `SOURCE_REVIEW_HOLD` in the later science decision ledger.
+- The Stage67 original numerical output and its historical `SOURCE_REVIEW_HOLD` statuses remain unchanged as a reproducible pre-decision audit; this investigator decision **overrides their ongoing-review status**, not the numerical failure details.
+- Thus **30/30 original selected temperature trigger edges now have a scientific disposition, 0 outstanding temperature manual-HOLD decisions under this policy**.
+- All other original QC transition classes are explicitly out-of-scope and passed unchanged under the present selective temperature repair policy.
+- The exceptional Stage63 original low-RH/P2P3 flagged US-Whs `201205260600` remains a **separate humidity science consideration**; passing a TA repair rule does not assert an RH/VPD correction. Original VPD and previous 204 approved RH/VPD candidate HH are unchanged. Any model forcing application should preserve this exact variable scope and provenance.
+
+**Important:** This records a genuine human investigator approval of the 51 versioned TA proposals, but **does not falsely claim that the original FLUXMET ZIP, source QC0/QC1/QC2 lineage, VPD, 204 RH/VPD overlay, DATM/CIME or Slurm were changed or run**. Model-forcing promotion is a separate technical step, not automatic approval of modified native meteorological physics.
