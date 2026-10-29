@@ -1,4 +1,5 @@
 # AmeriFlux MultiSite 10 — Batch 03
+> **2026-10-29 advanced-model reserved workstream:** [US-NR3 alpine 3504m science handoff (238 selected gaps vs 1,484 original QC2 cold-source anomalies; NO forcing writes)](docs/US_NR3_ADVANCED_MODEL_SCIENTIFIC_HANDOFF_20261029.md). This is a separate unresolved advanced review task, not a model-input signoff. US-MtB remains Claude's separate workstream, US-Me6 retains its manual HOLD review.
 
 > **2026-10-29 manual science/HOLD review (current checkpoint):** See [manual classification of US-Me6 19HH and ten-site status, including Claude US-MtB ownership](docs/MANUAL_HOLD_TRIAGE_AND_TEN_SITE_STATUS_20261029.md). Stage13AR actual original measured QC0 day/year source review PASS but does **not** approve missing winter 19HH or both QC2 border writes. Latest US-Me6 shadow remains 45 missing HH. The latest independently reported all-ten common snapshot is from 26 Oct, not a newly rerun IRIDIS6 inventory; no site is certified for Post-v5/DATM/AD400.
 
