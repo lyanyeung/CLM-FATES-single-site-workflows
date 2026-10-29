@@ -2,8 +2,8 @@
 set -euo pipefail
 BASE="$HOME/ameriflux_batch05_stage62"
 mkdir -p "$BASE"
-COMMIT="c7bc5b37a4b46a6216aeb43f107454176e3f90f3"
-BLOB="c501e2c4bd41abd705d015fa555e4bde8211e3fa"
+COMMIT="fef79c2e8e2386550871ca9700686875f13dbe3e"
+BLOB="cd6bf50688faaa6300b0386ebccded2a95b3a902"
 REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage62/62_merge_explicitly_approved_Wjs2018_30HH_into_versioned_204.py"
 SCRIPT="$BASE/stage62.py"
 curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL" -o "$SCRIPT"
