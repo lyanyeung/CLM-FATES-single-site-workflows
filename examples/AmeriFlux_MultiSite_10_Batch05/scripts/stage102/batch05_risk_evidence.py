@@ -94,7 +94,7 @@ def main():
     # Each target is scored only against other years, same site/calendar month
     # and same native time of day. Keep sums by year to exclude target year.
     grouped=defaultdict(lambda:[0,0.,0.]); byyear=defaultdict(lambda:[0,0.,0.])
-    context={}; source_hash={}; selected_columns={}
+    context={}; source_hash={}; selected_columns={}; missing_comparison_columns={}
     for rec in recipe:
         site=rec['site']; path=Path(rec['original_FLUXNET_source_path'])
         if not path.is_file() or path.is_symlink() or sha(path)!=RAW_SHA[site]:
@@ -102,10 +102,12 @@ def main():
         source_hash[site]=RAW_SHA[site]
         with path.open(encoding='utf-8-sig',newline='') as f:
             reader=csv.DictReader(f); hdr=reader.fieldnames or []
-            req={'TIMESTAMP_START','TA_F','VPD_F','TA_F_QC','VPD_F_QC','TA_ERA','VPD_ERA'}
+            req={'TIMESTAMP_START','TA_F','VPD_F'}
+            comparison={'TA_F_QC','VPD_F_QC','TA_ERA','VPD_ERA'}
             if not req.issubset(hdr) or len(set(hdr))!=len(hdr):
                 raise ValueError('required columns missing/duplicate for '+site+': '+str(sorted(req-set(hdr))))
-            cols=[c for c in hdr if c in req or c in ('TIMESTAMP_END','RH','RH_F','RH_ERA','PA_F','P_F','P_F_QC','SW_IN_F','SW_IN_F_QC','TA','VPD')]
+            missing_comparison_columns[site]=sorted(comparison-set(hdr))
+            cols=[c for c in hdr if c in req|comparison or c in ('TIMESTAMP_END','RH','RH_F','RH_ERA','PA_F','P_F','P_F_QC','SW_IN_F','SW_IN_F_QC','TA','VPD')]
             selected_columns[site]=cols
             for r in reader:
                 ts=r['TIMESTAMP_START']
@@ -114,8 +116,8 @@ def main():
                 if ts in wanted[site]:
                     if k in context: raise ValueError('duplicate target context '+str(k))
                     context[k]={c:r[c] for c in cols}
-                if k in protected or num(r['TA_F_QC'])!=0 or num(r['VPD_F_QC'])!=0: continue
-                obs=rh(r['TA_F'],r['VPD_F']); era=rh(r['TA_ERA'],r['VPD_ERA'])
+                if k in protected or num(r.get('TA_F_QC'))!=0 or num(r.get('VPD_F_QC'))!=0: continue
+                obs=rh(r['TA_F'],r['VPD_F']); era=rh(r.get('TA_ERA'),r.get('VPD_ERA'))
                 if obs is None or era is None or not (0<=obs<=100 and 0<=era<=100): continue
                 group=(site,ts[4:6],ts[8:12]); yr=ts[:4]; err=era-obs
                 for s in (grouped[group],byyear[group+(yr,)]):
@@ -172,7 +174,7 @@ def main():
         left,right=candidates; value=None
         if left and right: value=(num(left[1]['TA_F'])*right[0]+num(right[1]['TA_F'])*left[0])/(left[0]+right[0])
         raw=context[(site,ts)]; old=oidx[(site,ts)]
-        temps.append(dict(site=site,native_time=ts,source_T_C=raw['TA_F'],source_T_QC=raw['TA_F_QC'],
+        temps.append(dict(site=site,native_time=ts,source_T_C=raw['TA_F'],source_T_QC=raw.get('TA_F_QC',''),
           overlay_T_C=old['modified_TA_C'],overlay_RH_pct=old['modified_RH_pct'],
           left_minutes=left[0]*30 if left else '',left_T_C=left[1]['TA_F'] if left else '',
           right_minutes=right[0]*30 if right else '',right_T_C=right[1]['TA_F'] if right else '',
@@ -204,11 +206,12 @@ def main():
     report=dict(stage=102,status='EVIDENCE_ONLY_NOT_RELEASED',holds=56,temperature_risks=7,proxy_targets=1281,
         comparison='same site, calendar month, native time, other years; original TA_F_QC=VPD_F_QC=0; valid physical RH; exclude all Stage101 sparse keys',
         comparison_caveat='Not pointwise validation. Reference may be dependent on source ERA processing; provenance must be checked. No threshold implies approval.',
-        source_sha256=source_hash,source_columns=selected_columns,stage101_manifest_sha256=sha(d/'stage101_DATM_SCIENCE_SOURCE_SELECTION_PREPARED_NOT_RELEASED_MANIFEST.json'),
+        source_sha256=source_hash,source_columns=selected_columns,missing_comparison_columns=missing_comparison_columns,stage101_manifest_sha256=sha(d/'stage101_DATM_SCIENCE_SOURCE_SELECTION_PREPARED_NOT_RELEASED_MANIFEST.json'),
         output_sha256={p.name:sha(p) for p in out.iterdir() if p.is_file()})
     (out/'manifest.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n',encoding='utf-8')
     print('STAGE102 SUCCESS: 56 HOLD + 7 T evidence; 1281 proxy comparisons; NOT RELEASED')
     print('STAGE102 HOLD GROUPS',json.dumps(dict(Counter(r['review_group'] for r in holds)),sort_keys=True))
+    print('STAGE102 MISSING COMPARISON COLUMNS',json.dumps(missing_comparison_columns,sort_keys=True))
     print('STAGE102 HOLD SENSITIVITY',json.dumps(humidity,sort_keys=True))
     print('STAGE102 TEMPERATURE',json.dumps(temps,sort_keys=True))
     print('STAGE102 PROXY SUMMARY',json.dumps(summary,sort_keys=True))
