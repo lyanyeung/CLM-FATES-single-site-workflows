@@ -50,6 +50,9 @@ def qcalc(e,p):
 
 def main():
     ensure(len(GAPS)==16 and 25*365*24==219000 and esi(-20)<esw(-20), 'internal self-test')
+    ensure(pd.Series(['200001010000',None]).equals(pd.Series(['200001010000',None])) and
+           pd.Series([1.,np.nan]).equals(pd.Series([1.,np.nan])),
+           'mixed string/numeric no-mutation comparison regression')
     old_receipt = json.loads((OLD/'stage12g_research_only_sha_receipt.json').read_text())
     ensure(old_receipt['output_sha256'][FN]==digest(OLD/FN), 'Stage12G source SHA')
     ensure(old_receipt['Postv5_approved']==0, 'Stage12G model status changed')
@@ -143,9 +146,10 @@ def main():
            int(log.original_VPD.isna().sum())==16 and
            int(log.original_VPD.notna().sum())==42, 'exact 58 edit scope drift')
     for col in FIELDS:
-        a=base[col].to_numpy(); b=trial[col].to_numpy()
-        allowed=np.ones(len(a),dtype=bool) if col not in ('VPD_USE','QBOT') else ~mask
-        ensure(np.array_equal(a[allowed],b[allowed],equal_nan=True),
+        # pandas Series.equals handles both the string time column and numeric NaNs.
+        # np.array_equal(..., equal_nan=True) raises TypeError for string/object arrays.
+        allowed=np.ones(len(base),dtype=bool) if col not in ('VPD_USE','QBOT') else ~mask
+        ensure(base.loc[allowed,col].equals(trial.loc[allowed,col]),
                'off-target selected field changed '+col)
     ensure(not trial[FIELDS[1:]].isna().any().any(), 'numerical gaps remain')
     t=trial.TA_USE.to_numpy(float); p=trial.PSRF.to_numpy(float)
@@ -163,6 +167,11 @@ def main():
     for filename,df in files.items():
         df.to_csv(out/filename,index=False)
         hashes[filename]=digest(out/filename)
+    # Preserve the original 10-column CSV format (no accidental index column).
+    reread=pd.read_csv(out/'US_MMS_219000_HR_NUMERIC_SCENARIO_NOT_DATM.csv')
+    ensure(len(reread)==219000 and list(reread.columns)==FIELDS and
+           not reread[FIELDS[1:]].isna().any().any(),
+           'serialized output column/row/NaN consistency')
     (out/'NOT_APPROVED_FOR_DATM').write_text('Exploratory humidity; not independently measured or production approved. No Slurm.\n')
     hashes['NOT_APPROVED_FOR_DATM']=digest(out/'NOT_APPROVED_FOR_DATM')
     summary=dict(site='US-MMS',native_hourly_rows=219000,old_missing=16,new_missing=0,
