@@ -90,3 +90,10 @@ Single run with SHA-fixed version:
  python3 -B "$F" 2>&1 | tee "$HOME/US_MMS_MANUAL_16H_ONEPASS.log"
 )
 ```
+
+
+### 2026-10-29 Stage14C source comparison bugfix (HPC retry pending)
+
+The operator ran the prior pinned Stage14C at commit `be61f6c3f0e8a3743ca2d9b8064a6f310fbf3559`; the source/ERA input and 58 modified candidate values passed analysis in memory up to the pre-output exact scope comparison but stopped at line 148 with Python/Numpy `TypeError: ufunc 'isnan' not supported for the input types`. Cause: original `time` column is object/string; `np.array_equal(...,equal_nan=True)` invokes `isnan` on strings, invalid independently of science. This exception occurred *before* the new output directory was created: **no research forcing candidate was written by that attempt, and no originals modified**.
+
+**Corrected fixed source:** [US-MMS Stage14C pinned Python at commit 6385a171](https://github.com/lyanyeung/CLM-FATES-single-site-workflows/blob/6385a17113bc18243dc2be7851ad0a07971993af/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage14/14c_US_MMS_manual_16_onepass_exploratory_v1.py), Git blob `5dbb51b908ea71c86c408f2e6527aad01a23bb80`. Use pandas Series.equals for string/time and numeric missing data preservation, add native-string and numeric-NaN regression check, and output schema 219000x10 no-NaN re-read guard. The source was inspected by GitHub exact revision, but **full IRIDIS6 execution of corrected revision is not yet verified**. No method/approval/forcing changes.
