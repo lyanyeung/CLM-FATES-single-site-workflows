@@ -22,7 +22,7 @@ sys.dont_write_bytecode = True
 import numpy as np
 import pandas as pd
 
-VERSION = "nr3-01-v1-20261029"
+VERSION = "nr3-01-v1.1-20261029"
 SITE = "US-NR3"
 RELEASE = "AMF_US-NR3_FLUXNET_2007-2024_v1.3_r1"
 ROOT = Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03")
@@ -108,10 +108,30 @@ def emit_csv(label, frame):
     print("END_" + label, flush=True)
 
 
-def keys(frame, column):
+def native_times(frame, column):
+    """Read documented naive native times without shifts or inferred zones.
+
+    Historical CSVs serialize the same native clock using either ISO T or
+    a space. Normalize that separator only, before strict format parsing.
+    Never remove a timezone, round seconds, or accept an off-grid minute.
+    """
     value = frame[column].astype(str)
-    fmt = "%Y%m%d%H%M" if column in {"native_key", "TIMESTAMP_START"} else "%Y-%m-%d %H:%M:%S"
+    if column in {"native_key", "TIMESTAMP_START"}:
+        require(value.str.fullmatch(r"[0-9]{12}").all(), "Malformed native key: " + column)
+        fmt = "%Y%m%d%H%M"
+    else:
+        require(value.str.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}[T ][0-9]{2}:[0-9]{2}:[0-9]{2}").all(),
+                "Native time must be naive YYYY-MM-DD[T or space]HH:MM:SS: " + column)
+        value = value.str.replace("T", " ", regex=False)
+        fmt = "%Y-%m-%d %H:%M:%S"
     dt = pd.to_datetime(value, format=fmt, errors="raise")
+    require((dt.dt.second.eq(0) & dt.dt.minute.mod(30).eq(0)).all(),
+            "Native time is off the exact 30-minute grid: " + column)
+    return dt
+
+
+def keys(frame, column):
+    dt = native_times(frame, column)
     result = dt.dt.strftime("%Y%m%d%H%M")
     require(not result.duplicated().any(), "Duplicate native timestamps: " + column)
     return result
@@ -307,7 +327,7 @@ def audit(root, args):
     selected = linked_csv(g, gr, SITE + "_STAGE12G_INCOMPLETE_NOLEAP.csv")
     expected = pd.date_range("2007-01-01", "2025-01-01", freq="30min", inclusive="left")
     expected = expected[~((expected.month == 2) & (expected.day == 29))]
-    require(pd.DatetimeIndex(pd.to_datetime(selected.time)).equals(expected), "Stage12G NOLEAP chronology differs")
+    require(pd.DatetimeIndex(native_times(selected, "time")).equals(expected), "Stage12G NOLEAP chronology differs")
     require(len(selected) == 315360, "Unexpected Stage12G length")
     anomalies = event_keys(linked_csv(d, dr, "all_1924_manual_review.csv"))
     original_qc = event_keys(linked_csv(h, hr, "original_qc_source_classes_at_1924_blockers.csv"))
@@ -353,6 +373,24 @@ def audit(root, args):
 
 
 def self_test():
+    # Regression for the actual IRIDIS6 historical timestamp that stopped
+    # v1. A separator is representation, not a native-clock adjustment.
+    for stamp in ("2007-01-12T04:00:00", "2007-01-12 04:00:00"):
+        require(keys(pd.DataFrame({"time": [stamp]}), "time").tolist() == ["200701120400"],
+                "Historical ISO-T/space key normalization")
+    mixed = pd.DataFrame({"time": ["2007-01-12T04:00:00", "2007-01-12 04:30:00"]})
+    require(keys(mixed, "time").tolist() == ["200701120400", "200701120430"],
+            "Mixed historical separators changed time identity")
+    for times in (["2007-01-12T04:00:00", "2007-01-12 04:00:00"],
+                  ["2007-01-12T04:00:00Z"], ["2007-01-12T04:00:00-07:00"],
+                  ["2007-01-12T04:00:01"], ["2007-01-12T04:01:00"],
+                  ["2007-02-30T04:00:00"]):
+        try:
+            keys(pd.DataFrame({"time": times}), "time")
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("Ambiguous/duplicate/off-grid/invalid native times accepted")
     # Timestamp-keyed join must survive unequal source/ERA spans.
     primary = pd.DataFrame({"TIMESTAMP_START": ["201701010000", "201701010030"],
         "TIMESTAMP_END": ["201701010030", "201701010100"], "TA_F": [-20., -19.],
@@ -378,7 +416,7 @@ def self_test():
     # source-year rows nested inside 66; these are synthetic, not site data.
     dt = pd.date_range("2017-01-01", periods=238, freq="30min")
     native = pd.Series(dt.strftime("%Y%m%d%H%M"))
-    selected = pd.DataFrame({"time": dt.strftime("%Y-%m-%d %H:%M:%S"),
+    selected = pd.DataFrame({"time": dt.strftime("%Y-%m-%dT%H:%M:%S"),
         "TA_USE": np.full(238, -20.), "PSRF": np.full(238, 66000.),
         "VPD_USE": np.full(238, np.nan), "QBOT": np.full(238, np.nan)})
     raw = pd.DataFrame({"native_key": native, "TA_F": np.full(238, -20.)})
@@ -407,7 +445,7 @@ def self_test():
         else:
             raise AssertionError("Read-only guard failed")
     deny_writes("open", ("unused", "r", 0))
-    emit("NR3_SELF_TEST", "PASS: exact joins, unequal spans, duplicate/disjoint rejection, CSV row IDs, phase/QBOT algebra, 238/172/66/6 nested counts, overlaps, filled-protected-HOLD rejection and mutation guard; no files created")
+    emit("NR3_SELF_TEST", "PASS: historical ISO-T/space equivalence, timezone/off-grid/duplicate rejection, exact joins, unequal spans, CSV row IDs, phase/QBOT algebra, 238/172/66/6 nested counts, overlaps, filled-protected-HOLD rejection and mutation guard; no files created")
 
 
 def main():

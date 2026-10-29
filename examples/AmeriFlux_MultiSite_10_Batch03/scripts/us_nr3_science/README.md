@@ -10,6 +10,14 @@ repair/download scripts. It has no output-file, download, repair, or model
 execution mode. A Python audit hook rejects file writes and subprocesses.
 All tables, provenance and errors go to the terminal. Use `python -B`.
 
+Version `nr3-01-v1.1-20261029` fixes the first operator-run stop on historical
+`2007-01-12T04:00:00` timestamps. Only the ISO `T`/space separator is
+normalised; native instants, SHA pins, physical thresholds and HOLD rules
+are unchanged. Tests reject timezone-bearing values, nonzero seconds,
+off-grid minutes, invalid dates and duplicated equivalent timestamps.
+The v1 cluster run passed original source SHA/annual QC and metadata checks,
+then stopped before the 238-row reconciliation; it was not a complete PASS.
+
 In the existing `clm_fates_env` environment on IRIDIS6, from this repository:
 
 ```bash
