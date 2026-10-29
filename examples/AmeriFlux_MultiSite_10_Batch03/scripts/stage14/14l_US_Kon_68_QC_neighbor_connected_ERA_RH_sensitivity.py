@@ -227,16 +227,25 @@ def assess():
             # patch frontier toward a different distant original QC1 row.
             if (abs(cand[0]-v[j])<1e-9 and abs(cand[1]-q[j])<1e-12):
                 rejected["NO_MEANINGFUL_SOURCE_CHANGE"]+=1;continue
-            old_status,*_=getmetrics(min(i,j),max(i,j),v,q,t,p,tm)
+            # Check BOTH 30-minute interfaces of a new QC1/2 neighbour.
+            # Never improve one edge by creating a new warning on the other.
+            pairs=[(min(j,k),max(j,k)) for k in (j-1,j+1)
+                   if 0<=k<len(v) and
+                   tm.iat[max(j,k)]-tm.iat[min(j,k)]==pd.Timedelta(minutes=30)]
+            def alarms(label):
+                return 3 if label in ("MISSING_OR_UNPHYSICAL_ENDPOINT",
+                                      "TIME_DISCONTINUITY") else (
+                       0 if label=="PASS" else len(label.split(";")))
+            prior=[getmetrics(a,b,v,q,t,p,tm)[0] for a,b in pairs]
+            old_status=getmetrics(min(i,j),max(i,j),v,q,t,p,tm)[0]
             vnew=v[j];qnew=q[j];v[j],q[j]=cand
-            new_status,*_=getmetrics(min(i,j),max(i,j),v,q,t,p,tm)
-            # Only accept a change if the count of three alarms across
-            # that interface STRICTLY decreases. No mass ERA RH clamping.
-            nold=3 if old_status=="MISSING_OR_UNPHYSICAL_ENDPOINT" else len(old_status.split(";")) if old_status!="PASS" else 0
-            nnew=3 if new_status=="MISSING_OR_UNPHYSICAL_ENDPOINT" else len(new_status.split(";")) if new_status!="PASS" else 0
-            if nnew>=nold:
+            following=[getmetrics(a,b,v,q,t,p,tm)[0] for a,b in pairs]
+            new_status=getmetrics(min(i,j),max(i,j),v,q,t,p,tm)[0]
+            if (sum(map(alarms,following))>=sum(map(alarms,prior)) or
+                any(x=="PASS" and y!="PASS"
+                    for x,y in zip(prior,following))):
                 v[j],q[j]=vnew,qnew
-                rejected["NEIGHBOR_ERA_RH_NOT_IMPROVED"]+=1
+                rejected["NEIGHBOR_BOTH_EDGES_NOT_IMPROVED"]+=1
                 continue
             owner[j]=gid
             applied[j]=(gid,vnew,qnew,status,new_status)
