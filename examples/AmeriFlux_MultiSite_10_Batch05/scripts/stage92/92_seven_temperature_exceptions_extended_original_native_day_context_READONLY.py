@@ -221,8 +221,8 @@ def main():
   aT=n(after["TA_F"]) if after else None
   middle=(bT+aT)/2 if bT is not None and aT is not None else None
   candidate_rh=rh(cand,n(overlay["modified_VPD_hPa"])) if cand is not None else None
-  candidate_vpd=es(cand)*(1-n(overlay["modified_RH_pct"])/100) if
-    cand is not None and es(cand) is not None and n(overlay["modified_RH_pct"]) is not None else None
+  candidate_vpd=(es(cand)*(1-n(overlay["modified_RH_pct"])/100)
+    if cand is not None and es(cand) is not None and n(overlay["modified_RH_pct"]) is not None else None)
   # Scientific hypotheses, NOT temperature replacement approvals.
   if (cand is not None and abs(oldT-cand)<=0.1 and
       left[0]>=-2 and right[0]<=2):
