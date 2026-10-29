@@ -24,3 +24,24 @@ Total initial 77 missing selected site VPD+QBOT after source scientist holds Sta
 Important scientific status: Stage14P source is numerically closed over the **three changed event groups**, but is still an **incomplete research sensitivity**, not independent measured RH at each inferred time, and other previously flagged source QA events remain. **NO CIME/AD400/DATM or Slurm approval**.
 
 Next action: a *single*, bounded, SHA-gated, independent research-only Stage14Q candidate for the two most tractable source locations Oct15 single slot and Aug05 QC0-endpoint whole episode; the two long-range low-independent-QC0 events May26/Sep29 remain protected until actual independent source evidence or explicit low-confidence full-tape emulator. Never overwrite Stage14P or historical input. Do not claim four→two before real execution.
+
+
+## Next bounded one-run experiment (unexecuted) — Stage14Q
+
+[Stage14Q two independent original-source source/QC scoped research hypotheses](../scripts/stage14/14q_US_Kon_two_remaining_bounded_source_hypotheses.py), pinned at Git commit `d34b37f5f8969b61f880a6b3431cce76e41cde6f`, blob `ab60c9c7e4bc17b36ce6ec9538dd1a86be8d46d6`. It has been committed and source-delimiter-reviewed; it is **NOT yet executed on IRIDIS6**.
+
+- **Oct15 07:30**: one original source T QC0 + VPD QC1 missing; immediate 07:00 and 08:00 selected VPD are source-original **QC1**, and temperature QC0. This is only a numerical science candidate interpolating *derived QC1-source RH*, emphatically **not** original observed tower humidity. Does not change QC1 endpoints or claim truth.
+- **Aug05 09:00–11:00**: five adjacent original VPD QC1 source HH; 09:00 measured T QC0 protected, 09:30–11:00 four original T QC1 proposed interpolated between measured T QC0 09:00 and original measured 11:30. Source **08:30 and 11:30 are genuine paired T+VPD QC0** and bound time-interpolated RH across five HH. All newly calculated fields physics and all six source 30min interfaces must pass.
+- **May26 11:00 and Sep29 18:30 are not in the auto-patch scope**, remain source-science missing always. No already passed Stage14P repairs changed.
+- New independent source only if a group passes the complete, strict, atomic native physics, T/VPD/RH/QBOT and true-original-source QC gates. Output may still have 4, 3 or 2 original hard humidity missing. Even if both groups pass, neither inferred QC1 RH nor T is an independent observation, and remaining two missing preclude DATM/AD400. Do not assume success in advance.
+
+```bash
+(
+ set -euo pipefail
+ F="$HOME/US_Kon_two_remaining_once.py"
+ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/d34b37f5f8969b61f880a6b3431cce76e41cde6f/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage14/14q_US_Kon_two_remaining_bounded_source_hypotheses.py" -o "$F"
+ test "$(git hash-object "$F")" = "ab60c9c7e4bc17b36ce6ec9538dd1a86be8d46d6"
+ python3 -B -c 'import pathlib,sys;p=pathlib.Path(sys.argv[1]);compile(p.read_text(),str(p),"exec");print("SYNTAX PASS")' "$F"
+ python3 -B "$F" --run 2>&1 | tee "$HOME/US_Kon_two_remaining_once.log"
+)
+```
