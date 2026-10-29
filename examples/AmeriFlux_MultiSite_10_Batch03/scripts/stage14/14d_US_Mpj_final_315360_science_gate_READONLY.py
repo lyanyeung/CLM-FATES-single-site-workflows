@@ -93,7 +93,7 @@ def load():
     need(len(ledger)==20,"two signed source QC1 10HH episodes must have 20 rows")
     years=dt.dt.year.to_numpy()
     for t in PRESERVE+list(KEYS):
-        z=np.flatnonzero(source.time.eq(t).to_numpy())
+        z=np.flatnonzero(dt.eq(pd.Timestamp(t)).to_numpy())
         need(len(z)==1 and not changes["VPD_USE"][z[0]],
              "protected original 2014/2018/2020 source value altered "+t)
     return source,old,rec,dt,years,changes
