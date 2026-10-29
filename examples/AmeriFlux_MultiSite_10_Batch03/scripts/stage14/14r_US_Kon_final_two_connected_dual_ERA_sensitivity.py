@@ -159,8 +159,13 @@ def analyze():
                   "original measured tower T QC0 selected mismatch "+k)
             t=prev_t
         elif method=="MAY_ERA5_RH":
+            guard(np.isclose(prev_t,float(z.TA_F),atol=1e-8,rtol=0),
+                  "MAY original QC1 selected T has prior source modification "+k)
             t=float(g.ERA5_T_C)
         else:
+            guard(vq==2 and
+                  np.isclose(prev_t,float(z.TA_F),atol=1e-8,rtol=0),
+                  "SEP historical T source changed or VPD not original QC2 "+k)
             before="201109291700" if k=="201109291730" else "201109291800" if k=="201109291830" else None
             after ="201109291800" if k=="201109291730" else "201109291900" if k=="201109291830" else None
             if before and after:
