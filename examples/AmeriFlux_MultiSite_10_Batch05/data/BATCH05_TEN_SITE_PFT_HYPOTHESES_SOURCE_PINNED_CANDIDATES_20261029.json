@@ -1,0 +1,274 @@
+{
+  "artifact": "BATCH05_TEN_SITE_CLM_FATES_PFT_INITIAL_MODEL_CANDIDATES_NOT_OBSERVATIONS",
+  "source_path": "examples/Ameriflux_Site/Ameriflux_PFT/RECOMMENDED_50_SITE_CLM_FATES_INPUT_PFT_20261026.csv",
+  "source_git_blob": "26fdfda6f1c88c9a134e7853bd70234685665031",
+  "source_date": "2026-10-26",
+  "compiled_for_direct_AD400": "2026-10-29",
+  "site_count": 10,
+  "claim": "All host and FATES percentages are model hypotheses, not measured complete tower ground cover. Do not promote this into production surface without independent PFT, bare, soil and FATES parameter mapping review.",
+  "special_science_gates": {
+    "US_Vcm": "ENF100 model precedent only prefire 2007–2012; 2013 stand-replacing fire means not a valid static whole-2007–2025 observation without explicit model design.",
+    "US_Whs": "Host index0 bare57, special HYDRO_SHRUB mapping; shrub traits are priors.",
+    "US_Wkg": "Host index0 bare60, special HYDRO_SHRUB mapping; shrub trait proxy and storm temperature science uncertainty."
+  },
+  "sites": [
+    {
+      "site": "US-UiD",
+      "model_pft_hypothesis": "CoolC3 20 / C4 80",
+      "basis": "EXPLICIT_C3_C4_PRIOR",
+      "uncertainty": "HIGH",
+      "host_pct_nat_pft_by_index": {
+        "13": 20,
+        "14": 80
+      },
+      "fates_natural_land_percent_by_index": {
+        "13": 20,
+        "14": 80
+      },
+      "bare_percent": 0,
+      "mapping_profile": "DEFAULT14",
+      "design_state": "Restored native prairie C3/C4 prior",
+      "representative_time": "Established perennial prairie; harvest dynamics separate",
+      "science_denominator": "No observed PFT percentage",
+      "source_covered_composition": "No measured functional percentage recovered.",
+      "uncertainty_warnings": "HIGH; Entire80/20 split is a model prior, not seed-mix or measured cover; UiA/UiB are different fields.; Model convention bare=0; no independent zero-bare measurement.",
+      "source_urls": "https://cabbi.bio/datasets/university-of-illinois-ameriflux-measurements/ ; https://doi.org/10.1016/j.agee.2011.09.006 ; https://ameriflux.lbl.gov/sites/site-search/",
+      "operator_model_surface_approval": "NOT_APPROVED",
+      "actual_FATES_parameter_file_verified": false,
+      "actual_site_surface_created": false,
+      "physical_soil_source_verified": false
+    },
+    {
+      "site": "US-UMB",
+      "model_pft_hypothesis": "ENF 9 / DBF 91",
+      "basis": "DATED_BASAL_AREA_PROXY",
+      "uncertainty": "MEDIUM",
+      "host_pct_nat_pft_by_index": {
+        "1": 9,
+        "7": 91
+      },
+      "fates_natural_land_percent_by_index": {
+        "2": 9,
+        "6": 91
+      },
+      "bare_percent": 0,
+      "mapping_profile": "DEFAULT14",
+      "design_state": "2010 control-tower mixed forest",
+      "representative_time": "2010 census target",
+      "science_denominator": "Tree basal area from observational permanent-plot censuses; source fractions multiplied by100, not ground area",
+      "source_covered_composition": "Frasson et al.2015 Table1 observed basal-area fractions,2001/2010: P.grandidentata38/37%; P.tremuloides13/12%; B.papyrifera9/7%; Q.rubra10/12%; A.rubrum16/18%; F.grandifolia3/4%; A.saccharum1/1%; P.strobus8/9%.",
+      "uncertainty_warnings": "MEDIUM; Use BA as an area-allocation proxy;2001 two-point residual and later forest change remain outside this target.; Model convention bare=0; no independent zero-bare measurement.",
+      "source_urls": "https://ameriflux.lbl.gov/doi/AmeriFlux/US-UMB/ ; https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015JG003035",
+      "operator_model_surface_approval": "NOT_APPROVED",
+      "actual_FATES_parameter_file_verified": false,
+      "actual_site_surface_created": false,
+      "physical_soil_source_verified": false
+    },
+    {
+      "site": "US-UMd",
+      "model_pft_hypothesis": "ENF 10 / DBF 90",
+      "basis": "EXPLICIT_PRETREATMENT_FOREST_PRIOR",
+      "uncertainty": "HIGH",
+      "host_pct_nat_pft_by_index": {
+        "1": 10,
+        "7": 90
+      },
+      "fates_natural_land_percent_by_index": {
+        "2": 10,
+        "6": 90
+      },
+      "bare_percent": 0,
+      "mapping_profile": "DEFAULT14",
+      "design_state": "Pretreatment FASET forest mixture prior",
+      "representative_time": "2007 before2008 girdling; mortality separate",
+      "science_denominator": "Pretreatment treatment-area basal area; not whole-site PFT area; leaf-area figures separate",
+      "source_covered_composition": "Aspen+birch represented39% of pretreatment basal area in the39ha treatment; published accounts also report38% and35-40% leaf area on other bases.",
+      "uncertainty_warnings": "HIGH; 39% aspen/birch BA affected by girdling is a structural mortality quantity, not bare39 or DBF39.; Model convention bare=0; no independent zero-bare measurement.",
+      "source_urls": "https://repository.library.noaa.gov/view/noaa/49508/noaa_49508_DS1.pdf ; https://doi.org/10.1016/j.foreco.2016.06.001 ; https://www.mdpi.com/1999-4907/4/3/537",
+      "operator_model_surface_approval": "NOT_APPROVED",
+      "actual_FATES_parameter_file_verified": false,
+      "actual_site_surface_created": false,
+      "physical_soil_source_verified": false
+    },
+    {
+      "site": "US-Var",
+      "model_pft_hypothesis": "CoolC3 100",
+      "basis": "CATEGORICAL_HERBACEOUS_PROXY",
+      "uncertainty": "MEDIUM",
+      "host_pct_nat_pft_by_index": {
+        "13": 100
+      },
+      "fates_natural_land_percent_by_index": {
+        "13": 100
+      },
+      "bare_percent": 0,
+      "mapping_profile": "DEFAULT14",
+      "design_state": "Mediterranean annual C3 herbaceous proxy",
+      "representative_time": "Vaira wet-season annual community",
+      "science_denominator": "No measured area percentage",
+      "source_covered_composition": "No numeric ground-cover or functional mixture recovered.",
+      "uncertainty_warnings": "MEDIUM; Forbs/clover share is unmeasured; FATES grass physiology is an explicit herbaceous simplification.; Bare0 is potential vegetation patch convention; dry-season senescence is not permanent bare ground.",
+      "source_urls": "https://ameriflux.lbl.gov/doi/AmeriFlux/US-Var/",
+      "operator_model_surface_approval": "NOT_APPROVED",
+      "actual_FATES_parameter_file_verified": false,
+      "actual_site_surface_created": false,
+      "physical_soil_source_verified": false
+    },
+    {
+      "site": "US-Vcm",
+      "model_pft_hypothesis": "ENF 100",
+      "basis": "PUBLISHED_PREFIRE_MODEL_PRECEDENT",
+      "uncertainty": "HIGH",
+      "host_pct_nat_pft_by_index": {
+        "1": 100
+      },
+      "fates_natural_land_percent_by_index": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "mapping_profile": "DEFAULT14",
+      "design_state": "Prefire mixed-conifer forest precedent",
+      "representative_time": "2007-2012 ONLY; not whole2007-2025 historical record",
+      "science_denominator": "Tree mortality is a disturbance metric; not vegetation area",
+      "source_covered_composition": "No measured PFT fraction recovered; official page reports all trees killed in2013 fire. Li et al.2020 describes elderberry and aspen seedlings1-2m after fire, using records through2018; postfire percentages remain unresolved.",
+      "uncertainty_warnings": "HIGH; 2013 stand replacement and postfire elderberry/aspen require separate states; no prefire trees assumed to survive by this table.; Model convention bare=0; no independent zero-bare measurement.",
+      "source_urls": "https://ameriflux.lbl.gov/sites/siteinfo/US-Vcm ; https://www.tucson.ars.ag.gov/unit/publications/PDFfiles/2604.pdf ; https://fluxnet.org/2014/04/30/thompson-ridge-wildfire-takes-out-ameriflux-core-site/",
+      "operator_model_surface_approval": "NOT_APPROVED",
+      "actual_FATES_parameter_file_verified": false,
+      "actual_site_surface_created": false,
+      "physical_soil_source_verified": false
+    },
+    {
+      "site": "US-Vcp",
+      "model_pft_hypothesis": "ENF 100",
+      "basis": "PUBLISHED_MODEL_PRECEDENT",
+      "uncertainty": "MEDIUM",
+      "host_pct_nat_pft_by_index": {
+        "1": 100
+      },
+      "fates_natural_land_percent_by_index": {
+        "2": 100
+      },
+      "bare_percent": 0,
+      "mapping_profile": "DEFAULT14",
+      "design_state": "Ponderosa tree-type forest precedent",
+      "representative_time": "Published2007-2014 model reference",
+      "science_denominator": "No measured area percentage",
+      "source_covered_composition": "No measured species/PFT percent recovered.",
+      "uncertainty_warnings": "MEDIUM; Minor oak/understory omitted in baseline; test ENF90/DBF10 separately.; Model convention bare=0; no independent zero-bare measurement.",
+      "source_urls": "https://ameriflux.lbl.gov/sites/siteinfo/US-Vcp ; https://doi.org/10.1029/2021JG006400",
+      "operator_model_surface_approval": "NOT_APPROVED",
+      "actual_FATES_parameter_file_verified": false,
+      "actual_site_surface_created": false,
+      "physical_soil_source_verified": false
+    },
+    {
+      "site": "US-WCr",
+      "model_pft_hypothesis": "DBF 100",
+      "basis": "DOMINANT_BASAL_AREA_PROXY",
+      "uncertainty": "MEDIUM",
+      "host_pct_nat_pft_by_index": {
+        "7": 100
+      },
+      "fates_natural_land_percent_by_index": {
+        "6": 100
+      },
+      "bare_percent": 0,
+      "mapping_profile": "DEFAULT14",
+      "design_state": "Willow Creek deciduous forest-type proxy",
+      "representative_time": "Early inventory reference; later thinning separate",
+      "science_denominator": "Percent of total tree basal area; total28m2/ha in poster",
+      "source_covered_composition": "Original Cook et al. conference poster lists basal-area shares: sugar maple40%; basswood36%; green ash14%; red oak7%; red maple1%; paper birch1%; yellow birch<1%; other<1%.",
+      "uncertainty_warnings": "MEDIUM; Unlisted/rounded minor tree fraction assigned DBF as hypothesis; no regional WLEF30% conifer transfer.; Model convention bare=0; no independent zero-bare measurement.",
+      "source_urls": "https://www.researchgate.net/publication/241222633_Contributions_From_a_Deciduous_Forest_and_Shrub_Wetland_to_Regional_Carbon_Fluxes_in_Northern_Wisconsin ; https://research.fs.usda.gov/treesearch/download/55333.pdf",
+      "operator_model_surface_approval": "NOT_APPROVED",
+      "actual_FATES_parameter_file_verified": false,
+      "actual_site_surface_created": false,
+      "physical_soil_source_verified": false
+    },
+    {
+      "site": "US-Whs",
+      "model_pft_hypothesis": "EvergreenShrub 20 / HydrodecidShrub 20 / C4 3 / bare 57",
+      "basis": "COVER_GROUPS_PLUS_PHENOLOGY_PRIOR",
+      "uncertainty": "HIGH",
+      "host_pct_nat_pft_by_index": {
+        "0": 57,
+        "9": 20,
+        "10": 20,
+        "14": 3
+      },
+      "fates_natural_land_percent_by_index": {
+        "7": 20,
+        "8": 20,
+        "14": 3
+      },
+      "bare_percent": 57,
+      "mapping_profile": "HYDRO_SHRUB",
+      "design_state": "Mixed-phenology shrubland projection",
+      "representative_time": "2012 woody40/herb3 reference",
+      "science_denominator": "Ground canopy cover by vegetation stratum; not sum-to100 whole-ground classification",
+      "source_covered_composition": "Woody canopy40%; perennial grass/forb canopy3%.",
+      "uncertainty_warnings": "HIGH; 20/20 is assumed, not species cover; herb3 lumped C4 and overlapping cover collapsed to exclusive patch areas.; Bare57 follows published model allocation; not an independently verified survey residual.",
+      "source_urls": "https://doi.org/10.3390/soilsystems3010006 ; https://www.tucson.ars.ag.gov/unit/publications/PDFfiles/2525.pdf",
+      "operator_model_surface_approval": "NOT_APPROVED",
+      "actual_FATES_parameter_file_verified": false,
+      "actual_site_surface_created": false,
+      "physical_soil_source_verified": false
+    },
+    {
+      "site": "US-Wjs",
+      "model_pft_hypothesis": "ENF 26 / C4 74",
+      "basis": "BADM_IGBP_COMMENT_COVER",
+      "uncertainty": "MEDIUM",
+      "host_pct_nat_pft_by_index": {
+        "1": 26,
+        "14": 74
+      },
+      "fates_natural_land_percent_by_index": {
+        "2": 26,
+        "14": 74
+      },
+      "bare_percent": 0,
+      "mapping_profile": "DEFAULT14",
+      "design_state": "Juniper savanna with BADM-reported juniper cover",
+      "representative_time": "BADM IGBP record (IGBP SAV from 2007-05-04)",
+      "science_denominator": "No measured whole-ground PFT fraction",
+      "source_covered_composition": "No independently measured whole-ground vector recovered.",
+      "uncertainty_warnings": "MEDIUM; 74% C4 is the complement of the BADM juniper cover; herbaceous cover and bare ground were not measured separately.; Bare0 is a model convention; the assumed-bare25 sensitivity remains.",
+      "source_urls": "https://ameriflux.lbl.gov/sites/siteinfo/US-Wjs ; https://www.litvaklab.org/juniper-savanna-us-wjs.html",
+      "operator_model_surface_approval": "NOT_APPROVED",
+      "actual_FATES_parameter_file_verified": false,
+      "actual_site_surface_created": false,
+      "physical_soil_source_verified": false
+    },
+    {
+      "site": "US-Wkg",
+      "model_pft_hypothesis": "HydrodecidShrub 3 / C4 37 / bare 60",
+      "basis": "COVER_GROUPS_WITH_SHRUB_PHYSIOLOGY_PROXY",
+      "uncertainty": "HIGH",
+      "host_pct_nat_pft_by_index": {
+        "0": 60,
+        "10": 3,
+        "14": 37
+      },
+      "fates_natural_land_percent_by_index": {
+        "8": 3,
+        "14": 37
+      },
+      "bare_percent": 60,
+      "mapping_profile": "HYDRO_SHRUB",
+      "design_state": "C4grass with sparse dryland shrubs",
+      "representative_time": "2017 woody3/herb37; historical model reference",
+      "science_denominator": "Ground canopy cover by stratum; not species fraction or biomass",
+      "source_covered_composition": "Woody cover3%; perennial grass/forb cover37%. Earlier site description reports canopy~40%.",
+      "uncertainty_warnings": "HIGH; Woody species phenology is mixed and37 field group includes forbs; compare evergreen-shrub3 alternative.; Bare60 from published model allocation, not proof all uncovered ground is bare.",
+      "source_urls": "https://doi.org/10.3390/soilsystems3010006 ; https://www.tucson.ars.ag.gov/unit/publications/PDFfiles/2525.pdf ; https://doi.org/10.1029/2010JG001348",
+      "operator_model_surface_approval": "NOT_APPROVED",
+      "actual_FATES_parameter_file_verified": false,
+      "actual_site_surface_created": false,
+      "physical_soil_source_verified": false
+    }
+  ],
+  "no_model_case_or_surface_changes": true,
+  "no_slurm": true
+}
