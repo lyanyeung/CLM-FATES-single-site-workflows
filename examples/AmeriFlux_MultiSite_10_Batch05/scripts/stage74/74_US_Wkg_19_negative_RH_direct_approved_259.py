@@ -57,7 +57,7 @@ def saturation(T):
 def rh(T,V):
  if T is None or V is None:return None
  return 100*(1-V/saturation(T))
-def f(x):return "" if x is None else f"{x:.9f}"
+def format_float(x):return "" if x is None else f"{x:.9f}"
 def table(p,req):
  if p.is_symlink() or not p.is_file():raise ValueError("original science ledger missing "+str(p))
  with p.open(encoding="utf-8-sig",newline="") as h:
@@ -81,6 +81,7 @@ def csvout(p,hd,rows):
   wr.writeheader();wr.writerows(rows)
 def selftest():
  assert 240+19==259
+ assert callable(format_float) and format_float(1.25)=="1.250000000"
  assert len(FIX_T)==6
  assert abs(17.51+(20.85-17.51)*1/7-17.987142857)<1e-6
  assert rh(0,11.702)<0 and rh(17.987142857,11.702)>0
@@ -230,9 +231,9 @@ def main():
     source_RH_pct=o.get("RH",""),
     source_processed_ERA_T_C=o["TA_ERA"],
     source_processed_ERA_VPD_hPa=o["VPD_ERA"],
-    source_processed_ERA_RH_derived_pct=f(er),
-    modified_TA_C=f(newT),modified_RH_pct=f(newR),
-    modified_VPD_hPa=f(newV),delta_VPD_hPa=f(newV-V),
+    source_processed_ERA_RH_derived_pct=format_float(er),
+    modified_TA_C=format_float(newT),modified_RH_pct=format_float(newR),
+    modified_VPD_hPa=format_float(newV),delta_VPD_hPa=format_float(newV-V),
     replacement_RH_provenance=method,
     new_VPD_derivation="WATER_MAGNUS_AT_APPROVED_TA" if t not in FIX_T else "ORIGINAL_QC1_VPD_UNCHANGED_WHILE_CORRECTING_OBVIOUS_ZERO_TA",
     source_QC_provenance_only="ORIGINAL_TA_QC0_AND_VPD_QC1_HISTORICAL_FLAGS_RETAINED_ORIGINAL_TA_QC0_NOT_ASSERTED_REAL_AT_SIX_2020_ZEROS",
@@ -242,20 +243,20 @@ def main():
   audit.append(dict(site=SITE,episode_id=eid,native_time=t,
    source_TA_C=o["TA_F"],source_TA_QC=o["TA_F_QC"],
    source_VPD_hPa=o["VPD_F"],source_VPD_QC=o["VPD_F_QC"],
-   source_implied_RH_pct=f(rh(T,V)),
-   repaired_TA_C=f(newT),repaired_RH_pct=f(newR),
-   repaired_VPD_hPa=f(newV),repair_method=method,
-   anchor_before_native=before,anchor_before_TA_C=f(bT),
-   anchor_before_RH_pct=f(bR),
-   anchor_after_native=after,anchor_after_TA_C=f(cT),
-   anchor_after_RH_pct=f(cR),source_TA_ERA_C=o["TA_ERA"],
+   source_implied_RH_pct=format_float(rh(T,V)),
+   repaired_TA_C=format_float(newT),repaired_RH_pct=format_float(newR),
+   repaired_VPD_hPa=format_float(newV),repair_method=method,
+   anchor_before_native=before,anchor_before_TA_C=format_float(bT),
+   anchor_before_RH_pct=format_float(bR),
+   anchor_after_native=after,anchor_after_TA_C=format_float(cT),
+   anchor_after_RH_pct=format_float(cR),source_TA_ERA_C=o["TA_ERA"],
    source_VPD_ERA_hPa=o["VPD_ERA"],
    operator_status="USER_POLICY_DIRECT_APPROVED_NEGATIVE_RH_REPAIR"))
  passrows=[]
  for t,(eid,o) in sorted(passed.items()):
   passrows.append(dict(site=SITE,episode_id=eid,native_time=t,
    source_TA_C=o["TA_F"],source_VPD_hPa=o["VPD_F"],
-   source_implied_RH_pct=f(rh(num(o["TA_F"]),num(o["VPD_F"]))),
+   source_implied_RH_pct=format_float(rh(num(o["TA_F"]),num(o["VPD_F"]))),
    decision="PASS_ORIGINAL_RH_NONNEGATIVE_UNCHANGED_NO_NEW_OVERLAY"))
  combined=dict(old);combined.update(repaired)
  if len(combined)!=259 or any(old[k]!=combined[k] for k in old):
