@@ -94,3 +94,23 @@ Use \`python -B .../nr3_03_04_BASE_bridge_READONLY.py --self-test\` then \`--sta
 - **APPROVED_FOR_NEW_VERSION=false** for all 238. No raw FLUXMET/BASE/ERA overwrite, no existing shadow overwrite, no DATM, AD400, or Slurm.
 
 Next unapproved steps requiring scientific review: sensor-specific BADM start/end, instrument/height and QA (especially 2017); FLUXNET v1.3_r1 processing cause of \`VPD_ERA>es_water(TA_ERA)\`; ERA5-Land grid topography and pressure representativeness; installed active CDEPS datamode versus public reference. Do not infer true instrument failure or repair success from QC labels alone.
+
+
+## Stage04 post-commit operator failure and correction
+
+The operator tested the first GitHub consolidated script from commit
+`aa816af6661206b46c74b2b147aefe0deb7c3df8`. The
+`--self-test` passed, followed by both exact SHA checks. But the
+`--stage04` audit stopped during `load_sources` with
+`AttributeError: 'DataFrame' object has no attribute 'BASE_SONIC'. Did you
+mean: 'BASE_T_SONIC'?`.
+
+Root cause: raw BASE `T_SONIC` had been renamed automatically as
+`BASE_T_SONIC`, while Stage03/Stage04 referred to `BASE_SONIC`.
+In commit `f79b2ac5a29c2457ef1af9e403a6380af57e456b`, a
+single `base_column_map()` now maps `T_SONIC` consistently to
+`BASE_SONIC`, with schema regression checks in self-test and before
+analysis. No other science or source modification was authorised.
+**Corrected Stage04 has not yet been operator-run; no Stage04 results
+are claimed.** The previous Stage03 operator results remain the evidence
+baseline, not independently recalculated by this commit.
