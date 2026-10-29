@@ -136,7 +136,7 @@ def verify():
          "all 27 Stage13AO signed VPD original tower native values drift")
     return al,raw,site,src,science
 def evaluate():
-    al,raw,site,src,prior=evaluate_context=verify()
+    al,raw,site,src,prior=verify()
     idx=pd.DatetimeIndex(pd.to_datetime(src.native_time))
     native=raw.loc[idx];selected=site.loc[idx]
     T=selected.TA_USE.to_numpy(float)
