@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 07:00 UTC ACTUAL US-Kon Stage14P SUCCESS:** [three original QC0 RH connected groups all numerically pass, 5 protected humidity missing filled, 6 existing source QC1 VPD +2 T QC1 research corrections; nine original HOLDs reduced to four with full original sensor QC0 unchanged](docs/US_KON_STAGE14P_ACTUAL_THREE_CONNECTED_QC0_GROUPS_FIVE_HOLDS_FILLED_20261029.md). Next [Stage14Q only Oct15 QC1-endpoint LOW-CONFIDENCE RH single candidate and Aug05 source two-sided true-QC0 RH plus 4 QC1-T connected event](scripts/stage14/14q_US_Kon_two_remaining_bounded_source_hypotheses.py). Two other remaining May26/Sep29 special source holds explicitly protected. Stage14Q has NOT been executed on IRIDIS6. **No production DATM/AD400/Slurm authorization**.
+
+
 > **2026-10-29 06:50 UTC US-Kon Stage14O ACTUAL verified tower QC+both ERA sources all 9 missing:** [complete original 2011/2012 ±2h published tower QC0/1/2, paired FLUXNET ERA and independently SHA-verified ERA5-Land T2m/D2m/RH](docs/US_KON_STAGE14O_ACTUAL_9_NATIVE_EVENTS_TOWER_ERA5LAND_HUMAN_DECISION_20261029.md). Source manual review identifies **3 original observed-QC0 RH contiguous group candidates**: 2011-Feb22 3 missing, 2011-Oct23 5 VPD QC1 including 1 missing, 2012-Feb25 3 VPD QC1 incl 1 missing + 2 original T QC1 candidate repairs. [Stage14P three exact original-QC0-endpoint bounded, per-group atomic research-only 11-VPD-HH/2-T-HH test](scripts/stage14/14p_US_Kon_three_QC0_connected_blocks_5of9_research.py), not yet IRIDIS6 executed; **if** all groups pass, 9 science missing may fall to 4, not zero. Other four (May26, Sep29, Oct15 2011, Aug05 2012) remain source-science HOLD; never alter original data or submit AD400.
 
 
