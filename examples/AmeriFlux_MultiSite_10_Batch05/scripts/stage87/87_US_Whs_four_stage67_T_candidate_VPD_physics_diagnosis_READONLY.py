@@ -85,6 +85,7 @@ def selftest():
  assert RH(0,7)<0 and abs(RH(0,6.112))<1e-9
  assert shift("201205260000",-1)=="201205252330"
  assert 0<=RH(20,2)<=100
+ assert number("2.5")==2.5 and number("") is None and number("-9999") is None
  print("STAGE87 SELF-TEST PASS | 51 Stage67 Whs T candidates, exact four negative/invalid T+unchanged-VPD physics issues source context, read-only")
 
 def main():
@@ -172,10 +173,10 @@ def main():
  rows=[];bad=[];context=[]
  for key,c in sorted(candidate.items()):
   t=key[1];o=original[t]
-  T,V=num(o["TA_F"]),num(o["VPD_F"])
-  oldT=num(c["original_source_TA_F_C"])
-  newT=num(c["candidate_TA_F_C"])
-  oldV=num(c["source_VPD_F_hPa_unchanged"])
+  T,V=number(o["TA_F"]),number(o["VPD_F"])
+  oldT=number(c["original_source_TA_F_C"])
+  newT=number(c["candidate_TA_F_C"])
+  oldV=number(c["source_VPD_F_hPa_unchanged"])
   if (T is None or oldT is None or newT is None or
       abs(T-oldT)>0.002 or
       (V is None)!=(oldV is None) or
@@ -185,7 +186,7 @@ def main():
    raise ValueError("Stage67 candidate-original T/VPD/native QC provenance drift "+t)
   originalRH=RH(T,V)
   candidateRH=RH(newT,V)
-  eraT,eraV=num(o["TA_ERA"]),num(o["VPD_ERA"])
+  eraT,eraV=number(o["TA_ERA"]),number(o["VPD_ERA"])
   eraRH=RH(eraT,eraV)
   if candidateRH is None:
    isbad=True;issue="NONFINITE_CANDIDATE_T_ORIGINAL_VPD_RH"
@@ -228,8 +229,8 @@ def main():
       source_ERA_T_C="",source_ERA_VPD_hPa="",source_ERA_RH_pct="",
       original_measured_VPD_QC0_RH_physical="SOURCE_TIMESTAMP_MISSING"))
     continue
-   origRH=RH(num(obs["TA_F"]),num(obs["VPD_F"]))
-   erRH=RH(num(obs["TA_ERA"]),num(obs["VPD_ERA"]))
+   origRH=RH(number(obs["TA_F"]),number(obs["VPD_F"]))
+   erRH=RH(number(obs["TA_ERA"]),number(obs["VPD_ERA"]))
    qc0_meas=(obs["VPD_F_QC"]=="0" and origRH is not None and 1<=origRH<=100)
    context.append(dict(flagged_center_native=t,native_time=tt,
      relative_offset_minutes=j*30,original_T_C=obs["TA_F"],TA_F_QC=obs["TA_F_QC"],
