@@ -201,3 +201,58 @@ For the 2017-01-05 run, the e envelope half-width is 0.13–0.19 hPa and there i
 | 5 | All ERA-filled cold rows (outside the 238) | Separate decision: the 1.45 hPa VPD floor makes QC2 winter humidity systematically too dry, which affects 2017/2018/2023 entirely | Recommend a dedicated research shadow comparing companion vs GRID_A vs EMP for QC2 cold rows before any NR3 model admission. |
 
 US-NR3 cannot be admitted to a model run while any of the 238 rows is NaN. Whichever options are chosen, the result is a new research shadow. The original Stage12G is not edited.
+
+## 6. Stage08 (2026-10-29 06:33): alternatives for the HOLD rows and gap locations
+
+**Run.** Script [`nr3_08_claude_HOLD_alternatives_and_gap_locations_READONLY.py`](../scripts/us_nr3_science/nr3_08_claude_HOLD_alternatives_and_gap_locations_READONLY.py), commit `11068aa`. It is read-only and wrote one report: `reports/nr3_08_claude_HOLD_alternatives_20261029T063329Z_40b2fe2d`.
+
+**User decisions recorded on 2026-10-29.** The recommendations in §5 were accepted:
+- the 27 BASE rows are accepted as a research exception;
+- the 17 and 31 rows stay HOLD pending alternatives;
+- the 163 rows are sensitivity-only;
+- the spike flag goes for review;
+- the dry-bias question gets a separate study.
+
+Nothing has been written to any forcing or shadow yet.
+
+**Where the gaps are.**
+- All 238 lack **only humidity** (`QBOT|VPD_USE`).
+- They fall in 53 episodes. All but 2 are cold nights or early mornings, December to March, with TA_USE between −16 and −35 °C, inside QC2 (ERA-filled) periods.
+- The full episode table is `P0_missing_episodes.csv`.
+
+**T\* (humidity-corrected sonic) versus ERA as air temperature, on QC0 TA_F.**
+
+| Stratum | T\* MAE / bias (°C) | TA_ERA MAE / bias (°C) |
+| --- | --- | --- |
+| Pooled (N 161,950) | 0.75 / +0.46 | 3.36 / +0.02 |
+| COLD44 (N 13,714) | **0.58 / +0.20** | **4.17 / +3.10** |
+| \|TA_F − TA_ERA\| > 5 | 0.73 / +0.41 | 6.73 / −0.92 |
+| COLD44 by year | 0.21–0.82 (2011: 1.61) | 2.96–4.79 |
+
+- T\* is better than ERA in all 13 years, so the predeclared criterion `T_STAR_BETTER = True`.
+- The complete measured pair (VPD at T\*, from measured RH) has COLD44 MAE **0.027 hPa**.
+
+**Time interpolation.** It validates very well on NR3 QC0: 3-HH pseudo-gaps give MAE 0.02–0.24 hPa and every regime passes. It is formable for **none** of the gaps, because none has a QC0 anchor within 4 HH.
+
+**Alternatives for the 48 HOLD rows (none approved).**
+
+| Group | Alternative | HH |
+| --- | --- | --- |
+| 17 BASE temperature conflict | `MEASURED_PAIR_CANDIDATE_T_REPAIR`: TA = T\*, e = RH × esw(T\*); ice RH at T\* 46–97 % | 17 |
+| 31 non-BASE | EMP_LOYO validated at season + bin level: 2009-12-03 01:00–07:30 (14 HH), 2019-01-01 03:00 | 15 |
+| | GRID_A validated at bin level: 2019-11-27 04:00–05:00, 2022-03-11 05:00 | 4 |
+| | GRID_A capped to ice saturation, excess ≤ 3.3 %: 2018-10-15 01:00, 2023-10-29 23:30 | 2 |
+| | **HOLD**: 2011-10-25 14:30–15:00 (no validated stratum); 2011-11-29 13:30–14:00 (QC0 TA spike −34.87 °C); 2023-10-30 00:00–03:00 (6 HH, GRID_A 11–32 % above ice saturation; EMP would need only a 2.3–4.2 % cap, but the predeclared lower-MAE rule chose GRID_A) | 10 |
+
+**Scope beyond the 238.** There are **11,981** QC2-temperature half-hours that do have a tower RH+sonic+PA triplet: 2016-09 to 2017-05, and 2019-01.
+- The current shadow TA_USE differs from T\* by an MAE of about 3.3 °C.
+- The shadow e is biased −0.4 to −0.8 hPa.
+
+**Dry artefact.** Compare the shadow's QC2 cold rows (TA_USE < −10 °C, N = 16,670) with QC0 truth (N = 30,867):
+
+| Population | Median ice RH | Share with ice RH < 30 % |
+| --- | --- | --- |
+| Shadow QC2 cold rows | **31 %** | 47 % |
+| QC0 truth | **94 %** | 1.1 % |
+
+This is the largest humidity problem at US-NR3, and it lies outside the 238.
