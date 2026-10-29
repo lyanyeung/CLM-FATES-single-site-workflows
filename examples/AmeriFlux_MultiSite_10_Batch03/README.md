@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 new station ownership and next run:** **Claude** scientific-workstream handoffs: [US-Me6 45 missing HH / 19HH winter source-QC2](docs/US_ME6_CLAUDE_DIFFICULT_SITE_HANDOFF_20261029.md) and [US-NR1 234 missing HH after signed Stage13P](docs/US_NR1_CLAUDE_DIFFICULT_SITE_HANDOFF_20261029.md). **US-NR3** stays reserved for independent advanced-model review. **ChatGPT/operator** takes lowest-friction **US-Mpj**: [one-pass Stage13O signed 315360 full meteorology and model physics screen](docs/US_MPJ_FASTEST_ONEPASS_SCIENCE_GATE_20261029.md), with pinned [read-only executable](scripts/stage14/14d_US_Mpj_final_315360_science_gate_READONLY.py). **US-MMS** Stage14C and **US-MtB** MtB04 are now numerically complete isolated research candidates, still not admitted for Post-v5/DATM/AD400. Claude handoff documents are saved to GitHub, **not automatically sent** to any Claude service.
+
+
 > **2026-10-29 fastest remaining site: US-MMS.** [One-pass 16 native hourly humidity gaps and 18 historic original ERA negative-e anomalies — manual read-only evidence package](docs/US_MMS_ONEPASS_MANUAL_16_HOURLY_HOLDS_20261029.md). Do **not** assume 16+18 distinct or that the 15 missing verified grid-source records are repair approvals. The code is committed, first IRIDIS6 run pending. No forcing, DATM, AD400 or Slurm modifications.
 
 > **2026-10-29 advanced-model reserved workstream:** [US-NR3 alpine 3504m science handoff (238 selected gaps vs 1,484 original QC2 cold-source anomalies; NO forcing writes)](docs/US_NR3_ADVANCED_MODEL_SCIENTIFIC_HANDOFF_20261029.md). This is a separate unresolved advanced review task, not a model-input signoff. US-MtB remains Claude's separate workstream, US-Me6 retains its manual HOLD review.
