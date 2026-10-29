@@ -90,7 +90,8 @@ def main():
      m93.get("source_original_CSV_SHA256")!=RAW_SHA or
      m93.get("previous_1675_approved_SHA256")!=MAIN_SHA or
      m93.get("source_T_replacement_approved") is not False or
-     m93.get("two_T_QC0_neighbors_disagreement_C")!=6.05 or
+     not isinstance(m93.get("two_T_QC0_neighbors_disagreement_C"),(float,int)) or
+     abs(m93["two_T_QC0_neighbors_disagreement_C"]-6.05)>1e-6 or
      any(m93.get("output_SHA256",{}).get(p.name)!=sha(p) for p in (f93,opt93))):
   raise ValueError("Stage93 actual original Wkg SHA and unapproved science outcome changed")
  context=read(f93,["native_time","relative_minutes","source_TA_C",
