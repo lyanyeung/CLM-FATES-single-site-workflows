@@ -25,3 +25,24 @@
 **Group C Feb25, three adjacent QC1 VPD halfhours and TWO original QC1 T halfhours**: original 10:00 RH54.959440%/VPD2.611 and12:00 RH46.349255%/VPD4.420 are both-QC0 observed; original 10:30 T QC0 =0.626°C and 12:00 T QC0 =4.185°C, source 11:00/11:30 T QC1 spikes to 8.627/9.016°C; locally linear QC0-T candidates 11:00 `1.812333°C`, 11:30 `2.998667°C`; water-RH linear source candidates at 10:30/11:00/11:30 `52.80689%,50.65435%,48.50180%`, water-VPD `3.018,3.437,3.902 hPa`, versus outer VPD2.611/4.420 hPa. All 30min VPD jumps <=0.518 hPa. This is a **conditional research** joint T+VPD correction, not independently measured 11:00 T and not yet scientifically operator-approved.
 
 **Disposition:** Stage14O is evidence only; all actual Stage14K original 9 protected missing stay NaN. Prefer ONE strict, SHA-scoped, separately written **11-HH humidity, 2-HH temperature** low-confidence research candidate with per-group atomic acceptance after original QC0 source and both-edge VPD/RH/QBOT/phase physics checks; any failed group stays exactly unchanged. Keep four still special held native centers `201105261100`, `201109291830`, `201110150730`, `201208050900` until analogous independently sourced connected-event scope checks. No in-place overwrites, CIME/AD400/Slurm or false station approval.
+
+
+## One grouped research candidate Stage14P (not yet executed)
+
+[Stage14P source-pinned QC0-endpoint bounded research shadow](../scripts/stage14/14p_US_Kon_three_QC0_connected_blocks_5of9_research.py); Git commit `72a6b17d61712e6846d34c48ca86a97f906f93c5`, Git blob `c98edf224e8243d0c5883aeeec38ba0f329d376f`.
+
+Unlike Stage14N's **three isolated center-only** changes, this candidate applies three **atomic original source QC0 bracketing groups**: Feb22 three missing at once; Oct23 all five originally QC1 finite/missing VPD records between both true QC0 humidity endpoints; Feb25 three originally QC1 VPD and two original QC1 T values (research candidate, not independent measured T). It uses strict source original SHA receipts, protects all original T/VPD QC0, preserves the **four other HOLDs**, checks every internal and exterior native 30min water/RH/QBOT/T jump, and only publishes a NEW isolated science trial. If any group fails, that group remains exactly unchanged. Full site output remains production-UNAPPROVED, no Slurm jobs.
+
+This new code is **on GitHub, not yet confirmed run on IRIDIS6**. Even if all three groups numerically PASS, the provisional science research tape is still missing **4 HH** and not DATM/AD400 ready; numeric smoothness from interpolation does not provide independent RH observations at newly inferred HH.
+
+Run once:
+```bash
+(
+ set -euo pipefail
+ F="$HOME/US_Kon_final_three_connected_QC0.py"
+ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/72a6b17d61712e6846d34c48ca86a97f906f93c5/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage14/14p_US_Kon_three_QC0_connected_blocks_5of9_research.py" -o "$F"
+ test "$(git hash-object "$F")" = "c98edf224e8243d0c5883aeeec38ba0f329d376f"
+ python3 -B -c 'import pathlib,sys; p=pathlib.Path(sys.argv[1]); compile(p.read_text(),str(p),"exec"); print("SYNTAX PASS")' "$F"
+ python3 -B "$F" --run 2>&1 | tee "$HOME/US_Kon_final_three_connected_QC0.log"
+)
+```
