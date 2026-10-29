@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage92_T"
+mkdir -p "$BASE"
+SCRIPT="$BASE/stage92_7T_extended.py"
+COMMIT="537c097a7b114ad92d26a1d3def30dae99a6c80e"
+BLOB="a79a586ce06de6387f77ba6f330994238c11728b"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage92/92_seven_temperature_exceptions_extended_original_native_day_context_READONLY.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "$BLOB"
+echo "STAGE92 GITHUB ORIGINAL SCIENCE SOURCE SHA VERIFIED"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+D84="$HOME/ameriflux_batch05_stage84_Vcp/Vcp_direct582_20261029T062857Z_2211876"
+D90="$HOME/ameriflux_batch05_stage90/ten_site_remaining_risks_20261029T070834Z_2339016"
+D91="$HOME/ameriflux_batch05_stage91_T/seven_T_original_QC0_source_20261029T071238Z_2351612"
+OUT="$BASE/seven_T_extended_source_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SCRIPT" --stage84 "$D84" --stage90 "$D90" --stage91 "$D91" --out "$OUT" 2>&1 | tee "$BASE/stage92_seven_T.log"
+echo "STAGE92_REPORTS=$OUT"
+echo "STAGE92 ORIGINAL SCIENCE EVIDENCE ONLY | SOURCE/QC/PRIOR1675/STAGE91/DATM/CIME/SLURM UNCHANGED"
