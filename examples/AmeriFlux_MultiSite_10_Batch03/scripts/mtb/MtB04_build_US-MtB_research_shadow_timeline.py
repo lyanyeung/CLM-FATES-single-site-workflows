@@ -45,6 +45,7 @@ X_BLOB = "0f98f232910748ac80c5cb3c07defba0a930b7bb"
 MTB03_DEFAULT = Path("/iridisfs/scratch/ly3n24/CLM_FATES/experiments/AmeriFlux_MultiSite_10_Batch03/reports/"
                      "mtb03_US-MtB_multilevel_fill_candidates_20261029T031536Z_50d84498")
 TKFRZ = 273.15
+CAP_REL = 0.01
 A = (6.107799961, 4.436518521e-01, 1.428945805e-02, 2.650648471e-04, 3.031240396e-06, 2.034080948e-08, 6.136820929e-11)
 B = (6.109177956, 5.034698970e-01, 1.886013408e-02, 4.176223716e-04, 5.824720280e-06, 4.838803174e-08, 1.838826904e-10)
 
@@ -142,9 +143,19 @@ def build(g, df, tcand, hcand):
     if (e_new[sel] <= 0).any(): raise ValueError("non-positive vapour pressure produced")
     V = V_old.copy(); Q = out.QBOT.to_numpy(float).copy()
     V[sel] = M.esw(T[sel]) - e_new[sel]; Q[sel] = q_of(e_new[sel], P[sel])
-    qsat = q_of(datm_esat_hpa(T[sel]), P[sel])
-    over = Q[sel] - qsat
-    if (over > 1e-9).any(): raise ValueError(f"{int((over > 1e-9).sum())} new QBOT above DATM saturation")
+    # Candidates were screened with Magnus saturation; DATM's Flatau polynomial is up to ~0.1 % lower.
+    # A new value at most CAP_REL above the DATM cap is set to the cap (what DATM would do) and recorded;
+    # anything larger stops the run.
+    idx = np.flatnonzero(sel); qsat = q_of(datm_esat_hpa(T[idx]), P[idx]); rel = Q[idx] / qsat - 1.0
+    big = rel > CAP_REL
+    if big.any(): raise ValueError(f"{int(big.sum())} new QBOT more than {CAP_REL:.0%} above DATM saturation")
+    capped = []
+    for i, r in zip(idx[rel > 1e-12], rel[rel > 1e-12]):
+        capped.append(dict(native_key=key[i], source=src[i], TA_C=T[i], QBOT_before=Q[i], DATM_qsat=float(q_of(datm_esat_hpa(T[i]), P[i])),
+                           excess_pct=100 * r))
+        e_new[i] = datm_esat_hpa(T[i]); src[i] = src[i] + "+CAPPED_TO_DATM_SAT"
+        V[i] = M.esw(T[i]) - e_new[i]; Q[i] = q_of(e_new[i], P[i])
+    capped = pd.DataFrame(capped)
     for i in np.flatnonzero(sel):
         prov.append(dict(native_key=key[i], field="VPD_USE/QBOT", old=V_old[i], new=V[i], source=src[i]))
     out["TA_USE"] = T; out["TBOT"] = T + TKFRZ; out["VPD_USE"] = V; out["QBOT"] = Q
@@ -159,7 +170,7 @@ def build(g, df, tcand, hcand):
     counts = pd.Series(src[sel]).value_counts().rename_axis("source").rename("HH").reset_index()
     counts = pd.concat([pd.DataFrame([{"source": "TEMPERATURE_REPLACED", "HH": int(tchg.sum())}]), counts], ignore_index=True)
     nan = {c: int(out[c].isna().sum()) for c in out.columns if c != "time"}
-    return out, pd.DataFrame(prov), counts, nan, sat_only_t
+    return out, pd.DataFrame(prov), counts, nan, sat_only_t, capped
 
 
 def self_test():
@@ -176,13 +187,14 @@ def self_test():
     hcand = pd.DataFrame({"native_key": [df.native_key[k] for k in (5, 6, 7, 8, 20)],
                           "TA_used_C": [t[5], t[6], t[7], t[8], 1.0],
                           "source": ["COMPANION_E_user_option_B", "L24_measured_RH_transfer", "HOLD_NOT_FORMABLE", "HOLD_OUT_OF_REGIME", "HOLD_OUT_OF_REGIME"],
-                          "e_hPa": [M.esw(t[5]) * .7, M.esw(t[6]) * .6, np.nan, np.nan, np.nan]})
-    out, prov, counts, nan, s = build(g, df, tcand, hcand)
+                          "e_hPa": [M.esi(t[5]) * 0.99999, M.esw(t[6]) * .6, np.nan, np.nan, np.nan]})
+    out, prov, counts, nan, s, cap = build(g, df, tcand, hcand)
     assert nan["QBOT"] == 1 and nan["VPD_USE"] == 1          # row 9 was never a target
     assert abs(out.QBOT[7] - q_of(datm_esat_hpa(t[7]), p[7])) < 1e-12                    # saturated = DATM cap
     assert abs(out.TA_USE[30] + 9.9) < 1e-12 and abs(out.TBOT[30] - (TKFRZ - 9.9)) < 1e-12
     e30 = M.esw(t[30]) - v[30]; assert abs(out.VPD_USE[30] - (M.esw(-9.9) - min(e30, datm_esat_hpa(-9.9)))) < 1e-9
     assert set(prov.field) == {"TA_USE/TBOT", "VPD_USE/QBOT"}
+    assert len(cap) == 1 and abs(out.QBOT[5] - q_of(datm_esat_hpa(t[5]), p[5])) < 1e-12, "Magnus/Flatau cap"
     print("MtB04 SELF-TEST PASS: conventions, temperature replacement, sources, DATM saturation, e-kept consistency, untouched guard")
 
 
@@ -202,11 +214,13 @@ def main():
     gk = pd.to_datetime(g.time, format="%Y-%m-%d %H:%M:%S").dt.strftime("%Y%m%d%H%M").to_numpy()
     if not np.array_equal(gk, df.native_key.to_numpy()): raise ValueError("Stage12g timeline order differs from source frame")
     nT, nH = check_conventions(g)
-    out, prov, counts, nan, sat_only_t = build(g, df, tcand, hcand)
+    out, prov, counts, nan, sat_only_t, capped = build(g, df, tcand, hcand)
     pd.set_option("display.width", 200)
     print(f"\nconventions verified on {nT} temperature and {nH} humidity rows (TBOT = TA+273.15; QBOT closure rtol 1e-8)")
     print("\n=== changes ===\n" + counts.to_string(index=False))
     print("temperature-only rows capped to DATM saturation:", sat_only_t)
+    print(f"candidates capped to DATM saturation (<= {CAP_REL:.0%} above it, Magnus vs Flatau): {len(capped)}")
+    if len(capped): print(capped.to_string(index=False))
     print("\n=== remaining NaN per column (whole timeline) ===\n" + json.dumps(nan))
     left = {k: v for k, v in nan.items() if v}
     print("\nMtB04 SUMMARY: rows", len(out), "| changed T", int((prov.field == "TA_USE/TBOT").sum()),
@@ -215,7 +229,8 @@ def main():
     if a.check: print("MtB04 CHECK ONLY: no files written.", flush=True); return
     dest = M.ROOT / "science_trials" / ("mtb04_US-MtB_research_shadow_" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "_" + uuid4().hex[:8])
     dest.mkdir(parents=True, exist_ok=False)
-    names = {"US-MtB_MTB04_RESEARCH_SHADOW_NOLEAP.csv": out, "MTB04_change_provenance.csv": prov, "MTB04_change_counts.csv": counts}
+    names = {"US-MtB_MTB04_RESEARCH_SHADOW_NOLEAP.csv": out, "MTB04_change_provenance.csv": prov, "MTB04_change_counts.csv": counts,
+             "MTB04_capped_to_DATM_saturation.csv": capped}
     for k, d in names.items(): d.to_csv(dest / k, index=False)
     (dest / "INCOMPLETE_DO_NOT_USE_FOR_DATM_OR_SPINUP").write_text("Research shadow. DATM/Post-v5/spinup use needs a separate user decision.\n")
     (dest / "SCIENTIFIC_STATUS.md").write_text(
@@ -226,7 +241,7 @@ def main():
     files = [*names, "INCOMPLETE_DO_NOT_USE_FOR_DATM_OR_SPINUP", "SCIENTIFIC_STATUS.md"]
     rec = {"version": VERSION, "inputs": info, "MtB03_report": str(a.mtb03), "MtB03_receipt_sha256": M.sha(Path(a.mtb03) / "mtb03_receipt.json"),
            "Stage12g_timeline_sha256": M.sha(G / M.TIMELINE), "rows": len(out), "changes": counts.to_dict("records"),
-           "remaining_nan": nan, "temperature_only_rows_capped": sat_only_t,
+           "remaining_nan": nan, "temperature_only_rows_capped": sat_only_t, "candidates_capped_to_DATM_sat": len(capped),
            "Postv5_approved": 0, "DATM_ready": 0, "spinup_authorized": 0,
            "output_sha256": {n: M.sha(dest / n) for n in files}}
     (dest / "mtb04_research_shadow_receipt.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
