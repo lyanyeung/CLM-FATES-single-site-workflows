@@ -119,8 +119,8 @@ def assess():
         ew=es(t);e=ew-v;qq=0.622*100*e/(p-0.378*100*e)
         rw=100*e/ew;ri=100*e/ei(t)
     complete=np.logical_and.reduce([np.isfinite(z) for z in a.values()])
-    water=complete&(v>=0)&(e>=0)&(p>50000)&(p<110000)&
-          np.isclose(q,qq,rtol=1e-7,atol=1e-9)
+    water=(complete&(v>=0)&(e>=0)&(p>50000)&(p<110000)&
+           np.isclose(q,qq,rtol=1e-7,atol=1e-9))
     tk=complete&(np.abs(a["TBOT"]-t-273.15)<1e-8)
     ice_warn=water&(t<0)&(ri>100)
     dry_warn=water&(rw<5)
@@ -135,10 +135,10 @@ def assess():
     guard(len(old)==len(s) and old.time.equals(s.time),
           "latest selected science source cannot align to Stage11L")
     old_v=old.VPD_USE.to_numpy(float)
-    original_selected=pd.read_csv(S07/"US-NC2/forcing/processed_v5/US-NC2_CLM_forcing_2005_2025.csv",
-                                  dtype={"time":str},low_memory=False)
+    original_selected_file=S07/"US-NC2/forcing/processed_v5/US-NC2_CLM_forcing_2005_2025.csv"
+    original_selected=pd.read_csv(fil(original_selected_file),dtype={"time":str},low_memory=False)
     guard(len(original_selected)==len(s) and original_selected.time.equals(s.time),
-          "Stage07 original selected time differs from latest")
+          "Stage07 source original selected clock differs from current")
     need_raw=set()
     for name,aa,bb in BOUNDARIES:
         for z in (aa,bb):
@@ -231,7 +231,7 @@ def assess():
        "four_boundaries_over4hPa":int(edge.loc[edge.exceeds_old_4hPa_guard,"boundary"].nunique()),
        "source_QC0_not_implied_by_CDS_ERA5":True,
        "PFT_ZBOT_UTC_DATM_not_checked":True,
-       "postv5_D​ATM_AD400_approved":False,
+       "postv5_DATM_AD400_approved":False,
        "original_source_and_prior_shadow_unchanged":True}
     print("\nUS-NC2 ALL 367920 NATIVE HALFHOURS",flush=True)
     print(json.dumps(overview,indent=2),flush=True)
