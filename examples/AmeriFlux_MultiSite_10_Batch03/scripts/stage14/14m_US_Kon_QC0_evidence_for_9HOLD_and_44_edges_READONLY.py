@@ -65,10 +65,17 @@ def source():
             need(digest(root/fn)==h,"original signed SHA differed "+str(root/fn))
     meta=json.loads(regular(M).read_text())
     site=[x for x in meta["sites"] if x["site"]=="US-Kon"]
-    need(len(site)==1 and int(site[0]["native_minutes"])==30
-      and int(site[0]["first_year"])==2005
-      and int(site[0]["last_year"])==2020,
-      "original site year/clock changed")
+    need(len(site)==1,"US-Kon must have exactly one original source site")
+    source_first=int(site[0]["first_year"])
+    source_last=int(site[0]["last_year"])
+    need(int(site[0]["native_minutes"])==30 and
+         1900<=source_first<=source_last<=2100,
+         "original site product metadata/native minutes invalid")
+    # Never infer source release years from the count of selected rows:
+    # Stage14K/L have signed *280320 selected NOLEAP* half-hours, but
+    # manifest first_year/last_year are the original source release bounds.
+    print("US-Kon ORIGINAL MANIFEST YEARS:",source_first,source_last,
+          "native_minutes",site[0]["native_minutes"],flush=True)
     for k in ("primary","era"):
         f=regular(site[0][k])
         need(digest(f)==meta["input_sha256"].get(str(f.resolve())),
@@ -79,9 +86,21 @@ def source():
       k.time.equals(l.time),"Stage14K/14L original time/schema differs")
     keys=k.time.str.replace(r"[^0-9]","",regex=True).str.slice(0,12)
     timestamps=pd.to_datetime(keys,format="%Y%m%d%H%M",errors="raise")
-    need(keys.is_unique and timestamps.is_monotonic_increasing
-         and not bool(((timestamps.dt.month==2)&(timestamps.dt.day==29)).any()),
+    need(keys.is_unique and timestamps.is_monotonic_increasing and
+         keys.str.fullmatch(r"\d{12}").all() and
+         not bool(((timestamps.dt.month==2)&(timestamps.dt.day==29)).any()),
          "native NOLEAP selection altered")
+    selected_first=int(timestamps.iat[0].year)
+    selected_last=int(timestamps.iat[-1].year)
+    grid=pd.date_range(
+        f"{selected_first}-01-01 00:00",
+        f"{selected_last}-12-31 23:30",freq="30min")
+    grid=grid[~((grid.month==2)&(grid.day==29))]
+    need(len(grid)==len(k)==280320 and
+         np.array_equal(timestamps.to_numpy(),grid.to_numpy()),
+         "selected signed 280320 native clock is not 16 full NOLEAP years")
+    print("US-Kon SELECTED SIGNED NOLEAP YEARS:",
+          selected_first,selected_last,"HH",len(k),flush=True)
     need(set(keys[l.VPD_USE.isna()])==HARD9 and
          set(keys[k.VPD_USE.isna()])==HARD9 and
          l.QBOT.isna().equals(k.QBOT.isna()),
