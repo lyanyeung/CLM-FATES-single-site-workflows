@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 ten-site numeric state and next action:** [5 completed numerical research forcings, 4 with quantified remaining VPD/QBOT gaps, 1 (US-Me2) without comparable completed input; next easiest US-NC2, one SHA-signed complete 367920HH source/2025-March QC review](docs/BATCH03_TEN_SITE_PROGRESS_AND_US_NC2_NEXT_ONEPASS_20261029.md), [pinned one-pass source code](scripts/stage14/14e_US_NC2_next_onepass_site_march2025_QC_READONLY.py). Stage11Q is selected ONLY if its actual signed output exists; otherwise use verified Stage11L. Claude studies US-Me6/US-NR1; US-NR3 is reserved; no production Post-v5/DATM/AD400 approval.
+
+
 > **2026-10-29 03:56 UTC US-Mpj actual Stage14D full-site result:** [315,360 native HH all finite, water VPD/QBOT and TBOT conversion PASS; 17 signed Stage13O 2014 source repairs preserved; 610 RHwater<5% provenance warnings and 3,791 subfreezing RHice>100% phase-model cautions retained WITHOUT mass-clipping or forcing edits](docs/US_MPJ_STAGE14D_ACTUAL_FULL_SITE_PASS_MANUAL_DECISION_20261029.md). **Manual disposition:** meteorology numerical source QC closed; Post-v5/DATM/AD400 not yet admitted pending PFT, native time, ZBOT and actual DATM saturation/cap compatibility. US-Me6 and US-NR1 delegated study documents remain available; US-NR3 separately reserved.
 
 
