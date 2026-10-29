@@ -81,3 +81,39 @@ The user can rerun ONLY Stage14M with this pinned command:
 ```
 
 Stage14M remains **read-only except creation of its separate SHA-receipted report** and cannot authorize production DATM/AD400. Exact nine protected scientific holds and 44 actual expanded QC warning edges are unchanged.
+
+
+## 2026-10-29 06:19+ UTC — second actual Stage14M early-stop, FSDS CSV precision comparison
+
+Operator reran corrected Stage14M `35ce6de...`: source year metadata and selected source grid successfully confirmed:
+
+```
+SYNTAX PASS
+US-Kon STAGE14M QC0 ORIGINAL EVIDENCE SELF-TEST PASS
+US-Kon ORIGINAL MANIFEST YEARS: 2004 2019 native_minutes 30
+US-Kon SELECTED SIGNED NOLEAP YEARS: 2004 2019 HH 280320
+US-Kon STAGE14M FAIL CLOSED: non-humidity original source changed FSDS
+```
+
+This is a **second premature audit failure** before actual QC0 inference; the earlier false claim that original source might be 2005–2020 has been directly disproven: both original metadata and selected complete 16-year NOLEAP tape are **2004–2019**.
+
+Reason the original guard is too strict: Stage14L verified `new["FSDS"].equals(parent["FSDS"])` (and all other nonhumidity fields) **in memory before writing** its independent SHA-signed CSV. But Stage14M compares **two independently serialized and parsed floating-point CSVs** with `Series.equals()`, which is strict on dtype and binary floating equality. A last-bit difference from pandas CSV float parsing/17-digit output can trigger a **false scientific alteration**. The exact numerical discrepancy cannot be claimed until the added diagnostic runs.
+
+**Third corrected original-source auditor** pinned at Git commit `0906444ffdbd6749043f943a33e8e0ac60837e47`, blob `9909fddf2a80ed0290b726bfadc120b988ed57fa`. Before any original tower QC0 source interpretation, it:
+- checks strict equality of NaN, +infinity, −infinity masks for every nonhumidity numeric field (`TBOT,PSRF,FSDS,FLDS,WIND,PRECTmms,TA_USE`);
+- prints per-field max absolute readback difference and number of differences > **1e-10 in original field units**;
+- allows *only* parser/CSV-level tiny absolute differences <=1e-10, stops on any larger difference; `time` equality remains exact;
+- independently preserves strict source provenance: both Stage14K and Stage14L SHA receipts, exactly 7 actual humidity-source differences in signed ledger, exactly 9 preserved `VPD_USE/QBOT` native NaNs, original FLUXMET and paired ERA SHA, 280320 consecutive 2004–2019 source NOLEAP timestamps.
+
+The revised script has NOT been run on IRIDIS6 as of this note, and the first two actual attempts did not write source or QC reports. If the new per-field output shows any meaningful difference above tolerance, STOP and inspect before changing historical forcing. Stage14M does not modify scientific inputs, cases or Slurm jobs.
+
+```bash
+(
+ set -euo pipefail
+ F="$HOME/US_Kon_last_QC0_provenance.py"
+ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/0906444ffdbd6749043f943a33e8e0ac60837e47/examples/AmeriFlux_MultiSite_10_Batch03/scripts/stage14/14m_US_Kon_QC0_evidence_for_9HOLD_and_44_edges_READONLY.py" -o "$F"
+ test "$(git hash-object "$F")" = "9909fddf2a80ed0290b726bfadc120b988ed57fa"
+ python3 -B -c 'import pathlib,sys; p=pathlib.Path(sys.argv[1]); compile(p.read_text(),str(p),"exec"); print("SYNTAX PASS")' "$F"
+ python3 -B "$F" --run 2>&1 | tee "$HOME/US_Kon_last_QC0_provenance.log"
+)
+```
