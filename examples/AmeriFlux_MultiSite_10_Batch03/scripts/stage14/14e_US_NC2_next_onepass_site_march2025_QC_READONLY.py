@@ -135,10 +135,8 @@ def assess():
     guard(len(old)==len(s) and old.time.equals(s.time),
           "latest selected science source cannot align to Stage11L")
     old_v=old.VPD_USE.to_numpy(float)
-    original_selected_file=S07/"US-NC2/forcing/processed_v5/US-NC2_CLM_forcing_2005_2025.csv"
-    original_selected=pd.read_csv(fil(original_selected_file),dtype={"time":str},low_memory=False)
-    guard(len(original_selected)==len(s) and original_selected.time.equals(s.time),
-          "Stage07 source original selected clock differs from current")
+    # Stage11L/Stage11Q SHA receipts already pin the prior source lineage; do not
+    # re-read a redundant 367920-row Stage07 selected file to decide provenance.
     need_raw=set()
     for name,aa,bb in BOUNDARIES:
         for z in (aa,bb):
