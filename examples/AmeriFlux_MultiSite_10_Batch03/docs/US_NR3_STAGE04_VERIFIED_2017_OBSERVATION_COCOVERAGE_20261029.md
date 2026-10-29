@@ -44,7 +44,7 @@ The 2017 BASE RH and FLUXMET RH series have **6,329 exact matched numeric values
 | 2022 | 35 | 0 | 0 | 0 | 0 | 0 | 35 |
 | 2023 | 9 | 0 | 0 | 8 | 7 | 0 | 9 |
 | 2024 | 22 | 0 | 0 | 22 | 21 | 0 | 22 |
-| **Total** | **238** | **3** | **44** | **80** | **78** | **44** | **234** |
+| **Total** | **238** | **3** | **44** | **86** | **84** | **44** | **234** |
 
 Rows with original dual-QC2 are provenance counts, not a declaration that each row has numerical VPD or is itself one of the selected 1,484 source physics anomalies. Prior Stage01 verified **172 of the 238** overlapping that selected 1,484 population, a different definition.
 
