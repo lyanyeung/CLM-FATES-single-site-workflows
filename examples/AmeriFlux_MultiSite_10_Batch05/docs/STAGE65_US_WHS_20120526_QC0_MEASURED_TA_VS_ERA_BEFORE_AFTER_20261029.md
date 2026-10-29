@@ -28,3 +28,29 @@ curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-sing
 ```
 
 **Status:** GitHub script/launcher SHA verified; actual Stage65 IRIDIS6 source-QC results and syntax/self-test require operator execution. No assumption about measured versus ERA discrepancy until QC0 evidence is printed. This is a scientific source investigation, not authorisation to change the 204 approved candidates, original FLUXMET, DATM, CIME or Slurm jobs.
+
+## Actual Stage65 operator result — 29 October 2026
+
+User executed the hash-pinned Stage65. `STAGE65 SOURCE VERIFIED`, `SELF-TEST PASS`, `SUCCESS`; original ZIP, approved 204 candidate overlay, DATM/CIME and Slurm unchanged.
+
+**Target 2012-05-26 06:00 native:** `TA_F=29.620°C`, `TA_F_QC=1`, `TA_ERA=18.131°C`, apparent **+11.489°C**, but **QC1 is MDS-filled, not a tower measurement**. 13 surrounding original 30-min TA and VPD values were all QC1 and source RH was missing.
+
+**Nearest actual source QC0 tower TA measurements:** 2012-05-20 09:00 (**−141 h**, TA_F 22.720°C; TA_ERA 23.542°C; Δ −0.822°C) and 2012-05-31 12:30 (**+126.5 h**, TA_F 31.450°C; TA_ERA 29.040°C; Δ +2.410°C). No TA QC0 exists within 3 days on either side.
+
+**Actual Stage65 QC0 paired T−source-ERA medians:**
+
+| Native time window | QC0 TA–ERA pairs | Median ΔTA °C | QC0 same local clock 06:00±1h count | Same-clock median °C |
+|---|---:|---:|---:|---:|
+| ±1 d | 0 | none | 0 | none |
+| ±3 d | 0 | none | 0 | none |
+| ±7 d | 85 | +0.915 | 8 | +1.734 |
+| ±14 d | 691 | +0.566 | 71 | +1.454 |
+| ±30 d | 2,226 | +0.436 | 231 | +1.636 |
+
+From 18 to 30 May 2012, almost every product TA is QC1 except one original QC0 on 20 May 09:00; 24/25 May has QC2 source ERA replacements in some HH. On **25 May 06:00**, TA_F=TA_ERA=17.814°C but `TA_F_QC=2`, which is **not a confirming tower measurement**. On 27 May 06:00, QC1-filled TA_F=30.277°C vs source TA_ERA=10.339°C, Δ +19.938°C, indicating a **multi-day filled TA divergence**, not an isolated 26 May P2/P3 flag. The 26 May original source gap cannot be uniquely resolved by longer-window QC0 medians.
+
+At 06:00±1h in actual later QC0 measurements, temperature differences vary within morning warming (e.g. 2012-06-01 07:00 +7.609°C vs 06:00 +2.014°C), so use strictly same-clock matched comparisons rather than replacing source TA by global bias estimates.
+
+**Source provenance clarification:** `TA_ERA` in Stage65 is **the pre-existing original US-Whs FLUXMET_HH CSV variable**, not separately downloaded CDS ERA5 or ERA5-Land for this project. It is a **site-downscaled/processed reanalysis companion**. AmeriFlux FLUXNET current product policy acknowledges a modified version of **ERA5 hourly** inputs, while the historical FLUXNET2015 standard used **ERA-Interim**. Do not assert the precise reanalysis input for this specific `v1.3_r1` source without its archive processing documentation/AUXMETEO metadata. References: https://ameriflux.lbl.gov/data/data-policy/ and https://fluxnet.org/data/fluxnet2015-dataset/data-processing/ .
+
+**Decision:** no independent science approval of the May 26 US-Whs target; preserve original product and 204 versioned candidates. Next scientifically useful validation is independent, native-time-aligned ERA5-Land or alternate site-station measurements for 25–27 May 2012 and examination of original MDS temperature-gap behavior.
