@@ -7,8 +7,8 @@ ROOT="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflow
 B05="examples/AmeriFlux_MultiSite_10_Batch05/scripts"
 curl -fLsS --retry 3 "$ROOT/ff9bfd30597d3f50d46a58af0f23728426290875/$B05/AD400_direct_preflight/run_stage101_batch05_DATM_source_selection_NO_SUBMIT_iridis6.sh" -o "$RUN/stage101.sh"
 test "$(git hash-object "$RUN/stage101.sh")" = d9d74ba57c13376aeb0e1d5d310c6196e2cdff0f
-curl -fLsS --retry 3 "$ROOT/c9f3eea6b587a8a9e60b1d6c3c2f55af200e071f/$B05/stage102/batch05_risk_evidence.py" -o "$RUN/stage102.py"
-test "$(git hash-object "$RUN/stage102.py")" = 69d0c38885cc815f3dc5464842d14c268206c3da
+curl -fLsS --retry 3 "$ROOT/2c4ef552d123082fb3ad6c76f419a859880981f7/$B05/stage102/batch05_risk_evidence.py" -o "$RUN/stage102.py"
+test "$(git hash-object "$RUN/stage102.py")" = 2cd9bc9647768f49778f62e6b365842d9d0e4567
 echo "STAGE102: both downloaded scripts verified; running Stage101 then source evidence"
 python3 -B -m py_compile "$RUN/stage102.py"
 bash "$RUN/stage101.sh" 2>&1 | tee "$RUN/stage101.log"
