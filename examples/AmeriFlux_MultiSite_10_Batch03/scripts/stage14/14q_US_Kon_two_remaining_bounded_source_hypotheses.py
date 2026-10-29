@@ -217,8 +217,8 @@ def assess():
             jumps=dict(max_dVPD_hPa=abs(vb-va),max_dRH_pp=abs(rhb-rha),
                        max_dQBOT=abs(qb-qa),max_dTA_C=abs(tb-ta))
             for n,x in jumps.items():worst[n]=max(worst[n],x)
-            if jumps["max_dVPD_hPa"]>4 or jumps["max_dRH_pp"]>20 or
-               jumps["max_dQBOT"]>.003 or jumps["max_dTA_C"]>4:
+            if (jumps["max_dVPD_hPa"]>4 or jumps["max_dRH_pp"]>20 or
+                jumps["max_dQBOT"]>.003 or jumps["max_dTA_C"]>4):
                 errs.append("HALF_HOUR_"+u+"_"+vk+" "+json.dumps(jumps))
         ok=not errs
         if ok:
