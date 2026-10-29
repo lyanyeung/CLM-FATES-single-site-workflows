@@ -188,3 +188,26 @@ python3 -B examples/AmeriFlux_MultiSite_10_Batch03/scripts/us_nr3_science/nr3_03
 \`\`\`
 
 The second command rechecks source/Stage12G SHA, groups simultaneous 2017 BASE RH+sonic+pressure observations, compares raw/processed PA provenance, and joins the Stage12G 238 missing keys without approving any replacements. Use \`--stage03\` only if repeating the Stage03 verification is necessary. No downloads, output files, research shadow, DATM, AD400 or Slurm are produced. **Approved repairs: 0; HOLD: 238.**
+
+
+## Stage04 BASE alias fix (2026-10-29)
+
+The first operator run of the consolidated `nr3_03_04_BASE_bridge_READONLY.py`
+passed both source SHA256 checks and stopped at source loading with
+`AttributeError: 'DataFrame' object has no attribute 'BASE_SONIC'`.
+This is a **script alias typo**, not a file/source/data integrity error:
+`T_SONIC` had been renamed to `BASE_T_SONIC` but the audit expected
+`BASE_SONIC`.
+
+Version `nr3-03-04-v1.1-20261029` provides a single explicit
+`base_column_map()` and verifies the exact resulting column names in
+`--self-test` and again during source loading. No QC, saturation, HOLD,
+clock, method, or thresholds were changed. The previous Stage04 run was
+**NOT COMPLETED**; run the pinned corrected script on IRIDIS6:
+
+```bash
+git show f79b2ac5a29c2457ef1af9e403a6380af57e456b:examples/AmeriFlux_MultiSite_10_Batch03/scripts/us_nr3_science/nr3_03_04_BASE_bridge_READONLY.py | python3 -B - --self-test
+git show f79b2ac5a29c2457ef1af9e403a6380af57e456b:examples/AmeriFlux_MultiSite_10_Batch03/scripts/us_nr3_science/nr3_03_04_BASE_bridge_READONLY.py | python3 -B - --stage04
+```
+
+Read-only terminal output only; unchanged 238 HOLD, 0 approved repairs.
