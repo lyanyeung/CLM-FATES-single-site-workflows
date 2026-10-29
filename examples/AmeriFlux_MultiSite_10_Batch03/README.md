@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 04:49 UTC US-Kon Stage14K ACTUAL PASS but science edge issues:** [all 68 routine missing source VPD/QBOT transferred from paired ERA RH, 9 hard science missing protected, 280320-site T/VPD/QBOT physics pass; however 62/112 original native source joins flagged, including 43 VPD>4hPa, 18 RH>20pp, 8 QBOT>0.003](docs/US_KON_STAGE14K_ACTUAL_68_NUMERIC_SUCCESS_62_BOUNDARY_WARNINGS_AND_14L_QC_POLICY_20261029.md). **Next isolated research-only [Stage14L QC1/QC2 bounded finite neighbour source sensitivity](scripts/stage14/14l_US_Kon_68_QC_neighbor_connected_ERA_RH_sensitivity.py):** actual published FLUXMET source grade, source unchanged finite QC1/QC2, original QC0 protected, signed 9 hard HOLDs untouched; compare warning counts before/after, no production Post-v5, DATM, AD400 or Slurm.
+
+
 > **2026-10-29 04:44 UTC US-Kon Stage14J ACTUAL PASS:** [77 exact remaining paired humidity NaNs across 35 native events, 68 routine ERA-RH scenarios individually water/ice physically feasible, 9 independently protected hard source science holds retained, source SHA verified](docs/US_KON_STAGE14J_ACTUAL_77_SOURCE_AND_STAGE14K_NEXT_20261029.md). Next [Stage14K isolate exactly 68 low-confidence humidity reconstructions and keep 9 original NaNs, with all source/QA fields unchanged and all boundary diagnostics](scripts/stage14/14k_US_Kon_68_ERA_RH_only_9HOLD_isolated_onepass.py). The research output will remain **incomplete and not DATM / AD400-ready**; no Slurm jobs. US-MOz Stage14I numeric 49 source repairs completed separately; original Jan08 QC1 caution preserved.
 
 
