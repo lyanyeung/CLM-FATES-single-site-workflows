@@ -66,3 +66,28 @@ The rule order is: measured level, then INTERP, then the COLD-validated climatol
 Earlier hours were not printed. These rows were not part of the legacy four only because of how the historical Stage08–10 selection was made.
 
 **Implication.** Any future US-Me2 forcing needs a full-record scan for non-physical TA_F/VPD_F pairs, and the same decision rule applied to them.
+
+## User decision and site BIF review (2026-10-29 06:51)
+
+**Decision.** The user accepted the recommendations: "那就按照你说的做".
+- The four events take the EMP_LOYO values above, as a research, low-confidence fill. They will be used when a US-Me2 shadow is built.
+- A full-record scan was requested: CL05, `scripts/claude/CL05_Me2_full_record_nonphysical_humidity_scan_READONLY.py`, commit `3e4e1d4`.
+
+**Site BIF.** Claude read `AMF_US-Me2_BIF_20260527.xlsx` (SHA `adcd983c…`, 770 rows, sheet AMF-BIF) directly.
+
+It contains **no variable-level instrument metadata**: there is no `GRP_VAR_INFO` group, so no TA/RH sensor model, height or change dates. It cannot explain the midnight TA step.
+
+Relevant site facts it does record:
+
+| Item | Value |
+| --- | --- |
+| Tower type | walk-up |
+| `TOWER_POWER` | **Solar panels**. Winter outages are plausible; this is consistent with the 2014-12-31 RH loss and the constant PA, but it is a hypothesis. |
+| Canopy height | 16.5 m (2011; 16.49 m on 2014-04-29) |
+| `UTC_OFFSET` | −8 |
+| Location before the fire | 44.4523, −121.5574, 1253 m |
+| Location after the fire (from 2022-08) | 44.4526, −121.5589 |
+| Original tower | used until 2022-08-25; after that a new shorter tower centred on the regenerating footprint |
+| Disturbance | Green Ridge Fire on **2020-08-20** (surface to full crown fire); salvage logging late March to April 2021 |
+
+Instrument history needs the AmeriFlux BASE-BADM data package or the PI.
