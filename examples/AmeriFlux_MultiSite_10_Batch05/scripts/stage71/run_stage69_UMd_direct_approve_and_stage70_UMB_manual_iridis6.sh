@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage69_70"
+mkdir -p "$BASE"
+REPO="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows"
+ROOT="examples/AmeriFlux_MultiSite_10_Batch05/scripts"
+U_SCRIPT="$BASE/stage69_UMd.py"
+B_SCRIPT="$BASE/stage70_UMB.py"
+curl -fLsS --retry 3 "$REPO/ce33ae843a59b05d63a93b9f37332db99b4a6ab9/$ROOT/stage69/69_US_UMd_15_negative_RH_direct_user_approved_219.py" -o "$U_SCRIPT"
+test "$(git hash-object "$U_SCRIPT")" = "0205f9433b44fc414c6eda79330fc9ff0437a315"
+curl -fLsS --retry 3 "$REPO/b526a8f7773221e8f7f8853360f527b8c1b3db68/$ROOT/stage70/70_US_UMB_8events_22HH_original_context_print_READONLY.py" -o "$B_SCRIPT"
+test "$(git hash-object "$B_SCRIPT")" = "641b5da52040ce8fc6a0c766fad0aeaeed33a2be"
+echo "STAGE69_70 BOTH SOURCES VERIFIED"
+python3 -B -m py_compile "$U_SCRIPT" "$B_SCRIPT"
+python3 -B "$U_SCRIPT" --self-test
+python3 -B "$B_SCRIPT" --self-test
+D63="$HOME/ameriflux_batch05_stage63/exact10_site_204_crosswalk_20261029T025331Z_1904396"
+D62="$HOME/ameriflux_batch05_stage62/wjs2018_30HH_approved_versioned_204_20261029T001706Z_431668"
+D27="$HOME/ameriflux_batch05_stage27/source_comparison_20261026T040257Z_1589604"
+test -d "$D63" && test -d "$D62" && test -d "$D27"
+OUT="$BASE/UMd_219_directly_approved_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$U_SCRIPT" --stage63-dir "$D63" --stage62-dir "$D62" --stage27-dir "$D27" --out "$OUT" 2>&1 | tee "$BASE/stage69_UMd.log"
+echo "========== NEXT: US-UMB ORIGINAL 8 EVENTS 22 HH NATIVE BEFORE / AFTER =========="
+python3 -B "$B_SCRIPT" --stage63-dir "$D63" --stage27-dir "$D27" 2>&1 | tee "$BASE/stage70_UMB_manual.log"
+echo "STAGE69_UMD_APPROVED_219=$OUT/stage69_VERSIONED_219_USER_APPROVED_RH_VPD_native_overlay.csv"
+echo "STAGE70_UMB_REVIEW_LOG=$BASE/stage70_UMB_manual.log"
+echo "STAGE71 ORIGINAL SOURCE / OLD 204 / DATM / CIME / SLURM UNCHANGED"
