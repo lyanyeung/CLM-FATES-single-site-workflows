@@ -156,8 +156,7 @@ def main():
  if (len(all51)!=51 or len(bad)!=4 or {k[1] for k in bad}!=set(FOUR) or
      len(ctx)!=52 or {x["flagged_center_native"] for x in ctx}!=set(FOUR)):
   raise ValueError("Stage87 exact 4×13 original contexts or 51 candidates differ")
- if any((SITE,t) not in all51 for t in FOUR) or any(
-     {x["site"] for x in all51.values()}!={SITE} for _ in (0,)):
+ if any((SITE,t) not in all51 for t in FOUR) or {x["site"] for x in all51.values()}!={SITE}:
   raise ValueError("Stage87 51 original candidate site keys differ")
  for t in FOUR:
   x=bad[(SITE,t)]
