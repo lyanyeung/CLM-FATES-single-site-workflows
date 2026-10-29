@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage79_Vcm"
+mkdir -p "$BASE"
+PY="$BASE/stage79_Vcm.py"
+COMMIT="bcf0f0e1d12dd3c9f5e225747a141b89646febbc"
+BLOB="1d1b3e22ffa76d2a78410c85edad070516adc49a"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage79/79_US_Vcm_362HH_original_QC_temperature_RH_event_audit_READONLY.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL" -o "$PY"
+test "$(git hash-object "$PY")" = "$BLOB"
+echo "STAGE79 ORIGINAL AUDIT CODE GITHUB SHA VERIFIED"
+python3 -B -m py_compile "$PY"
+python3 -B "$PY" --self-test
+D27="$HOME/ameriflux_batch05_stage27/source_comparison_20261026T040257Z_1589604"
+D63="$HOME/ameriflux_batch05_stage63/exact10_site_204_crosswalk_20261029T025331Z_1904396"
+D78="$HOME/ameriflux_batch05_stage78_Var/Var_378_20261029T044442Z_2477410"
+OUT="$BASE/Vcm_original_362_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$PY" --stage27-dir "$D27" --stage63-dir "$D63" --stage78-dir "$D78" --out "$OUT" 2>&1 | tee "$BASE/stage79_Vcm.log"
+echo "STAGE79_REPORTS=$OUT"
+echo "STAGE79 NEXT: original QC/source temperature exceptions reviewed before Stage80 versioned direct RH repair"
