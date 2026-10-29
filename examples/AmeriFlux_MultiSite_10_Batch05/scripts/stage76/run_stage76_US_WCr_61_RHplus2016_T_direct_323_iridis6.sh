@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+BASE="$HOME/ameriflux_batch05_stage76_WCr"
+mkdir -p "$BASE"
+SCRIPT="$BASE/stage76_WCr.py"
+COMMIT="e264d4504622c1d4f66e27358fdc052fd699b995"
+BLOB="936a46921df2fc1bd5eff8c56dc66547592527b6"
+REL="examples/AmeriFlux_MultiSite_10_Batch05/scripts/stage76/76_US_WCr_61_negative_RH_plus_3_temperature_context_direct_approved_323.py"
+curl -fLsS --retry 3 "https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/$REL" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "$BLOB"
+echo "STAGE76 EXACT GITHUB SOURCE SHA VERIFIED"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+D27="$HOME/ameriflux_batch05_stage27/source_comparison_20261026T040257Z_1589604"
+D63="$HOME/ameriflux_batch05_stage63/exact10_site_204_crosswalk_20261029T025331Z_1904396"
+D74="$HOME/ameriflux_batch05_stage74_Wkg/Wkg_direct_19_negative_RH_20261029T042245Z_2362992"
+test -d "$D27" && test -d "$D63" && test -d "$D74"
+test -f "$D74/stage74_VERSIONED_259_APPROVED_RH_VPD_TA_native_overlay.csv"
+OUT="$BASE/WCr_direct61_Tplus3_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+python3 -B "$SCRIPT" --stage27-dir "$D27" --stage63-dir "$D63" --stage74-dir "$D74" --out "$OUT" 2>&1 | tee "$BASE/stage76_WCr.log"
+echo "STAGE76_REPORTS=$OUT"
+echo "STAGE76 ALL ORIGINAL / PRIOR 259 / QC / DATM / CIME / SLURM UNCHANGED"
