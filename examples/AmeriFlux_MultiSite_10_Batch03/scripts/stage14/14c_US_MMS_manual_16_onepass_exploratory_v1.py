@@ -71,3 +71,60 @@ def main():
     base.index = pd.to_datetime(base.time).dt.strftime('%Y%m%d%H%M')
     ensure(base.index.is_unique and set(base.index[base.VPD_USE.isna()])==GAPS and
            set(base.index[base.QBOT.isna()])==GAPS, 'exact original 16 gaps')
+    trial = base.copy(deep=True)
+    edits = []
+    def put(k,v,method,details=None):
+        ensure(k not in {z['native_key'] for z in edits}, 'duplicate patch '+k)
+        t=float(base.at[k,'TA_USE']); p=float(base.at[k,'PSRF'])
+        e=float(esw(t))-float(v); q=float(qcalc(e,p))
+        ensure(np.isfinite([t,p,v,e,q]).all() and 50000<p<110000 and
+               0<=v<float(esw(t)) and e>0 and 0<q<.08 and
+               (t>=0 or e/float(esi(t))<=1.001), 'physical candidate '+k)
+        row=dict(native_key=k,original_VPD=base.at[k,'VPD_USE'],
+                 original_QBOT=base.at[k,'QBOT'],new_VPD=float(v),new_QBOT=q,
+                 method=method,T_QC=int(source.at[k,'TA_F_QC']),
+                 VPD_QC=int(source.at[k,'VPD_F_QC']),
+                 RH_water_pct=100*e/float(esw(t)),
+                 RH_ice_pct=100*e/float(esi(t)),
+                 scenario_not_measured=True,scientific_approval=False)
+        if details:row.update(details)
+        edits.append(row)
+        trial.at[k,'VPD_USE']=float(v);trial.at[k,'QBOT']=q
+    def transfer(k,label):
+        t=float(base.at[k,'TA_USE']); ta=float(era.at[k,'TA_ERA'])
+        ve=float(era.at[k,'VPD_ERA']);rh=1-ve/float(esw(ta))
+        ensure(np.isfinite([t,ta,rh]).all() and 0<rh<1,'paired ERA RH invalid '+k)
+        v=float(esw(t)*(1-rh))
+        put(k,v,label,dict(ERA_RH_pct=100*rh,tower_minus_ERA_T_C=t-ta))
+    window = pd.date_range('2014-09-22','2014-09-23 23:00',freq='h').strftime('%Y%m%d%H%M')
+    qcs=source.loc[window,'VPD_F_QC']
+    ensure(len(window)==48 and int(qcs.eq(1).sum())==47 and int(qcs.eq(2).sum())==1 and
+           int(qcs.eq(0).sum())==0 and
+           set(base.loc[window].index[base.loc[window,'VPD_USE'].isna()])==set(SEPT),
+           '2014 47-QC1 / 5 missing scope changed')
+    for k in window:
+        if int(qcs.loc[k])==1:
+            ensure(int(source.at[k,'TA_F_QC']) in (0,1), '2014 source T QC unsupported '+k)
+            transfer(k,'2014_48H_ALL_47_VPD_QC1_ERA_RH_SCENARIO')
+    for k in MARCH:
+        ensure(int(source.at[k,'TA_F_QC'])==1 and int(source.at[k,'VPD_F_QC'])==2,
+               '2000 T QC1 VPD QC2 provenance '+k)
+        transfer(k,'2000_6H_ERA_RH_T_QC1_HIGH_UNCERTAINTY')
+    t=trial.TA_USE.to_numpy(float);p=trial.PSRF.to_numpy(float)
+    v=trial.VPD_USE.to_numpy(float);q=trial.QBOT.to_numpy(float)
+    e=esw(t)-v;rhi=e/esi(t)
+    valid=(np.isfinite(rhi)&np.isfinite(q)&(e>0)&(rhi>0)&(rhi<=1.01)&
+           np.isclose(q,qcalc(e,p),rtol=1e-5,atol=1e-8))
+    indexes={k:i for i,k in enumerate(trial.index)}
+    for episode in ([COLD[0]],COLD[1:]):
+        a=indexes[episode[0]];b=indexes[episode[-1]]
+        before=[i for i in range(max(0,a-48),a) if valid[i]]
+        after=[i for i in range(b+1,min(len(trial),b+49)) if valid[i]]
+        ensure(bool(before) and bool(after),'no two-sided existing source humidity '+episode[0])
+        l=before[-1];r=after[0]
+        start=pd.Timestamp(trial.iloc[l].time);end=pd.Timestamp(trial.iloc[r].time)
+        ensure(pd.Timedelta(0)<end-start<=pd.Timedelta(hours=97),'source anchors too distant')
+        for k in episode:
+            ensure(int(source.at[k,'VPD_F_QC'])==2 and base.at[k,'TA_USE']<0,
+                   'cold source QC2/tower T changed '+k)
+            f=float((pd.Timestamp(base.at[k,'time'])-start)/(end-start))
