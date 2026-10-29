@@ -254,3 +254,17 @@ The exact 44 triplets are **not** validated direct absolute temperature;
 any BASE H2O count is unknown until Stage05 actually runs and the original
 sensor provenance is checked. All **238 remain HOLD**, with
 **APPROVED_FOR_NEW_VERSION=false**.
+
+## Stage07 (Claude): ERA mechanism, QC0 validation, per-event decisions (2026-10-29)
+
+[`nr3_07_claude_ERA_mechanism_QC0_validation_event_decisions_READONLY.py`](nr3_07_claude_ERA_mechanism_QC0_validation_event_decisions_READONLY.py)
+imports Stage01 from pinned blob `83e3643e`. It was run once by the operator with `--run`, which produced the report
+`reports/nr3_07_claude_event_science_20261029T061908Z_505d290d`.
+
+Results and options: [US_NR3_CLAUDE_STAGE07_EVENT_DECISION_REPORT_20261029.md](../../docs/US_NR3_CLAUDE_STAGE07_EVENT_DECISION_REPORT_20261029.md).
+
+Key findings:
+- There are 5,466 negative-e ERA pairs; the 1,484 are a selected subset.
+- VPD_ERA has a constant floor of 1.449 hPa, the intercept of the independent VPD regression.
+- RH+sonic reaches 0.067 hPa MAE in cold QC0 data, but fails the predeclared every-year rule in 2011.
+- Classes: 0 measured-supported, 163 uncertain external, 75 physics HOLD; **0 approved**.
