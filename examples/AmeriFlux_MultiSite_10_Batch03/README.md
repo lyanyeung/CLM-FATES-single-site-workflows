@@ -1,5 +1,8 @@
 # AmeriFlux MultiSite 10 — Batch 03
 
+> **2026-10-29 07:08 UTC ACTUAL US-Kon Stage14Q 2/2 bounded science groups PASS — numerical humidity gaps now 2/280320:** [2011 Oct15 one low-confidence QC1-endpoint RH and 2012 Aug05 five VPD-QC1 plus four T-QC1 corrections, all group-level T/VPD/RH/QBOT/30min joins checked, all original QC0 immutable](docs/US_KON_STAGE14Q_ACTUAL_2_HOLDS_REMAIN_AND_14R_FINAL_SOURCE_SCIENCE_20261029.md). Two historical source HOLDs remain: 201105261100 original T QC0/VPD QC1 with nearby T-QC1 spikes, and 201109291830 original T QC1/VPD QC2 ERA absolute VPD mismatch. Next [Stage14R single isolated dual-source ERA5-Land/companion ERA RH bounded group sensitivity](scripts/stage14/14r_US_Kon_final_two_connected_dual_ERA_sensitivity.py), **NOT YET run on IRIDIS6**; no originals, DATM or AD400 jobs, regardless whether 0-NaN hypothetical research output emerges.
+
+
 > **2026-10-29 07:00 UTC ACTUAL US-Kon Stage14P SUCCESS:** [three original QC0 RH connected groups all numerically pass, 5 protected humidity missing filled, 6 existing source QC1 VPD +2 T QC1 research corrections; nine original HOLDs reduced to four with full original sensor QC0 unchanged](docs/US_KON_STAGE14P_ACTUAL_THREE_CONNECTED_QC0_GROUPS_FIVE_HOLDS_FILLED_20261029.md). Next [Stage14Q only Oct15 QC1-endpoint LOW-CONFIDENCE RH single candidate and Aug05 source two-sided true-QC0 RH plus 4 QC1-T connected event](scripts/stage14/14q_US_Kon_two_remaining_bounded_source_hypotheses.py). Two other remaining May26/Sep29 special source holds explicitly protected. Stage14Q has NOT been executed on IRIDIS6. **No production DATM/AD400/Slurm authorization**.
 
 
