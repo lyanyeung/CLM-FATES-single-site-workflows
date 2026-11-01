@@ -115,6 +115,36 @@ The published [OzFlux AU-How](../OzFlux_AU-How/) case is an **existing Howard Sp
 
 Stage01 success requires `INVENTORIED 10 /10`. A successful metadata read alone does not approve meteorological physics or any forcing gap-filling decision.
 
+## 3a. Stage02: source-time and meteorological/QC audit (read-only)
+
+Stage01 was verified by the operator: **10/10 source files INVENTORIED**. The first AU-Tum interval was **60 minutes**, whereas all other file first steps were **30 minutes**; first-step cadence is not sufficient to establish complete-record continuity, so Stage02 checks full source time arrays. Original AU-ASM files remain separate. The new AU-How source coverage differs from the historical example; preserve the old successful case.
+
+The Stage02 program is located at scripts/stage02/02_audit_ozflux_source_readonly.py and creates reports under HOME, never in the site source tree. Run on IRIDIS6:
+
+~~~bash
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/examples/OzFlux_MultiSite_09"
+AUDIT_DIR="$HOME/ozflux_stage02_code"
+OUT="$HOME/ozflux_stage02_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$AUDIT_DIR"
+curl -fLsS "$BASE/sites.tsv" -o "$AUDIT_DIR/sites.tsv"
+curl -fLsS "$BASE/scripts/stage02/02_audit_ozflux_source_readonly.py" \
+  -o "$AUDIT_DIR/ozflux_stage02_source_audit.py"
+python3 -B -m py_compile "$AUDIT_DIR/ozflux_stage02_source_audit.py"
+python3 -B "$AUDIT_DIR/ozflux_stage02_source_audit.py" \
+  --manifest "$AUDIT_DIR/sites.tsv" --out "$OUT" \
+  2>&1 | tee "$HOME/ozflux_stage02_last.log"
+echo "Stage02 report directory: $OUT"
+~~~
+
+Four outputs:
+- **stage02_source_audit.json** — time metadata, all variable names, source QC candidates, physics alarms and annual counts.
+- **stage02_file_summary.tsv** — full-record cadence, discontinuities and duplicate/backward time.
+- **stage02_year_counts.tsv** — per-year sample counts and whole-year expected counts.
+- **stage02_variable_summary.tsv** — nine candidate forcing/EC variables per source, units, missing/fill and broad physics alarms when units are recognised.
+
+**Interpretation guardrails:** AUDITED 10/10 means the original files were read/screened, **not** physics/QC approval. Physical bounds are alerts rather than corrections. No timezone transformation, interpolation, concatenation, forcing output, changes to site files, or Slurm jobs. Never run the historical AU-How DATM writer on new unreviewed data; it deletes its matching old outputs.
+
 ## 4. Subsequent scientific stages (not implemented/authorised yet)
 
 1. **Stage02 — source provenance/time QC:** verify actual temporal coverage, time coordinate convention (UTC vs local, interval start/end/centre), timestep, gaps/duplicates, fill values, QA/QC flags, lat/lon, instrument/source changes and especially the two AU-ASM periods. Keep each source immutable.
