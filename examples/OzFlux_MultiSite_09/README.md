@@ -359,6 +359,42 @@ echo "Stage07 output: $OUT"
 
 Artifacts: stage07_file_summary.tsv; stage07_year_status.tsv; stage07_year_variable_qc.tsv; stage07_native_year_provenance.json. No source writes, no interpolation, no forcing, no output NetCDF and no model submissions. STRUCTURAL_CANDIDATE_ONLY_QC_UNAPPROVED is explicitly not a PASS for scientific source provenance, atmospheric height, time zone or DATM readiness.
 
+## 3h. Stage08: classify annual HOLD reasons and identify contiguous structural-year blocks (read-only)
+
+**Operator Stage07 result (2026-11-01): 10/10 original sources examined, 169 native file-year rows. 67 structural-only candidate years and 102 REVIEW/HOLD years; no source edits or science approval.** Per source-file structural years: ASM1 9/14; ASM2 1/3; Cow 12/18; Cpr 2/17; DaS 16/19; Dry 14/17; Gin 0/16; How 2/25; Stp 4/19; Tum 7/21.
+
+Candidate year subsets in the latest Stage07 native-time labels include:
+
+- AU-DaS 2009–2021 (13 consecutive native years), and 2023–2025.
+- AU-Dry 2010–2018 (9), 2020–2024 (5).
+- AU-ASM Mulga1 2013–2018 (6), 2020–2022 (3); Mulga2 separate 2025 (1). No cross-gap merge.
+- AU-Cow 2015–2019 (5), 2022–2025 (4), and isolated earlier years.
+- AU-How has only 2006 and 2007 meeting the new L6 source's conservative structural gate. This does not invalidate the historically successful AU-How case, which used a different source selection and QC assumptions.
+
+The new Stage08 source does **not open original NetCDF** and uses three Stage07 report files plus sites.tsv. It validates row totals, native QC partition counts and per-year summations, and reports all per-year missing/physical/time reasons plus QC code fractions (native QC0 and 410 AWS, 420 ACCESS, 440 ERA5 hypotheses). It identifies maximal consecutive structural-year blocks; these are not science-approved or necessarily sufficient to support later DATM year-cycling.
+
+Use the original operator Stage07 directory on IRIDIS6:
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/da3ea4d945ba5092afdc056a28dff61884f31120/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage08_code"
+STAGE07="$HOME/ozflux_stage07_20261101T062633Z"
+OUT="$HOME/ozflux_stage08_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/sites.tsv" -o "$CODE/sites.tsv"
+curl -fLsS "$BASE/scripts/stage08/08_year_block_qc_triage_readonly.py" -o "$CODE/ozflux_stage08_triage.py"
+python3 -B -m py_compile "$CODE/ozflux_stage08_triage.py"
+python3 -B "$CODE/ozflux_stage08_triage.py" --self-test
+python3 -B "$CODE/ozflux_stage08_triage.py" --manifest "$CODE/sites.tsv" --stage07 "$STAGE07" --out "$OUT"
+echo "Stage08 output: $OUT"
+)
+~~~
+
+Outputs: stage08_review_summary.json, stage08_year_reason_ledger.tsv, stage08_contiguous_candidate_blocks.tsv, stage08_source_qc_per_year.tsv. `CONTIGUOUS_NATIVE_STRUCTURAL_ONLY` is not a simulator-ready status. No forcing, netCDF, model experiment or Slurm job will be created.
+
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
