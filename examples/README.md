@@ -14,6 +14,7 @@ Each experiment has its own directory, site/release manifest, scripts and operat
 | **AmeriFlux Batch 04** | **[AmeriFlux_MultiSite_10_Batch04](AmeriFlux_MultiSite_10_Batch04/)** | Fourth ten-site batch; Stage00 SHA256 verified and Stage01 extraction/structure 10/10 PASS; Stage02/Stage02C 10/10 PASS; Stage04 3/3 source-lineage audit verified; Stage05 QCv5 sparse interpolation/ERA-RH candidates prepared |
 | **AmeriFlux Batch 05** | **[AmeriFlux_MultiSite_10_Batch05](AmeriFlux_MultiSite_10_Batch05/)** | Fifth ten-site batch; Stage00 upload/checksums VERIFIED 10/10 from operator log; Stage01 extraction/structure VERIFIED 10/10; Stage02 metadata/full HH-HR chronology/basic met audit ready, IRIDIS execution pending |
 | AmeriFlux single site | [AmeriFlux_US-Ha1](AmeriFlux_US-Ha1/) | Harvard Forest hourly-data workflow |
+| **JapanFlux 11-site cohort** | **[JapanFlux_MultiSite_11](JapanFlux_MultiSite_11/)** | Eleven JapanFlux archive releases, WSL/IRIDIS6 Stage00 uploader, source-integrity hashes and read-only Stage01 ZIP/header inventory; transfer and science QC NOT YET RUN |
 | ICOS multi-site campaigns | [ICOS_sites](ICOS_sites/) | Existing 6-, 8-, 11- and 13-site campaigns |
 | ICOS single site | [ICOS_ES-LJu](ICOS_ES-LJu/) | ES-LJu workflow |
 | OzFlux single site | [OzFlux_AU-How](OzFlux_AU-How/) | Howard Springs workflow |
