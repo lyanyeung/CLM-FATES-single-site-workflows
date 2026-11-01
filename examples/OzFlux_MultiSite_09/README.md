@@ -278,12 +278,68 @@ Reports:
 
 **Science gate:** no source edits, no QC tier approvals, no reanalysis injection, no DATM, no Slurm. Keep AU-ASM source segments separate and AU-Tum hourly. No spatially invariant ZBOT or PFT assumptions.
 
-## 4. Subsequent scientific stages (not implemented/authorised yet)
+## 3f. Stage06A: targeted donor lineage and gap-boundary forensics (read-only)
 
-1. **Stage02B — source provenance/time QC human review:** verify actual temporal coverage, time coordinate convention (UTC vs local, interval start/end/centre), timestep, gaps/duplicates, fill values, QA/QC flags, lat/lon, instrument/source changes and especially the two AU-ASM periods. Keep each source immutable.
-2. **Stage03 — meteorological physics and forcing candidate:** evaluate OzFlux variable mapping per station, compare native data and observation QC, assess radiation/humidity/precipitation and site-specific height. Existing AU-How uses `Ta→TBOT`, `SH→QBOT`, `ps→PSRF`, `Fsd→FSDS`, `Fld→FLDS`, `Ws→WIND`, `Precip→PRECTmms`; **do not assume units, gap-filling status or mapping are identical for these other L6 products**.
-3. **Stage04 — site vegetation/soil/surface:** scientific approval of each site's PFT fractions, shrub/bare ground, soil texture and correct surface/mesh. No copy of an unrelated site's vegetation or forcing height.
-4. **Stage05 — independent DATM and NOLEAP audit; model preflight:** validate chronology, water and radiation physics and all required forcing fields. Only after sign-off, prepare site-specific CIME/FATES cases and consider the established staged spinup (AD and Normal) approach. **Stage00 and Stage01 submit no Slurm jobs.**
+**Operator Stage05 verified 10/10, 18 donor comparisons and 468 candidate
+records (nonunique across donors). Stage05 source audit output:
+`$HOME/ozflux_stage05_20261101T060943Z`.** No source edits or
+science approvals.
+
+The three high-priority evidence findings are:
+1. AU-Cpr main Ta versus `Ta_HMP_2m` on 262,984 common native
+   QC=0 records has **exactly zero RMSE**; 106/110 missing main Ta records
+   have a valid donor value with donor QC=0. This suggests common lineage,
+   NOT independent sensor validation. `Ta_SONIC_Av` has 96/110.
+2. AU-Gin `Fsd_1` has 265/1,156 values available during
+   primary Fsd gaps, all donor QC=0, **none exceed 20 W/m²**. This is low
+   irradiance evidence, *not proven nighttime* until solar time/geolocation
+   is independently checked. On simultaneous QC=0 Fsd data, Fsd_1
+   RMSE 10.09 W/m² (both positive >20: 10.57).
+3. AU-How `Fsd_ARM` is available at one of six primary
+   Fsd gaps, native donor QC=0, but RMSE 88.30 W/m² on both QC0 data,
+   126.96 W/m² when both >20. Do not substitute unconditionally.
+
+Stage06A separately checks the exact source flags, exact/numerical agreement
+of main and candidate in overlapping times, donor values at each target
+gap, neighbouring original source records, and units/instrument/height
+metadata. Native timestamps are labelled **unverified timezone**; there
+is no automatic nighttime or independence conclusion.
+
+Run on IRIDIS6 using this pinned version (no source modifications):
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/e6e8e6a078eac4a0d8a590c564a929f7b9258560/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage06_code"
+STAGE05="$HOME/ozflux_stage05_20261101T060943Z"
+OUT="$HOME/ozflux_stage06_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/sites.tsv" -o "$CODE/sites.tsv"
+curl -fLsS "$BASE/scripts/stage06/06_targeted_donor_lineage_forensics_readonly.py" -o "$CODE/ozflux_stage06_lineage.py"
+python3 -B -m py_compile "$CODE/ozflux_stage06_lineage.py"
+python3 -B "$CODE/ozflux_stage06_lineage.py" --self-test
+python3 -B "$CODE/ozflux_stage06_lineage.py" \
+    --manifest "$CODE/sites.tsv" --stage05 "$STAGE05" --out "$OUT"
+echo "Stage06A output: $OUT"
+)
+~~~
+
+Expected: 3 original source files, 5 donor comparisons, detailed gap-row
+evidence. Reports: `stage06_lineage_evidence.json`,
+`stage06_donor_lineage_summary.tsv` and
+`stage06_exact_candidate_records.tsv`. This is an investigative
+subset of the larger 9-site cohort, not a waiver of other stations' HOLDs.
+
+## 4. Future science decisions (still require explicit approvals)
+
+The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
+
+1. Independently verify native timezone, site location and time semantics, L6 variable source descriptions, observation/gap-fill fraction and approved QC code interpretations; retain Mulga1/Mulga2 separately and AU-Tum hourly.
+2. Determine science-approved site-specific handling of meteorological missing values and physical holds, considering independent tower donors before testing weather-station, ACCESS or ERA5 data. Keep original NetCDF immutable and record each proposed intervention.
+3. Verify PFT, bare-ground/shrub fractions, soil properties, atmospheric measurement heights and original site surface assumptions independently per tower.
+4. Only after QC sign-off, produce separately versioned candidate forcing and year-specific DATM/NOLEAP files, verify physics/time series and then decide whether to submit AD400/Normal400 experiments; do not touch previous AU-How runs.
 
 ## 5. Provenance and non-destructive rules
 
