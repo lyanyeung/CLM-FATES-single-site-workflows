@@ -196,6 +196,33 @@ HOME only. After review, create site-specific scientific decisions on
 L6 flag provenance and on UTC/local timestamps, especially two
 AU-ASM segments and hourly AU-Tum.
 
+## 3c. Stage04: QCFlag codes and independent sensor candidates (read-only)
+
+After the operator-confirmed Stage03 audit (10/10, 1,026 missing/physical-alarm episodes, science approval FALSE), Stage04 inspects original L6 files for:
+
+- The original global FlagXX definitions and primary meteorological QCFlag code counts, with **no automatic QC tier interpretation**.
+- Same-prefix candidate sensors (e.g. Fsd_1 / Fsd_7m or Ta_HMP_xx), recording whether they have finite values on target-source missing rows. Only exact same-unit candidates are numerically compared; sensor independence, station height and source-quality provenance remain manual HOLDs.
+- Original Ta, SH, ps values and QCFlag context at the Calperum 2016-08-23 humidity physical alarm. No inference from a single out-of-range threshold is treated as a repair.
+
+Run on IRIDIS6 (stage03 directory must be the operator's actual timestamped report):
+
+~~~bash
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage04_code"
+STAGE03="$HOME/ozflux_stage03_20261101T055354Z"
+OUT="$HOME/ozflux_stage04_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/sites.tsv" -o "$CODE/sites.tsv"
+curl -fLsS "$BASE/scripts/stage04/04_qcflag_donor_evidence_readonly.py" -o "$CODE/ozflux_stage04_qc_donors.py"
+python3 -B -m py_compile "$CODE/ozflux_stage04_qc_donors.py"
+python3 -B "$CODE/ozflux_stage04_qc_donors.py" --self-test
+python3 -B "$CODE/ozflux_stage04_qc_donors.py" --manifest "$CODE/sites.tsv" --stage03 "$STAGE03" --out "$OUT"
+echo "Stage04 evidence directory: $OUT"
+~~~
+
+Outputs: stage04_evidence.json and stage04_donor_candidates.tsv. No NetCDF mutation, candidate substitution, forcing, or model jobs. Source alternatives with plausible units are only REVIEW candidates, never direct approval.
+
 ## 4. Subsequent scientific stages (not implemented/authorised yet)
 
 1. **Stage02B — source provenance/time QC human review:** verify actual temporal coverage, time coordinate convention (UTC vs local, interval start/end/centre), timestep, gaps/duplicates, fill values, QA/QC flags, lat/lon, instrument/source changes and especially the two AU-ASM periods. Keep each source immutable.
