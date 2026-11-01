@@ -237,6 +237,47 @@ BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflow
 
 Source evidence additionally identifies Calperum 2016-08-23 07:30:00 `SH=-0.0001619283944 kg/kg`, `Ta=5.131046 °C`, `ps=100.4991 kPa`, `SH_QCFlag=50`, `Ta_QCFlag=50`. Negative humidity is physically invalid. Do not translate code 50 or other QCFlag values 410/420/440 to site measurements/ERA provenance until examining each file's original FlagXX definitions.
 
+## 3e. Stage05: PyFluxPro QC code provenance and donor comparability (READ ONLY)
+
+Operator Stage04 v2 completed **10/10** on 2026-11-01:
+- AU-Cpr Ta_HMP_2m finite in 106 of 110 missing Ta records; Ta_SONIC_Av finite in 96 of 110 (overlapping, not additive).
+- AU-Gin Fsd_1 finite in 265 of 1,156 missing Fsd records (22.9%); Fsd_7m in 0. Remaining 891 without a verified in-file donor.
+- AU-How Fsd_ARM finite in 1 of 6 missing Fsd; Ws_SONIC_Av 0 of 345.
+- AU-Gin Ta 10 alternatives all 0/24; Fld_1 and Fld_7m both 0/17.
+
+**Authoritative PyFluxPro codebook provenance**:
+- OzFlux/PyFluxPro scripts/pfp_gf.py (function gfalternate_createdict_outputs) maps default=400, AWS=410, ACCESS=420, ERA-Interim=430, ERA5=440.
+- OzFlux/PyFluxPro scripts/pfp_ts.py (function do_attributes) documents Flag00 good data, Flag10 linear correction, Flag50 interpolation.
+- These are *software-code definitions*, not proof that this particular source product was processed with this exact software/configuration version. Verify original variable-level description_L1/L2/L3/L4/L5/L6 and original flag metadata before approval.
+
+The Stage05 inspector compares each Stage04 candidate with its main series in (1) all finite overlap and (2) overlap where both native QC flags are exactly 0, plus (3) a Fsd high-irradiance proxy stratum where both values exceed 20 W/m^2. This controls low-radiation domination of RMSE. **QC=0 is a comparison stratum, not certification of an independent tower observation**. It inventories exact native timestamps, candidate values, donor flags, the before/after primary data context, and an exact QC histogram of gap-period candidate rows. It does not auto-fill.
+
+On IRIDIS6:
+
+~~~bash
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/ce7372bb846d4f23e975f564dc375a3e8e2a4e86/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage05_code"
+STAGE04="$HOME/ozflux_stage04_v2_20261101T060431Z"
+OUT="$HOME/ozflux_stage05_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/sites.tsv" -o "$CODE/sites.tsv"
+curl -fLsS "$BASE/scripts/stage05/05_qcflag_donor_independence_readonly.py" \
+    -o "$CODE/ozflux_stage05_donor_science.py"
+python3 -B -m py_compile "$CODE/ozflux_stage05_donor_science.py"
+python3 -B "$CODE/ozflux_stage05_donor_science.py" --self-test
+python3 -B "$CODE/ozflux_stage05_donor_science.py" \
+    --manifest "$CODE/sites.tsv" --stage04 "$STAGE04" --out "$OUT"
+echo "Stage05 output: $OUT"
+~~~
+
+Reports:
+- stage05_qc_provenance.json: per-file metadata/QC histograms, donor statistics and codebook provenance.
+- stage05_donor_comparison.tsv: target vs donor co-located source statistics across valid and QC0/QC0 overlap (high-Fsd proxy separate).
+- stage05_candidate_gap_values.tsv: all donor-available gap record indices, native timestamps, source values, QC flags and nearest primary neighbours.
+
+**Science gate:** no source edits, no QC tier approvals, no reanalysis injection, no DATM, no Slurm. Keep AU-ASM source segments separate and AU-Tum hourly. No spatially invariant ZBOT or PFT assumptions.
+
 ## 4. Subsequent scientific stages (not implemented/authorised yet)
 
 1. **Stage02B — source provenance/time QC human review:** verify actual temporal coverage, time coordinate convention (UTC vs local, interval start/end/centre), timestep, gaps/duplicates, fill values, QA/QC flags, lat/lon, instrument/source changes and especially the two AU-ASM periods. Keep each source immutable.
