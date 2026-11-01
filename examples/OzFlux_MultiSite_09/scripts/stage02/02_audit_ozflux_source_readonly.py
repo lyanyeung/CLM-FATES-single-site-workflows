@@ -171,7 +171,7 @@ def physical_bounds(key, units):
             return (45000.0, 115000.0)
         if u in ("hpa", "mbar"):
             return (450.0, 1150.0)
-    if key in ("Fsd", "Fld") and any(token in u for token in ("wm-2", "w/m2", "wm^-2", "wm**-2")):
+    if key in ("Fsd", "Fld") and any(token in u for token in ("wm-2", "w/m^2", "w/m2", "wm^-2", "wm**-2")):
         return ((-50.0, 1600.0) if key == "Fsd" else (0.0, 850.0))
     if key == "Ws" and u in ("m/s", "ms-1", "ms^-1"):
         return (-0.1, 65.0)
