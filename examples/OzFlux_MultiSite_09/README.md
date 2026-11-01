@@ -332,6 +332,33 @@ evidence. Reports: `stage06_lineage_evidence.json`,
 `stage06_exact_candidate_records.tsv`. This is an investigative
 subset of the larger 9-site cohort, not a waiver of other stations' HOLDs.
 
+## 3g. Stage07: native-year forcing candidate assessment (strictly read-only)
+
+**Stage06A operator output 2026-11-01:** 3/3 selected original sources, 5 donor comparisons, 468 candidate rows (including duplicate time indices across candidate sensors); no modifications. AU-Cpr Ta vs Ta_HMP_2m exact 262,984/262,984 during shared QC0 periods; donor 106/110 missing main Ta. AU-Gin Fsd_1 265/1,156 gap records with donor values -2.746366 to +4.295752 W/m²; no gap value above 20; Fsd_7m 0. AU-How Fsd_ARM one gap value 94.69449933 W/m², shared QC0 Fsd RMSE 88.301753 W/m². None of these are approved as independent meteorological repairs.
+
+Because a repair cannot be approved before knowing the viable driving period, Stage07 scans **all ten** original L6 NetCDF files again to establish for every native calendar year: number of timestamps vs expected native cadence, strict midnight-label boundaries, each of seven meteorological missing values and broad physical alarms, and per-variable original QCFlag counts (0,10,50,400,410,420,430,440, other). It inventories source time zone/site metadata and source-level description attributes. This yields structural candidate years, **not scientific/model approval**. Year boundaries are native numeric labels only: interval-start/end/center and UTC/local-time semantics remain unverified. Retain two AU-ASM releases separately, and native AU-Tum hourly cadence; no resampling is authorised.
+
+IRIDIS6 usage (download pinned script, do not pre-create its OUT folder):
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/db11c06fbc8290a04f28f622c390e6ac3f04c448/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage07_code"
+OUT="$HOME/ozflux_stage07_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/sites.tsv" -o "$CODE/sites.tsv"
+curl -fLsS "$BASE/scripts/stage07/07_native_year_forcing_readiness_readonly.py" -o "$CODE/ozflux_stage07_years.py"
+python3 -B -m py_compile "$CODE/ozflux_stage07_years.py"
+python3 -B "$CODE/ozflux_stage07_years.py" --self-test
+python3 -B "$CODE/ozflux_stage07_years.py" --manifest "$CODE/sites.tsv" --out "$OUT"
+echo "Stage07 output: $OUT"
+)
+~~~
+
+Artifacts: stage07_file_summary.tsv; stage07_year_status.tsv; stage07_year_variable_qc.tsv; stage07_native_year_provenance.json. No source writes, no interpolation, no forcing, no output NetCDF and no model submissions. STRUCTURAL_CANDIDATE_ONLY_QC_UNAPPROVED is explicitly not a PASS for scientific source provenance, atmospheric height, time zone or DATM readiness.
+
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
