@@ -77,18 +77,23 @@ This line confirms a byte-for-byte transfer, **not scientific validation**. Do n
 
 ## 3. Stage01: read-only NetCDF inventory on IRIDIS6
 
-After Stage00 finishes, log into **IRIDIS6** and run:
+**Critical Python import safeguard:** Never download this inspector as `inspect.py`, because `inspect` is a Python standard-library module imported by `netCDF4`. A previous Stage01 command did that and caused `AttributeError: module 'inspect' has no attribute 'cleandoc'` for every site *before any NetCDF data were inspected*. This was a script-name error, not source corruption. Existing generated `$HOME/ozflux_stage01/inspect.py` must be moved aside before rerunning. The source-controlled script is named `01_inspect_ozflux_nc.py`.
+
+After Stage00 has independently verified all ten file SHA256 hashes, log into **IRIDIS6**. Run the commands below **without enabling `set -e` in the interactive shell**:
 
 ```bash
-set -euo pipefail
 conda activate clm_fates_env
 DIR="$HOME/ozflux_stage01"
 BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/examples/OzFlux_MultiSite_09"
-mkdir -p "$DIR"
-curl -fLsS "$BASE/sites.tsv" -o "$DIR/sites.tsv"
-curl -fLsS "$BASE/scripts/stage01/01_inspect_ozflux_nc.py" -o "$DIR/inspect.py"
-python3 -c 'import netCDF4; print("netCDF4", netCDF4.__version__)'
-python3 -B "$DIR/inspect.py" --manifest "$DIR/sites.tsv" > "$DIR/inventory.json"
+mkdir -p "$DIR/old"
+# Move only the previously misnamed inspector; leave all source NetCDF untouched.
+if [[ -f "$DIR/inspect.py" ]]; then
+  mv -n "$DIR/inspect.py" "$DIR/old/inspect.py"
+fi
+curl -fLsS "$BASE/sites.tsv" -o "$DIR/sites.tsv" || exit 1
+curl -fLsS "$BASE/scripts/stage01/01_inspect_ozflux_nc.py" -o "$DIR/ozflux_nc_metadata.py" || exit 1
+python3 -c 'import inspect, netCDF4; print("inspect from", inspect.__file__); print("netCDF4", netCDF4.__version__)'
+python3 -B "$DIR/ozflux_nc_metadata.py" --manifest "$DIR/sites.tsv" > "$DIR/inventory.json"
 python3 - "$DIR/inventory.json" <<'PY'
 import json,sys
 x=json.load(open(sys.argv[1]))
@@ -101,9 +106,13 @@ print("INVENTORIED", x["inventoried_count"], "/10")
 PY
 ```
 
-This inspector only reads original NetCDF headers, variable/dimension attributes and at most three scalar samples per eligible 1-D time coordinate. It records source metadata, selected physics/EC variables, numerical and decoded time samples, and the exact file paths. It **does not modify site data, convert timezone, concatenate periods, generate forcing or submit jobs**.
+If `$DIR/old/inspect.py` already exists, manually choose an alternative name before moving the new one; do not overwrite previous logs or scripts. The Python `inspect.__file__` shown in the import test must point to the system/conda Python standard library, **not** to `$DIR/inspect.py`. Ignore a stale `__pycache__` subdirectory after the source has been moved.
 
-Review `$HOME/ozflux_stage01/inventory.json` and `$HOME/ozflux_stage00_upload.log` before proceeding. Successful execution requires `INVENTORIED 10 /10`; missing files or failed NetCDF decoding are not considered a PASS.
+This inspector reads original NetCDF headers, attributes and up to three scalar time samples per time coordinate. It does **not** modify site data, convert timezone, concatenate periods, produce forcing or submit jobs.
+
+The published [OzFlux AU-How](../OzFlux_AU-How/) case is an **existing Howard Springs example**, not a generic permission to apply its 2003–2025, 23 m, zero-gap, 30-minute, NOLEAP, or DATM logic to every new site. In particular, its `05_make_datm.py` removes earlier matching output files and must **not** be executed on unreviewed source locations. No independently validated AU-Tum example currently exists under this repository's `examples/` tree.
+
+Stage01 success requires `INVENTORIED 10 /10`. A successful metadata read alone does not approve meteorological physics or any forcing gap-filling decision.
 
 ## 4. Subsequent scientific stages (not implemented/authorised yet)
 
