@@ -145,6 +145,57 @@ Four outputs:
 
 **Interpretation guardrails:** AUDITED 10/10 means the original files were read/screened, **not** physics/QC approval. Physical bounds are alerts rather than corrections. No timezone transformation, interpolation, concatenation, forcing output, changes to site files, or Slurm jobs. Never run the historical AU-How DATM writer on new unreviewed data; it deletes its matching old outputs.
 
+## 3b. Stage03: exact gap-event and native QC flag provenance (read-only)
+
+**Stage02 operator result (2026-11-01): 10/10 AUDITED_SOURCE_ONLY; 0 duplicate
+timestamps and 0 noncanonical steps in each file.** Nine sources have 1800 s
+(30 min) median steps; AU-Tum has 3600 s (1 h). Source completeness is not
+scientific approval. Residual forcing gaps: ASM1 Ta 4; Cow SH 9/Ws 12; Cpr
+Ta 110/Fld 17 plus one SH physical alarm; DaS Fsd 1/Fld 150; Dry Fsd 6;
+Gin Fsd 1156/Ta 24/Fld 17; How Ws 345/Fsd 6; Stp ps 1233/Fsd 14; Tum
+SH 658. ASM2 contains no missing values among the seven candidate meteorological
+fields but its native vs filled provenance is still unverified.
+
+A bug in the initial Stage02 physical-unit screening reported alarms=None
+for Fsd/Fld units written as W/m^2. The latest Stage02 script has been
+corrected; Stage03 independently screens W/m^2 radiation values. None
+never meant zero anomalies.
+
+Because these files are **OzFlux L6 processed products**, missing-free
+meteorology can still have gap-filled values from other sources. Native
+QC flags and their semantics must be independently investigated; the
+Stage03 inspector reports source flag codes and distributions without
+assuming flag 0 / nonzero are interchangeable with FLUXNET's QC tiers.
+See the OzFlux data portal and PyFluxPro documentation.
+
+Run on IRIDIS6, **do not pre-create the timestamped output directory**:
+
+~~~bash
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/main/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage03_code"
+OUT="$HOME/ozflux_stage03_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/sites.tsv" -o "$CODE/sites.tsv"
+curl -fLsS "$BASE/scripts/stage03/03_source_gap_qc_events_readonly.py" \
+    -o "$CODE/ozflux_stage03_gap_qc.py"
+python3 -B -m py_compile "$CODE/ozflux_stage03_gap_qc.py"
+python3 -B "$CODE/ozflux_stage03_gap_qc.py" \
+    --manifest "$CODE/sites.tsv" --out "$OUT" \
+    2>&1 | tee "$HOME/ozflux_stage03_last.log"
+echo "Stage03 report directory: $OUT"
+~~~
+
+The new outputs are stage03_source_gap_qc.json (source QC candidates, code
+frequency, selected longest event context), stage03_event_ledger.tsv (all
+missing/physical-alarm intervals), and stage03_summary.tsv (per-file issues).
+
+No NetCDF is edited, no data replaced or interpolated, no ERA5 injected, no
+segments merged, no DATM generated, no Slurm submitted. Reports are under
+HOME only. After review, create site-specific scientific decisions on
+L6 flag provenance and on UTC/local timestamps, especially two
+AU-ASM segments and hourly AU-Tum.
+
 ## 4. Subsequent scientific stages (not implemented/authorised yet)
 
 1. **Stage02B — source provenance/time QC human review:** verify actual temporal coverage, time coordinate convention (UTC vs local, interval start/end/centre), timestep, gaps/duplicates, fill values, QA/QC flags, lat/lon, instrument/source changes and especially the two AU-ASM periods. Keep each source immutable.
