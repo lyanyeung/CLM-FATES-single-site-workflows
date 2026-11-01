@@ -223,6 +223,20 @@ echo "Stage04 evidence directory: $OUT"
 
 Outputs: stage04_evidence.json and stage04_donor_candidates.tsv. No NetCDF mutation, candidate substitution, forcing, or model jobs. Source alternatives with plausible units are only REVIEW candidates, never direct approval.
 
+## 3d. Stage04 v2 correction and operator evidence (2026-11-01)
+
+Initial Stage04 execution completed 10/10 at `ozflux_stage04_20261101T055838Z`, with independent numerical donor candidates: Calperum Ta_HMP_2m 106/110; Ta_SONIC_Av 96/110 (overlapping, not additive); Gingin 10 Ta alternatives 0/24, two Fld alternatives 0/17; Howard Springs Ws_SONIC_Av 0/345. These counts indicate numeric availability only; QC code meanings and physical comparability remain unapproved.
+
+**Stage04 v1 bug:** The candidate-filter excluded any full variable name containing substring `sd`, inadvertently excluding all `Fsd_*` names because `Fsd` contains `sd`. Thus the absence of Gingin Fsd donor rows was a false negative. Commit `d3e594c877b6d2143767525dab355da06b9272c4` fixes filtering to operate on suffix tokens only, and adds a self-test requiring Fsd_1 and Fsd_7m to survive. **Re-run the corrected Stage04 before assessing AU-Gin Fsd alternatives.** Prior result remains preserved.
+
+Run the same Stage04 command above but set BASE to the following pinned commit, and use a *new* timestamped OUT directory:
+
+~~~bash
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/d3e594c877b6d2143767525dab355da06b9272c4/examples/OzFlux_MultiSite_09"
+~~~
+
+Source evidence additionally identifies Calperum 2016-08-23 07:30:00 `SH=-0.0001619283944 kg/kg`, `Ta=5.131046 °C`, `ps=100.4991 kPa`, `SH_QCFlag=50`, `Ta_QCFlag=50`. Negative humidity is physically invalid. Do not translate code 50 or other QCFlag values 410/420/440 to site measurements/ERA provenance until examining each file's original FlagXX definitions.
+
 ## 4. Subsequent scientific stages (not implemented/authorised yet)
 
 1. **Stage02B — source provenance/time QC human review:** verify actual temporal coverage, time coordinate convention (UTC vs local, interval start/end/centre), timestep, gaps/duplicates, fill values, QA/QC flags, lat/lon, instrument/source changes and especially the two AU-ASM periods. Keep each source immutable.
