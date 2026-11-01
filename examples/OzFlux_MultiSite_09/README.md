@@ -462,6 +462,74 @@ Only reports are written; no original NetCDF is modified and no
 forcing/model case/Slurm jobs are created. The science approval remains
 FALSE even if the solar clock hypothesis strongly favors one convention.
 
+## 3j. Stage10: UTC-year boundary hypotheses and AU-DaS 885-event humidity forensic (READ ONLY)
+
+**Operator-confirmed Stage09 output (2026-11-01): 2/2 target sources, 19
+complete native source years.** Both AU-DaS 2009–2021 and AU-ASM Mulga1
+2013–2018 show sharply better Fsd-vs-solar-position correlations if source
+timestamps are interpreted as Australia/Darwin local labels (UTC+09:30):
+DaS **r=0.946480** for local vs **r=-0.563873** for direct UTC;
+ASM **r=0.946425** for local vs **r=-0.536661** for direct UTC.
+The best sampled solar candidate is native end-label minus 15 min to the
+interval midpoint, not evidence that the ORIGINAL source must be shifted.
+PyFluxPro overview documents that it preserves input timestamps, that TERN
+alternate meteorological data typically use local END-of-interval labels,
+and that PyFluxPro makes no blanket assumption about input time semantics:
+https://github-wiki-see.page/m/ternaustralia/PyFluxPro/wiki/Overview-of-PyFluxPro
+
+**AU-DaS serious HOLD**: 885 native half-hours exceed 1.05 times
+specific humidity saturation inferred from the simultaneous original
+Ta and ps, in 2015 (1), 2016 (370), 2017 (5), 2018 (202),
+2019 (77) and 2021 (230). AU-ASM has zero of this diagnostic type.
+These source-derived physical consistency flags are not identical to
+an instrument failure. QA/QC, height, pressure and L4 gap-fill
+provenance must be investigated; never clamp SH, edit source or
+automatically replace with ERA5.
+
+Stage10 reads the two original files in mode='r' and the pinned Stage09
+report, without any source writes. It checks three *numeric-view-only*
+hypothetical interpretations of local clock values converted to UTC:
+local end-label only (-9h30), candidate 30-min interval midpoint
+(-9h45), and candidate start (-10h); it validates candidate
+UTC calendar-year record counts and center stamps across the
+year boundary using ALL original file records, including surrounding
+years. These are NOT approved time transforms or DATM files.
+
+For AU-DaS only, Stage10 reproduces and cross-checks all 885 events
+with the exact Stage09 saturation calculation; writes each row with
+native time, Ta, SH, ps, qsat and 3 original QCFlags, event-group
+duration, year counts and potential original RH evidence. At no point
+does it mark all 885 as repair-approved.
+
+IRIDIS6 command (use pinned source; do NOT create OUT in advance):
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/f40386e2a0064919ac302bce045cde31640074cb/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage10_code"
+STAGE09="$HOME/ozflux_stage09_20261101T064744Z"
+OUT="$HOME/ozflux_stage10_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/scripts/stage10/10_utc_boundary_and_das_humidity_forensics_readonly.py" \
+  -o "$CODE/ozflux_stage10_forensics.py"
+python3 -B -m py_compile "$CODE/ozflux_stage10_forensics.py"
+python3 -B "$CODE/ozflux_stage10_forensics.py" --self-test
+python3 -B "$CODE/ozflux_stage10_forensics.py" \
+  --stage09 "$STAGE09" --out "$OUT"
+echo "STAGE10 REPORT_DIR $OUT"
+)
+~~~
+
+Reports: stage10_source_time_humidity.json,
+stage10_hypothetical_UTC_year_bounds.tsv,
+stage10_DaS_SH_885_exact_records.tsv,
+stage10_DaS_SH_event_episodes.tsv,
+stage10_DaS_SH_year_stats.tsv.
+None are source/model/forcing files. Explicit human science sign-off
+for clock semantics, PFT, soil and ZBOT remains required.
+
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
