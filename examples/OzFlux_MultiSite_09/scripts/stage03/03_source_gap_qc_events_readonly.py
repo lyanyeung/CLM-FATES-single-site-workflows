@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import sys
 from pathlib import Path
 
 import netCDF4
@@ -258,7 +259,24 @@ def audit_file(path, site, fname):
         return report, event_rows
 
 
+def self_test():
+    assert runs(np.array([False, True, True, False, True, False])) == [(1,3),(4,5)]
+    assert runs(np.array([True, True, True])) == [(0,3)]
+    assert runs(np.array([False, False])) == []
+    assert unit_bounds("Fsd", "W/m^2") == (-50,1600)
+    assert unit_bounds("Fld", "W/m^2") == (0,850)
+    assert unit_bounds("SH", "kg/kg") == (0,0.055)
+    assert unit_bounds("Ta", "degC") == (-55,65)
+    assert unit_bounds("Precip", "mm") == (0,None)
+    q = distribution(np.array([0,0,1,1,1,np.nan]))
+    assert q["finite_count"] == 5 and q["distinct_codes"] == 2
+    print("STAGE03 SELF-TEST PASS: interval grouping, native radiation units, humidity bounds, QC code histogram; NO SOURCE WRITES")
+
+
 def main():
+    if sys.argv[1:] == ['--self-test']:
+        self_test()
+        return 0
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--manifest", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
