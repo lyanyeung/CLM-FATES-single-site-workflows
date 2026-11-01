@@ -338,8 +338,8 @@ def write_tsv(path,columns,rows):
 
 
 def selftest():
-    assert np.allclose(qsat(np.array([25.]),np.array([100.])),
-                       np.array([qsat(np.array([25.]),np.array([100.]))[0]]))
+    qs=qsat(np.array([25.]),np.array([100.]))
+    assert qs.shape==(1,) and 0.019 < float(qs[0]) < 0.022
     assert rh_percent(100.0,"%")==100
     assert rh_percent(1.0,"1")==100
     assert rh_percent(1.0,"unverified")==None
