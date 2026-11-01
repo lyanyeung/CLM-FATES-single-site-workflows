@@ -395,6 +395,73 @@ echo "Stage08 output: $OUT"
 
 Outputs: stage08_review_summary.json, stage08_year_reason_ledger.tsv, stage08_contiguous_candidate_blocks.tsv, stage08_source_qc_per_year.tsv. `CONTIGUOUS_NATIVE_STRUCTURAL_ONLY` is not a simulator-ready status. No forcing, netCDF, model experiment or Slurm job will be created.
 
+## 3i. Stage09: first-cohort native-clock, solar and humidity gate (read-only)
+
+**Operator Stage08 verified 2026-11-01:** 169 source-file years, 67
+structural candidates, 102 REVIEW/HOLD. Breakdown of non-exclusive reasons:
+19 native-year record-count mismatches, 19 incomplete year boundaries,
+86 MET-missing source-years and 1 broad physics alarm; 67 structural-only
+QC provenance HOLDs. The largest continuous native structural candidates:
+AU-DaS 2009-2021 (13 years, 0.929446 native QC=0 across seven
+meteorological fields), AU-Dry 2010-2018 (9 years, 0.751297),
+AU-ASM Mulga1 2013-2018 (6 years, 0.975131); AU-Cow 2015-2019
+(5 years, 0.927380). These are *not* source-lineage or model approvals.
+
+**Important land-cover history:** TERN OzFlux's AU-DaS description records
+clearing for crop development in November 2022. Do not assume that 2023-2025
+and pre-2022 years use the same vegetation/PFT regime. Focus this Stage09
+first-cohort science pilot on **AU-DaS 2009-2021** and independent
+**AU-ASM Mulga1 2013-2018**. Keep Mulga2 separate and do not change
+the successful AU-How case. Site reference:
+https://tern-ozflux.odoo.com/daly-river .
+
+**Native time warning:** PyFluxPro L1 documentation explicitly says
+PyFluxPro does not use the time_zone metadata to convert timestamps
+automatically; it leaves the original data timestamps intact. The
+successful preexisting AU-How example used native OzFlux timestamps rather
+than an earlier TCCAS local-to-UTC conversion, then wrote DATM with
+30-minute interval centres. This cannot simply be copied without
+verifying each new original source's local clock and interval convention.
+See https://github-wiki-see.page/m/OzFlux/PyFluxPro/wiki/Level-1 .
+
+Stage09 examines those two sites' original NetCDFs strictly in mode r,
+revalidates selected Stage07 complete years, checks source latitude and
+longitude against official OzFlux site descriptions, inventories time/height
+and precip metadata, compares native timestamps against approximate solar
+position for clock offsets 0 and +9.5 hours and exploratory +/-30 minute
+interval shifts, and screens humidity against a diagnostic physical
+saturation threshold. The 0 vs +9.5 candidate is *hypothesis testing*,
+not an authorised time transformation. Neither solar correlation nor
+preliminary native clock hypothesis grants official UTC or interval-centre
+approval. ZBOT, units per precipitation interval and PFT/soil/site surface
+also remain manual science gates.
+
+Run on IRIDIS6:
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/498459f2ea84c929802cb50cdde5991e8f972bfc/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage09_code"
+STAGE07="$HOME/ozflux_stage07_20261101T062633Z"
+OUT="$HOME/ozflux_stage09_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/sites.tsv" -o "$CODE/sites.tsv"
+curl -fLsS "$BASE/scripts/stage09/09_first_cohort_time_solar_physics_gate_readonly.py" -o "$CODE/ozflux_stage09.py"
+python3 -B -m py_compile "$CODE/ozflux_stage09.py"
+python3 -B "$CODE/ozflux_stage09.py" --self-test
+python3 -B "$CODE/ozflux_stage09.py" \
+  --manifest "$CODE/sites.tsv" --stage07 "$STAGE07" --out "$OUT"
+echo "Stage09 report dir: $OUT"
+)
+~~~
+
+Outputs: stage09_source_time_solar_physics.json, stage09_year_physics.tsv.
+Only reports are written; no original NetCDF is modified and no
+forcing/model case/Slurm jobs are created. The science approval remains
+FALSE even if the solar clock hypothesis strongly favors one convention.
+
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
