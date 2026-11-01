@@ -46,7 +46,11 @@ mkdir -p "$D"
 curl -fLsS "$BASE/sites.tsv" -o "$D/sites.tsv"
 curl -fLsS "$BASE/scripts/stage04/04_audit_native_timestamps_and_source_QC_READONLY.py" -o "$D/audit.py"
 python3 -B "$D/audit.py" --manifest "$D/sites.tsv" --site JP-Api --max-rows 20000 > "$D/JP-Api_pilot_20k.json"
-python3 -B "$D/audit.py" --manifest "$D/sites.tsv" > "$D/full11_raw_source_qc.json"
+# Full 11-site scan: prefer a separate Slurm compute-node audit job, not login-node work
+PYTHON="$(command -v python3)"
+sbatch --job-name=JPF_S04_QC --nodes=1 --ntasks=1 --cpus-per-task=1 \
+  --mem=4G --time=01:30:00 --output="$D/stage04_%j.log" \
+  --wrap="set -eu; '$PYTHON' -B '$D/audit.py' --manifest '$D/sites.tsv' > '$D/full11_raw_source_qc.json'"
 ```
 
-The pilot is deliberately **partial**, and the full command is deliberately **read-only**. Outputs are written to the user's HOME audit folder via shell redirection, not to original tower packages or CIME cases. A `screened=11/11` outcome indicates the source streams could be scanned; it does not mean there were zero anomalies or a scientific release.
+The pilot is deliberately **partial**; the full scan runs as a **Slurm read-only DATA-AUDIT job**, not a CIME/model submission, to avoid prolonged heavy decompression on a login node. Outputs are written to the user's HOME audit folder via shell redirection, not to original tower packages or CIME cases. A `screened=11/11` outcome indicates the source streams could be scanned; it does not mean there were zero anomalies or a scientific release.
