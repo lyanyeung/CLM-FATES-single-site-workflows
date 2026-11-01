@@ -17,7 +17,7 @@ Each experiment has its own directory, site/release manifest, scripts and operat
 | **JapanFlux 11-site cohort** | **[JapanFlux_MultiSite_11](JapanFlux_MultiSite_11/)** | Eleven JapanFlux archive releases, WSL/IRIDIS6 Stage00 uploader, source-integrity hashes and read-only Stage01 ZIP/header inventory; transfer and science QC NOT YET RUN |
 | ICOS multi-site campaigns | [ICOS_sites](ICOS_sites/) | Existing 6-, 8-, 11- and 13-site campaigns |
 | ICOS single site | [ICOS_ES-LJu](ICOS_ES-LJu/) | ES-LJu workflow |
-| OzFlux single site | [OzFlux_AU-How](OzFlux_AU-How/) | Howard Springs workflow |
+| **OzFlux 9-site cohort** | **[OzFlux_MultiSite_09](OzFlux_MultiSite_09/)** | 10 original L6 NetCDF files across nine site IDs; Stage00 transfer complete by operator; Stage01–03 10/10 source inventory/time/gap audit, 1026 missing/alarm episodes; Stage04 QC/donor evidence ready, no science approval or forcing |\n| OzFlux single site | [OzFlux_AU-How](OzFlux_AU-How/) | Howard Springs workflow |
 | NEON single site | [NEON_PUUM](NEON_PUUM/) | Pu'u Maka'ala workflow |
 
 The [AmeriFlux collection](AmeriFlux_sites/) lists AmeriFlux batches separately from ICOS. Batch02's latest operator result is five verified numeric candidates and five humidity-blocked sites; it has no DATM or model jobs. Numeric candidate completion does not establish scientific validation or spin-up convergence.
