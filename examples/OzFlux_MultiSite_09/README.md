@@ -507,7 +507,7 @@ IRIDIS6 command (use pinned source; do NOT create OUT in advance):
 (
 set -euo pipefail
 conda activate clm_fates_env
-BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/f40386e2a0064919ac302bce045cde31640074cb/examples/OzFlux_MultiSite_09"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/5d9333609f6ba798ce49671eb615d4a8642d8265/examples/OzFlux_MultiSite_09"
 CODE="$HOME/ozflux_stage10_code"
 STAGE09="$HOME/ozflux_stage09_20261101T064744Z"
 OUT="$HOME/ozflux_stage10_$(date -u +%Y%m%dT%H%M%SZ)"
