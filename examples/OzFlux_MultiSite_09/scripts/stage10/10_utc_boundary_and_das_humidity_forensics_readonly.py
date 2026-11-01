@@ -212,7 +212,12 @@ def humidity_forensics(ds,site,filename,year_ranges,time_num,v):
     ps=column(ds,"ps",dim,n)
     fsd=column(ds,"Fsd",dim,n)
     flags={z:column(ds,z+"_QCFlag",dim,n) for z in ("Ta","SH","ps","Fsd")}
-    rh=column(ds,"RH",dim,n,required=False)
+    # RH is optional contextual evidence: malformed optional RH must not
+    # block the primary Ta/SH/ps forensic or cause any data transformation.
+    try:
+        rh=column(ds,"RH",dim,n,required=False)
+    except ValueError:
+        rh=None
     rh_units=(str(ds.variables["RH"].getncattr("units"))
         if rh is not None and "units" in ds.variables["RH"].ncattrs() else None)
     qsat=magnus_qsat(ta,ps)
