@@ -82,17 +82,21 @@ def unit_same(a,b):
 
 
 def candidate_names(ds,main):
-    # Only clear same-prefix alternatives. Multiple heights must not be
-    # combined or assumed exchangeable without independent metadata review.
+    # Restrict exclusions to suffix tokens. Never search the entire name for
+    # "sd": Fsd_1 and Fsd_7m both legitimately contain that substring!
+    # Same-prefix sensor candidates are evidence only, not authorised substitutes.
     p=main.lower()+"_"
+    blocked={"qc","qcflag","flag","coverage","status","percent","source",
+             "method","gap","range","sd","variance","sdev","std","se"}
     out=[]
     for name in ds.variables:
         z=name.lower()
         if not z.startswith(p):
             continue
-        if any(token in z for token in (
-                "qc","flag","coverage","status","percent","source",
-                "method","gap","range","u_","sd","variance","sdev")):
+        suffix=z[len(p):]
+        if not suffix:
+            continue
+        if any(token in blocked for token in suffix.split("_")):
             continue
         out.append(name)
     return out[:25]
@@ -233,7 +237,14 @@ def self_test():
     assert not valid_met(np.array([np.nan,-9999.0,1.0])).tolist()[:2]==[True,True]
     assert valid_met(np.array([np.nan,-9999.0,1.0])).tolist()==[False,False,True]
     assert qc_hist(np.array([0,10,10,np.nan]))["codes"]=={"0.0":1,"10.0":2}
-    print("STAGE04 SELF-TEST PASS: strict donor-unit guard, original-fill guard and uninterpreted QC histogram")
+    # Regression for Stage04 v1: "sd" substring must not hide all Fsd donors.
+    class FakeDataset:
+        variables={"Fsd":None,"Fsd_1":None,"Fsd_7m":None,
+                   "Fsd_QCFlag":None,"Fsd_1_QCFlag":None,"Fsd_SD":None,
+                   "Ta_HMP_2m":None,"Ta_QCFlag":None}
+    assert candidate_names(FakeDataset(),"Fsd")==["Fsd_1","Fsd_7m"]
+    assert candidate_names(FakeDataset(),"Ta")==["Ta_HMP_2m"]
+    print("STAGE04 SELF-TEST PASS: same-unit donor guard, Fsd_1/Fsd_7m regression, source-fill guard and QC histogram")
 
 
 def main():
