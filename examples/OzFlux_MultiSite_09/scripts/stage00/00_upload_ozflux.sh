@@ -26,7 +26,15 @@ expected=(AU-ASM AU-Cow AU-Cpr AU-DaS AU-Dry AU-Gin AU-How AU-Stp AU-Tum)
 for site in "${expected[@]}"; do COUNT["$site"]=0; done
 
 line_no=0
-while IFS=    [[ "$site" =~ ^AU-[A-Za-z0-9]+$ && "$name" =~ ^[A-Za-z0-9_.-]+\.nc$ && -z "${extra:-}" ]] || die "Invalid manifest row: $site $name"
+while IFS=$'\t' read -r site name extra || [[ -n "${site:-}" ]]; do
+    line_no=$((line_no + 1))
+    if (( line_no == 1 )); then
+        [[ "$site" == site && "$name" == filename && -z "${extra:-}" ]] || die "Invalid manifest header row"
+        continue
+    fi
+    [[ -n "${site:-}" ]] || continue
+    [[ "$site" != "site" ]] || die "Duplicate manifest header"
+    [[ "$site" =~ ^AU-[A-Za-z0-9]+$ && "$name" =~ ^[A-Za-z0-9_.-]+\.nc$ && -z "${extra:-}" ]] || die "Invalid manifest row: $site $name"
     [[ -v COUNT[$site] ]] || die "Unexpected site: $site"
     [[ ! -v SEEN[$site:$name] ]] || die "Duplicate filename: $site/$name"
     SEEN["$site:$name"]=1
