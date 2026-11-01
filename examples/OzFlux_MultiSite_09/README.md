@@ -530,6 +530,74 @@ stage10_DaS_SH_year_stats.tsv.
 None are source/model/forcing files. Explicit human science sign-off
 for clock semantics, PFT, soil and ZBOT remains required.
 
+## 3k. Stage11: AU-DaS 885 humidity-source consistency and AU-ASM 6-year NOLEAP preflight (read-only)
+
+**Operator Stage10 execution 2026-11-01:** source hash, syntax,
+selftest and exact source forensic passed. Under the *unapproved*
+Australia/Darwin local END-label -> hypothetical UTC interval-centre
+interpretation, **19/19** complete native source-years remain complete
+as UTC center-year windows (AU-DaS 2009–2021: 13/13;
+AU-ASM Mulga1 2013–2018: 6/6). The assumption is strongly supported by
+solar consistency but still requires source time metadata verification.
+
+**Critical AU-DaS scientific HOLD:** Stage10 exactly recovered **885**
+native half-hours with SH > 1.05 qsat, in **207 episodes**, and
+**all 885 SH_QCFlag are 0**. This means the source variable's numeric
+QC 0 alone did not capture cross-variable humidity physics failures.
+The Feb 18–19 2021 episode (26 half-hours) has a peak SH/qsat of
+3.4863, so this is not merely a small tolerable humidity excess.
+Do not clip all values automatically to saturation or relabel QC0.
+Preserve raw and investigate paired temperature and pressure sensors,
+humidity transformation, optional RH/VPD and site-specific
+instrument/processing lineage.
+
+Stage11 is the *final source-physics/clock preflight* before either
+candidate forcing artifact generation or an explicit site hold decision.
+It **does not edit source data or create forcing**. It performs:
+1. AU-DaS exact 885 original records: reproduce indices and SH-QC0,
+   stratify severity by year, capture original Ta/ps QC, neighbouring
+   measurements, and optional original RH/VPD. Optional RH/VPD
+   from the **same processed L6 file are not independent validation**;
+   retain metadata/units, compare only when units are recognised.
+2. AU-ASM six hypothetical UTC center-years: recheck the Stage10
+   6/6 boundary result with original source values and timestamp
+   sample cadence; remove UTC Feb29 **in a temporary numerical view only**
+   and verify 17,520 remaining half-hours each, zero residual missing
+   among the seven meteorological forcing fields and zero
+   SH >1.05 qsat events. Catalogue original PFT/ZBOT/time/precip
+   metadata but **do not claim approval** of any.
+
+IRIDIS6 command (pinned GitHub version and operator Stage10 report):
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/43d611892b8eb8ad48129f06ae02a82718a387c9/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage11_code"
+STAGE10="$HOME/ozflux_stage10_20261101T065245Z"
+OUT="$HOME/ozflux_stage11_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/scripts/stage11/11_das_humidity_and_asm_noleap_preflight_readonly.py" \
+  -o "$CODE/ozflux_stage11_das_asm.py"
+test "$(git hash-object "$CODE/ozflux_stage11_das_asm.py")" = \
+  "25f48e12b34ba0177649414d766d4128319fd801"
+python3 -B -m py_compile "$CODE/ozflux_stage11_das_asm.py"
+python3 -B "$CODE/ozflux_stage11_das_asm.py" --self-test
+python3 -B "$CODE/ozflux_stage11_das_asm.py" \
+  --stage10 "$STAGE10" --out "$OUT"
+echo "STAGE11 REPORT_DIR $OUT"
+)
+~~~
+
+Outputs: `stage11_science_evidence.json`,
+`stage11_DaS_885_cross_variable.tsv`,
+`stage11_ASM_UTC_NOLEAP_preview.tsv`.
+The 885 source records and six years are both strict reproducibility gates.
+No model cases or Slurm submissions. AU-ASM remains provisional until
+time semantics, source precipitation per-interval meaning, ZBOT,
+PFT/surface/soil and file-writing provenance are independently signed off.
+
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
