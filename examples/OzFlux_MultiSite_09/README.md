@@ -90,8 +90,9 @@ mkdir -p "$DIR/old"
 if [[ -f "$DIR/inspect.py" ]]; then
   mv -n "$DIR/inspect.py" "$DIR/old/inspect.py"
 fi
-curl -fLsS "$BASE/sites.tsv" -o "$DIR/sites.tsv" || exit 1
-curl -fLsS "$BASE/scripts/stage01/01_inspect_ozflux_nc.py" -o "$DIR/ozflux_nc_metadata.py" || exit 1
+curl -fLsS "$BASE/sites.tsv" -o "$DIR/sites.tsv"
+curl -fLsS "$BASE/scripts/stage01/01_inspect_ozflux_nc.py" -o "$DIR/ozflux_nc_metadata.py"
+# Check both downloads succeeded before running the next commands.
 python3 -c 'import inspect, netCDF4; print("inspect from", inspect.__file__); print("netCDF4", netCDF4.__version__)'
 python3 -B "$DIR/ozflux_nc_metadata.py" --manifest "$DIR/sites.tsv" > "$DIR/inventory.json"
 python3 - "$DIR/inventory.json" <<'PY'
