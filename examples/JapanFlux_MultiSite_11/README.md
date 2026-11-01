@@ -1,6 +1,8 @@
 # JapanFlux MultiSite 11 — CLM-FATES single-site workflow (new experiment)
 
-**Status (2026-11-01): PREPARED, NOT EXECUTED.** Eleven source releases have been recorded from the operator's local Windows paths. Stage00 uploader and Stage01 read-only ZIP/header inspector are published. **No transfer, archive validation, forcing conversion, PFT/soil input, CIME case, or Slurm/model job is claimed here.**
+> **2026-11-01 ACTUAL Stage00 + Stage01: 11/11 VERIFIED.** User-reported WSL uploads confirmed all eleven original ZIPs with local-to-IRIDIS SHA256 equality, and the IRIDIS Stage01 script inventoried all eleven outer archives. Nine JPF archives have exactly 3 members each with no conventional FLUXMET/ERA/BIF substrings in outer member names; JP-Tom has 29 and JP-Tgf has 27 (both names include ERA5_HH). This is not yet a CRC/scientific-QC/DATM approval. [Exact transfer hashes and evidence](docs/STAGE00_01_VERIFIED_TRANSFER_AND_ZIP_INVENTORY_20261101.md). **Next: inspect true outer member names, signatures and bounded source header previews using [Stage02](scripts/stage02/02_print_outer_members_and_headers_READONLY.py), without extraction or Slurm.**
+
+**Current status (2026-11-01): Stage00 transfer and Stage01 basic archive inventory EXECUTED 11/11.** Original 11-site source list was supplied by the operator. Stage02 true file-name/header review and all forcing, PFT/soil, CIME/Slurm execution remain pending.
 
 This is a separate JapanFlux cohort following the source-preserving workflow pattern in [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and [AmeriFlux Batch05](../AmeriFlux_MultiSite_10_Batch05/), NOT a copy of those campaigns' site-specific science decisions.
 
