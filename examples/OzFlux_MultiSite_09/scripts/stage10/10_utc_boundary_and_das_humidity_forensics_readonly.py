@@ -112,7 +112,7 @@ def is_valid(x):
     return np.isfinite(x)&(x>-9990)
 
 
-def magnesium_qsat(T_C,p_kPa):
+def magnus_qsat(T_C,p_kPa):
     # Follow Stage09 EXACTLY, independently checking its 885 event count.
     # e_s is saturation over water, diagnostic only.
     es=0.6112*np.exp(np.clip(17.67*T_C/(T_C+243.5),-50,30))
@@ -215,7 +215,7 @@ def humidity_forensics(ds,site,filename,year_ranges,time_num,v):
     rh=column(ds,"RH",dim,n,required=False)
     rh_units=(str(ds.variables["RH"].getncattr("units"))
         if rh is not None and "units" in ds.variables["RH"].ncattrs() else None)
-    qsat=magnesium_qsat(ta,ps)
+    qsat=magnus_qsat(ta,ps)
     valid=is_valid(ta)&is_valid(sh)&is_valid(ps)&np.isfinite(qsat)&(qsat>0)
     ratio=np.where(valid,sh/qsat,np.nan)
     records=[]
@@ -314,7 +314,7 @@ def write_rows(path,cols,rows):
 
 
 def self_test():
-    test=magnesium_qsat(np.array([25.,25.,25.]),np.array([100.,100.,100.]))
+    test=magnus_qsat(np.array([25.,25.,25.]),np.array([100.,100.,100.]))
     assert 0.019 < test[0] < 0.022
     assert np.allclose(test[0],test[1])
     assert episodes(np.array([0,1,1,0,1,0],dtype=bool))==[(1,3),(4,5)]
