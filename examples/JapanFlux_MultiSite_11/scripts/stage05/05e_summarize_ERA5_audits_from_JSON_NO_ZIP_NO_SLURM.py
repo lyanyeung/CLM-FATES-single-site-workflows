@@ -19,20 +19,56 @@ def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--dir", type=Path, required=True, help="Folder of JP-*_ERA5_audit.json")
     p.add_argument("--events", action="store_true", help="Print deduplicated stored event examples")
+    p.add_argument("--check", action="store_true", help="Check all 9 saved JSON files; do not summarize or fail on an invalid file")
+    p.add_argument("--ignore-invalid", action="store_true", help="Explicitly exclude invalid files and summarize VALID reports only (INCOMPLETE)")
     a = p.parse_args()
     reports = {}
+    bad = {}
     for site in SITES:
         f = a.dir / (site + "_ERA5_audit.json")
         if not f.is_file():
+            bad[site] = "MISSING"
             continue
-        r = json.loads(f.read_text(encoding="utf-8"))
-        if r.get("stage") != "JapanFlux Stage05D" or r.get("site") != site:
-            raise ValueError("Unexpected report stage or site for " + str(f))
-        if r.get("status") != "ERA5_FULL_SCAN_COMPLETED" or not r.get("read_only"):
-            raise ValueError("Incomplete or non-read-only report " + str(f))
+        size = f.stat().st_size
+        if size == 0:
+            bad[site] = "EMPTY (0 bytes; likely interrupted/failed redirected output)"
+            continue
+        try:
+            r = json.loads(f.read_text(encoding="utf-8"))
+            if not isinstance(r, dict):
+                raise ValueError("JSON root is not an object")
+            if r.get("stage") != "JapanFlux Stage05D" or r.get("site") != site:
+                raise ValueError("Unexpected stage/site identity")
+            if r.get("status") != "ERA5_FULL_SCAN_COMPLETED" or r.get("read_only") is not True:
+                raise ValueError("Incomplete or non-read-only audit")
+            if not isinstance(r.get("rows"), int) or r["rows"] < 1:
+                raise ValueError("Missing or invalid scanned row count")
+        except (json.JSONDecodeError, UnicodeDecodeError, ValueError, OSError) as exc:
+            bad[site] = f"INVALID ({size} bytes; {type(exc).__name__}: {exc})"
+            continue
         reports[site] = r
+    if a.check:
+        print("STAGE05E VALIDATE SAVED REPORTS ONLY: NO ZIP, NO SLURM, NO CHANGES")
+        for site in SITES:
+            if site in reports:
+                r = reports[site]
+                print(site, "VALID", "rows=" + str(r["rows"]),
+                      "unique_screen_flags=" + str(r.get("flagged_unique_native_starts")))
+            else:
+                print(site, bad[site])
+        print("VALID", len(reports), "/9", "MISSING_OR_INVALID", len(bad))
+        return 0
+    bad_files = {site: problem for site, problem in bad.items() if not problem.startswith("MISSING")}
+    if bad_files and not a.ignore_invalid:
+        p.error("Cannot summarize invalid existing JSON files; run --check to identify: "
+                + "; ".join(f"{s}: {problem}" for s, problem in bad_files.items())
+                + ". Rerun Stage05D ONLY for invalid sites; no existing valid file needs rescanning.")
     if not reports:
-        p.error("No Stage05D station reports in --dir")
+        p.error("No valid Stage05D station reports in --dir")
+    if bad_files:
+        print("WARNING: INCOMPLETE SUMMARY; INVALID REPORTS EXCLUDED BY --ignore-invalid")
+        for site, problem in bad_files.items():
+            print("INVALID_REPORT", site, problem)
 
     print("STAGE05E READ-ONLY SUMMARIES FROM SAVED ERA5_HH JSON; NO ZIP OR SLURM")
     print("STATIONS_LOADED", len(reports), "/9", ",".join(reports))
