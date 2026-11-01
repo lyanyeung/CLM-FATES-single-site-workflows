@@ -159,7 +159,13 @@ def year_bounds(t,year):
 
 def summarize_qc(q,index):
     if q is None:
-        return {"qc_missing":len(index),"qc_other_finite":0,
+        if isinstance(index,slice):
+            if index.start is None or index.stop is None:
+                raise ValueError("Explicit slice boundaries required for absent QC")
+            count=max(0,index.stop-index.start)
+        else:
+            count=len(index)
+        return {"qc_missing":count,"qc_other_finite":0,
                 **{"qc"+str(k):0 for k in QC_CODES}}
     values=q[index]
     finite=np.isfinite(values)
@@ -286,6 +292,7 @@ def selftest():
     assert physical_alarms("SH","kg/kg",np.array([0.1,-0.01,0.005])).tolist()==[True,True,False]
     assert summarize_qc(np.array([0.,0.,410.,440.,np.nan]),slice(0,5))["qc410"]==1
     assert summarize_qc(np.array([0.,0.,410.,440.,np.nan]),slice(0,5))["qc_missing"]==1
+    assert summarize_qc(None,slice(2,8))["qc_missing"]==6
     assert unit_seconds("days since 1800-01-01 00:00:00.0")==86400
     print("STAGE07 SELF-TEST PASS: radiation/negative-humidity alarm, native-year QC flags and time units; NO SOURCE WRITES")
 
