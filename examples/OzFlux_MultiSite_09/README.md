@@ -147,7 +147,7 @@ Four outputs:
 
 ## 4. Subsequent scientific stages (not implemented/authorised yet)
 
-1. **Stage02 — source provenance/time QC:** verify actual temporal coverage, time coordinate convention (UTC vs local, interval start/end/centre), timestep, gaps/duplicates, fill values, QA/QC flags, lat/lon, instrument/source changes and especially the two AU-ASM periods. Keep each source immutable.
+1. **Stage02B — source provenance/time QC human review:** verify actual temporal coverage, time coordinate convention (UTC vs local, interval start/end/centre), timestep, gaps/duplicates, fill values, QA/QC flags, lat/lon, instrument/source changes and especially the two AU-ASM periods. Keep each source immutable.
 2. **Stage03 — meteorological physics and forcing candidate:** evaluate OzFlux variable mapping per station, compare native data and observation QC, assess radiation/humidity/precipitation and site-specific height. Existing AU-How uses `Ta→TBOT`, `SH→QBOT`, `ps→PSRF`, `Fsd→FSDS`, `Fld→FLDS`, `Ws→WIND`, `Precip→PRECTmms`; **do not assume units, gap-filling status or mapping are identical for these other L6 products**.
 3. **Stage04 — site vegetation/soil/surface:** scientific approval of each site's PFT fractions, shrub/bare ground, soil texture and correct surface/mesh. No copy of an unrelated site's vegetation or forcing height.
 4. **Stage05 — independent DATM and NOLEAP audit; model preflight:** validate chronology, water and radiation physics and all required forcing fields. Only after sign-off, prepare site-specific CIME/FATES cases and consider the established staged spinup (AD and Normal) approach. **Stage00 and Stage01 submit no Slurm jobs.**
