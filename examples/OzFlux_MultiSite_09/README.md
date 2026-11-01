@@ -647,6 +647,46 @@ manifest, with no deletion and no Slurm. Science approval remains FALSE.
 This is for model-input validation only after operator confirmation,
 not production FATES spinup.
 
+## 3m. Stage12 operator preflight SUCCESS; guarded candidate DATM write eligible but NOT authorised automatically
+
+2026-11-01 operator Stage12 preflight output:
+`$HOME/ozflux_stage12_preflight_20261101T174552Z` .
+Verified script source hash, syntax and self-test. `STAGE12 SOURCE_PREFLIGHT_ONLY FILES 0` (expected).
+Original Mulga1 source SHA256 is
+`b9381c4ed0744d03ae609cfbf3805e30bbb9223851a05f4e5b63b149dd0b10eb`.
+2013–2018 UTC-center hypotheses all pass 17,520 NOLEAP half-hours;
+2016 Feb29 removes exactly 48 half-hour records. No original source
+NetCDF was changed. Original source metadata includes:
+- lat -22.2828, lon 133.2493; `time_zone=Australia/Darwin`, `time_step=30`.
+- `Ta` HMP45c 11.6m, average; `Ws` CSAT3/3B 11.6m, average.
+- `SH` specific humidity kg/kg, "Merged with SH calculated from AH", no reported source height.
+- `ps` kPa at source `height=23m` (must independently review provenance);
+  Fsd/Fld W/m2 at source 12.2m; Precip at source 2m, `units=mm`,
+  `statistic_type=sum`, source L4 fill includes AWS/ACCESS/ERA5.
+- Vegetation is acacia mulga plus C3 forbs/shrubs, C3 grass and C4 grass;
+  soil red kandosol, sandy loam; canopy_height 4.4m.
+  These descriptions are not surface/PFT/soil parameter estimates.
+
+**Next decision:** The existing Stage12 builder supports manually run
+`--write-candidate` with reviewed `--zbot-m 11.6` (candidate, SH height unknown),
+nonempty evidence strings for ZBOT, site-local END label/UTC midpoint
+time interpretation, and per-30min accumulated Precip in mm, plus exact
+`--confirm BUILD_AU_ASM_PROVISIONAL_2013_2018`. It writes
+six **new provisional** yearly NetCDF files under a unique HOME output
+folder with source SHA256 provenance, never overwrites/deletes original
+source, and does not submit Slurm. The QC/science approval remains FALSE;
+none of these records establish final approved source or vegetation,
+soil, surface, ZBOT or CIME forcing conventions.
+
+**AU-DaS independent operator excerpt**: All 885 SH/saturation ratio
+alerts have source SH_QCFlag=0; 40 at ratio>=1.5. Severe records also
+report RH as high as ~350 percent and negative VPD to -1.9 kPa, and
+derived RH/VPD from Ta, SH and ps are similar. L6 RH/VPD may share
+upstream Ta/SH processing and are not independently verifying data.
+Unusually low paired Ta (~0-6 C in extreme events) makes temperature
+sensor and source processing an urgent first diagnostic. Do not clip SH
+or relabel QC0, and do not infer one instrument is solely responsible.
+
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
