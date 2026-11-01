@@ -687,6 +687,74 @@ Unusually low paired Ta (~0-6 C in extreme events) makes temperature
 sensor and source processing an urgent first diagnostic. Do not clip SH
 or relabel QC0, and do not infer one instrument is solely responsible.
 
+## 3n. Operator Stage12 six provisional DATM files VERIFIED; Stage13 independent mapping and negative-FSDS science QC
+
+2026-11-01 Stage12 guarded `--write-candidate` operator execution succeeded for six years 2013–2018. Original source SHA256 was independently checked before/after:
+`b9381c4ed0744d03ae609cfbf3805e30bbb9223851a05f4e5b63b149dd0b10eb`.
+Candidate directory is
+`/iridisfs/home/ly3n24/ozflux_ASM_PROVISIONAL_DATM_20261101T182517Z`.
+Exactly six independent
+`AU-ASM_PROVISIONAL_DATM_{year}.nc` files, 17,520 NOLEAP half-hours/year, 8 finite variables including
+`ZBOT=11.6m`, full calendar and source SHA metadata, no model jobs.
+2016 Feb29 was excluded in the *derived* candidate only. No original
+files changed. Precip source `mm per 30 minutes` -> candidate
+`mm/s` retained year totals: 2013 142.8, 2014 376.4, 2015
+315.6, 2016 635.4, 2017 363.2, 2018 106.8 mm.
+
+**Unresolved main blocker:** Original-derived candidate FSDS has negative
+values on **359 half-hours in 2014** (minimum -4.886132 W/m2) and
+**1 half-hour in 2016** (minimum -7.257903 W/m2); no such values in
+2013/2015/2017/2018. The correct treatment needs original source
+`Fsd_QCFlag`, precise UTC-hypothesis solar position and
+day/night classification. Do not blindly clamp or directly launch AD400.
+2018 wind maximum 16.296 m/s warrants basic source/QC investigation,
+not automatic filtering.
+
+**New Stage13** *reads original and all six candidate NetCDFs strictly in
+read mode* and reconstructs the exact source-index mapping after
+provisional local END minus 585 min and UTC Feb29 exclusion.
+It demands exact float32 agreement for all seven transformed
+meteorological forcing fields, correct NOLEAP time, lat/lon, ZBOT,
+source SHA256 and annual precipitation conservation. It records all 360
+source-negative-Fsd rows with the source QC and *provisional* UTC
+solar elevation, plus any wind >15 m/s source records. It writes
+**reports only** under a new HOME path and never overwrites or changes
+the six candidates.
+
+Execute Stage13:
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/455af424e62fe2ea4fc33a766f7865ff5cbc19fb/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage13_code"
+OUT="$HOME/ozflux_stage13_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/scripts/stage13/13_asm_provisional_datm_byte_science_QC_readonly.py" -o "$CODE/ozflux_stage13_QC.py"
+test "$(git hash-object "$CODE/ozflux_stage13_QC.py")" = "82daf98edf8e0ac7ea73634566c0194fe2cbbcc5"
+python3 -B -m py_compile "$CODE/ozflux_stage13_QC.py"
+python3 -B "$CODE/ozflux_stage13_QC.py" --self-test
+python3 -B "$CODE/ozflux_stage13_QC.py" --out "$OUT"
+echo "Stage13 output: $OUT"
+)
+~~~
+
+Outputs:
+- stage13_ASM_candidate_QC_summary.json
+- stage13_ASM_annual_exact_validation.tsv
+- stage13_ASM_360_negative_FSDS.tsv
+- stage13_ASM_wind_gt15.tsv
+
+Success remains **science_approval=false** and does not authorize
+final forcing or AD400. Once the source-negative shortwave issue
+is adjudicated, separately audit the site-observed Mulga
+canopy/shrub/C3/C4 grass/bare-soil fractions and site's red
+kandosol/sandy-loam soil against a candidate surface, plus
+FATES-PFT and CIME/DATM streams. ZBOT=11.6m is supported by
+reported source Ta/Ws heights but SH height remains undocumented,
+and source ps height is recorded as 23m; preserve this uncertainty.
+
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
