@@ -598,6 +598,55 @@ No model cases or Slurm submissions. AU-ASM remains provisional until
 time semantics, source precipitation per-interval meaning, ZBOT,
 PFT/surface/soil and file-writing provenance are independently signed off.
 
+## 3l. Stage12: AU-ASM guarded PROVISIONAL DATM builder (audit-only by default)
+
+**Operator Stage11 succeeded on IRIDIS6 (2026-11-01).**
+- AU-ASM Mulga1 2013–2018 all six hypothetical UTC-centre years contain complete source records, no missing in the seven forcing variables and no SH >1.05 calculated qsat. 2013/14/15/17/18 native-view UTC source years have 17,520 records; 2016 17,568 with 48 hypothetical UTC Feb29 records removed to give 17,520 each.
+- AU-DaS retains 885 independent source-physics flags even with SH_QCFlag=0, 207 grouped episodes; severity bands: 741 in 1.05–1.10, 81 in 1.10–1.20, 23 in 1.20–1.50 and **40 at or above 1.50 qsat**. Optional source RH and VPD exist but are from the same processed L6 product, not automatically independent measurements. Severe events involve unusual simultaneous Ta values around 0–4 C; must investigate temperature source/height/instrument and paired original humidity before attributing failure solely to SH.
+- Stage11 reports reside at `$HOME/ozflux_stage11_20261101T065724Z`. No source edits or DATM generated.
+
+**Independent external site evidence:** OzFlux's Alice Springs Mulga site description (https://ozflux.org.au/monitoringsites/alicesprings/alicesprings_description.html) gives coordinates -22.2828, 133.2493, a **13.7 m mast**, canopy average **6.5 m**, temperature and humidity **11.6 m above canopy**, wind speed **9.25 m**, downwelling radiation **12.2 m**, precipitation **2.5 m** and barometric pressure **1 m**. The tower height is not ZBOT. Using 11.6 m for the candidate atmospheric forcing reference height is a *source-informed candidate*, NOT automatic science approval; verify the actual selected L6 Ta/SH field metadata and modelling convention. Precip units mm require verification as *per-interval accumulation* before the established AU-How conversion mm/1800 s -> mm/s can be applied. The site's mulga canopy, understory grass and bare soil also require independent PFT/surface science decisions before CTSM case building.
+
+The **new standalone Stage12 script** defaults to a preflight-only action.
+It opens only original AU-ASM Mulga1 source read-only, checks Stage11 exact
+6-year records, verifies hypothetical UTC-centre 30-min chronology,
+zero residual gaps and broad physical consistency, and records native
+time/height/source/precip metadata under a new HOME output directory.
+No new NetCDF or model case is created by preflight.
+
+To run preflight:
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/210bb542f03ec825e44e74298f3d10012c8438e8/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage12_code"
+STAGE11="$HOME/ozflux_stage11_20261101T065724Z"
+OUT="$HOME/ozflux_stage12_preflight_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/scripts/stage12/12_asm_provisional_DATM_builder_guarded.py" \
+ -o "$CODE/ozflux_stage12_guarded.py"
+test "$(git hash-object "$CODE/ozflux_stage12_guarded.py")" = \
+ "600712bf17d1e6b59fe4fd43c91cf75066423ee6"
+python3 -B -m py_compile "$CODE/ozflux_stage12_guarded.py"
+python3 -B "$CODE/ozflux_stage12_guarded.py" --self-test
+python3 -B "$CODE/ozflux_stage12_guarded.py" \
+ --stage11 "$STAGE11" --preflight --out "$OUT"
+echo "STAGE12 preflight report: $OUT/stage12_ASM_candidate_manifest.json"
+)
+~~~
+
+**No write-candidate action is authorised yet.** The script's *separate*
+write-candidate mode is guarded by exact confirmation text, reviewed
+ZBOT value and evidence, reviewed source local END time semantics,
+and reviewed per-30-minute Precip accumulation provenance. Write mode
+requires a **new** output path outside all original source trees and
+writes six independently named PROVISIONAL NetCDFs and a provenance
+manifest, with no deletion and no Slurm. Science approval remains FALSE.
+This is for model-input validation only after operator confirmation,
+not production FATES spinup.
+
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
