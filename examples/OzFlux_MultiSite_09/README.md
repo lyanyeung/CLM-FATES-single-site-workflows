@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-01): PREPARED, NOT EXECUTED.** This cohort contains **9 station IDs and 10 original NetCDF files**. The Windows D: file locations were supplied by the experiment operator; neither local files nor remote files have been opened by this repository change. Scripts are published, but **no upload, byte verification, NetCDF assessment, forcing conversion, CIME case or Slurm run is yet claimed**.
+**Status (2026-11-01): SOURCE AUDITS EXECUTED THROUGH STAGE08; STAGE09 SCRIPT PUBLISHED, EXECUTION PENDING.** This cohort contains **9 station IDs and 10 original NetCDF files**. The operator executed Stages01–08 on IRIDIS6: Stage01–03 and Stage04 v2 inspected 10/10 original source files, Stage05 inspected 18 donor comparisons, Stage06A investigated 3 target sources, Stage07 classified 169 source-file calendar years (67 structural candidates; 102 REVIEW/HOLD), and Stage08 confirmed those annual classifications and the contiguous-year blocks. Original NetCDFs were not modified. **No source science approval, DATM forcing conversion, CIME case, or Slurm model submission has occurred in this new cohort.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
