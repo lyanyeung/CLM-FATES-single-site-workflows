@@ -140,7 +140,7 @@ def validate_original(ds):
         a=int(np.searchsorted(view,low,"left"))
         b=int(np.searchsorted(view,high,"left"))
         ix=np.arange(a,b,dtype=int)
-        if len(ix)!=17568 if year==2016 else len(ix)!=17520:
+        if len(ix)!=(17568 if year==2016 else 17520):
             raise ValueError("Wrong provisional UTC year source count "+str(year))
         if not np.all(np.abs(np.diff(view[a:b])-step)*time_seconds(t)<1):
             raise ValueError("Source timestep discontinuity in UTC preview "+str(year))
@@ -288,9 +288,11 @@ def main():
     args=p.parse_args()
     source=args.source.resolve()
     out=args.out.resolve()
-    if args.out.is_symlink() or source==out or source.parent in out.parents or out.exists():
-        raise ValueError("Must use new output directory outside original source path")
-    if source.is_symlink() or not source.is_file():
+    source_tree=Path("/iridisfs/scratch/ly3n24/CLM_FATES/sites/MY_EC_SITE").resolve()
+    if (args.out.is_symlink() or source==out or source_tree==out
+            or source_tree in out.parents or out.exists()):
+        raise ValueError("Must use a new output directory outside all original source trees")
+    if args.source.is_symlink() or not source.is_file():
         raise ValueError("Original source not found or symlinked")
     validate_stage11(args.stage11)
     with netCDF4.Dataset(str(source),mode="r") as ds:
