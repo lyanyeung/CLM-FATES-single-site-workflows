@@ -302,7 +302,7 @@ def main():
     sourceroot=SOURCE_ROOT.resolve()
     if (a.out.is_symlink() or out.exists() or out==sourceroot
             or sourceroot in out.parents or out==candidates
-            or candidates in out.parents):
+            or candidates in out.parents or out==source):
         raise ValueError("New report output must be outside original and candidate data trees")
     if a.source.is_symlink() or not source.is_file():
         raise ValueError("Original source missing or symlinked")
