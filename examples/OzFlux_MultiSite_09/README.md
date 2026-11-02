@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–26 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE SURFACE VERIFIED; STAGE20–24 FATES MAP, TRAITS AND LOCAL HEIGHT FORMULAS VERIFIED; STAGE25 FOUR TERN CSV SOURCES SHA VERIFIED; STAGE26 ALL 222 STEM ROWS ARE BASAL D20 (ZERO TRUE 1.3m DBH PAIRS), 142 LEAF ROWS/7 SPECIES VERIFIED; STAGE27 YEAR-SCOPED OBSERVED HEIGHT VS FATES7 AND CONDITIONAL LEAF LMA/SLA SENSITIVITY PUBLISHED, EXECUTION PENDING. PFT/SOIL/FORCING APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–27 OPERATOR EXECUTED; STAGE14 FSDS0 FORCING AND STAGE16 REFERENCE SURFACE PRESERVED; STAGE20–24 EXACT FATES PFT/TRAITS/H(DBH) VERIFIED; STAGE25 FOUR TERN FIELD CSVs SHA VERIFIED; STAGE26 222 STEM D20 ROWS, ZERO TRUE DBH-HEIGHT PAIRS, 142 LEAF ROWS; STAGE27 54/206 DOMINANT ACACIA HEIGHT RECORDS EXCEED FATES7 DEFAULT HEIGHT CAP BUT ALL 222 ROW-LEVEL YEARS ARE UNKNOWN; STAGE28 ORIGINAL-STEM DUPLICATE AND DATE FORENSICS PUBLISHED, EXECUTION PENDING. PFT/SOIL/FORCING SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -1848,6 +1848,63 @@ Do not infer actual experimental PFT cover, a new 10-layer Kandosol
 profile or publish model errors until an independently measured
 DBH-height dataset has been secured.
 
+## 3ad. Stage27 operator SUCCESS; false 2014-year flag and duplicated stem IDs
+
+Stage27 actual operator result: /home/ly3n24/ozflux_stage27_20261102T123656Z .
+Original TERN source CSV, Stage21 traits and Stage24/26 receipt hashes were verified.
+FATES7 installed exact height ceiling 4.735410175384586 m.
+Observed field height rows above this cap: Acacia aneura 18/86 (20.93%),
+Acacia aptaneura 36/120 (30.0%), combined **54/206 rows (26.21%)**;
+Psydrax latifolia 2/14; Eremophila latrobei ssp glabra 0/2.
+All 222 raw diameter values correspond to basal D20 at 0.2 m, not DBH at 1.3 m.
+Therefore Stage27 correctly did not compute any FATES H(DBH) fit error.
+
+Important sampling issue: the Stage27 per-species table contains 222 raw
+rows but only 111 unique stem keys and 92 unique plant keys. The 2:1
+count *suggests* repeat/derived records but exact per-stem repeat counts
+still need direct original-CSV reconciliation. Repeated stems are not
+independent trees. TERN publisher states 2014 field measurements
+and 2018 basal-area increments derived from dendrometers WITHOUT
+independent repeat stem surveying.
+
+Critical Stage27 BUG: its 2014 tall-stem flag FALSE is an artefact of
+all 222 phenotypeTime row values yielding UNSPECIFIED years; the
+filter looking for exactly year 2014 returned an empty selection.
+FALSE DOES NOT MEAN NO TALL STEMS. Need inspect startVisitDate,
+endVisitDate, phenomenonTime and 21-entry original data dictionary
+before attributing individual rows to 2014 or 2018.
+Publisher: https://portal.tern.org.au/metadata/c2968de2-1e8b-4a05-919f-46744b3171ed
+
+Stage27 Acacia aneura leaf observations: 40 leaf records from 20 plant IDs;
+LMA median 279.985 g dry mass/m2. Hypothetical carbon mass fractions
+0.45/0.50 imply derived SLA 0.007936934/0.007143240 m2/gC, numerically
+closer to FATES4 canopy-top 0.009 than FATES7 0.012. This is only
+a sensitivity screen (carbon fraction not measured; phyllode position
+and season not necessarily canopy top). No Acacia aptaneura leaf
+measurements in the source. No model parameter calibration authorized.
+
+**Stage28 read-only audit published, NOT run:**
+scripts/stage28/28_asm_TERN_stem_duplicates_and_temporal_provenance_READONLY.py
+pinned commit 62f6e17f5f3f5383400fd1054b3bee2d25cf73d5
+Git blob afbb06c458b527282a649cd65ec97d8a3088d766.
+Checks original 222-row CSV and 21-row dictionary SHA and the actual
+Stage26/27 receipts; groups exact (siteId, plotId, plantId, stemId)
+to count duplicate rows and classify FATES7 ceiling exceedances
+only once per stem with a separate DISCORDANT classification.
+Audits three original date fields and reports raw values, rather than
+assuming 2014 for every row or incorrectly claiming 2014 had no tall trees.
+Writes only new HOME JSON + two TSV files, never source/forcing/params/
+surface/CIME/Slurm. AD400 stays blocked.
+
+Stage28 outputs: stage28_TERN_unique_stem_height_and_provenance.tsv;
+stage28_TERN_species_unique_stem_height_ceiling_summary.tsv;
+stage28_TERN_time_and_duplicate_stem_science_HOLD.json.
+
+Independent verified DBH survey metadata:
+https://researchdata.edu.au/vegetation-data-direct-ha-2014/617073
+reports 200 true 1.3m DBH stems from 86 trees (2014-01-21 to 2014-01-22)
+inside tower footprint; direct individual original DBH-height source
+NOT downloaded/validated and separate from the D20 TERN release.
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
