@@ -155,8 +155,8 @@ def check_baseline_files(mod,folder):
 def verify_inputs(mod,a):
     d=mod.validate(js(a.stage05ar_plan),js(a.stage05ar_summary))
     if len(d)!=7 or set(DAYS)-set(d):raise ValueError("Stage05AR must retain all four original remaining site days")
-    at=js(a.stage05at_tef)
-    au=js(a.stage05au_tmd)
+    at=js(a.stage05at_tef_report)
+    au=js(a.stage05au_tmd_report)
     validate_actual_previous(at,au)
     source=validate_source_events(tsv(a.stage05aq_fields))
     for k,vars_ in DAYS.items():
@@ -308,6 +308,13 @@ def selftest():
     assert (datetime(2022,4,9,3)-timedelta(hours=9))==datetime(2022,4,8,18)
     assert (datetime(2011,12,17,7)-timedelta(hours=9))==datetime(2011,12,16,22)
     assert 720000/3600==200 and 100000/1000==100
+    # Regression: argparse converts hyphenated report flags into these exact names.
+    parser=argparse.ArgumentParser()
+    parser.add_argument("--stage05at-tef-report",type=Path)
+    parser.add_argument("--stage05au-tmd-report",type=Path)
+    args=parser.parse_args(["--stage05at-tef-report","/tmp/at.json","--stage05au-tmd-report","/tmp/au.json"])
+    assert args.stage05at_tef_report==Path("/tmp/at.json")
+    assert args.stage05au_tmd_report==Path("/tmp/au.json")
     print("STAGE05AV SELF-TEST PASS | remaining four candidate CDS days, 8 original Tef/Tmd QC2 fields, two-day Tmd Dec2011; no network/forcing")
 def main():
     p=argparse.ArgumentParser(description=__doc__)
