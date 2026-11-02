@@ -148,7 +148,7 @@ def verify_2011(adrows,adsummary,registry):
         or adsummary.get("all_45_original_JPF_source_QC2_fields_HOLD") is not True
         or adsummary.get("CDS_requests_this_stage")!=0):
         raise ValueError("Stage05AD actual 48-hour science QC2 source provenance changed")
-    if len(adrows)!=3:return fail("Expected exactly 3 actual 2011 JP-Fjy PA events")
+    if len(adrows)!=3:raise ValueError("Expected exactly 3 actual 2011 JP-Fjy PA events")
     seen=set();out=[]
     for r in adrows:
         k=r["site"],r["original_JST_halfhour_start"],r["variable"]
