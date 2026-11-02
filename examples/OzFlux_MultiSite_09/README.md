@@ -826,6 +826,74 @@ Proceed next to a site-specific Mulga PFT/soil/bare-ground/surface science
 gate. See the register at
 `science/AU-ASM_stage13_science_register_20261102.md`.
 
+## 3p. Stage14 operator execution SUCCESS; Stage15 AU-ASM site PFT/soil/surface input inventory
+
+**Stage14 operator confirmed 2026-11-02:** the \`--preview\` and
+\`--write-candidate\` scientific gates both passed. Created exactly six
+separately named FSDS0 provisional DATM files under
+\`/home/ly3n24/ozflux_stage14_FSDS0_20261102T012038Z\`;
+only 359 negative FSDS records from ACCESS QC420 in 2014 and
+one negative FSDS from interpolation QC50 in 2016 were set to zero.
+All seven meteorological variables other than FSDS, all timestamps,
+coordinates and ZBOT remain identical at source native precision;
+old Stage12 candidates and original OzFlux L6 remain untouched.
+Energy increments +3.0701117705 MJ/m² (2014) and +0.0130642256 MJ/m² (2016).
+No surface/PFT/case/Slurm activity. Stage14 new candidate SHA256 by year:
+2013 0e722aec1d73d35ff4671ccd1c72fbf02c7e3af8f9fdd6cae291834741b2bffe;
+2014 54345a6ae15ba8091b118dc62c891cff1fb851eda895178a47c8d3a23143871b;
+2015 6d7b9cc4f0e24d6395f1f6d1ae3217f9fd70a67d93f41969eb6cdafe283447bf;
+2016 8b5576e424625a0bf62f0fb0fa552230ff7c01e26e440a565242e169fe455c7f;
+2017 634d8d395e95331cf9f13dcbf5d48edbc2e881af4ca913acb75abe1333032951;
+2018 8ce901670486469358525c95f6a78db82698a5712312c4b1bf610aff744be55d.
+
+**Now stop meteorological gap-repair iteration** and establish defensible
+land-model inputs. Published TERN site data describe a mixed Acacia aneura
+/ aptaneura evergreen woody Mulga canopy, several C3 shrub/forb and
+perennial C3 grass groups, C4 grasses, patchy bare ground, and
+a red Kandosol with 74:11:15 sand:silt:clay in recent metadata.
+Older OzFlux describes different (50:50) sand:clay; soil depth,
+sample coverage and source vintage must be reconciled before selecting
+CLM soil layers. These are descriptive ecosystem observations, not a
+measured 15-slot \`PCT_NAT_PFT\` vector or verified FATES PFT
+mapping. Bare ground is host natural PFT **index 0**, but cannot be
+treated as an FATES active canopy. An older academic 74.5% woody-area
+estimate is NOT a ready-made EC-footprint or natland fraction.
+
+**Stage15: inspect the existing IRIDIS6 point surface and reference
+CTSM resources only**, source at
+\`scripts/stage15/15_asm_pft_soil_surface_source_inventory_readonly.py\`
+(commit \`3e753d76783f2d7032b78db487c5facce7bfa58a\`).
+The inspector checks original six Stage12 and six Stage14 hashes
+against the Stage14 operator manifest, scans a bounded AU-ASM site
+folder for existing \`surfdata*.nc\` NetCDFs, inventories natural/host
+PFT vector, gridded natveg, host bare index0, sand/clay soil layer
+profiles, location and CTSM 2000 input templates. Existing CTSM grid
+point surfdata is a **reference only**, not proven tower PFT/soil.
+
+IRIDIS6 command (READ-ONLY, report under HOME):
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/3e753d76783f2d7032b78db487c5facce7bfa58a/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage15_code"
+OUT="$HOME/ozflux_stage15_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/scripts/stage15/15_asm_pft_soil_surface_source_inventory_readonly.py" -o "$CODE/ozflux_stage15.py"
+python3 -B -m py_compile "$CODE/ozflux_stage15.py"
+python3 -B "$CODE/ozflux_stage15.py" --self-test
+python3 -B "$CODE/ozflux_stage15.py" --out "$OUT"
+echo "Stage15 report directory: $OUT"
+)
+~~~
+
+Outputs \`stage15_ASM_surface_PFT_soil_source_register.json\` and
+\`stage15_existing_surface_candidates.tsv\`. **Zero NetCDF writes**,
+no PFT assignments or case preparation. Requires exact per-site
+scientific PFT fractions, compiled model mapping, 10-layer soil profiles
+and independently reviewed point-surface values before CIME submission.
+
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
