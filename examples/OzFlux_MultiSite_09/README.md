@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–24 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 CTSM REFERENCE POINT SURFACE SHA VERIFIED; STAGE20 ACTUAL FATES 14×14 MAP AND STAGE21 214 TRAITS VERIFIED; STAGE23/24 VERIFIED LOCAL FORTRAN MODE5/1 AND FATES4/FATES7 HEIGHT CURVES; STAGE25 EXTERNAL 2014 TERN FIELD STEM + LEAF TRAIT SOURCE INTAKE PUBLISHED, EXECUTION PENDING. SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–25 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE VERIFIED; STAGE20/21 FATES MAPPING AND TRAIT VALUES VERIFIED; STAGE24 LOCAL HEIGHT CURVES VERIFIED; STAGE25 ALL FOUR TERN STEM/LEAF CSV+DICTIONARIES DOWNLOADED AND SHA256 VERIFIED (222 STEM ROWS, 142 LEAF ROWS); STAGE26 MEASUREMENT-POINT-AWARE FIELD AUDIT PUBLISHED, EXECUTION PENDING. PFT/SOIL/FORCING SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -1648,6 +1648,99 @@ The scientific next step is data dictionary and sensor/plot provenance,
 then paired model height-vs-field DBH and possibly leaf traits,
 instead of generating more arbitrary PFT/soil parameter candidates.
 All PFT/SURFACE/forcing approvals remain FALSE.
+
+## 3ab. Stage25 operator SUCCESS; Stage26 measurement-point-aware field stem/leaf science
+
+**2026-11-02 actual Stage25 SUCCESS:** source SHA, syntax and
+self-test PASS, 4/4 public TERN original CSVs and field dictionaries
+downloaded into the immutable operator report dir
+`/home/ly3n24/ozflux_stage25_20261102T121025Z`.
+Verified original CSV source SHA256 / rows:
+- Stem 2014 release: `Alice_Mulga_diameter_height_biomass_data_lVZI0qg.csv`,
+  SHA `7a3f4efabc1c8650670bc996d25d2145cd5f5a2679f6fe8f2003d487c4a0db55`,
+  **222 rows**, includes `stemDiameter_centimeters`,
+  `stemHeight_metres`, and crucially
+  `stemDiameterPointOfMeasurement_metres`, `plantId`,
+  `stemId`, `phenomenonTime`, `scientificName`, `plotId`.
+- Stem dictionary:
+  `Alice_Mulga_diameter_height_biomass_data_dictionary_XcBdgzD.csv`,
+  SHA `82c2d28b8616ee31f1c687ef600f4249592827503adbdcfce73e1e06b6da44fe`,
+  **21 entries**.
+- Leaf traits:
+  `Alice_Mulga_functional_leaf_traits_data_mGiVbmq.csv`,
+  SHA `d982b9217ac0ca641e7aca47e681c03f82d08e72215de30fe7ecb1b42952acf0`,
+  **142 rows**, detailed species, date/season/branch/plant,
+  2014 dry-season light-saturated net photosynthesis, leaf dark
+  respiration, stomatal conductance, leaf VPD, PAR and
+  LMA `meanLeafDryMassPerLeafAreaTrait_gramsPerSquareMeter`,
+  nitrogen/phosphorus.
+- Leaf dictionary:
+  `Alice_Mulga_functional_trait_data_dictionary_S0G8tsI.csv`,
+  SHA `1a6520517e6e2d694477ca45342c769d7ce275681d080d11b4e9aba79e387288`,
+  **45 entries**.
+
+The numerical site science remains unverified: `222` is original
+**rows**, not guaranteed independent stems/trees; `142` is leaf
+**records**, not necessarily unique plants. **D20 != DBH**; use
+`stemDiameterPointOfMeasurement_metres` to classify each row.
+Model Stage24 H(DBH) can be compared directly to observations only
+where diameter measurement height is 1.30m (within declared tolerance)
+and valid height/diameter coexist in the same field row. A basal D20
+observation may still constrain height distribution but must NEVER be
+used directly as FATES formula input. Measurements at other heights
+are also excluded from DBH residual evaluation.
+
+Leaf LMA is g dry-matter per m2, hence 1/LMA is m2/g **dry matter**,
+not FATES m2/g **carbon**; the carbon mass fraction and canopy-level
+traits would need independent verification before comparing model
+`fates_leaf_slatop` values. Light-saturated net A is NOT Vcmax25
+and measured stomatal conductance is NOT the Medlyn slope parameter;
+record ambient CO2, VPD, leaf temp and PAR for future process
+evaluation. Repeated stems of one plant and multiple branches can
+induce pseudoreplication; preserve plant/plot grouping.
+
+**Stage26 read-only source-grounded analysis is published**:
+`scripts/stage26/26_asm_TERN_stem_measurement_height_and_leaf_trait_science_audit_READONLY.py`;
+pinned commit `13f501ed772b43a85283f9e9ba0f5a173386b2ed`,
+Git blob `10cd43b7678a1aa4d002efb41ae1e3f6f59dcdf7`.
+It verifies all original four Stage25 CSV hashes and row counts,
+checks Stage24 source-formula receipt, groups observations by
+scientificName and exact measurement-height class
+(`DIRECT_DBH_1P30M`, `BASAL_D20_0P20M_NOT_DBH`, other, missing),
+computes *exploratory* FATES4/FATES7 height residuals ONLY for paired
+1.30m DBH rows, reports species-specific field leaf LMA, A_net,
+stomatal conductance, PAR, VPD and per-plant/branch identifiers,
+and includes relevant dictionary entries. Outputs only three new
+HOME files:
+`stage26_all_TERN_stem_rows_height_measurement_class.tsv`,
+`stage26_TERN_leaf_species_trait_summaries.tsv`,
+`stage26_TERN_actual_D20_DBH_leaf_science_gate.json`.
+No CIME/Slurm, new surface, FATES JSON modifications or final
+science approval. External 2014 core DBH plot records remain
+a separate source (not substituted for this D20 dataset).
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="13f501ed772b43a85283f9e9ba0f5a173386b2ed"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage26_code"
+SCRIPT="$CODE/ozflux_stage26.py"
+OUT="$HOME/ozflux_stage26_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS --retry 3 "$BASE/scripts/stage26/26_asm_TERN_stem_measurement_height_and_leaf_trait_science_audit_READONLY.py" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "10cd43b7678a1aa4d002efb41ae1e3f6f59dcdf7"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+python3 -B "$SCRIPT" --out "$OUT"
+echo "REPORT_DIR $OUT"
+)
+~~~
+
+**Stage26 not yet executed on IRIDIS6.** Do not assume any source DBH
+count or species-specific leaf trait median until actual report output.
+No source/forcing/surface/experiment files modified.
 
 ## 4. Future science decisions (still require explicit approvals)
 
