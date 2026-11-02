@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–31 OPERATOR EXECUTED; STAGE14 FORCING AND STAGE16 REFERENCE SURFACE PRESERVED; STAGE20–24 EXACT FATES MAP/TRAITS/HEIGHT VERIFIED; STAGE25–29 TERN ORIGINAL FIELD DATA VERIFIED; 2014 27/103 UNIQUE ACACIA STEMS TALLER THAN DEFAULT FATES7 CAP; STAGE30 48/111 2018-DERIVED STEMS FLAGGED; STAGE31 D20–AGB SPEARMAN CORRELATION DROPS FROM 2014 0.999/0.945 TO 2018 0.237/0.318 FOR TWO DOMINANT ACACIA SPECIES, PLUS REPEATED EXACT 2018 AGB VALUES AND EXTREME AGB RATIOS. STAGE32 2014 LOG-ALLOMETRY CONSISTENCY SCREEN PUBLISHED, EXECUTION PENDING. ORIGINAL SOURCE, FATES, SURFACE, FORCING UNMODIFIED. NO AD400.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–32 OPERATOR EXECUTED; STAGE14 FORCING AND STAGE16 REFERENCE SURFACE PRESERVED; STAGE20–24 FATES MAP/TRAITS/HEIGHT VERIFIED; STAGE25–29 TERN FIELD SOURCE AND 111 STEM PAIRS VERIFIED; 2014 27/103 ACACIA STEMS ABOVE DEFAULT FATES7 HEIGHT CAP; STAGE30 48/111 DERIVED-AGB SCIENCE REVIEW STEMS; STAGE31 D20–AGB ASSOCIATIONS COLLAPSE IN 2018; STAGE32 2014 D20–AGB LOG-REFERENCE FIT R²=0.99997 A. ANEURA, 0.94811 A. APTANEURA, BUT 2018 DERIVED AGB DEVIATIONS EXTREME; STAGE33 OFFICIAL SITE-LEVEL BIOMASS CSV SOURCE INTAKE PUBLISHED, EXECUTION PENDING. NO PFT/SOIL/FORCING SCIENCE APPROVAL AND NO AD400.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -2293,6 +2293,93 @@ Next is independent source/process validation: confirm publisher's
 or contact TERN field authors with reproducible source examples.
 Do not use 2018 AGB for modeling or derive actual C stocks from
 these source samples; PFT/soil/surface/forcing/AD400 remain blocked.
+## 3ai. Stage32 operator SUCCESS — strong original 2014 D20–AGB baseline and extreme 2018 inconsistency; Stage33 independent site source
+
+**Stage32 actual operator SUCCESS** (2026-11-02):
+`/home/ly3n24/ozflux_stage32_20261102T185340Z`.
+Git source hash, Python syntax, self-test, 222-row original stem CSV,
+and Stage30/31 111-row science reports verified. Output original
+2014 log(AGB)~log(D20) fits were IN-SAMPLE and used 2014 allometrically
+**estimated** biomass, not measured/destructively weighed AGB.
+
+| Taxon | Stem IDs | 2014 in-sample log R² | 2018 / reference median [min,max] | 2018 ratio <0.2x / >5x |
+|---|---:|---:|---:|---:|
+| Acacia aneura | 43 | 0.9999665 | 0.7464 [0.0181,69.5657] | 8 / 3 |
+| Acacia aptaneura | 60 | 0.9481079 | 1.2135 [0.00368,269.9659] | 11 / 15 |
+| Psydrax latifolia | 7 | 0.9997390 | 0.4918 [0.0562,5.9489] | 1 / 1 |
+| Eremophila latrobei ssp glabra | 1 | not fit | not available | not fit |
+
+The **37 of 103 Acacia stems** with derived 2018 AGB
+outside the exploratory 0.2x–5x reference band demonstrate
+strong internal inconsistency, but **DO NOT validate the 2014
+allometric estimates**, recover Návar (2013) parameters,
+identify a specific record swap, or authorize replacing 2018 AGB.
+A. aneura original 111-stem-sample subgroup has
+2014 AGB sum 299.103 kg vs 2018 derived 242.785 kg;
+A. aptaneura 1881.777 kg vs 2344.063 kg. These are
+**sums over the observed/derived subset only**, not tower site
+t/ha or empirical NPP and must NOT be used to estimate ecosystem
+carbon stock/flux trends. All original D are **D20 basal**
+and NOT FATES DBH. The 2014 27/103 dominant Acacia tall-stem
+result is completely independent of the derived-AGB issue.
+
+**New verified external resource:** The same TERN dataset metadata,
+https://portal.tern.org.au/metadata/c2968de2-1e8b-4a05-919f-46744b3171ed ,
+publishes an official separate **site-level aboveground woody
+biomass CSV** in Access Data, with known original HTTPS link
+`https://shared.tern.org.au/attachment/c2968de2-1e8b-4a05-919f-46744b3171ed/Alice_Mulga_site_level_biomass_data_v3pQRMW.csv`.
+The published lineage states site-level estimates were **scaled to
+tonnes/hectare**; the actual CSV units, dates, sampled area,
+plot definitions and stem cohort have **NOT been verified**.
+Our initial web/container source fetch was unsuccessful, which
+does not mean IRIDIS6 cannot download it (Stage25 public CSVs
+did download successfully). TERN metadata page describes 2014
+field D20 measurements and 2018 dendrometer-based derived uniform
+basal-area increments, not repeated field survey.
+Citation: Cleverly, J. (2022), Alice Mulga Stem Diameter, Height
+and Aboveground Woody Biomass Data 2014, TERN, v1.0.
+
+**Stage33 official site-level biomass source intake PUBLISHED
+(operator execution pending):**
+`scripts/stage33/33_asm_TERN_site_level_AGB_original_source_intake_READONLY.py`
+pinned GitHub commit `6ff3c1cc4254beec943bf42d1fb0c75ba0f8297d`,
+Git blob `4beb9ea03e8903e3e0a55183a17b0ce915241ce9`.
+It verifies unchanged original Stage25 CSV and 21-field dictionary
+SHAs and successful Stage31/32 receipts, attempts public TERN
+site-level CSV acquisition into a fresh HOME folder, records
+download URL and actual SHA256, original headers, row count,
+potential time/biomass/unit/area/plot fields and raw samples,
+and explicitly **does not perform any kg-to-t/ha conversion,
+cross-source matching, or reinterpretation of the 111-stem set**.
+If external HTTP access or CSV schema fails, a report with exact
+failure is saved, not a false source-verification claim.
+No source, FATES model, surface, forcing, CIME, Slurm or AD400 changes.
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="6ff3c1cc4254beec943bf42d1fb0c75ba0f8297d"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage33_code"
+OUT="$HOME/ozflux_stage33_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS --retry 3 "$BASE/scripts/stage33/33_asm_TERN_site_level_AGB_original_source_intake_READONLY.py" -o "$CODE/stage33.py.download"
+test "$(git hash-object "$CODE/stage33.py.download")" = "4beb9ea03e8903e3e0a55183a17b0ce915241ce9"
+mv "$CODE/stage33.py.download" "$CODE/stage33.py"
+python3 -B -m py_compile "$CODE/stage33.py"
+python3 -B "$CODE/stage33.py" --self-test
+python3 -B "$CODE/stage33.py" --out "$OUT"
+echo "REPORT_DIR $OUT"
+)
+~~~
+
+Expected JSON: `stage33_TERN_original_site_level_biomass_intake_science_HOLD.json`.
+If source HTTP download succeeds, raw CSV also saved in the
+same NEW HOME folder. Need subsequent source-specific year/area/unit
+crosswalk before comparing against 2014 allometric stem data.
+PFT, soil, final forcing and AD400 science gates stay HOLD.
+
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
