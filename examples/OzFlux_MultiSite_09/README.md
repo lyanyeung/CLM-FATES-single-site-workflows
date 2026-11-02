@@ -2132,10 +2132,22 @@ Stage30 source exhibits mostly +0.7cm D20, which should be
 treated as an observed RELEASE PATTERN, not proof the
 publisher used a fixed diameter increment.
 
+**Stage31 first operator attempt failed at self-test only on 2026-11-02:**
+Actual source SHA and syntax passed, but synthetic sample called
+JSON field `2018_rank_corr_D20_AGB`, whereas the analysis correctly
+produces `2018_derived_rank_corr_D20_AGB`.
+Raised `KeyError: '2018_rank_corr_D20_AGB'` before any 111-stem
+production audit, new report or model write.
+Corrected script: commit `f3dc5b8113319d683c9eefe1d3063508e086bda9`,
+Git blob `6e865af12dfd6d6ac4401cf2c07239161a4ae881`.
+Extended the synthetic regression test to assert all four rank
+report keys, repeated AGB summary, all emitted TSV column names,
+and exact 2014 and 2018 original stem species and key matching.
+**New actual IRIDIS6 selftest and original-data audit NOT YET RUN.**
 **Stage31 new read-only audit published, operator execution PENDING:**
 `scripts/stage31/31_asm_TERN_2018_AGB_join_formula_consistency_READONLY.py`;
-pinned commit `541845fcf224a314e5929951b325b008f947acba`,
-blob `d145b35b4a8773d13d3f0bf74ec5983e15aed349`.
+pinned commit `f3dc5b8113319d683c9eefe1d3063508e086bda9`,
+blob `6e865af12dfd6d6ac4401cf2c07239161a4ae881`.
 Stage31 pins the source 222-row CSV SHA and checks the actual
 Stage30 receipt (111 stems, 48 flagged, 36 mismatched direction,
 37 negative AGB, 20 large AGB changes). Independently joins
@@ -2155,13 +2167,13 @@ Run on IRIDIS6:
 (
 set -euo pipefail
 conda activate clm_fates_env
-COMMIT="541845fcf224a314e5929951b325b008f947acba"
+COMMIT="f3dc5b8113319d683c9eefe1d3063508e086bda9"
 BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
 CODE="$HOME/ozflux_stage31_code"
 OUT="$HOME/ozflux_stage31_$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$CODE"
 curl -fLsS --retry 3 "$BASE/scripts/stage31/31_asm_TERN_2018_AGB_join_formula_consistency_READONLY.py" -o "$CODE/stage31.py.download"
-test "$(git hash-object "$CODE/stage31.py.download")" = "d145b35b4a8773d13d3f0bf74ec5983e15aed349"
+test "$(git hash-object "$CODE/stage31.py.download")" = "6e865af12dfd6d6ac4401cf2c07239161a4ae881"
 mv "$CODE/stage31.py.download" "$CODE/stage31.py"
 python3 -B -m py_compile "$CODE/stage31.py"
 python3 -B "$CODE/stage31.py" --self-test
