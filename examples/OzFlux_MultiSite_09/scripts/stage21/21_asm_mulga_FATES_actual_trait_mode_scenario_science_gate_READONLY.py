@@ -140,8 +140,11 @@ def extract_pft_axis(entry):
     values={}
     for i in SELECTED:
         selected=np.take(arr,i-1,axis=axis)
-        # JSON round-trip converts np scalars and arrays to primitive types.
-        raw=selected.tolist()
+        # np.take(dtype=object) may return a native Python int/float/str/
+        # bool (NO .tolist method) when fates_pft is the only dimension.
+        # np.asarray works for both native scalars and N-D arrays,
+        # retaining dimensions on e.g. [soil_depth,fates_pft].
+        raw=np.asarray(selected).tolist()
         value=json.dumps(raw,ensure_ascii=False,allow_nan=False,default=str)
         if len(value)>6000:
             value=value[:6000]+"...[TRUNCATED IN REPORT]"
@@ -228,13 +231,25 @@ def selftest():
     actual=extract_pft_axis(fixture)
     assert actual["extraction_status"]=="PFT_AXIS_VERIFIED"
     assert actual["values"]["9"]=="9"
+    for primitive in (9, 9.25, "leaf_on", True):
+        typed=extract_pft_axis({
+            "dims":["fates_pft"],"data":[primitive]*14})
+        assert typed["extraction_status"]=="PFT_AXIS_VERIFIED"
+        assert json.loads(typed["values"]["9"])==primitive
     other=extract_pft_axis({"dims":["soil_depth","fates_pft"],
         "data":[list(range(14)),list(range(14,28))]})
     assert other["fates_axis_index"]==1
     assert other["values"]["9"]=="[8, 22]"
+    reverse=extract_pft_axis({"dims":["fates_pft","soil_depth"],
+        "data":[[i, i+100] for i in range(14)]})
+    assert reverse["fates_axis_index"]==0
+    assert reverse["values"]["9"]=="[8, 108]"
+    badly_shaped=extract_pft_axis({
+        "dims":["fates_pft"],"data":[0]*13})
+    assert badly_shaped["extraction_status"]=="DIMENSIONS_DO_NOT_MATCH_DATA"
     assert trait_class("fates_phen_leaf")=="PHENOLOGY"
     assert trait_class("fates_leaf_stomatal_slope")=="PHOTOSYNTHESIS_STOMATA"
-    print("STAGE21 SELF-TEST PASS: 14-PFT trait extraction axes, phenology/stomata and source gates; NO MODEL WRITES")
+    print("STAGE21 SELF-TEST PASS: native scalar int/float/str/bool, both 2D PFT axes, malformed shape; NO MODEL WRITES")
 
 
 def main():
