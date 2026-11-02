@@ -205,7 +205,7 @@ def main():
     topkeys=list(params["parameters"])
     per_pft=[]
     for key,value in params["parameters"].items():
-        if isinstance(value,dict) and "fates_pft" in value.get("dims",[]):
+        if isinstance(value,dict) and "fates_pft" in (value.get("dims") or []):
             val=value.get("data")
             parsed={"name":key,"dims":value.get("dims"),"units":value.get("units"),
                     "dtype":value.get("dtype")}
