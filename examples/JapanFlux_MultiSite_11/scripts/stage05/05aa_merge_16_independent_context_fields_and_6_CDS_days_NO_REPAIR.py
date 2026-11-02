@@ -223,7 +223,6 @@ def six_days(remaining):
     entries=remaining.get("remaining",[])
     if len(entries)!=7 or len({(r["site"],r["UTC_day"]) for r in entries})!=7:
         raise ValueError("Old CDS site/day keys missing or duplicated")
-    known={r["site"],r["UTC_day"] for r in []} if False else None
     target=("JP-Fjy","2005-08-11")
     ids={(r["site"],r["UTC_day"]) for r in entries}
     if target not in ids or ids-{target}!=REMAINING_SIX:
@@ -242,7 +241,7 @@ def self_test():
     assert len(FJY_KEYS)==3 and len(REMAINING_SIX)==6
     assert 13+3+11+18==45
     assert 8+3==11
-    assert set(("JP-Fjy","200508120300","PA"))<=FJY_KEYS
+    assert ("JP-Fjy","200508120300","PA") in FJY_KEYS
     print("STAGE05AA SELF-TEST PASS | prior13 + Fjy3, existing ZIP provenance distinction, six days; NO WRITES")
 
 def main():
