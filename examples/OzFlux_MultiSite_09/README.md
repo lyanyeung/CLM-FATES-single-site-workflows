@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–16 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 ISOLATED REFERENCE CTSM 2000 POINT SURFACE GENERATED AND HASH VERIFIED; STAGE17 PFT/SOIL SCIENCE GATE PUBLISHED, EXECUTION PENDING.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–17 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE GENERATED/HASH VERIFIED; STAGE17 HOST PFT AND TEN-LAYER SOIL SCIENCE DISCREPANCIES AUDITED; STAGE18 ACTUAL FATES PARAMETER SOURCE DISCOVERY PUBLISHED, EXECUTION PENDING.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -1003,6 +1003,35 @@ echo "STAGE17 report: $OUT"
 Outputs: `stage17_AU_ASM_host_PFT_exact.tsv`, `stage17_AU_ASM_soil10_grid_vs_site_bulk.tsv`, `stage17_AU_ASM_PFT_soil_science_gate.json`. Stage17 **does not approve** PFT fractions, 10-layer soil or the active FATES HLM-PFT map.
 
 Primary ecology refs: https://opus.lib.uts.edu.au/bitstream/10453/133258/2/02whole.pdf ; https://ozflux.org.au/monitoringsites/alicesprings/alicesprings_description.html . Host-to-FATES matrix ref: https://fates-users-guide.readthedocs.io/en/latest/user/HLM-FATES-PFT-map.html .
+
+## 3s. Stage17 operator success; Stage18 actual FATES PFT parameter mapping gate
+
+**Stage17 actual IRIDIS6 PASS 2026-11-02** with SHA-verified Stage16 reference surface and complete PFT/soil report in /home/ly3n24/ozflux_stage17_20261102T025047Z. Host natural PFT composition was 34.886295790% bare (host0), 0.839963621% tropical evergreen broadleaf tree (host4), 1.734531508% temperate evergreen broadleaf tree (host5), 0.026522242% deciduous temperate tree (host7), 41.585928756% **deciduous temperate shrub (host10)**, 0.040868100% C3 non-arctic grass (host13) and 20.885889983% C4 grass (host14). The grid host10 is not host9 evergreen shrub. The default FATES map may translate it to cold-deciduous shrub, which is not necessarily appropriate for arid-zone Mulga; **actual selected FATES parameter and simulation mode are unknown**.
+
+Ten gridded soil layers: sand 90,90,90,90,89,89,90,90,90,90%; clay 6,6,6,6,7,7,7,7,7,7%. Layer means 89.8% sand, 6.6% clay vs published site-bulk 74% sand and 15% clay. Do not assign 74/15 to every model layer without independent profile evidence. The earlier plot-study Acacia cover 74.5% does not use the same denominator/domain as the host natural-PFT vector.
+
+**Stage18 read-only discovery** at scripts/stage18/18_asm_actual_fates_parameter_map_and_surface_decision_readonly.py, pinned commit 17a34bfced799ca5d7bebc4fc624c89e5325a70c; Git blob SHA 24b07ce73aa2ea85f567d52d3e4da70f6bdc1eec. It SHA-verifies the Stage16/17 source reports, searches only bounded FATES parameter directories, understands .json/.nc/.cdl, inventories HLM-PFT mapping dimensions/nonzero entries and candidate source file hashes, and inspects an older AU-How case for **reference only**. Explicit --params and --case arguments allow known additional sources. No active AU-ASM parameter, map orientation or modeling mode is assumed, and no surface/forcing/CIME files are changed.
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="17a34bfced799ca5d7bebc4fc624c89e5325a70c"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage18_code"
+SCRIPT="$CODE/ozflux_stage18.py"
+OUT="$HOME/ozflux_stage18_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/scripts/stage18/18_asm_actual_fates_parameter_map_and_surface_decision_readonly.py" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "24b07ce73aa2ea85f567d52d3e4da70f6bdc1eec"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+python3 -B "$SCRIPT" --out "$OUT"
+echo "STAGE18 REPORT: $OUT"
+)
+~~~
+
+Reference: https://fates-users-guide.readthedocs.io/en/latest/user/HLM-FATES-PFT-map.html and https://ncar.github.io/CESM-Tutorial/notebooks/challenge/clm_ctsm/clm_exercise_3.html . Science approval remains FALSE; no new surface or AD400 submission.
 
 ## 4. Future science decisions (still require explicit approvals)
 
