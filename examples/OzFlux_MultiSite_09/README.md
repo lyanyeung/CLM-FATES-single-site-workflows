@@ -894,6 +894,68 @@ no PFT assignments or case preparation. Requires exact per-site
 scientific PFT fractions, compiled model mapping, 10-layer soil profiles
 and independently reviewed point-surface values before CIME submission.
 
+## 3q. Stage15 operator SUCCESS and Stage16 isolated CTSM reference surface builder (not approved for FATES)
+
+**Stage15 actual operator result 2026-11-02**: input script SHA and
+self-test PASS; 6/6 Stage14 FSDS0 candidate file SHA/metadata verified;
+**0** existing AU-ASM surfdata files found *within the bounded scan*
+(does not prove absence globally). Verified that local CTSM, executable
+`tools/site_and_regional/subset_data`, reference
+`default_data_2000.cfg`, CTSM 5.3.0 16-PFT year-2000 global reference
+surfdata and ESMF mesh all exist on IRIDIS6. Report:
+`/home/ly3n24/ozflux_stage15_20261102T020625Z`.
+Site vegetation/PFT/soil area fractions remain science HOLD; AD400 is
+not permitted.
+
+**Stage16 implementation** is
+`scripts/stage16/16_asm_isolated_CTSM2000_reference_point_surface.py`.
+It uses exactly the three existing proven AU-How / AmeriFlux Batch02
+year-2000 reference config substitutions (surfdata 5.4->5.3,
+`surfdat_16pft` and `mesh_surf`) and
+`subset_data point --lat -22.2828 --lon 133.2493 --lon-type 180
+--site AU-ASM --surf-year 2000 --create-surface --create-user-mods`.
+No `--dompft`, no `--overwrite`. The output is an isolated fresh
+direct child of the operator's HOME directory, **outside original AU-ASM,
+AU-How, other site cases, forcing and inputdata**. Check mode performs
+read-only tool/import/template and Stage15 source checks; reference
+build mode needs exact operator confirmation. It inventories actual
+newly generated `PCT_NAT_PFT` (host index0 bare), natural land fraction,
+sand/clay and organic layers and records source SHA256 and output SHA256.
+The output is **a gridded CTSM reference point subset**, not an observed
+Mulga canopy/C3/C4/ground-cover or 10-layer site-specific soil
+prescription, and no original point surface or model case is modified.
+
+Recommended IRIDIS6 invocation (first `--check`, then OPTIONAL
+reference-only build with explicit consent):
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/c32e331c36c58e9e87587f21082488d59ad67d57/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage16_code"
+SCRIPT="$CODE/ozflux_stage16_surface.py"
+OUT="$HOME/ozflux_stage16_reference_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/scripts/stage16/16_asm_isolated_CTSM2000_reference_point_surface.py" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "910e7394ac66291bb9c98428d1bbefcc9dcee0a0"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+python3 -B "$SCRIPT" --check --out "$OUT"
+# Only after successful read-only preflight, create a new REFERENCE surface:
+python3 -B "$SCRIPT" --build-reference \
+  --confirm CREATE_ISOLATED_AU_ASM_REFERENCE_SURFACE_ONLY --out "$OUT"
+)
+~~~
+
+Outputs `stage16_AU_ASM_REFERENCE_SURFACE_NOT_MODEL_APPROVED.json`,
+one `surfdata*.nc` and generated CTSM `user_mods` under `$OUT`.
+Do not put the generated reference in an active CLM namelist,
+nor modify its PFT or soil values without first choosing an explicitly
+versioned site-science model-hypothesis vector. Before any CIME case,
+compare actual reference bare/PFT/soil against independent Mulga site
+observations, compiled FATES-PFT mapping and soil-layer evidence.
+
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
