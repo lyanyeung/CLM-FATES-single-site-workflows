@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–28 OPERATOR EXECUTED; STAGE14 FSDS0 FORCING AND STAGE16 REFERENCE SURFACE PRESERVED; STAGE20–24 EXACT FATES PFT/TRAITS/H(DBH) VERIFIED; STAGE25 FOUR TERN CSVs SHA VERIFIED; STAGE26 222 ROWS ALL D20 NOT DBH, 142 LEAF RECORDS; STAGE28 222 ROWS = 111 UNIQUE STEMS EACH REPEATED TWICE; RAW D/M/YYYY 2014 AND 2018 DATES DISCOVERED; 27/103 UNIQUE ACACIA STEMS HAVE ALL RECORDED HEIGHTS ABOVE DEFAULT FATES7 4.7354m CEILING; STAGE29 2014 FIELD VS 2018 DERIVED CROSS-YEAR RECONCILIATION PUBLISHED, EXECUTION PENDING. PFT/SOIL/FORCING SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–29 OPERATOR EXECUTED; STAGE14 FORCING AND STAGE16 REFERENCE SURFACE PRESERVED; STAGE20–24 EXACT FATES PFT AND ALL0METRY VERIFIED; STAGE25–28 FIELD STEM/LEAF AND DUPLICATE/DATE QC VERIFIED; STAGE29 222 D/M/YYYY DATES VERIFIED, EXACTLY 111 PAIRED STEMS 1x2014 FIELD + 1x2018 DERIVED; 2014 ACACIA 27/103 STEMS EXCEED THE FATES7 DEFAULT 4.7354m CAP; UNUSUAL 2018-DERIVED D20 AND BIOMASS CHANGES REQUIRE STAGE30 ORIGINAL-SOURCE AUDIT, PUBLISHED BUT NOT YET EXECUTED. PFT/SOIL/FORCING SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -1997,6 +1997,93 @@ Separately, the older 2014 **true breast-height DBH** core
 https://researchdata.edu.au/vegetation-data-direct-ha-2014/617073
 but the exact original paired H(DBH) CSV/XLSX remains
 unobtained; do not substitute this D20 release.
+## 3af. Stage29 operator actual SUCCESS: exact 2014 field/2018 derived 111-stem pairs; Stage30 anomaly audit
+
+Stage29 first operator attempt failed at **self-test only** from the
+hard-coded 111-stem expected count against a 1-stem fixture;
+fixed in commit `5c4b136e75fc11e6a5e6025f1a3ac48a3887529d`
+(blob `a45d514909e7af803e5628727f7660117f545827`).
+**Corrected Stage29 real operator run SUCCESS on 2026-11-02:**
+`/home/ly3n24/ozflux_stage29_20261102T131205Z`.
+Original TERN stem CSV, original 21-row dictionary, Stage28 receipt
+and true D/M/YYYY dates all verified. **222/222** dates valid,
+**111** exact unique stem pairs; each stem has one 2014 field and
+one 2018 *derived* record, and 111/111 stem height-cap
+classes agree across source years. This resolves Stage27's
+`TALL STEMS IN 2014: False` parsing artefact.
+
+FATES7 local default height max **4.735410175384586m**.
+From 2014 FIELD observed data, **9/43 A. aneura stems** (33 plant
+IDs) and **18/60 A. aptaneura stems** (53 plant IDs) exceed
+this ceiling; combined **27/103 Acacia unique stem IDs =26.21%**.
+Other taxa: Psydrax latifolia 1/7; Eremophila latrobei ssp
+glabra 0/1. These are not independent trees nor canopy-cover
+fractions and do not imply FATES4's PFT parameter set has
+been validated. All 222 source diameters are basal D20 at 0.20m,
+not model DBH at 1.30m; no quantitative H(DBH) fit computed.
+
+**2018 source is derived, not independently surveyed**,
+per TERN publisher lineage:
+https://portal.tern.org.au/metadata/c2968de2-1e8b-4a05-919f-46744b3171ed
+Stem-level changes from Stage29: A. aneura 43 stems have height
+deltas all zero; D20 delta median +0.700000cm, min +0.675210,
+max +0.700000, AGB delta median +0.2733kg, min -60.7166,
+max +51.2722kg. A. aptaneura 60 stems have 2 nonzero height
+deltas (min -0.4m, max +0.4m), D20 delta median +0.700000cm
+but min **-2.3cm**, max **+3.7cm**; AGB delta median +1.4057kg,
+min **-289.3485kg**, max **+329.6728kg**.
+Eremophila and Psydrax D20 delta approx +0.7cm, with some
+negative derived AGB deltas. These are QC CANDIDATES:
+do not directly interpret them as carbon loss, true stem
+growth, mortality or a forcing/PFT failure. An ordinary increase
+in basal diameter does not automatically imply every source
+above-ground biomass allometric calculation increased. Need
+check original exact values, species/plot/status and derivation.
+
+**Stage30 source-level forensic script PUBLISHED, operator run pending**:
+`scripts/stage30/30_asm_2018_derived_D20_AGB_outlier_source_reconciliation_READONLY.py`
+commit `ee40e9bfd449b399a574b7a6b56d0ff610f05448`,
+Git blob `a4ea0317f3179155ecf9a6f628bccf7a052f1f7c`.
+Read-only, cross-verifies ALL 111 Stage29 paired stems against original
+SHA-pinned 222-row CSV, checks exact 2014/2018 raw measurements,
+computes D20 change and basal-area change **pi/4 * (D18^2-D14^2)**
+in cm², compares measured/published derived height and AGB
+without falsely calling D20 DBH or a 2018 derived estimate
+independent field observation. Flags D20 decreases, >1cm gain,
+departure from the nominal +0.7cm *screen* (not a physical
+threshold), derived basal area decreases, height changes,
+large or negative AGB deltas, and mismatched signs, preserving
+exact stem IDs, source status and comments. These flags mean
+**requires scientific review**, NEVER automatic exclusion or
+data repair. Source paper says uniform *basal area* increment,
+which cannot be conflated with uniform *diameter* increment.
+Results only new HOME TSV/JSON, no FATES params, DATM forcing,
+surface, CIME cases or Slurm changes.
+
+```bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="ee40e9bfd449b399a574b7a6b56d0ff610f05448"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage30_code"
+OUT="$HOME/ozflux_stage30_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS --retry 3 "$BASE/scripts/stage30/30_asm_2018_derived_D20_AGB_outlier_source_reconciliation_READONLY.py" -o "$CODE/stage30.py.download"
+test "$(git hash-object "$CODE/stage30.py.download")" = "a4ea0317f3179155ecf9a6f628bccf7a052f1f7c"
+mv "$CODE/stage30.py.download" "$CODE/stage30.py"
+python3 -B -m py_compile "$CODE/stage30.py"
+python3 -B "$CODE/stage30.py" --self-test
+python3 -B "$CODE/stage30.py" --out "$OUT"
+echo "REPORT_DIR $OUT"
+)
+```
+
+Reports: `stage30_all_111_2014_field_2018_derived_original_stems.tsv`,
+`stage30_flagged_D20_BA_height_AGB_source_stems.tsv`,
+`stage30_AU_ASM_derived_2018_stem_increment_science_HOLD.json`.
+Actual Stage30 execution on IRIDIS6 pending, and no science approval
+or AD400/Normal400 authorized.
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
