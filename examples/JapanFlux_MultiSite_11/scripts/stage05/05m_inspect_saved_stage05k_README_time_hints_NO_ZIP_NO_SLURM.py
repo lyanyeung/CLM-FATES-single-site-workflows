@@ -45,7 +45,7 @@ def inspect(dir:Path)->list[dict]:
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--metadata-dir",type=Path,required=True)
+    p.add_argument("--metadata-dir",type=Path)
     p.add_argument("--self-test",action="store_true")
     args=p.parse_args()
     if args.self_test:
@@ -53,6 +53,8 @@ def main():
         assert MATCH.search("No daylight saving time is observed")
         print("STAGE05M SELF-TEST PASS | JSON metadata and README pattern guards, NO WRITES")
         return
+    if args.metadata_dir is None:
+        p.error("--metadata-dir required unless using --self-test")
     rows=inspect(args.metadata_dir)
     print("STAGE05M | EXISTING JSON ONLY | NO ZIP / SLURM / FORCING WRITES")
     for r in rows:
