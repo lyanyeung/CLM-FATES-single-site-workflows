@@ -48,21 +48,46 @@ def sha(path):
     return h.hexdigest()
 
 def config_text(raw):
-    # Precisely the same three substitutions as successful AU-How and
-    # AmeriFlux Batch02 source-pinned CTSM 2000 point-surface examples.
-    text=raw
-    old="dir = lnd/clm2/surfdata_esmf/ctsm5.4.0"
-    new="dir = lnd/clm2/surfdata_esmf/ctsm5.3.0"
-    if text.count(old)!=1:
-        raise ValueError("Unexpected CTSM surfdata directory layout: source template changed")
-    text=text.replace(old,new)
-    for key,value in (("surfdat_16pft",REFERENCE_SURF),
-                      ("mesh_surf",REFERENCE_MESH)):
-        text,count=re.subn(
-            r"(?m)^(\s*"+key+r"\s*=)[^\n]*$",
-            lambda m:m.group(1)+" "+value,text)
-        if count!=1:raise ValueError("Config must have exactly one "+key)
-    return text
+    """Pin known, existing CTSM source data only inside [surfdat].
+
+    Old code required one literal "dir = .../ctsm5.4.0" in the WHOLE
+    template. Actual CTSM cfg files can already use ctsm5.3.0, have
+    different whitespace, or repeat a surfdata directory in [landuse].
+    Neither case should silently fail or change other sections.
+    """
+    headers=list(re.finditer(
+        r"(?m)^[ \t]*\[surfdat\][ \t]*(?:[;#][^\r\n]*)?$", raw))
+    if len(headers)!=1:
+        found=[line.strip() for line in raw.splitlines()
+               if line.lstrip().startswith("[") or "surfdata_esmf" in line]
+        raise ValueError("Expected exactly one [surfdat] section; "
+                         "observed headings/paths: "+repr(found[:25]))
+    start=headers[0].end()
+    next_section=re.search(
+        r"(?m)^[ \t]*\[[A-Za-z0-9_-]+\][ \t]*(?:[;#][^\r\n]*)?$",
+        raw[start:])
+    end=start+next_section.start() if next_section else len(raw)
+    source_section=raw[start:end]
+    section=source_section
+    for key, value in (
+        ("dir", "lnd/clm2/surfdata_esmf/ctsm5.3.0"),
+        ("surfdat_16pft", REFERENCE_SURF),
+        ("mesh_surf", REFERENCE_MESH),
+    ):
+        pat=re.compile(r"(?m)^([ \t]*"+re.escape(key)+r"[ \t]*=[ \t]*)[^\r\n]*\r?$")
+        section,count=pat.subn(lambda m:m.group(1)+value,section)
+        if count!=1:
+            keys=[line.strip() for line in source_section.splitlines()
+                  if re.match(r"^[ \t]*(dir|surfdat_16pft|mesh_surf)\s*=",line)]
+            raise ValueError("Expected one "+key+" in [surfdat], found "+
+                             str(count)+"; observed entries: "+repr(keys))
+    result=raw[:start]+section+raw[end:]
+    # All content outside the pinned [surfdat] body is byte-for-byte
+    # preserved, including [landuse] or other similarly named "dir" lines.
+    if result[:start]!=raw[:start] or result[start+len(section):]!=raw[end:]:
+        raise AssertionError("Configuration change escaped [surfdat]")
+    return result
+
 
 def read_stage15(path):
     if path.is_symlink() or not path.is_dir():
@@ -193,12 +218,37 @@ def output_files(folder):
     return output
 
 def selftest():
-    x="[surfdat]\ndir = lnd/clm2/surfdata_esmf/ctsm5.4.0\nsurfdat_16pft = old.nc\nmesh_surf = oldmesh.nc\n"
-    z=config_text(x)
-    assert "ctsm5.3.0" in z and REFERENCE_SURF in z and REFERENCE_MESH in z
+    surf_54=("[surfdat]\n"
+             "dir = lnd/clm2/surfdata_esmf/ctsm5.4.0\n"
+             "surfdat_16pft = old.nc\nmesh_surf = oldmesh.nc\n")
+    landuse=("[landuse]\n"
+             "dir = lnd/clm2/surfdata_esmf/ctsm5.4.0\n"
+             "landuse_16pft = keep_original_file.nc\n")
+    source=("[main]\nclmforcingindir = /original/unchanged\n"
+            +surf_54+"\n"+landuse)
+    result=config_text(source)
+    assert "dir = lnd/clm2/surfdata_esmf/ctsm5.3.0" in result
+    assert REFERENCE_SURF in result and REFERENCE_MESH in result
+    assert landuse in result
+    assert "clmforcingindir = /original/unchanged" in result
+    assert result.count("ctsm5.4.0")==1  # only [landuse] remains unchanged
+    # Idempotence when the source already uses ctsm5.3.0, plus flexible
+    # horizontal whitespace and unrelated 'dir' values.
+    assert config_text(result)==result
+    variant=surf_54.replace(
+        "dir = lnd/clm2/surfdata_esmf/ctsm5.4.0",
+        "  dir\t=  lnd/clm2/surfdata_esmf/ctsm5.3.0")
+    assert "  dir\t=  lnd/clm2/surfdata_esmf/ctsm5.3.0" in config_text(variant)
+    try:
+        config_text("[surfdat]\nsurfdat_16pft = bad\nmesh_surf = bad\n")
+    except ValueError as exc:
+        assert "Expected one dir" in str(exc)
+    else:
+        raise AssertionError("Missing [surfdat] dir must fail")
     assert len(LABELS)==16 and LABELS[0]=="bare_ground"
     assert LAT<0 and LON>0
-    print("STAGE16 SELF-TEST PASS: template patch precision and site-only 2000 reference, no existing files touched")
+    print("STAGE16 SELF-TEST PASS: [surfdat]-scoped version/whitespace fix, landuse unchanged; no file writes")
+
 
 def main():
     if sys.argv[1:]==["--self-test"]:
