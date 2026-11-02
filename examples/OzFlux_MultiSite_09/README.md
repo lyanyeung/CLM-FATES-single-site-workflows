@@ -755,6 +755,77 @@ FATES-PFT and CIME/DATM streams. ZBOT=11.6m is supported by
 reported source Ta/Ws heights but SH height remains undocumented,
 and source ps height is recorded as 23m; preserve this uncertainty.
 
+## 3o. Stage13 exact FSDS/QC event review completed; Stage14 NEW candidate variant guarded
+
+**Operator 2026-11-02 Stage13 audit**: 6/6 DATM source mappings **exact**,
+source SHA256 remained verified, and 360 negative FSDS entries originated
+from original OzFlux L6. Detailed follow-up:
+- **2014: 359 entries, all Fsd_QCFlag 420** (PyFluxPro ACCESS
+  alternate source), negative Fsd -4.8861322 to -0.7414520 W/m².
+  Under the provisional local Australia/Darwin END -> UTC center clock,
+  345 entries are below solar elevation -6°, and 14 are between -6° and 0°;
+  all negative values are below solar horizon, with peak elevation -0.18055°.
+  Hypothetical FSDS=0 energy perturbation: **+3.07011177 MJ/m²**.
+- **2016: 1 entry, original Fsd_QCFlag 50** (PyFluxPro interpolation
+  metadata); original native local label 2016-05-27 07:00, provisional UTC
+  center 2016-05-26 21:15, solar elevation **-5.43182°**, FSDS -7.2579031
+  W/m². Zero floor would add **+0.01306423 MJ/m²**.
+- Total 360 negative source values; all have provisional modelled solar elevation
+  below 0°, with 345 below -6° and 15 between -6° and 0°. Combined
+  zero-floor energy perturbation +3.083175996 MJ/m² across 2014 and 2016.
+- **2018: 1 WIND=16.29613 m/s at local 2018-03-10 20:30,
+  native Ws_QCFlag=0**; remains untouched. Do not reject extreme wind
+  merely because it is above 15 m/s.
+
+**Science disposition:** It is defensible to make a separate strictly
+provisional FSDS0 candidate branch that sets only the 360
+source-negative shortwave flux values to 0, because downward solar
+irradiance cannot be negative as a physical model input. This is NOT proof
+of sensor malfunction; twilight and ACCESS/interpolation provenance
+remain documented. The time axis and source data are NOT changed.
+Do not modify original L6, original six Stage12 DATM files, any humidity,
+wind, precipitation, or model experiment. Do not submit AD400.
+
+Stage14 is an explicit two-mode guarded script:
+`scripts/stage14/14_asm_FSDS_zero_floor_provisional_guarded.py`
+(pinned commit `d5cb27e12ecfd958f2758379a1821681614d3906`,
+Git blob SHA `adaaa87a538cb508fcd371172869745f5b4d09e1`).
+Its `--preview` creates only JSON/TSV reports, checks exact
+360 year/QC/time/index/magnitude/solar records against Stage13 and all 6
+source-faithful Stage12 candidate hashes. Its separately guarded
+`--write-candidate --confirm CREATE_ONLY_AU_ASM_360_NIGHT_FSDS_ZERO_CANDIDATES`
+copies the six source-faithful candidate files under a *new* directory,
+modifies exactly those 360 FSDS entries to 0 and checks every
+other original NetCDF variable at **native-dtype bitwise identity**.
+It also verifies all original file hashes before and after, records
+energy differences and annual output SHA256, and marks all outputs
+as UNAPPROVED. No Slurm, no CIME case, no original overwrite.
+
+IRIDIS6 command:
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/d5cb27e12ecfd958f2758379a1821681614d3906/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage14_code"
+OUT="$HOME/ozflux_stage14_FSDS0_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/scripts/stage14/14_asm_FSDS_zero_floor_provisional_guarded.py" -o "$CODE/ozflux_stage14.py"
+test "$(git hash-object "$CODE/ozflux_stage14.py")" = "adaaa87a538cb508fcd371172869745f5b4d09e1"
+python3 -B -m py_compile "$CODE/ozflux_stage14.py"
+python3 -B "$CODE/ozflux_stage14.py" --self-test
+python3 -B "$CODE/ozflux_stage14.py" --write-candidate \
+  --confirm CREATE_ONLY_AU_ASM_360_NIGHT_FSDS_ZERO_CANDIDATES --out "$OUT"
+echo "Stage14 report and new provisional six candidates: $OUT"
+)
+~~~
+
+Do not treat Stage14 as final surface/PFT/soil/stream science approval.
+Proceed next to a site-specific Mulga PFT/soil/bare-ground/surface science
+gate. See the register at
+`science/AU-ASM_stage13_science_register_20261102.md`.
+
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
