@@ -102,10 +102,16 @@ def check_first_day(mod,src,zip_path,expected_dir):
 
 def check_source_events(rows):
     events={}
-    for r in rows:
-        if r.get("site")!=SITE:continue
+    all_site=[r for r in rows if r.get("site")==SITE]
+    if len(rows)!=18 or len(all_site)!=4:
+        raise ValueError("Original Tef 4 / all-site 18 Stage05AQ QC2 fields changed")
+    for r in all_site:
         native=r["original_native_halfhour_start"]
-        if native not in EVENTS or r["variable"]!="LW_IN" or native in events:
+        if native not in EVENTS:
+            if native not in ("202204090200","202204090230") or r["variable"]!="LW_IN":
+                raise ValueError("Unexpected non-2011 JP-Tef original source scope")
+            continue
+        if r["variable"]!="LW_IN" or native in events:
             raise ValueError("Original JP-Tef 2011 source field/time scope changed")
         if (r["candidate_UTC_start"]!=EVENTS[native]
             or r["candidate_time_basis"]!=JST
