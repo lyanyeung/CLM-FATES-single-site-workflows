@@ -42,7 +42,13 @@ def records(p):
         return list(csv.DictReader(f,delimiter="\t"))
 
 def values(ds,key):
-    return np.ma.asarray(ds.variables[key][:],dtype=np.float32).filled(np.nan)
+    """Preserve native NetCDF dtype (not float32) for exact byte comparison."""
+    data=np.ma.asarray(ds.variables[key][:])
+    if np.ma.is_masked(data):
+        if not np.issubdtype(data.dtype,np.floating):
+            raise ValueError("Masked non-floating source variable: "+key)
+        data=data.filled(np.nan)
+    return np.asarray(data)
 
 def selftest():
     assert float(np.float32(-7.257902999373263))==-7.257903099060059
@@ -157,8 +163,9 @@ def write_new_files(folder,original,corrections,hashes):
                     if len(indices):x[indices,0,0]=np.float32(0)
                     if np.any(z<0):
                         raise ValueError("New candidate still has negative FSDS")
-                if x.shape!=z.shape or not np.array_equal(x,z):
-                    raise ValueError(f"{year}: unexpected modification of {name}")
+                if (x.shape!=z.shape or x.dtype!=z.dtype
+                        or x.tobytes()!=z.tobytes()):
+                    raise ValueError(f"{year}: unexpected bitwise modification of {name}")
             if (getattr(after,"source_sha256",None)!=SHA
                 or getattr(after,"science_approval",None)!="FALSE"
                 or getattr(after,"model_submission_authorised",None)!="FALSE"):
