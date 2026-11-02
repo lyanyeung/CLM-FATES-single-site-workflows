@@ -2539,8 +2539,9 @@ separately inventoried and cannot be assumed identical.
 **Stage35 original-Plant99 two-year source-row forensic and seven
 counterfactual tests PUBLISHED, operator execution pending**:
 `scripts/stage35/35_asm_Plant99_AGB_year_grouping_counterfactual_and_provenance_READONLY.py`
-pinned GitHub commit `b3238aa0f8acd70ffcbf98fe089e4e4844c856c5`
-and git blob `d07ec490b7bda2a5c36d77fe7d9b9313258e8305`.
+pinned GitHub commit `07029e39bc51da7c991ac200ec4e68b9626de039`
+and git blob `76ecbdec3b27a69604091a1d67c697a7b895b4c4`.
+A synthetic regression test was corrected before first operator release to use a nonzero 2018 stand fixture; an all-zero fixture would have been ambiguous with the omit-both case. The corrected source remains operator-UNTESTED.
 It independently reopens all original sources and exact Stage34
 one-candidate receipt, displays both raw 2014/2018 Plant99 1b
 records including dates, stemStatus and comment, and computes
@@ -2556,13 +2557,13 @@ No source/model write, Slurm, or AD400.
 (
 set -euo pipefail
 conda activate clm_fates_env
-COMMIT="b3238aa0f8acd70ffcbf98fe089e4e4844c856c5"
+COMMIT="07029e39bc51da7c991ac200ec4e68b9626de039"
 BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
 CODE="$HOME/ozflux_stage35_code"
 OUT="$HOME/ozflux_stage35_$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$CODE"
 curl -fLsS --retry 3 "$BASE/scripts/stage35/35_asm_Plant99_AGB_year_grouping_counterfactual_and_provenance_READONLY.py" -o "$CODE/stage35.py.download"
-test "$(git hash-object "$CODE/stage35.py.download")" = "d07ec490b7bda2a5c36d77fe7d9b9313258e8305"
+test "$(git hash-object "$CODE/stage35.py.download")" = "76ecbdec3b27a69604091a1d67c697a7b895b4c4"
 mv "$CODE/stage35.py.download" "$CODE/stage35.py"
 python3 -B -m py_compile "$CODE/stage35.py"
 python3 -B "$CODE/stage35.py" --self-test
