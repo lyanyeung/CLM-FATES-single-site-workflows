@@ -33,4 +33,6 @@ Original two JP-Tef source-selected LW_IN_QC2 values remain 26.164 W m⁻² at o
 
 ## Next Stage05AT
 
+[Stage05AT dedicated second-day JP-Tef 2011-12-17 original CDS ZIP validation + both-day two original 26.164 W m⁻² QC2 source-context comparison](../scripts/stage05/05at_JP_Tef_20111217_second_CDS_day_two_day_LW_QC2_CONTEXT_ONLY.py) has now been **committed**. Its real IRIDIS test/CDS second-day run is **pending**. It checks the first downloaded 467-byte source ZIP SHA plus original Stage05AS JSON, actual Stage05AR source BIF/7-day roster, and exact Stage05AQ two December 2011 LW original native times. No timebase approval/automatic repair.
+
 Use source-gated same-day Stage05AR stage/coordinates, pin and reuse the successful Stage05AS ZIP parsing science checker, rehash unchanged original day16 ZIP against known SHA, then obtain explicitly approved **JP-Tef 2011-12-17** CDS timeseries `strd` for 24 UTC hours. Check returned ZIP CRC, all 24 hours, variable and grid, then compare original two QC2 native source LW values against a conservative two-day hourly context; label as `CONTEXT_ONLY` candidate, not strong-approved or 30-min replacement. Keep original JPF 75-line `local solar time` README conflict and operator JST+9 hypothesis explicit, all original 45 source fields scientific HOLD. No PFT, Slurm, source ZIP or forcing changes.
