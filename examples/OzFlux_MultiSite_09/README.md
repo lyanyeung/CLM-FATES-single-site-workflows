@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–21 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE GENERATED/HASH VERIFIED; STAGE20 EXACT FATES 14×14 MAP VERIFIED; STAGE21 ALL 214 PFT TRAIT FIELDS EXTRACTED, 126 PRIORITY, 8 PHENOLOGY, 0 ERRORS; ACTUAL FATES4/7 EVERGREEN, FATES8 HYDRODECID, FATES9 COLDDECID VERIFIED; STAGE22 TARGETED WOODY TRAIT COMPARISON PUBLISHED, EXECUTION PENDING. SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–22 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE GENERATED/HASH VERIFIED; STAGE20 EXACT FATES 14×14 MAP VERIFIED; STAGE21 ALL 214 TRAITS EXTRACTED; STAGE22 COMPARED 35 MULGA-RELEVANT TRAITS WITH 11 FATES4/7 DIFFERENCES AND VERIFIED PHENOLOGY; STAGE23 ACTUAL LOCAL FATES ALLOMETRY SOURCE/P50 FORENSICS PUBLISHED, EXECUTION PENDING. SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -1382,6 +1382,96 @@ Do not infer PFT area fractions from stand or plot-level Acacia
 cover, nor set 74% sand, 15% clay into all 10 CLM soil layers without
 vertical evidence. Stage14 FSDS0 forcing and Stage16 reference surface
 remain provisional and immutable, and no AD400 is authorized.
+
+## 3y. Stage22 operator actual SUCCESS; Stage23 source-code allometry/hydraulic forensic gate
+
+**Stage22 actual operator SUCCESS 2026-11-02**:
+`/iridisfs/home/ly3n24/ozflux_stage22_20261102T112126Z`.
+Operator verified Stage21 TSV SHA256
+`2ce8e2e0eba38bf284b67ddb73ffc54f4392105c6a35de0eeb44e49ec1c7b85d`.
+Reviewed **35** actual PFT traits, **8** phenology. FATES4 vs
+FATES7 differed in **11** fields: `allom_d2h1/2/3`,
+`allom_dbh_maxheight`, `allom_fnrt_prof_b`,
+`allom_zroot_min_dbh/max_dbh`, `leaf_slamax/slatop`,
+`leaf_stomatal_slope_medlyn`, and `leaf_vcmax25top`.
+FATES4 vs FATES7 evergreen leaf habit both 1, but major structural,
+rooting and leaf geometry differences.
+
+Exact selected values (FATES4 tree vs FATES7 shrub):
+- `fates_allom_d2h1`: 104.3586841 vs 0.64
+- `fates_allom_d2h2`: 1.1146973 vs 0.37
+- `fates_allom_d2h3`: 160.6835089 vs **-999.9**
+  (treat as possible sentinel until actual code/mode verified)
+- `fates_allom_dbh_maxheight`: 1000 vs 3 **cm DBH** (not height)
+- `fates_allom_fnrt_prof_b`: 1 vs 1.5
+- `fates_leaf_slatop`: 0.009 vs 0.012 m2/gC
+- `fates_leaf_slamax`: 0.0954 vs 0.012 m2/gC
+- `fates_leaf_stomatal_slope_medlyn`: 4.1 vs 4.7
+- `fates_leaf_vcmax25top`: [61] vs [62] µmol CO2 m-2 s-1
+
+All four reviewed PFTs shared defaults
+`fates_hydro_p50_gs=-1.5 MPa`,
+`fates_hydro_p50_node=[-2.25,-2.25,-2.25,-2.25] MPa`,
+`fates_hydro_kmax_node=[-999,3,-999,-999]`,
+and `fates_leaf_stomatal_btran_model=1`.
+This **does not** demonstrate that Acacia is actually represented
+with site-realistic drought hydraulics, or that -999 values are active
+physical traits. Root `zroot_min_z=max_z=100m` in defaults cannot
+be interpreted as verified actual root depth. Need the active root/
+hydraulic mode and source code before interpreting.
+
+External study: Creek et al. (2018), doi 10.1111/pce.13418,
+reported *Acacia aneura* leaf/stem/root Ψ50 respectively
+-5.84/-8.46/-8.16 MPa. Treat only as **literature context**:
+the dataset's species/site, the measured organ-specific conductivity
+and FATES parameter's node/root/gs semantics are not established as
+identical. Do NOT copy empirical P50 into all nodes; use it to
+prioritize model-mode checks and site-specific calibration.
+Ref: https://onlinelibrary.wiley.com/doi/full/10.1111/pce.13418 .
+FATES mainline height allometry wrapper dispatches on
+`allom_hmode` and uses `allom_dbh_maxheight` as a diameter cap,
+not as maximum canopy height:
+https://github.com/NGEET/fates/blob/main/biogeochem/FatesAllometryMod.F90 .
+Actual IRIDIS6 checked-out source must be read before evaluating H(DBH).
+
+**Stage23 read-only**:
+`scripts/stage23/23_asm_Mulga_height_hydraulics_FATES_local_code_forensics_READONLY.py`,
+commit `bb324aac04f8648c8d88821746ffbe0b74c09fee`,
+Git blob `0c55ac00531e4a751f6091dc5304d1e91888372e`.
+It verifies Stage21/22 evidence and original FATES JSON hashes,
+reads the actual `fates_allom_hmode` and related allometry/root/
+hydraulic parameters for PFT4,7,8,9, shallow-searches actual local
+FatesAllometryMod and related Fortran modules, records their SHA256 and
+matching code excerpts, and registers literature P50 strictly as an
+unmatched research comparator. **No heights, PFT fractions or
+soil layers are inferred; no FATES/Surface/source writes.**
+Reports: `stage23_AU_ASM_PFT4_7_8_9_allometry_hydraulic_traits.tsv`,
+`stage23_AU_ASM_actual_allometry_source_science_hold.json`.
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="bb324aac04f8648c8d88821746ffbe0b74c09fee"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage23_code"
+SCRIPT="$CODE/ozflux_stage23.py"
+OUT="$HOME/ozflux_stage23_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS --retry 3 "$BASE/scripts/stage23/23_asm_Mulga_height_hydraulics_FATES_local_code_forensics_READONLY.py" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "0c55ac00531e4a751f6091dc5304d1e91888372e"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+python3 -B "$SCRIPT" --out "$OUT"
+echo "REPORT_DIR $OUT"
+)
+~~~
+
+**Experiment design gate remains HOLD:** standalone Full-FATES reference,
+candidate Acacia evergreen PFT4 vs PFT7 traits, root hydraulics,
+C3/C4/bare area assumptions, Kandosol 10-layer profiles and final
+forcing science are not approved for CIME/AD400. Stage23 is discovery,
+not simulation.
 
 ## 4. Future science decisions (still require explicit approvals)
 
