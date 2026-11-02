@@ -303,11 +303,57 @@ def selftest():
     assert all(len(s)==64 for s in SHA_BY_DAY.values())
     assert Counter({"JP-Fjy":6,"JP-Khw":11,"JP-Yms":10})==SRC_COUNTS
     assert set(x[1] for x in VARIABLES.values())=={"sp","strd"}
-    # The hourly CDS time-series dataset is ALREADY de-accumulated:
-    # 1h radiative energy 1,080,000 J m-2 gives 300 W m-2, not a 24h sum.
+    # ERA5-Land *time-series* strd is ALREADY de-accumulated hourly energy.
     assert 1080000/3600==300
     assert datetime.strptime("201112170000","%Y%m%d%H%M")-timedelta(hours=1)==datetime(2011,12,16,23)
-    print("STAGE05AK SELF-TEST PASS | five new Yms QC2 fields source-bounded, both original ZIPs, hourly DEACCUMULATED strd/3600, no repairs/NETWORK/WRITES")
+
+    # Regression: originally 27 variable fields, including 2005 historically
+    # validated Yms fields, but only FIVE December 2011 source rows remain.
+    source=[]
+    old22=[]
+    units={"PA":"kPa","LW_IN":"W m-2","TA":"deg C"}
+    def insert(site,iso,var,existing,value):
+        utc=datetime.strptime(iso,"%Y%m%d%H%M")
+        native=utc+timedelta(hours=9)
+        r={"site":site,"native_start":native.strftime("%Y%m%d%H%M"),
+           "utc_start":iso,"variable":var,"selected_F":str(value),
+           "ERA_in_same_release":str(value),"raw_F_QC":"2",
+           "unit":units[var],
+           "source_status":"HOLD_INDEPENDENT_ERA_CHECK_NOT_REPAIR_APPROVED"}
+        source.append(r)
+        if existing:
+            old22.append({"site":site,"native_JST_halfhour_start":r["native_start"],
+                          "variable":var,"source_QC":"2","context_outside":"1",
+                          "original_JPF_F":str(value),
+                          "repair_status":"SOURCE_QC2_HOLD_NO_SCIENTIFICALLY_APPROVED_REPLACEMENT"})
+    for i in range(6):
+        utc=datetime(2005,8,11,12)+timedelta(minutes=i*30)
+        insert("JP-Fjy",utc.strftime("%Y%m%d%H%M"),"PA",True,45)
+    for i,var in enumerate(["LW_IN"]*2+["PA"]*6+["TA"]*3):
+        utc=datetime(2005,8,11,14)+timedelta(minutes=i*30)
+        insert("JP-Khw",utc.strftime("%Y%m%d%H%M"),var,True,49)
+    for i in range(5):
+        utc=datetime(2005,8,11,19)+timedelta(minutes=i*30)
+        insert("JP-Yms",utc.strftime("%Y%m%d%H%M"),"PA",True,43)
+    for i,var in enumerate(["PA","PA","LW_IN","LW_IN","PA"]):
+        utc=datetime(2011,12,16,21)+timedelta(minutes=i*30)
+        insert("JP-Yms",utc.strftime("%Y%m%d%H%M"),var,False,0 if var=="PA" else 5)
+    picked=select_exact_source_fields(source,old22)
+    assert len(picked)==5 and Counter(r["variable"] for r in picked)==Counter({"PA":3,"LW_IN":2})
+    samples={}
+    for h in range(48):
+        utc=datetime(2011,12,16)+timedelta(hours=h)
+        samples["sp",utc]=99.0
+        samples["strd",utc]=300.0
+    out=compare(picked,samples,(34.8,135.8))
+    assert len(out)==5 and all(r["outside_independent_hourly_envelope"]==1 for r in out)
+    assert all(r["science_review_state"]=="HOLD_CONTEXT_COMPARISON_ONLY_NOT_YET_APPROVED_AS_STRONG_EVIDENCE" for r in out)
+    assert sum(r["variable"]=="LW_IN" for r in out)==2
+    # Off-hour LW interval envelope MUST include previous-end valid time.
+    lw=next(r for r in out if r["variable"]=="LW_IN")
+    assert len(lw["independent_UTC_reference_labels"].split(";"))==4
+    assert lw["independent_hourly_product_processing"].startswith("CDS_TIMESERIES_DEACCUMULATED")
+    print("STAGE05AK SELF-TEST PASS | original 27/22+5 mixed Yms PA/LW source scope, CDS 1h DEACCUMULATED strd/3600, cross-midnight UTC and HOLD; NO NETWORK/WRITES")
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
