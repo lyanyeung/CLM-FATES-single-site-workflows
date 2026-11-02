@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–21 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE GENERATED/HASH VERIFIED; STAGE20 EXACT FATES 14×14 MAP VERIFIED; STAGE21 ALL 214 PFT TRAIT FIELDS EXTRACTED, 126 PRIORITY, 8 PHENOLOGY, 0 EXTRACTION ERRORS. SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–21 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE GENERATED/HASH VERIFIED; STAGE20 EXACT FATES 14×14 MAP VERIFIED; STAGE21 ALL 214 PFT TRAIT FIELDS EXTRACTED, 126 PRIORITY, 8 PHENOLOGY, 0 ERRORS; ACTUAL FATES4/7 EVERGREEN, FATES8 HYDRODECID, FATES9 COLDDECID VERIFIED; STAGE22 TARGETED WOODY TRAIT COMPARISON PUBLISHED, EXECUTION PENDING. SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -1310,6 +1310,78 @@ competition. Neither mode nor soil profile is selected for AU-ASM.
 Site-level Kandosol texture 74/11/15 is not a ten-layer soil profile,
 and the CTSM gridded sand ~89.8 / clay ~6.6 remains only a baseline
 reference.
+
+## 3x. Stage21 actual phenology values; Stage22 evergreen Mulga candidate functional traits
+
+**Operator direct read of Stage21 TSV (2026-11-02):** All **8** FATES
+phenology parameter values successfully reported for default
+PFT4 evergreen extratropical broadleaf tree, PFT7 evergreen extratropical
+broadleaf shrub, PFT8 hydrodeciduous extratropical shrub and PFT9
+cold-deciduous extratropical shrub. In the original SHA-pinned JSON,
+`fates_phen_leaf_habit` is respectively **1,1,3,2**:
+1=evergreen, 2=cold-season deciduous, 3=hydro/stress deciduous.
+`fates_phen_flush_fraction` is **null** for PFT4/PFT7,
+0.5 for PFT8/PFT9; null is not scientific evidence for zero.
+`fates_phen_drought_threshold` is -152957.4 (source units mm
+water-column matric potential, **not** positive volumetric soil water)
+for all four. `fates_phen_moist_threshold` is -122365.9;
+cold-size threshold 0 cm; fine-root and stem phenology drop
+fractions 0; minimum leafless days 100. The same numerical drought
+threshold may be inactive under evergreen phenology; do NOT claim
+all PFTs exhibit drought-triggered leaf-drop. As of Stage21, Mulga
+PFT type, active model mode and all soil values remain unapproved.
+
+Ecological interpretation: AU-ASM's dominant mixed Acacia canopy is
+evergreen, median canopy height ~4.3m (TERN); PFT4 is the first
+**tree-structure/evergreen** working candidate, PFT7 the
+**shrub-structure/evergreen** sensitivity candidate. PFT8 is a
+stress-deciduous shrub comparator; the gridded host10 -> FATES9
+cold-deciduous shrub should NOT automatically represent evergreen
+Mulga. This selects *candidates only*: foliage habit does not establish
+root/hydraulic/allometric physiology, actual site PFT cover,
+FATES competition dynamics or a complete 10-layer red Kandosol.
+References: https://portal.tern.org.au/metadata/TERN/608dca79-0ec8-412d-9f13-71f7714affac ;
+https://fates-users-guide.readthedocs.io/projects/tech-doc/en/stable/fates_tech_note.html .
+
+**Stage22 read-only** `scripts/stage22/22_asm_mulga_evergreen_PFT4_vs_PFT7_actual_traits_gate_READONLY.py`
+(commit `477de28c0056b2da83ec1ea4c244eae60d1ca074`,
+git blob `6cf8029180927aeb139872b77e61cf6cfeeb7b9b`).
+Checks Stage21 receipt SHA and source FATES JSON, loads the actual 214
+extracted trait values, insists on leaf-habit 1/1/3/2 and null
+flush for PFT4/7, then writes only a fresh HOME directory with an
+exact selected PFT4/7/8/9 trait-value TSV and an unsigned science
+decision JSON. The review focuses on height/crown allometry, fine-root
+and hydraulic traits, Vcmax, stomatal response and water-stress
+configuration before any arbitrary PFT fractions are chosen.
+**No** NetCDF source or compiled JSON changes, new surface, model
+case, Slurm or AD400.
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="477de28c0056b2da83ec1ea4c244eae60d1ca074"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage22_code"
+SCRIPT="$CODE/ozflux_stage22.py"
+OUT="$HOME/ozflux_stage22_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS --retry 3 "$BASE/scripts/stage22/22_asm_mulga_evergreen_PFT4_vs_PFT7_actual_traits_gate_READONLY.py" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "6cf8029180927aeb139872b77e61cf6cfeeb7b9b"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+python3 -B "$SCRIPT" --out "$OUT"
+echo "REPORT_DIR $OUT"
+)
+~~~
+
+Review the actual values in
+`stage22_actual_FATES4_7_8_9_trait_comparison.tsv` and science flags in
+`stage22_AU_ASM_Mulga_evergreen_PFT_science_gate.json`.
+Do not infer PFT area fractions from stand or plot-level Acacia
+cover, nor set 74% sand, 15% clay into all 10 CLM soil layers without
+vertical evidence. Stage14 FSDS0 forcing and Stage16 reference surface
+remain provisional and immutable, and no AD400 is authorized.
 
 ## 4. Future science decisions (still require explicit approvals)
 
