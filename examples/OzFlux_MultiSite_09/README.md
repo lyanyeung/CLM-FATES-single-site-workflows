@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–22 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE GENERATED/HASH VERIFIED; STAGE20 EXACT FATES 14×14 MAP VERIFIED; STAGE21 ALL 214 TRAITS EXTRACTED; STAGE22 COMPARED 35 MULGA-RELEVANT TRAITS WITH 11 FATES4/7 DIFFERENCES AND VERIFIED PHENOLOGY; STAGE23 ACTUAL LOCAL FATES ALLOMETRY SOURCE/P50 FORENSICS PUBLISHED, EXECUTION PENDING. SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–23 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE GENERATED/HASH VERIFIED; STAGE20 EXACT FATES 14×14 MAP VERIFIED; STAGE21 ALL 214 TRAITS EXTRACTED; STAGE22 COMPARED 35 MULGA-RELEVANT TRAITS; STAGE23 ACTUAL FATES4 hmode5 / FATES7 hmode1 AND LOCAL ALLOMETRY FORTRAN SHA VERIFIED; STAGE24 EXACT-LOCAL-SOURCE HEIGHT CURVES PUBLISHED, EXECUTION PENDING. SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -1472,6 +1472,83 @@ candidate Acacia evergreen PFT4 vs PFT7 traits, root hydraulics,
 C3/C4/bare area assumptions, Kandosol 10-layer profiles and final
 forcing science are not approved for CIME/AD400. Stage23 is discovery,
 not simulation.
+
+## 3z. Stage23 operator SUCCESS, exact local source SHA known; Stage24 formula-verified H(DBH) read-only
+
+**Actual Stage23 operator PASS 2026-11-02**:
+`/home/ly3n24/ozflux_stage23_20261102T114525Z`.
+Stage21 214-trait TSV SHA256
+`2ce8e2e0eba38bf284b67ddb73ffc54f4392105c6a35de0eeb44e49ec1c7b85d`
+and default FATES JSON SHA256
+`0819f8fddcb3566f6209f72bb1159a3161d03c8225a1464727b1d2b21aec6c04`
+verified. 20 targeted trait fields found, only
+`fates_allom_rmode` missing from the optional target-name inventory.
+This **does not establish absent root physics or erroneous source
+parameters**; `fates_allom_fnrt_prof_mode` was present in Stage22.
+
+**Actual modes**:
+`FATES4 allom_hmode=5` (Martinez-Cano, evergreen
+extrapropical tree), while `FATES7/8/9 allom_hmode=1` (O'Brien,
+evergreen/hydro/cold shrub). Found local installed Fortran:
+`/iridisfs/scratch/ly3n24/CLM_FATES/CTSM/src/fates/biogeochem/FatesAllometryMod.F90`,
+SHA256
+`8ad6c9eaaa9f5c40036f8aa099f6435b80f2a8e7248a48b6ddb3a978db3c7f16`.
+Stage23 did not evaluate heights, modify anything, or authorize
+model runs.
+
+Independent upstream FATES `h_allom` source inspection finds
+- Mode 1 `d2h_obrien`:
+  `h = 10**(log10(min(d,dbh_maxh))*p1+p2)`
+- Mode 5 `d2h_martcano`:
+  `h = (p1*min(d,dbh_maxh)**p2)/(p3+min(d,dbh_maxh)**p2)`
+- `d` is DBH in **cm**; `h` in **m**.
+Source: https://github.com/NGEET/fates/blob/main/biogeochem/FatesAllometryMod.F90 .
+**Do not compute actual source-validated curves unless the frozen
+IRIDIS6 Fortran is independently checked to contain these exact
+two functional statements and mode dispatch.** Upstream mainline
+is not guaranteed identical to local pinned SHA.
+
+**Stage24 published**:
+`scripts/stage24/24_asm_local_FATES_verified_height_DBH_curve_READONLY.py`;
+commit `0b9a61afc1b6b23b3dc0304d72fc2ed12b913578`,
+Git blob `2284d17cfe6c7112605e3c1fea739b9fe141346c`.
+It validates exact Stage23 receipt, local Fortran SHA and original JSON
+SHA, then checks the mode 1 and 5 local dispatch and actual height
+expression strings **before** evaluating the 0.5–50 cm DBH comparison.
+It computes the inverse diameter for an illustrative 4.3m reference
+canopy height and the FATES7 plateau at `dbh_maxheight=3cm`.
+These are **structural allometry outputs**, not tower-measured DBH,
+flux predictions or FATES growth/competition simulations.
+If local code differs, Stage24 fails closed before report creation.
+It writes only new HOME TSV + JSON, never original input/params/cases/
+Slurm/AD400.
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="0b9a61afc1b6b23b3dc0304d72fc2ed12b913578"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage24_code"
+SCRIPT="$CODE/ozflux_stage24.py"
+OUT="$HOME/ozflux_stage24_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS --retry 3 "$BASE/scripts/stage24/24_asm_local_FATES_verified_height_DBH_curve_READONLY.py" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "2284d17cfe6c7112605e3c1fea739b9fe141346c"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+python3 -B "$SCRIPT" --out "$OUT"
+echo "REPORT_DIR $OUT"
+)
+~~~
+
+After Stage24 compare both curves with site *canopy-height
+distribution and measured DBH distribution*, not one site mean alone.
+Record species-specific allometry uncertainties, and do not infer
+FATES4 is objectively superior to FATES7 simply because the
+model's generic allometric height crosses 4.3 m.
+PFT fractions, source forcing QC signoff, soil ten-layer parameters
+and AU-ASM CIME mode remain science HOLD.
 
 ## 4. Future science decisions (still require explicit approvals)
 
