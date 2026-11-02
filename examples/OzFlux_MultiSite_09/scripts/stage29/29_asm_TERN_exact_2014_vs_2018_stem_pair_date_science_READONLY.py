@@ -151,7 +151,7 @@ def verify_inputs():
                              "stage28_receipt_sha":sha(receipt)}
 
 
-def analyze(rows):
+def analyze(rows, expected_stems=None):
     stems=defaultdict(list)
     counts=Counter()
     for r in rows:
@@ -161,8 +161,12 @@ def analyze(rows):
         d=date_record(r)
         counts[d.get("reason","NO_REASON")]+=1
         stems[key].append((r,d))
-    if len(stems)!=111:
-        raise ValueError("111 exact independent stem identifiers expected")
+    # Fixtures intentionally have fewer stems than the real TERN archive.
+    # Enforce the source-specific count only when explicitly requested.
+    if expected_stems is not None and len(stems)!=expected_stems:
+        raise ValueError(
+            "Expected "+str(expected_stems)+" distinct stem identifiers, got "+
+            str(len(stems)))
     results=[]
     by_species=defaultdict(list)
     temporal_classes=Counter()
@@ -251,12 +255,15 @@ def analyze(rows):
             "cross_year_cap_discordant_stems":sum(r["height_class_disagreement"] is True for r in items),
             **groups,
         })
+    # Counts derive from the *actual* input, not a magic 111/222 that
+    # makes single-stem fixtures incorrectly fail or falsely pass.
+    counts_by_year={"2014":len(stems),"2018":len(stems)}
     return results,summary,{"original_rows":len(rows),"unique_stem_identifiers":len(stems),
-                           "calendar_source_year_counts":{"2014":111,"2018":111},
-                           "rows_per_stem":{"2":111},
+                           "calendar_source_year_counts":counts_by_year,
+                           "rows_per_stem":{"2":len(stems)},
                            "longitudinal_pair_classes":dict(temporal_classes),
-                           "all_111_stems_have_one_2014_and_one_2018_source_row":True,
-                           "all_dates_parse_original_DMY_and_phenomenon_within_visit":counts==Counter({"DMY_SOURCE_DATES_VERIFIED":222}),
+                           "all_111_stems_have_one_2014_and_one_2018_source_row":len(stems)==111,
+                           "all_dates_parse_original_DMY_and_phenomenon_within_visit":counts==Counter({"DMY_SOURCE_DATES_VERIFIED":len(rows)}),
                            "raw_date_check_counts":dict(counts),
                            "DBH_pairs_original":0,
                            "note":"2014 field measurement vs 2018 derived/modelled increment, not two independent field measurements"}
@@ -288,11 +295,28 @@ def selftest():
                     stemDiameter_centimeters=str(d),
                     aboveGroundBiomass_kilograms="2.0",
                     stemDiameterPointOfMeasurement_metres="0.2")
-    pairs,sp,qa=analyze([fixture(2018,5,2.2),fixture(2014,5,2)])
+    single=[fixture(2018,5,2.2),fixture(2014,5,2)]
+    pairs,sp,qa=analyze(single,expected_stems=1)
     assert len(pairs)==1 and sp[0]["2014_field_stems_above_FATES7_height_cap"]==1
     assert qa["all_dates_parse_original_DMY_and_phenomenon_within_visit"]
+    assert qa["original_rows"]==2 and qa["unique_stem_identifiers"]==1
+    assert qa["calendar_source_year_counts"]=={"2014":1,"2018":1}
+    assert qa["rows_per_stem"]=={"2":1}
+    assert qa["all_111_stems_have_one_2014_and_one_2018_source_row"] is False
     assert math.isclose(pairs[0]["D20_change_cm"],0.2)
-    print("STAGE29 SELF-TEST PASS: strict D/M/YYYY parser, 1x2014 + 1x2018 per unique stem, D20-only, source-year without false zero; NO MODEL WRITES")
+    try:
+        analyze(single,expected_stems=111)
+    except ValueError as exc:
+        assert "Expected 111 distinct stem identifiers" in str(exc)
+    else:
+        raise AssertionError("Production 111-stem guard must reject 1-stem fixture")
+    try:
+        analyze([fixture(2014,5,2),fixture(2014,5,2.2)],expected_stems=1)
+    except ValueError as exc:
+        assert "EXACT 1 row 2014 and 1 row 2018" in str(exc)
+    else:
+        raise AssertionError("Duplicate-year stem must be rejected")
+    print("STAGE29 SELF-TEST PASS: strict D/M/YYYY dates, fixture 1 stem, production 111-stem guard, one row/year, no D20=DBH; NO MODEL WRITES")
 
 
 def main():
@@ -307,7 +331,13 @@ def main():
                (ROOT.resolve(),STAGE25.resolve(),STAGE28.resolve()))):
         raise ValueError("Must write to fresh direct HOME report dir")
     stem,dictionary,provenance=verify_inputs()
-    pairs,species,qc=analyze(stem)
+    pairs,species,qc=analyze(stem,expected_stems=111)
+    if (qc["original_rows"]!=222 or
+        qc["calendar_source_year_counts"]!={"2014":111,"2018":111} or
+        qc["rows_per_stem"]!={"2":111} or
+        qc["all_111_stems_have_one_2014_and_one_2018_source_row"] is not True or
+        qc["all_dates_parse_original_DMY_and_phenomenon_within_visit"] is not True):
+        raise ValueError("Actual TERN 222 row / 111 stem exact two-year science gate not met")
     report={
       "stage":"OzFlux Stage29 exact original D/M/YYYY and 2014/2018 per-stem time reconciliation",
       "source_SHA256":provenance,
