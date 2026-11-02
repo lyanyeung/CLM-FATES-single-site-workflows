@@ -219,14 +219,18 @@ def selftest():
           "stemDiameterPointOfMeasurement_metres":"0.2",
           "aboveGroundBiomass_kilograms":biomass,
         })
+    # A synthetic official 2018 value representing both 2018 AGB and
+    # the extra 2014 AGB tests the intended two-year grouping hypothesis.
+    expected2018=q4((D("2.429615547")+D("3.713499951"))/KG_PER_THA)
     sites=[{"phenomenonTime":"21/1/2014","standBiomass_tonnesPerHectare":"0.0000"},
-           {"phenomenonTime":"1/6/2018","standBiomass_tonnesPerHectare":"0.0000"}]
+           {"phenomenonTime":"1/6/2018","standBiomass_tonnesPerHectare":str(expected2018)}]
     cases,meta=counterfactual(src,sites,expected_keys=1)
     assert len(cases)==7
     assert meta["original_unique_stems"]==1
     assert meta["Plant99_2014_AGB_kg"]==D("2.429615547")
     assert len({x["scenario"] for x in cases})==7
-    assert sum(x["both_years_match_official_4dp"] for x in cases)==0
+    assert [x["scenario"] for x in cases if x["both_years_match_official_4dp"]]==[
+        "OMIT_2014_AND_EXTRA_2014_AGB_IN_2018"]
     assert cases[3]["2014_kg"]==Decimal("0")
     print("STAGE35 SELF-TEST PASS: exact original P99 key and 2 source years, seven distinct Decimal attribution scenarios, 0.06ha stand 4dp, no source write")
 
