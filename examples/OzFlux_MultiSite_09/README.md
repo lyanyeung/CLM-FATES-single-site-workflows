@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–13 OPERATOR EXECUTED; SIX AU-ASM 2013–2018 SOURCE-FAITHFUL PROVISIONAL DATM FILES VERIFIED; STAGE14 360-RECORD FSDS0 BRANCH PUBLISHED, EXECUTION PENDING.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–14 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE15 PFT/SOIL/SURFACE INVENTORY PUBLISHED, EXECUTION PENDING.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -828,10 +828,10 @@ gate. See the register at
 
 ## 3p. Stage14 operator execution SUCCESS; Stage15 AU-ASM site PFT/soil/surface input inventory
 
-**Stage14 operator confirmed 2026-11-02:** the \`--preview\` and
-\`--write-candidate\` scientific gates both passed. Created exactly six
+**Stage14 operator confirmed 2026-11-02:** the `--preview` and
+`--write-candidate` scientific gates both passed. Created exactly six
 separately named FSDS0 provisional DATM files under
-\`/home/ly3n24/ozflux_stage14_FSDS0_20261102T012038Z\`;
+`/home/ly3n24/ozflux_stage14_FSDS0_20261102T012038Z`;
 only 359 negative FSDS records from ACCESS QC420 in 2014 and
 one negative FSDS from interpolation QC50 in 2016 were set to zero.
 All seven meteorological variables other than FSDS, all timestamps,
@@ -854,18 +854,18 @@ a red Kandosol with 74:11:15 sand:silt:clay in recent metadata.
 Older OzFlux describes different (50:50) sand:clay; soil depth,
 sample coverage and source vintage must be reconciled before selecting
 CLM soil layers. These are descriptive ecosystem observations, not a
-measured 15-slot \`PCT_NAT_PFT\` vector or verified FATES PFT
+measured 15-slot `PCT_NAT_PFT` vector or verified FATES PFT
 mapping. Bare ground is host natural PFT **index 0**, but cannot be
 treated as an FATES active canopy. An older academic 74.5% woody-area
 estimate is NOT a ready-made EC-footprint or natland fraction.
 
 **Stage15: inspect the existing IRIDIS6 point surface and reference
 CTSM resources only**, source at
-\`scripts/stage15/15_asm_pft_soil_surface_source_inventory_readonly.py\`
-(commit \`3e753d76783f2d7032b78db487c5facce7bfa58a\`).
+`scripts/stage15/15_asm_pft_soil_surface_source_inventory_readonly.py`
+(commit `3e753d76783f2d7032b78db487c5facce7bfa58a`).
 The inspector checks original six Stage12 and six Stage14 hashes
 against the Stage14 operator manifest, scans a bounded AU-ASM site
-folder for existing \`surfdata*.nc\` NetCDFs, inventories natural/host
+folder for existing `surfdata*.nc` NetCDFs, inventories natural/host
 PFT vector, gridded natveg, host bare index0, sand/clay soil layer
 profiles, location and CTSM 2000 input templates. Existing CTSM grid
 point surfdata is a **reference only**, not proven tower PFT/soil.
@@ -888,8 +888,8 @@ echo "Stage15 report directory: $OUT"
 )
 ~~~
 
-Outputs \`stage15_ASM_surface_PFT_soil_source_register.json\` and
-\`stage15_existing_surface_candidates.tsv\`. **Zero NetCDF writes**,
+Outputs `stage15_ASM_surface_PFT_soil_source_register.json` and
+`stage15_existing_surface_candidates.tsv`. **Zero NetCDF writes**,
 no PFT assignments or case preparation. Requires exact per-site
 scientific PFT fractions, compiled model mapping, 10-layer soil profiles
 and independently reviewed point-surface values before CIME submission.
