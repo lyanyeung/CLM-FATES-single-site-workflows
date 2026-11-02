@@ -1087,9 +1087,12 @@ Selected exact host-to-FATES assignments in this JSON:
   `broadleaf_evergreen_extratrop_tree`.
 - host7 (temperate deciduous broadleaf) -> FATES6
   `broadleaf_colddecid_extratrop_tree`.
-- host10 (temperate deciduous broadleaf shrub) -> **FATES8
-  `broadleaf_hydrodecid_extratrop_shrub`** (row9,
-  zero-based column7), **NOT cold-deciduous** in this local JSON.
+- host10 (temperate deciduous broadleaf shrub) -> **FATES9
+  `broadleaf_colddecid_extratrop_shrub`** (0-based mapping row9,
+  0-based FATES column8). **FATES8** in the same JSON is
+  `broadleaf_hydrodecid_extratrop_shrub` but is **not the target
+  for host10**. The initial Stage20 code mistakenly asserted column7;
+  operator preflight correctly halted before writing reports or cases.
 - host13 -> FATES13 `cool_c3_grass`; host14 -> FATES14
   `c4_grass`.
 - Host11 (boreal deciduous shrub, 0% in this reference surface) splits
@@ -1108,8 +1111,8 @@ competition configuration**. No AU-ASM CIME mode has been selected.
 
 **Stage20 independent reconciliation** (read-only):
 `scripts/stage20/20_asm_exact_host_to_fates_mapping_mode_and_soil_strategy_readonly.py`
-pinned commit `0020ff86ecd51ad13f047c2232cd6fc471af2199`,
-Git blob `452b13e4e845120e77156e5fc9a3cd0a58202c1f`.
+CORRECTED pinned commit `6451009636a90de39a713cfed0fbf7a7678dfee4`,
+Git blob `861dde532cd329ec37529c225d36361f1663b0fe`.
 It compares SHA-pinned Stage19 JSON against exact Stage16 surface,
 validates each of 14 mapping rows sums to 1,
 prints the full host->FATES table and **hypothetical fixed-biogeography
@@ -1122,14 +1125,14 @@ or Slurm job.
 (
 set -euo pipefail
 conda activate clm_fates_env
-COMMIT="0020ff86ecd51ad13f047c2232cd6fc471af2199"
+COMMIT="6451009636a90de39a713cfed0fbf7a7678dfee4"
 BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
 CODE="$HOME/ozflux_stage20_code"
 SCRIPT="$CODE/ozflux_stage20.py"
 OUT="$HOME/ozflux_stage20_$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$CODE"
 curl -fLsS "$BASE/scripts/stage20/20_asm_exact_host_to_fates_mapping_mode_and_soil_strategy_readonly.py" -o "$SCRIPT"
-test "$(git hash-object "$SCRIPT")" = "452b13e4e845120e77156e5fc9a3cd0a58202c1f"
+test "$(git hash-object "$SCRIPT")" = "861dde532cd329ec37529c225d36361f1663b0fe"
 python3 -B -m py_compile "$SCRIPT"
 python3 -B "$SCRIPT" --self-test
 python3 -B "$SCRIPT" --out "$OUT"
@@ -1150,6 +1153,17 @@ forcing is preserved and not modified. **No AD400 authorisation**.
 
 Official mode behavior:
 https://fates-users-guide.readthedocs.io/projects/tech-doc/en/stable/fates_tech_note.html
+
+**Stage20 first operator attempt (2026-11-02) STOPPED safely**:
+code SHA, syntax and self-test passed, but the initial run halted with
+`ValueError: Expected mapping entry drifted`. This was a **script
+regression, not actual source drift**. The author had misread source
+mapping row9/col8 as row9/col7. Corrected Stage20 now
+requires source-verified host10 -> FATES9 colddeciduous shrub,
+reports detailed per-row mappings for any future drift,
+and regression-tests that FATES8 is not the actual host10 target.
+Neither the failed preflight nor corrected code changes original
+FATES JSON, Stage16 surface, DATM, CIME cases or Slurm.
 
 ## 4. Future science decisions (still require explicit approvals)
 
