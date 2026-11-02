@@ -932,13 +932,13 @@ reference-only build with explicit consent):
 (
 set -euo pipefail
 conda activate clm_fates_env
-BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/c32e331c36c58e9e87587f21082488d59ad67d57/examples/OzFlux_MultiSite_09"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/b2bdae2d68c39f5b14bed19fac06aa8b8490425b/examples/OzFlux_MultiSite_09"
 CODE="$HOME/ozflux_stage16_code"
 SCRIPT="$CODE/ozflux_stage16_surface.py"
 OUT="$HOME/ozflux_stage16_reference_$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$CODE"
 curl -fLsS "$BASE/scripts/stage16/16_asm_isolated_CTSM2000_reference_point_surface.py" -o "$SCRIPT"
-test "$(git hash-object "$SCRIPT")" = "910e7394ac66291bb9c98428d1bbefcc9dcee0a0"
+test "$(git hash-object "$SCRIPT")" = "962c5d220b32b51c750654dd371f99e5e2e18aa0"
 python3 -B -m py_compile "$SCRIPT"
 python3 -B "$SCRIPT" --self-test
 python3 -B "$SCRIPT" --check --out "$OUT"
@@ -956,6 +956,20 @@ versioned site-science model-hypothesis vector. Before any CIME case,
 compare actual reference bare/PFT/soil against independent Mulga site
 observations, compiled FATES-PFT mapping and soil-layer evidence.
 
+**Stage16 bugfix (2026-11-02, first operator check failed safely before any output):**
+The original strict text.count of the literal `dir = .../ctsm5.4.0`
+over the **entire** CTSM default template demanded exactly one occurrence.
+Depending on installed CTSM, `[surfdat]` may already be `ctsm5.3.0`,
+the config spacing may differ, or `[landuse]` may repeat the same
+directory. This can fail even when the intended reference inputdata is
+present. Updated Stage16 (commit `b2bdae2d68c39f5b14bed19fac06aa8b8490425b`,
+blob `962c5d220b32b51c750654dd371f99e5e2e18aa0`) now edits
+**only the unique `[surfdat]` section**: one `dir`, one
+`surfdat_16pft`, one `mesh_surf`, pinning exact inputs already checked
+by Stage15. Leaves `[landuse]` and all other config sections untouched.
+The self-test now covers duplicate directory references in different
+sections, an already 5.3.0 surface dir, spacing differences, and missing
+required keys. **No reference surface was made during the failed check.**
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
