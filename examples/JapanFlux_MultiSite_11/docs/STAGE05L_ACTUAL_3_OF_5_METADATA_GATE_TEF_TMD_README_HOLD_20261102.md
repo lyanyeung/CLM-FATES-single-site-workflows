@@ -1,5 +1,7 @@
 # JapanFlux Stage05L — actual metadata gate result 3/5, JP-Tef and JP-Tmd README evidence pending (2026-11-02)
 
+> **FOLLOW-UP 2026-11-02 — Stage05N source evidence resolved WHY the gate failed, NOT the time convention.** JP-Tef and JP-Tmd share one original, source-SHA-verified 75-line README: **line 64 explicitly says `local solar time (without DST)`**. It was not a generic missing paragraph or excerpt cap. All original BIF UTC_OFFSET values still equal +9; FLUXNET's official standard is local **standard** time without DST. Thus the source release contains a genuine text/specification ambiguity. The 3/5 stage gate is scientifically correct to remain unresolved for Tef/Tmd until independent producer or data/time-series evidence. See [Stage05N actual full source](STAGE05N_ACTUAL_SOLAR_VS_STANDARD_README_CONFLICT_STAGE05O_SCOPE_20261102.md) and [Stage05O 3-mapped/2-unresolved scoped mapping](../scripts/stage05/05o_scoped_3site_UTC_2site_solar_README_HOLD_NO_ZIP.py). Earlier diagnosis of 'possible missing paragraph' below is superseded by this evidence.
+
 ## Actual operator IRIDIS6 result
 
 The operator completed Stage05K per-site metadata scans for JP-Fjy, JP-Tef, JP-Tmd, JP-Yms; JP-Khw had already passed Stage05K. Each Stage05K reported `READONLY_BIF_VARIABLE_AND_TIME_METADATA_EXTRACTED` with `METADATA PASS` (this confirms JSON structure and scan completion, **not complete temporal provenance validation**). Stage05L subsequently printed:
