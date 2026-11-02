@@ -147,78 +147,127 @@ def describe_file(path:Path):
     if stat.S_ISREG(mode):return "REGULAR"
     return "NONREGULAR_HOLD"
 
+def audit_cds_csv_members(z:zipfile.ZipFile,site:str,day:str,expected_vars:set[str]):
+    """Accept either two variable-specific CSVs or one combined CDS CSV.
+
+    The source must contain exactly the authorized variables and exactly one
+    independently screened observation for every variable x every UTC hour.
+    Pure read/CRC; no extraction to disk, no implicit replacement or approval.
+    """
+    files=[info for info in z.infolist() if not info.is_dir()]
+    if not 1<=len(files)<=len(expected_vars):
+        return "UNEXPECTED_CSV_MEMBER_COUNT",{}
+    for info in files:
+        pure=PurePosixPath(info.filename)
+        if (pure.is_absolute() or ".." in pure.parts or "\\" in info.filename
+            or not info.filename.lower().endswith(".csv")
+            or info.file_size>MAX_CSV_MEMBER_SIZE):
+            return "SUSPICIOUS_OR_OVERSIZE_CSV_MEMBER",{}
+    if z.testzip() is not None:
+        return "ZIP_CRC_FAIL",{}
+    expected_raw={VARS[v][0] for v in expected_vars}
+    known_raw={"sp","strd"}
+    base={"valid_time","latitude","longitude"}
+    seen_global=set()
+    observed=set()
+    grids=set()
+    names=[]
+    layout=[]
+    for info in files:
+        names.append(info.filename)
+        data=z.read(info)
+        rd=csv.DictReader(io.StringIO(data.decode("utf-8-sig")))
+        fields=rd.fieldnames
+        if not fields or len(fields)!=len(set(fields)):
+            return "UNEXPECTED_ORIGINAL_CDS_CSV_SCHEMA",{}
+        columns=set(fields)
+        actual_raw=columns-base
+        if (not base<=columns or not actual_raw
+            or not actual_raw<=known_raw or not actual_raw<=expected_raw
+            or len(fields)!=len(base)+len(actual_raw)):
+            return "UNEXPECTED_ORIGINAL_CDS_CSV_SCHEMA",{}
+        if observed & actual_raw:
+            return "MISMATCHED_OR_DUPLICATE_CDS_VARIABLE",{}
+        observed.update(actual_raw)
+        layout.append(sorted(actual_raw))
+        readings=list(rd)
+        if len(readings)!=24:
+            return "CSV_NOT_24_HOURLY_ROWS",{}
+        seen_hours=set()
+        source_grids=set()
+        for rec in readings:
+            t=datetime.strptime(rec["valid_time"],"%Y-%m-%d %H:%M:%S")
+            if (t.date().isoformat()!=day or t.minute or t.second
+                or t.hour in seen_hours):
+                return "CSV_UTC_DAY_OR_HOUR_INVALID",{}
+            seen_hours.add(t.hour)
+            lat=float(rec["latitude"])
+            lon=float(rec["longitude"])
+            if not all(math.isfinite(x) for x in (lat,lon)):
+                return "NONFINITE_CDS_DATA",{}
+            if (abs(lat-TOWERS[site][0])>0.11
+                or abs(lon-TOWERS[site][1])>0.11):
+                return "RETURNED_GRID_NOT_NEAR_ORIGINAL_TOWER",{}
+            grids.add((lat,lon))
+            source_grids.add((lat,lon))
+            for var in actual_raw:
+                value=float(rec[var])
+                if not math.isfinite(value):
+                    return "NONFINITE_CDS_DATA",{}
+                converted=value/(1000 if var=="sp" else 3600)
+                if var=="sp":
+                    plausible=0<converted<120
+                else:
+                    plausible=0<=converted<1500
+                if not plausible:
+                    return "GROSS_INDEPENDENT_NUMERIC_SCREEN_FAIL",{}
+                key=(var,t.hour)
+                if key in seen_global:
+                    return "DUPLICATE_CDS_VARIABLE_UTC_HOUR",{}
+                seen_global.add(key)
+        if seen_hours!=set(range(24)) or len(source_grids)!=1:
+            return "CSV_MISSING_HOURS_OR_MULTIPLE_GRIDS",{}
+    if observed!=expected_raw or len(seen_global)!=24*len(expected_raw):
+        return "CDS_REQUESTED_VARIABLE_OR_HOURLY_VALUES_MISSING",{}
+    if len(grids)!=1:
+        return "MULTIPLE_RETURNED_GRIDS_OR_VARIABLE_MISMATCH",{}
+    lat,lon=next(iter(grids))
+    return "COMPLETE_CDS_STYLE_ZIP_PAYLOAD_VERIFIED_NOT_A_REPAIR",{
+        "source_csv_members":len(files),
+        "member_names":names,
+        "member_variable_layout":layout,
+        "independent_hourly_values_count":len(seen_global),
+        "validated_raw_columns":sorted(expected_raw),
+        "ERA5L_grid_lat":lat,
+        "ERA5L_grid_lon":lon,
+    }
+
 def inspect_existing_zip(path:Path,site:str,day:str,expected_vars:set[str]):
-    """Return content status + audit metadata, never alter raw data."""
+    """Return independent original ZIP provenance + verified content, no writes."""
     if describe_file(path)!="REGULAR":
         return "NOT_REGULAR",{}
     length=path.stat().st_size
     digest=sha256(path)
-    result={"ZIP_bytes":length,"ZIP_SHA256":digest,"source_csv_members":0,
-            "independent_hourly_values_count":0,
-            "ERA5L_grid_lat":"","ERA5L_grid_lon":""}
+    result={
+        "ZIP_bytes":length,
+        "ZIP_SHA256":digest,
+        "source_csv_members":0,
+        "independent_hourly_values_count":0,
+        "ERA5L_grid_lat":"",
+        "ERA5L_grid_lon":""
+    }
     if not 0<length<=MAX_ZIP_SIZE:
         return "BAD_OR_OVERSIZE_ARCHIVE",result
     if not zipfile.is_zipfile(path):
         return "NOT_ZIP_FILE",result
     try:
-        observations=[]; grids=set(); foundvars=set(); names=[]
         with zipfile.ZipFile(path) as z:
-            files=[v for v in z.infolist() if not v.is_dir()]
-            if len(files)!=len(expected_vars):
-                return "UNEXPECTED_CSV_MEMBER_COUNT",result
-            for info in files:
-                pure=PurePosixPath(info.filename)
-                if (pure.is_absolute() or ".." in pure.parts or "\\" in info.filename
-                    or not info.filename.lower().endswith(".csv")
-                    or info.file_size>MAX_CSV_MEMBER_SIZE):
-                    return "SUSPICIOUS_OR_OVERSIZE_CSV_MEMBER",result
-            crc_bad=z.testzip()
-            if crc_bad is not None:
-                return "ZIP_CRC_FAIL",result
-            for info in files:
-                data=z.read(info)
-                rd=csv.DictReader(io.StringIO(data.decode("utf-8-sig")))
-                if (not rd.fieldnames or len(rd.fieldnames)!=4
-                    or len(set(rd.fieldnames))!=4
-                    or set(rd.fieldnames)-{"valid_time","latitude","longitude"} not in ({"sp"},{"strd"})):
-                    return "UNEXPECTED_ORIGINAL_CDS_CSV_SCHEMA",result
-                var=(set(rd.fieldnames)-{"valid_time","latitude","longitude"}).pop()
-                matching=[v for v in expected_vars if VARS[v][0]==var]
-                if len(matching)!=1 or var in foundvars:
-                    return "MISMATCHED_OR_DUPLICATE_CDS_VARIABLE",result
-                foundvars.add(var);names.append(info.filename)
-                readings=list(rd)
-                if len(readings)!=24:return "CSV_NOT_24_HOURLY_ROWS",result
-                seen=set(); memberset=set()
-                for rec in readings:
-                    dt=datetime.strptime(rec["valid_time"],"%Y-%m-%d %H:%M:%S")
-                    if (dt.date().isoformat()!=day or dt.minute or dt.second
-                        or dt.hour in seen):
-                        return "CSV_UTC_DAY_OR_HOUR_INVALID",result
-                    seen.add(dt.hour)
-                    lat=float(rec["latitude"]);lon=float(rec["longitude"])
-                    val=float(rec[var])
-                    if any(not math.isfinite(x) for x in (lat,lon,val)):
-                        return "NONFINITE_CDS_DATA",result
-                    if (abs(lat-TOWERS[site][0])>0.11 or abs(lon-TOWERS[site][1])>0.11):
-                        return "RETURNED_GRID_NOT_NEAR_ORIGINAL_TOWER",result
-                    converted=val/(1000 if var=="sp" else 3600)
-                    if not (0<converted<120 if var=="sp" else 0<=converted<1500):
-                        return "GROSS_INDEPENDENT_NUMERIC_SCREEN_FAIL",result
-                    memberset.add((lat,lon));grids.add((lat,lon))
-                    observations.append((var,dt.hour,converted))
-                if seen!=set(range(24)) or len(memberset)!=1:
-                    return "CSV_MISSING_HOURS_OR_MULTIPLE_GRIDS",result
-        if len(grids)!=1 or len(foundvars)!=len(expected_vars):
-            return "MULTIPLE_RETURNED_GRIDS_OR_VARIABLE_MISMATCH",result
-        (lat,lon),=grids
-        result.update({"source_csv_members":len(names),
-                       "member_names":names,
-                       "independent_hourly_values_count":len(observations),
-                       "ERA5L_grid_lat":lat,"ERA5L_grid_lon":lon})
-        return "COMPLETE_CDS_STYLE_ZIP_PAYLOAD_VERIFIED_NOT_A_REPAIR",result
-    except (OSError,ValueError,UnicodeError,RuntimeError,zipfile.BadZipFile,KeyError,OverflowError) as e:
-        result["error_type"]=type(e).__name__
+            status,values=audit_cds_csv_members(z,site,day,expected_vars)
+        result.update(values)
+        return status,result
+    except (OSError,ValueError,UnicodeError,RuntimeError,zipfile.BadZipFile,
+            KeyError,OverflowError) as exc:
+        result["error_type"]=type(exc).__name__
         return "CDS_ZIP_OR_CSV_PARSE_ERROR_HOLD",result
 
 def self_test():
@@ -227,7 +276,66 @@ def self_test():
     assert len(VARS)==2
     assert (datetime.strptime("201112170000","%Y%m%d%H%M").strftime("%Y-%m-%d") in DAYS)
     assert sum(len(EXPECTED_BY_SITE[s]) for s,d in SIX)==8
-    print("STAGE05AB SELF-TEST PASS | 6 exact site-days, 8 expected CSV members, hold existing .zip/.partial/.csv; NO NETWORK/WRITES")
+
+    # Offline, in-memory regression. Never write files or reach the CDS API.
+    date="2011-12-16"
+    site="JP-Yms"
+    latitude,longitude=TOWERS[site][:2]
+    header=["valid_time","latitude","longitude","sp","strd"]
+    records=[{"valid_time":f"{date} {hour:02d}:00:00",
+              "latitude":latitude,"longitude":longitude,
+              "sp":100250.0+hour,"strd":720000.0+3600.0*hour}
+             for hour in range(24)]
+    def as_csv(fields):
+        buffer=io.StringIO()
+        writer=csv.DictWriter(buffer,fieldnames=fields,lineterminator="\n")
+        writer.writeheader()
+        for record in records:
+            writer.writerow({k:record[k] for k in fields})
+        return buffer.getvalue()
+    def check_memory(members):
+        target=io.BytesIO()
+        with zipfile.ZipFile(target,mode="w",compression=zipfile.ZIP_DEFLATED) as z:
+            for member,data in members:
+                z.writestr(member,data)
+        target.seek(0)
+        with zipfile.ZipFile(target) as z:
+            return audit_cds_csv_members(z,site,date,EXPECTED_BY_SITE[site])
+    # Both real CDS output packaging formats are legitimate.
+    status1,meta1=check_memory([("both.csv",as_csv(header))])
+    assert status1=="COMPLETE_CDS_STYLE_ZIP_PAYLOAD_VERIFIED_NOT_A_REPAIR"
+    assert meta1["source_csv_members"]==1
+    assert meta1["independent_hourly_values_count"]==48
+    assert meta1["validated_raw_columns"]==["sp","strd"]
+
+    base=["valid_time","latitude","longitude"]
+    status2,meta2=check_memory([
+        ("pressure.csv",as_csv(base+["sp"])),
+        ("thermal.csv",as_csv(base+["strd"]))
+    ])
+    assert status2=="COMPLETE_CDS_STYLE_ZIP_PAYLOAD_VERIFIED_NOT_A_REPAIR"
+    assert meta2["source_csv_members"]==2
+    assert meta2["independent_hourly_values_count"]==48
+
+    # Fail closed if same variable appears twice, or a required variable missing.
+    bad,status=check_memory([("first.csv",as_csv(base+["sp"])),
+                              ("duplicate.csv",as_csv(base+["sp"]))])
+    assert bad=="MISMATCHED_OR_DUPLICATE_CDS_VARIABLE"
+    bad,status=check_memory([("pressure.csv",as_csv(base+["sp"]))])
+    assert bad=="CDS_REQUESTED_VARIABLE_OR_HOURLY_VALUES_MISSING"
+
+    # Ensure prior one-variable Fjy/Khw 24-hour CSV case still passes.
+    target=io.BytesIO()
+    with zipfile.ZipFile(target,mode="w",compression=zipfile.ZIP_DEFLATED) as z:
+        z.writestr("pressure.csv",as_csv(base+["sp"]))
+    target.seek(0)
+    with zipfile.ZipFile(target) as z:
+        original_status,original_meta=audit_cds_csv_members(
+            z,site,date,{"surface_pressure"})
+    assert original_status=="COMPLETE_CDS_STYLE_ZIP_PAYLOAD_VERIFIED_NOT_A_REPAIR"
+    assert original_meta["independent_hourly_values_count"]==24
+
+    print("STAGE05AB SELF-TEST PASS | original six site-days, Yms combined/split sp+strd CSV, Fjy/Khw pressure-only, SHA/CRC/24UTC, NO NETWORK/WRITES")
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
