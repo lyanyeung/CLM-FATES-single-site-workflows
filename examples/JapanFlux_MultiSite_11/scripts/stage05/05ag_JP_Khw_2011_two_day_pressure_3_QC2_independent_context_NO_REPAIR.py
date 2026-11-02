@@ -57,9 +57,11 @@ def sha256(path:Path):
     return h.hexdigest()
 
 def source_events(records):
+    """Verify all 27 source fields; scope JP-Khw 2011 PA after 2005 mixed-variable separation."""
     if len(records)!=27 or Counter(r["site"] for r in records)!=COUNTS:
         raise ValueError("Expected exactly 27 original QC2 source-mapped fields")
-    seen=set();source=[]
+    seen=set();source=[]; historical=[]
+    unit_by_var={"PA":"kPa","LW_IN":"W m-2","TA":"deg C"}
     for r in records:
         k=r["site"],r["native_start"],r["variable"]
         if k in seen:raise ValueError("Duplicate original QC2 source event")
@@ -74,17 +76,26 @@ def source_events(records):
             or not all(math.isfinite(t) for t in (x,y))
             or not math.isclose(x,y,rel_tol=1e-12,abs_tol=1e-9)):
             raise ValueError("Original source F/ERA QC2 HOLD invariant changed")
+        if r["variable"] not in unit_by_var or r["unit"]!=unit_by_var[r["variable"]]:
+            raise ValueError("Original source variable/units changed: "+str(k))
         if r["site"]!=SITE:continue
-        if r["variable"]!="PA" or r["unit"]!="kPa":
-            raise ValueError("Original JP-Khw source QC2 variable / units unexpected")
-        if utc.date().isoformat() in DATES:
+        if utc.year==2005 and utc.month==8:
+            # Original JP-Khw 2005 anomalies are mixed variables:
+            # LW_IN (2), PA (3), TA (3). They are already separately evidenced.
+            historical.append(r)
+        elif utc.date().isoformat() in DATES:
+            # Stage05AG is strictly the THREE previously unreviewed 2011 PA fields.
+            if r["variable"]!="PA" or r["unit"]!="kPa":
+                raise ValueError("Original JP-Khw 2011 QC2 source variable / units unexpected")
             source.append(r)
-        elif utc.year==2005 and utc.month==8:
-            pass
         else:
             raise ValueError("JP-Khw original QC2 event outside known 2005/2011 review dates")
-    if len(source)!=3:
-        raise ValueError("Expected three original JP-Khw 2011 QC2 pressure candidates")
+    if Counter(r["variable"] for r in historical)!=Counter({"LW_IN":2,"PA":3,"TA":3}):
+        raise ValueError("Original JP-Khw 2005 eight mixed-variable QC2 history changed")
+    if len(source)!=3 or Counter(r["variable"] for r in source)!=Counter({"PA":3}):
+        raise ValueError("Expected precisely three original JP-Khw 2011 QC2 PA candidates")
+    if len({r["native_start"] for r in source})!=3:
+        raise ValueError("2011 JP-Khw source native half-hours duplicated")
     return sorted(source,key=lambda r:r["utc_start"])
 
 def source_hour_keys(source,allhours):
@@ -254,7 +265,41 @@ def selftest():
     assert (d.replace(minute=0)+timedelta(hours=1)).strftime("%Y-%m-%dT%H:%MZ")=="2011-12-17T00:00Z"
     assert (d-timedelta(hours=9)).strftime("%Y%m%d%H%M")=="201112161430"
     assert len(DATES)==2 and COUNTS==Counter({"JP-Fjy":6,"JP-Khw":11,"JP-Yms":10}) and sum(COUNTS.values())==27
-    print("STAGE05AG SELF-TEST PASS | source-verified two-day UTC-midnight, exact per-variable Stage05P context, SHA/CRC; NO WRITES")
+
+    # Regression for actual Stage05AG failure: JP-Khw 2005 data include
+    # LW_IN/TA as well as PA. Only the three Dec 2011 rows require PA-only.
+    synthetic=[]
+    def add(site,utc_str,var,offset,value):
+        utc=datetime.strptime(utc_str,"%Y%m%d%H%M")+timedelta(minutes=30*offset)
+        native=utc+timedelta(hours=9)
+        units={"PA":"kPa","TA":"deg C","LW_IN":"W m-2"}
+        synthetic.append({"site":site,"native_start":native.strftime("%Y%m%d%H%M"),
+            "utc_start":utc.strftime("%Y%m%d%H%M"),"variable":var,
+            "selected_F":str(value),"ERA_in_same_release":str(value),
+            "raw_F_QC":"2","unit":units[var],
+            "source_status":"HOLD_INDEPENDENT_ERA_CHECK_NOT_REPAIR_APPROVED"})
+    for j in range(6):add("JP-Fjy","200508111700","PA",j,45.0+j)
+    for j,var in enumerate(("LW_IN","LW_IN","PA","PA","PA","TA","TA","TA")):
+        add("JP-Khw","200508111600",var,j,float(j+1))
+    for j in range(3):add("JP-Khw","201112162100","PA",j,45.0+j)
+    for j in range(10):add("JP-Yms","200508111600","PA",j,float(j+1))
+    selected=source_events(synthetic)
+    assert len(selected)==3 and all(r["variable"]=="PA" for r in selected)
+    # Source-type regression: PA-only restriction MUST NOT screen out
+    # earlier, valid LW/TA anomalies, but still fail on new 2011 LW/TA.
+    altered=[r.copy() for r in synthetic]
+    for r in altered:
+        if r["site"]=="JP-Khw" and r["utc_start"].startswith("20111216"):
+            r["variable"]="LW_IN"
+            r["unit"]="W m-2"
+            break
+    try:
+        source_events(altered)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("2011 JP-Khw non-pressure source field not rejected")
+    print("STAGE05AG SELF-TEST PASS | actual 2005 Khw LW/PA/TA mixed-field regression + 2011 PA-only, UTC+9, two-day context; NO WRITES")
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
