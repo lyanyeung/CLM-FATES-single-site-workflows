@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–33 OPERATOR EXECUTED; STAGE25–32 EXACT 111 STEM ORIGINAL/DERIVED PAIRS AND SOURCE AGB INTERNAL AUDITS VERIFIED; 2014 27/103 ACACIA STEMS TALLER THAN DEFAULT FATES7 HEIGHT CAP; STAGE33 OFFICIAL TERN SITE-LEVEL BIOMASS SOURCE CSV 2 ROWS SHA VERIFIED, 2014=37.4168 t/ha AND 2018-DERIVED=44.6277 t/ha (core1ha LABEL, PUBLISHER'S ACTUAL STEM SAMPLING AREA 0.06ha); SOURCE 111 STEM SUMS SCALED TO 0.06ha SHOW OPPOSING ±0.0405 t/ha RESIDUALS MATCHING A SINGLE 2014 EREMOPHILA AGB VALUE ON A CROSS-YEAR ARITHMETIC SCREEN; STAGE34 SOURCE ROW YEAR/SCALE RECONCILIATION PUBLISHED, EXECUTION PENDING. PFT/SOIL/FORCING, 2018 AGB SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–34 OPERATOR EXECUTED; 111 EXACT TERN 2014 FIELD / 2018 DERIVED STEM PAIRS SOURCE VERIFIED; 2014 27/103 ACACIA UNIQUE STEMS ABOVE DEFAULT FATES7 HEIGHT CAP; 2018 DERIVED AGB ASSOCIATION AND ALLOMETRY SCIENCE HOLD; STAGE33 OFFICIAL TERN STAND 37.4168 (2014) AND 44.6277 (2018 DERIVED) t/ha VERIFIED; STAGE34 INDEPENDENTLY RECOMPUTED 111 SOURCE STEM TOTALS WITH PUBLISHER 0.06ha: +2.429182506 kg VS 2014 STAND, -2.429857769 kg VS 2018 STAND, WITH EXACTLY ONE SINGLE-2014-STEM-AGB TWO-YEAR ARITHMETIC TRANSFER CANDIDATE: Eremophila latrobei ssp glabra PLANT99 STEM1b, 2.429615547 kg. STAGE35 SEVEN SOURCE GROUPING COUNTERFACTUALS PUBLISHED, OPERATOR RUN PENDING. NOT PROOF OF A SOURCE JOIN ERROR. NO PFT/SOIL/FORCING APPROVAL OR AD400.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -2484,6 +2484,103 @@ stem IDs above default FATES7 cap** remains separate;
 source 2018 derived AGB still not approved for model
 calibration. Never substitute D20 at 0.2m for DBH
 at 1.3m. PFT, soil, forcing and AD400 HOLD unchanged.
+
+## 3ak. Stage34 operator SUCCESS — uniquely matched Plant99 1b source arithmetic; Stage35 original source provenance counterfactuals
+
+**Actual Stage34 operator SUCCESS**:
+`/home/ly3n24/ozflux_stage34_20261102T193337Z`.
+SHA verified:
+- original 222-row TERN basal D20 stem CSV `7a3f4efabc1c8650670bc996d25d2145cd5f5a2679f6fe8f2003d487c4a0db55`;
+- original 2-row official TERN stand biomass CSV `f4fcfe46fd5132ed040187ae443441d37822e18c8deb48c01be667af51b9fea8`.
+
+Exact original Decimal source arithmetic across **111 distinct stem keys,
+2014 field vs 2018 derived (222 rows)** with TERN publisher's
+**0.06ha actual sampled subplot** and 4-decimal stand t/ha:
+- 2014 official stand 37.4168 t/ha (2245.008 kg implied);
+  raw original 111 stem AGB total **2247.437182506 kg**,
+  so stem-minus-stand **+2.429182506 kg**.
+- 2018 official stand 44.6277 t/ha (2677.662 kg implied);
+  raw original 111 derived stem AGB total **2675.232142231 kg**,
+  so stem-minus-stand **−2.429857769 kg**.
+- Pooled two-year mass difference from published rounded site
+  totals only **−0.000675263 kg**, below 4dp site precision.
+- Of all **111 original 2014 source stem AGB entries**, EXACTLY
+  ONE produces both published stand AGB values to 4dp when
+  hypothesizing *omission of its 2014 value from 2014*
+  and *additional inclusion of that same 2014 value in
+  the 2018 aggregate*:
+  **`Eremophila latrobei ssp glabra`, site Alice Mulga,
+  plot Alice Mulga, core1ha, Plant ID 99, Stem ID 1b,
+  original phenomenonTime `22/1/2014`, AGB
+  `2.429615547 kg`**.
+  Two recalculated scenario stands:
+  2014 **37.41679278265 t/ha -> 37.4168**;
+  2018 **44.6276959629666667 t/ha -> 44.6277**.
+  The match includes original output precision, not
+  an invented adjustment. THIS IS **AN ARITHMETIC HYPOTHESIS**,
+  not a verified publisher grouping/join error nor
+  permission to edit TERN data.
+- The underlying 2018 per-stem derived AGB itself remains
+  scientifically questionable based on Stage30–32 and
+  NOT APPROVED for model calibration. Official stand values
+  are from the same dataset lineage and thus not independent
+  biomass validation.
+
+TERΝ dataset metadata cites a source 0.06ha stem subplot and
+Návar (2013) AGB allometry; 2018 repeat individual field stem
+census was not done for this product. Source:
+https://portal.tern.org.au/metadata/c2968de2-1e8b-4a05-919f-46744b3171ed
+Separate historical archived 2018 core1ha AGB dataset may
+help a later independent cross-product comparison:
+https://researchdata.edu.au/vegetation-data-direct-ha-2018/1340784
+but its stems / units / survey methodology MUST be
+separately inventoried and cannot be assumed identical.
+
+**Stage35 original-Plant99 two-year source-row forensic and seven
+counterfactual tests PUBLISHED, operator execution pending**:
+`scripts/stage35/35_asm_Plant99_AGB_year_grouping_counterfactual_and_provenance_READONLY.py`
+pinned GitHub commit `b3238aa0f8acd70ffcbf98fe089e4e4844c856c5`
+and git blob `d07ec490b7bda2a5c36d77fe7d9b9313258e8305`.
+It independently reopens all original sources and exact Stage34
+one-candidate receipt, displays both raw 2014/2018 Plant99 1b
+records including dates, stemStatus and comment, and computes
+seven different original year inclusion/exclusion interpretations.
+It explicitly distinguishes (a) omission only, (b) addition
+only, (c) omit 2014 and add 2014 value to 2018,
+(d) replace 2018 value with 2014 value, (e) add extra 2018
+value, and (f) omit both years; only a mathematical source
+arithmetic match is possible without the official code.
+No source/model write, Slurm, or AD400.
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="b3238aa0f8acd70ffcbf98fe089e4e4844c856c5"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage35_code"
+OUT="$HOME/ozflux_stage35_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS --retry 3 "$BASE/scripts/stage35/35_asm_Plant99_AGB_year_grouping_counterfactual_and_provenance_READONLY.py" -o "$CODE/stage35.py.download"
+test "$(git hash-object "$CODE/stage35.py.download")" = "d07ec490b7bda2a5c36d77fe7d9b9313258e8305"
+mv "$CODE/stage35.py.download" "$CODE/stage35.py"
+python3 -B -m py_compile "$CODE/stage35.py"
+python3 -B "$CODE/stage35.py" --self-test
+python3 -B "$CODE/stage35.py" --out "$OUT"
+echo "REPORT_DIR $OUT"
+)
+~~~
+
+Outputs:
+`stage35_Plant99_seven_AGB_year_grouping_counterfactuals.tsv`
+and `stage35_Plant99_original_source_stand_biomass_science_HOLD.json`.
+Following operator success, ask dataset maintainers
+`esupport@tern.org.au` for exact site-level grouping/filtering
+steps / source code and biomass method, and direct DBH field
+survey records, supplying only reproducible source IDs
+and stand residuals. Do not assert a publisher defect
+unless confirmed. No direct D20=DBH substitution,
+science approval, FATES surface modification or AD400.
 
 ## 4. Future science decisions (still require explicit approvals)
 
