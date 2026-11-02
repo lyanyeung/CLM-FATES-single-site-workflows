@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–17 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE GENERATED/HASH VERIFIED; STAGE17 HOST PFT AND TEN-LAYER SOIL SCIENCE DISCREPANCIES AUDITED; STAGE18 ACTUAL FATES PARAMETER SOURCE DISCOVERY PUBLISHED, EXECUTION PENDING.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–18 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE GENERATED/HASH VERIFIED; STAGE17 HOST PFT AND TEN-LAYER SOIL SCIENCE DISCREPANCIES AUDITED; STAGE18 FATES DEFAULT JSON AND AU-HOW COMPETITION MODE DOCUMENTED; STAGE19 DEEP PARAMETER-STRUCTURE FORENSICS PUBLISHED, EXECUTION PENDING.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -1032,6 +1032,38 @@ echo "STAGE18 REPORT: $OUT"
 ~~~
 
 Reference: https://fates-users-guide.readthedocs.io/en/latest/user/HLM-FATES-PFT-map.html and https://ncar.github.io/CESM-Tutorial/notebooks/challenge/clm_ctsm/clm_exercise_3.html . Science approval remains FALSE; no new surface or AD400 submission.
+
+## 3t. Stage18 operator success; Stage19 FATES default JSON structure and model-mode forensics
+
+**Stage18 operator output 2026-11-02:** `/home/ly3n24/ozflux_stage18_20261102T030211Z`. Stage16 reference surface SHA256 verified, and one local FATES parameter candidate actually exists:
+`/iridisfs/scratch/ly3n24/CLM_FATES/CTSM/src/fates/parameter_files/fates_params_default.json`;
+SHA256 `0819f8fddcb3566f6209f72bb1159a3161d03c8225a1464727b1d2b21aec6c04`.
+Stage18 reports `MAP FOUND: False` **only after checking top-level JSON keys**; this does not prove the JSON lacks nested mapping fields. One pre-existing reference case `AU-How_FATES_1PT` had its effective `CaseDocs/lnd_in` setting `fates_paramfile` to this exact path, with `use_fates_nocomp = .false.`; that setting is evidence for the **AU-How example ONLY**, not a newly selected AU-ASM run mode. No AU-ASM case or FATES parameter is approved.
+
+FATES upstream documentation states that `fates_hlm_pft_map` is used for fixed biogeography and no-competition input mapping, whereas a full competition case may not prescribe the patch fractions the same way. A default mapping has host10 broadleaf deciduous temperate shrub potentially linked to cold-deciduous extratropical shrub, but **the model's actual parameter file has not yet demonstrated that map**. Do not silently assign the 41.5859% host10 fraction to an arid-zone hydrodeciduous Mulga shrub. Use `--params` only for exact known source path and continue separating host index labels from FATES PFT indices.
+
+**Stage19 read-only**: `scripts/stage19/19_asm_fates_json_structure_and_mode_forensics_readonly.py`, commit `379afddaa5023b872fd5fc4f435601a132ce9a3d`, git blob SHA `b31830f2b8cac01e4034d9c01d4fbad1caa33a38`. Verifies the original JSON SHA256 and the Stage18 report and then recursively explores FATES parameter keys, including nested `fates_hlm_pft_map`, PFT names, PFT dimensions and selected init parameters. Reports **true missing** if absent at all inspected JSON levels. Reads older AU-How CaseDocs mode and param references, never assumes this applies to AU-ASM. Only new HOME JSON report is written, no Surface/FATES parameters/CIME/Slurm changes.
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="379afddaa5023b872fd5fc4f435601a132ce9a3d"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage19_code"
+SCRIPT="$CODE/ozflux_stage19.py"
+OUT="$HOME/ozflux_stage19_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/scripts/stage19/19_asm_fates_json_structure_and_mode_forensics_readonly.py" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "b31830f2b8cac01e4034d9c01d4fbad1caa33a38"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+python3 -B "$SCRIPT" --out "$OUT"
+echo "REPORT_DIR: $OUT"
+)
+~~~
+
+Science gate remains **HOLD**: do not generate assumed Mulga PFT fractions or ten soil layers, do not launch CIME/Slurm. Next action is choose a transparent competition vs fixed mode and evaluate calibrated local woody PFT/soil scenarios, with separate source-preserving reference experiments.
 
 ## 4. Future science decisions (still require explicit approvals)
 
