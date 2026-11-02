@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–23 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE GENERATED/HASH VERIFIED; STAGE20 EXACT FATES 14×14 MAP VERIFIED; STAGE21 ALL 214 TRAITS EXTRACTED; STAGE22 COMPARED 35 MULGA-RELEVANT TRAITS; STAGE23 ACTUAL FATES4 hmode5 / FATES7 hmode1 AND LOCAL ALLOMETRY FORTRAN SHA VERIFIED; STAGE24 EXACT-LOCAL-SOURCE HEIGHT CURVES PUBLISHED, EXECUTION PENDING. SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–24 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 CTSM REFERENCE POINT SURFACE SHA VERIFIED; STAGE20 ACTUAL FATES 14×14 MAP AND STAGE21 214 TRAITS VERIFIED; STAGE23/24 VERIFIED LOCAL FORTRAN MODE5/1 AND FATES4/FATES7 HEIGHT CURVES; STAGE25 EXTERNAL 2014 TERN FIELD STEM + LEAF TRAIT SOURCE INTAKE PUBLISHED, EXECUTION PENDING. SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -1549,6 +1549,105 @@ FATES4 is objectively superior to FATES7 simply because the
 model's generic allometric height crosses 4.3 m.
 PFT fractions, source forcing QC signoff, soil ten-layer parameters
 and AU-ASM CIME mode remain science HOLD.
+
+## 3aa. Stage24 operator SUCCESS; field stem DBH and leaf traits now available for direct model evaluation
+
+**Actual Stage24 operator PASS (2026-11-02)**:
+`/home/ly3n24/ozflux_stage24_20261102T115254Z`.
+FATES source Fortran SHA256
+`8ad6c9eaaa9f5c40036f8aa099f6435b80f2a8e7248a48b6ddb3a978db3c7f16`;
+original FATES JSON SHA256
+`0819f8fddcb3566f6209f72bb1159a3161d03c8225a1464727b1d2b21aec6c04`.
+The installed **local** h_allom mode5 Martinez-Cano and mode1
+O'Brien formulas and dispatch were verified before calculating curves.
+At site canopy height reference **4.3 m**, model formula inverse DBH:
+FATES4 5.660263445 cm, FATES7 2.580295600 cm.
+FATES7 (O'Brien with `allom_dbh_maxheight=3cm`) has a
+height plateau **4.735410175 m at DBH≥3cm**.
+FATES4 can reach 4.3m at 5.66cm DBH. At 10cm DBH FATES4
+predicts 7.823676m while FATES7 stays at 4.73541m.
+These are structural model formula values, not measured DBH or model runs.
+Stage24 writes no original sources and approves no case/AD400.
+
+**New, more discriminating external site evidence**:
+1. The TERN 2026_v3 Mulga flux collection reports **median canopy
+   height 4.3m, tallest trees 8.9m**, mixed Acacia aneura/aptaneura
+   woodland and **total standing biomass 32.5t/ha** (NOT automatically
+   equivalent to aboveground woody biomass/cAGB).
+   https://portal.tern.org.au/metadata/TERN/608dca79-0ec8-412d-9f13-71f7714affac
+   The historical OzFlux site page separately says **mean height 6.5m**,
+   which is not the same statistic/measurement period as the median.
+   https://ozflux.org.au/monitoringsites/alicesprings/alicesprings_description.html
+   The FATES7 default height plateau 4.735m CANNOT represent the
+   highest 8.9m trees, while FATES4 reaches 8.9m at a structural-model
+   DBH of ~11.339cm. This is stronger evidence of tree allometry
+   suitability but does not itself validate the PFT.
+2. A 2014 **direct DBH** core plot dataset located ~130–250m from
+   tower within its footprint reports **200 stems** (>1cm DBH)
+   from **86 trees**: 154 stems (1–5cm), 27 (5–10cm), 19 (>10cm).
+   Source metadata:
+   https://researchdata.edu.au/vegetation-data-direct-ha-2014/617073
+   **Many stems per tree, not 200 independently measured trees**;
+   the files/paired individual heights have not been fetched or QCed.
+3. Another separate TERN **2014 stem diameter/height/woody biomass**
+   release gives an original CSV and data dictionary:
+   https://portal.tern.org.au/metadata/c2968de2-1e8b-4a05-919f-46744b3171ed
+   Its documented diameter is **basal D20 at 20cm height, NOT DBH**.
+   Comparing D20 directly against the FATES input DBH is invalid
+   unless a field-supported conversion is available. The 2018 values
+   may derive from increment estimates rather than remeasured stems;
+   check release/lineage before using them.
+4. TERN **Alice Mulga Leaf Functional Trait Data, 2014**:
+   https://portal.tern.org.au/metadata/5e4f379d-0be6-4e40-b52c-9fa3e1e71a00
+   Original CSV and dictionary cover sampled 2014 dry-season
+   leaf net photosynthesis, stomatal conductance, LMA, nitrogen,
+   phosphorus and respiration. These give potential constraints
+   for FATES4/7, **but measured Amax/net photosynthesis is not
+   directly Vcmax25; LMA needs verified units before converting SLA**.
+   Remote public CSV attachment links are real TERN links; availability
+   from IRIDIS6 has NOT been tested.
+
+**Stage25** now prepared:
+`scripts/stage25/25_asm_TERN_field_DBH_D20_leaf_traits_source_intake_READONLY.py`;
+pinned commit `8a59c9384133644d65f7a29dea8329a19d5e32e0`,
+Git blob `afccea2b716ddd05dd9cb02a94f4311000c404f9`.
+The script verifies Stage24 receipt; attempts original TERN CSV + data
+dictionary downloads for stem and leaf measurements into one NEW direct
+HOME folder; records each source URL, SHA256, headers, first 3 rows,
+row counts, data dictionaries and individual access failures. It does
+**not** calculate height/trait residuals before reviewing actual field
+definitions. A failed TERN attachment access is recorded as
+`NOT_VERIFIED_ACCESS_OR_CSV_SCHEMA`, not evidence of absent data.
+No overwrite of original FATES, Stage14 forcing, CTSM Surface or
+model cases; no Slurm/AD400.
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="8a59c9384133644d65f7a29dea8329a19d5e32e0"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage25_code"
+SCRIPT="$CODE/ozflux_stage25.py"
+OUT="$HOME/ozflux_stage25_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS --retry 3 "$BASE/scripts/stage25/25_asm_TERN_field_DBH_D20_leaf_traits_source_intake_READONLY.py" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "afccea2b716ddd05dd9cb02a94f4311000c404f9"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+python3 -B "$SCRIPT" --out "$OUT"
+echo "REPORT_DIR $OUT"
+)
+~~~
+
+Source inventory outputs only:
+`stage25_AU_ASM_TERN_stem_leaf_intake_science_HOLD.json`
+and any newly acquired source CSVs within the fresh HOME report
+folder. **Do not commit the raw TERN files to GitHub**.
+The scientific next step is data dictionary and sensor/plot provenance,
+then paired model height-vs-field DBH and possibly leaf traits,
+instead of generating more arbitrary PFT/soil parameter candidates.
+All PFT/SURFACE/forcing approvals remain FALSE.
 
 ## 4. Future science decisions (still require explicit approvals)
 
