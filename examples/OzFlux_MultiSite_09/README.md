@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–18 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE GENERATED/HASH VERIFIED; STAGE17 HOST PFT AND TEN-LAYER SOIL SCIENCE DISCREPANCIES AUDITED; STAGE18 FATES DEFAULT JSON AND AU-HOW COMPETITION MODE DOCUMENTED; STAGE19 DEEP PARAMETER-STRUCTURE FORENSICS PUBLISHED, EXECUTION PENDING.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–19 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE GENERATED/HASH VERIFIED; STAGE17 HOST PFT AND TEN-LAYER SOIL SCIENCE DISCREPANCIES AUDITED; STAGE19 EXACT 14x14 FATES MAP AND AU-HOW FULL-COMPETITION EXAMPLE CONFIRMED; STAGE20 MODE/PFT/SOIL DECISION GATE PUBLISHED, EXECUTION PENDING.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -1064,6 +1064,92 @@ echo "REPORT_DIR: $OUT"
 ~~~
 
 Science gate remains **HOLD**: do not generate assumed Mulga PFT fractions or ten soil layers, do not launch CIME/Slurm. Next action is choose a transparent competition vs fixed mode and evaluate calibrated local woody PFT/soil scenarios, with separate source-preserving reference experiments.
+
+## 3u. Stage19 actual FATES HLM 14x14 map FOUND; Stage20 mode and site-science decision
+
+**Operator Stage19 SUCCESS (2026-11-02)**:
+`/home/ly3n24/ozflux_stage19_20261102T031102Z`.
+Verified local JSON SHA256 `0819f8fddcb3566f6209f72bb1159a3161d03c8225a1464727b1d2b21aec6c04`.
+The JSON top-level schema is exactly `attributes, dimensions, parameters`,
+so Stage18 top-level-only map search returned a **false negative**.
+The ACTUAL local mapping is at `parameters.fates_hlm_pft_map`,
+dimensions `[fates_hlm_pftno, fates_pft]`,
+shape **14×14**. The 14 exact FATES names are in
+`parameters.fates_pftname.data`. The rows correspond to
+host natpft indices **1–14**; host natpft0 is bare/nonvegetated and
+has no row. Source matrix entries are pinned to the local JSON, **not
+generic online docs**, which may reflect different versions.
+
+Selected exact host-to-FATES assignments in this JSON:
+- host4 (tropical evergreen broadleaf) -> 1-based FATES1
+  `broadleaf_evergreen_tropical_tree`.
+- host5 (temperate evergreen broadleaf) -> FATES4
+  `broadleaf_evergreen_extratrop_tree`.
+- host7 (temperate deciduous broadleaf) -> FATES6
+  `broadleaf_colddecid_extratrop_tree`.
+- host10 (temperate deciduous broadleaf shrub) -> **FATES8
+  `broadleaf_hydrodecid_extratrop_shrub`** (row9,
+  zero-based column7), **NOT cold-deciduous** in this local JSON.
+- host13 -> FATES13 `cool_c3_grass`; host14 -> FATES14
+  `c4_grass`.
+- Host11 (boreal deciduous shrub, 0% in this reference surface) splits
+  three FATES shrub types with weights 0.1, 0.1 and 0.8,
+  demonstrating this is a *fractional matrix*, not a universal
+  one-to-one PFT number conversion.
+
+Reference AU-How `CaseDocs/lnd_in` explicitly has
+`use_fates=.true.`, `use_fates_fixed_biogeog=.false.`,
+`use_fates_nocomp=.false.`: Full FATES with PFT
+competition, **not** no-competition/fixed biogeography.
+The **exact 14x14 fixed-biogeography map remains a valid potential
+future fixed-PFT mapping, but the reference Surface's natural-PFT
+percentages are NOT the fixed areas maintained by this Full FATES
+competition configuration**. No AU-ASM CIME mode has been selected.
+
+**Stage20 independent reconciliation** (read-only):
+`scripts/stage20/20_asm_exact_host_to_fates_mapping_mode_and_soil_strategy_readonly.py`
+pinned commit `0020ff86ecd51ad13f047c2232cd6fc471af2199`,
+Git blob `452b13e4e845120e77156e5fc9a3cd0a58202c1f`.
+It compares SHA-pinned Stage19 JSON against exact Stage16 surface,
+validates each of 14 mapping rows sums to 1,
+prints the full host->FATES table and **hypothetical fixed-biogeography
+areas only**; verifies existing AU-How's three namelist flags,
+audits parameter PFT-dimensional trait names and records soil
+reference-vs-field assumptions. No new Surface, FATES parameter, case
+or Slurm job.
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="0020ff86ecd51ad13f047c2232cd6fc471af2199"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage20_code"
+SCRIPT="$CODE/ozflux_stage20.py"
+OUT="$HOME/ozflux_stage20_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/scripts/stage20/20_asm_exact_host_to_fates_mapping_mode_and_soil_strategy_readonly.py" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "452b13e4e845120e77156e5fc9a3cd0a58202c1f"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+python3 -B "$SCRIPT" --out "$OUT"
+echo "REPORT_DIR $OUT"
+)
+~~~
+
+Outputs: `stage20_AU_ASM_exact_host_to_FATES_mapping.tsv` and
+`stage20_AU_ASM_exact_mode_PFT_soil_science_gate.json`.
+After Stage20, prefer a deliberate scientific modeling choice:
+(A) Full FATES competition *reference* trial consistent with AU-How's
+mode, treating existing gridded site surface as a nonrepresentative
+baseline; versus (B) prescribed-biogeography/nocomp hypotheses
+requiring scientifically justified woody/C3/C4/bare fractions, ten-layer
+soil and careful default traits. These are **experimental design
+alternatives**, not pre-approved runs. Existing Stage14 FSDS0
+forcing is preserved and not modified. **No AD400 authorisation**.
+
+Official mode behavior:
+https://fates-users-guide.readthedocs.io/projects/tech-doc/en/stable/fates_tech_note.html
 
 ## 4. Future science decisions (still require explicit approvals)
 
