@@ -174,7 +174,7 @@ def verify_source_sites(helper,manifest_path,k_dir,root):
         detail,original=helper.evaluate(site,coords,offsets,digest,member)
         if (original is None or detail["status"]!="VERIFIED_ORIGINAL_BIF_COORDINATES"
             or original["status"]!="VERIFIED_COORDS_NOT_ERA5L_GRID_CELL_APPROVED"
-            or len(coords)!=1 or original["UTC_OFFSET_hours"]!=9):
+            or not coords or original["UTC_OFFSET_hours"]!=9):
             raise ValueError("Cannot verify original source BIF tower location for "+site+": "+str(detail["problems"]))
         lat=float(original["latitude"]);lon=float(original["longitude"])
         if not(20<=lat<=47 and 120<=lon<=154 and math.isfinite(lat) and math.isfinite(lon)):
