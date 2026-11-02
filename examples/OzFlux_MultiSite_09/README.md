@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–15 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE15 FOUND ZERO POINT SURFACES WITHIN ITS BOUNDED SCAN; STAGE16 ISOLATED REFERENCE CTSM SURFACE BUILDER PUBLISHED, EXECUTION PENDING.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–16 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 ISOLATED REFERENCE CTSM 2000 POINT SURFACE GENERATED AND HASH VERIFIED; STAGE17 PFT/SOIL SCIENCE GATE PUBLISHED, EXECUTION PENDING.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -970,6 +970,40 @@ by Stage15. Leaves `[landuse]` and all other config sections untouched.
 The self-test now covers duplicate directory references in different
 sections, an already 5.3.0 surface dir, spacing differences, and missing
 required keys. **No reference surface was made during the failed check.**
+## 3r. Stage16 reference surface SUCCESS; Stage17 exact PFT/soil vs Mulga science gate
+
+**2026-11-02 Stage16 actual operator run SUCCESS** after the `[surfdat]`-scoped config fix. Pinned config SHA256 `e700b675bc9a461b53cf353d075250534515c5a965b343da2373554504abe254`. Independent isolated CTSM-2000 point surface under:
+`/home/ly3n24/ozflux_stage16_reference_20261102T023647Z/surfdata_AU-ASM_hist_2000_16pfts_c261102.nc`.
+SHA256 `18edace32d8e356c7d73269329dca7ed6338140e1ad1456f1a88691522c307fa`.
+No `--dompft`, no PFT override, no source replacement, no CIME/Slurm, **science_approval=False**.
+
+**Observed reference CTSM natural PFT vector** (all fractions percent of natural land, distinct from non-natural landunits): bare 34.88629579, all tree 2.60101737, shrubs 41.58592876, C3 grass 0.04086810, C4 grass 20.88588998. Landunits: PCT_NATVEG 99.99938922% and crop 0.00061078%. This is a gridded CTSM reference input, NOT a measured tower-footprint Acacia/shrub/bare composition. The ~2.6% generic grid-tree representation is in clear tension with a field plot survey cited in the thesis reporting ~74.5% of plot area occupied by Acacia, but **the survey and model host natural-PFT denominators, periods and sampling domains are different and must not be equated**.
+
+**Reference 10-layer soil** is exceptionally sandy: sand [90,90,90,90,89,89,90,90,90,90]%; clay [6,6,6,6,7,7,7,7,7,7]%; ORGANIC [6.844117,6.844117,6.844117,6.844117,4.859421,3.795641,2.863758,1.688834,1.789572,1.789572] (CTSM units; not soil carbon %, see NetCDF attributes). A published Mulga site description reports red Kandosol sand:silt:clay 74:11:15; the older OzFlux website reports 50:50 sand:clay. Neither is a site-verified **10-layer** CLM texture vector. The reference gridded soil is internally valid but cannot automatically be called tower-representative.
+
+**Stage17 science gate**: `scripts/stage17/17_asm_reference_surface_vs_site_PFT_soil_FATES_gate_readonly.py`, commit `8aee7e87a3b299550e75d4283f901dd41c1d499f`, blob `4aa1aac58d0847441983516d96a35af069866185`. It reads the exact hashed Stage16 surface and Stage16 receipt, writes a full host PFT 0–14 (or 15 when present) reference table, and a 10-layer soil reference-vs-site-bulk comparison. Optionally accepts `--fates-params /EXACT/PATH/fates_params.nc` to inspect **the actual** `fates_hlm_pft_map` matrix without guessing its orientation or active FATES PFT indices. Never edits source, surface, FATES parameters, or Slurm.
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/8aee7e87a3b299550e75d4283f901dd41c1d499f/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage17_code"
+OUT="$HOME/ozflux_stage17_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS "$BASE/scripts/stage17/17_asm_reference_surface_vs_site_PFT_soil_FATES_gate_readonly.py" -o "$CODE/ozflux_stage17.py"
+test "$(git hash-object "$CODE/ozflux_stage17.py")" = "4aa1aac58d0847441983516d96a35af069866185"
+python3 -B -m py_compile "$CODE/ozflux_stage17.py"
+python3 -B "$CODE/ozflux_stage17.py" --self-test
+python3 -B "$CODE/ozflux_stage17.py" --out "$OUT"
+echo "STAGE17 report: $OUT"
+)
+~~~
+
+Outputs: `stage17_AU_ASM_host_PFT_exact.tsv`, `stage17_AU_ASM_soil10_grid_vs_site_bulk.tsv`, `stage17_AU_ASM_PFT_soil_science_gate.json`. Stage17 **does not approve** PFT fractions, 10-layer soil or the active FATES HLM-PFT map.
+
+Primary ecology refs: https://opus.lib.uts.edu.au/bitstream/10453/133258/2/02whole.pdf ; https://ozflux.org.au/monitoringsites/alicesprings/alicesprings_description.html . Host-to-FATES matrix ref: https://fates-users-guide.readthedocs.io/en/latest/user/HLM-FATES-PFT-map.html .
+
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
