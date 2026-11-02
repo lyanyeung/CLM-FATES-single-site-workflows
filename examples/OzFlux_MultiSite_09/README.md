@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–35 OPERATOR VERIFIED; STAGE36 2018-FIRST EVIDENCE INTAKE PUBLISHED, NOT YET RUN. PRIMARY TARGET: INDEPENDENT CATALOGUED 2018 ALICE MULGA CORE1HA D20/HEIGHT/STANDING AGB SURVEY, `supersite.1041` (EDITION 5; ORIGINAL DATA FILE STILL NOT VERIFIED). SECONDARY: 2022 TERN SOURCE'S 111 DERIVED 2018 STEM ROWS; ALL 2018 DERIVED AGB SCIENCE HOLD DUE TO STAGE30–35 SOURCE CONSISTENCY PROBLEMS. 2014 FIELD 27/103 ACACIA STEM IDS ABOVE FATES7 DEFAULT HEIGHT CAP IS RETAINED AS HISTORIC SUPPORT ONLY. A SEPARATE 2018-FIRST SOURCE-PRIORITY NOTE IS COMMITTED; NO MORE SPECULATIVE HISTORICAL COUNTERFACTUAL STAGES. PFT/SOIL/FORCING SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–36 OPERATOR VERIFIED. Stage36 source/catalog preflight confirmed 111 original 2018-DERIVED stems (NOT independent 2018 measurements); the separate 2018 supersite.1041 ARDC URL returned HTTP 404 and legacy TERN URL redirected to the portal without this dataset, so no true 2018 stem-file bytes are verified. User has SELECTED GitHub review-accepted OzFlux v1.1 PFT source for all nine NEW non-competition cases: source branch `oz-jp-pft-guidance-20261102`, commit `d62c814585c4aa85731f77b4a555efe6ec9e94a3`; primary vectors have been snapshotted in [Non-Competition OzFlux_Batch01_09](https://github.com/lyanyeung/Non-Competition-CLM-experiment/tree/main/examples/OzFlux_Batch01_09/). PFT composition is now an OPERATOR-SELECTED FIXNC model hypothesis, not observed cover; no source L6, DATM, surface, FATES params, old AU-How case, CIME or Slurm job has been changed. Final per-site forcing/soil/surface/effective-case science gates remain pending; AD5 and AD400 not submitted.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -2724,6 +2724,47 @@ structure/biomass evaluation. D20 must never become DBH without
 a site-specific evidenced transformation. Existing 2014 allometry
 and 2018 AGB review remain documented, with NO further historic
 forensic stages unless new source evidence emerges.
+
+## 3an. Stage36 operator success and selected OzFlux09 FIXNC PFT v1.1 handoff
+
+**Stage36 actual IRIDIS6 operator SUCCESS**:
+`/home/ly3n24/ozflux_stage36_20261102T201012Z`.
+Original 111 per-stem 2018 *derived* records and 44.6277 t/ha
+published derived stand data SHA verified, but catalog probes
+returned HTTP 404 for the separate ARDC independent 2018
+survey and a generic TERN portal redirect for the legacy
+`supersite.1041` URL. Thus NO original independent 2018 survey
+table has been downloaded; do not treat catalog metadata as data.
+
+**New user decision:** Use the accepted 2026-11-02 OzFlux 9-site
+PFT v1.1 PRIMARY model-hypothesis values from source branch
+`oz-jp-pft-guidance-20261102`, immutable commit
+`d62c814585c4aa85731f77b4a555efe6ec9e94a3`,
+`examples/OzFlux_JapanFlux_PFT/`. Main does NOT contain that
+branch's PFT directory; the non-competition repository now
+contains original-blob-pinned nine-site CLM 15-class host PFT,
+FATES PFT and validation snapshots:
+https://github.com/lyanyeung/Non-Competition-CLM-experiment/tree/main/examples/OzFlux_Batch01_09 .
+All bare `host0` shares are RETAINED, PFT model mode FIXNC
+(`use_fates_nocomp=.true.`,
+`use_fates_fixed_biogeog=.true.`),
+mapping DEFAULT14. The operator accepts the scientific
+PFT allocation AS A MODEL SCENARIO, not a measured land-cover fact.
+Do not continue historical AU-ASM PFT4/7 ambiguity as a blocker.
+
+**Next real HPC action:** Run the nine-site source-PFT
+Git blob and bounded original L6/Surface/DATM readiness inventory
+from `Non-Competition-CLM-experiment/examples/OzFlux_Batch01_09/`.
+It is read-only; after its operator PASS, create NEW PFT-specific
+point surface candidates, retain original soil as an explicitly
+stated reference where acceptable, independently verify exact
+FATES per-case effective mappings and DATM physics, and then
+start isolated **AD5** before AD400. No Slurm job is currently
+authorized by Stage36 or the GitHub PFT numeric review alone.
+AU-How's old competition case is NOT a FIXNC candidate and must
+be retained unchanged. Forcing and surface readiness remain
+independent per-site gates (the other 8 sites are not automatically
+ready because AU-ASM has 6 candidate DATM years).
 
 ## 4. Future science decisions (still require explicit approvals)
 
