@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–29 OPERATOR EXECUTED; STAGE14 FORCING AND STAGE16 REFERENCE SURFACE PRESERVED; STAGE20–24 EXACT FATES PFT AND ALL0METRY VERIFIED; STAGE25–28 FIELD STEM/LEAF AND DUPLICATE/DATE QC VERIFIED; STAGE29 222 D/M/YYYY DATES VERIFIED, EXACTLY 111 PAIRED STEMS 1x2014 FIELD + 1x2018 DERIVED; 2014 ACACIA 27/103 STEMS EXCEED THE FATES7 DEFAULT 4.7354m CAP; UNUSUAL 2018-DERIVED D20 AND BIOMASS CHANGES REQUIRE STAGE30 ORIGINAL-SOURCE AUDIT, PUBLISHED BUT NOT YET EXECUTED. PFT/SOIL/FORCING SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–30 OPERATOR EXECUTED; STAGE14 FORCING AND STAGE16 REFERENCE SURFACE PRESERVED; STAGE20–24 EXACT FATES MAP/TRAITS/HEIGHT FUNCTIONS VERIFIED; STAGE25–29 2014 TERN FIELD HEIGHTS AND 2018 DERIVED PAIRS VERIFIED; 2014 27/103 UNIQUE ACACIA STEMS EXCEED DEFAULT FATES7 HEIGHT CAP; STAGE30 111 STEMS SOURCE-RECONCILED WITH 48 SCIENCE FLAGS, 36 D20-UP/HEIGHT-SAME/AGB-DOWN, 37 DERIVED AGB-DECREASE, 20 ABS AGB CHANGES >50KG; STAGE31 2018 AGB JOIN/ALLOMETRY ASSOCIATION AUDIT PUBLISHED, EXECUTION PENDING. NO SOURCE REPAIR, PFT/SOIL/FORCING APPROVAL OR AD400.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -2084,6 +2084,102 @@ Reports: `stage30_all_111_2014_field_2018_derived_original_stems.tsv`,
 `stage30_AU_ASM_derived_2018_stem_increment_science_HOLD.json`.
 Actual Stage30 execution on IRIDIS6 pending, and no science approval
 or AD400/Normal400 authorized.
+## 3ag. Stage30 operator SUCCESS: 48/111 derived AGB anomaly stems; Stage31 join/allometry association gate
+
+**Actual Stage30 operator SUCCESS 2026-11-02:**
+`/home/ly3n24/ozflux_stage30_20261102T131841Z`.
+Original TERN 222-row D20 source SHA verified and 111 original
+2014 field vs 2018 derived stem pair values independently
+reconciled to Stage29. Stage30 reports **48 distinct stems**
+with at least one source-QC REVIEW flag (overlapping categories):
+**37** derived AGB decreases; **36** D20-up, height-stable but
+2018 AGB down; **20** absolute AGB changes >50kg; exactly
+**one** D20/basal-area decrease and two changed heights.
+These flags are exploratory, NOT 48 proven source errors.
+
+Species: A. aneura 43 stem IDs, D20 delta median +0.7cm
+(min +0.67521, max +0.7), 19 derived AGB decreases and
+3 changes abs >50kg. A. aptaneura 60 stems, D20 delta
+median +0.7cm, min -2.3cm, max +3.7cm, 14 AGB decreases,
+17 changes abs >50kg. Psydrax 4 AGB decreases in 7 stems;
+Eremophila 1 stem no flags. The two exceptional D20 changes
+occur within **A. aptaneura plant 29**, stem 1b (-2.3cm)
+and stem 2b (+3.7cm), with opposite 0.4m height changes.
+These may be stem identification/swap/derived processing issues;
+no source edit or reinterpretation is justified yet.
+
+Critical same-stem examples from original source:
+A. aptaneura plant 13 stem 1b D20 26.0 to 26.7 cm,
+H stable 7.8m, AGB 304.3746875 to 15.02621289kg;
+plant 69 stem 1b D20 2.5 to 3.2cm,
+H 3.1m stable, AGB 0.470644739 to 158.1053356kg;
+plant 86 stem 2b D20 9.9 to 10.6cm, H 5.0m stable,
+AGB 21.02976969 to 350.7026157kg.
+These changes cannot be accepted as empirical carbon uptake/loss
+without verifying 2018 AGB field mapping and the exact original
+2018 biomass derivation pipeline.
+
+TERN official dataset methodology:
+https://portal.tern.org.au/metadata/c2968de2-1e8b-4a05-919f-46744b3171ed
+explains the 2014 D20/height survey, 2018 independent
+re-measurement **did not occur**, dendrometer-informed
+*uniform basal-area increment* was applied,
+AGB was calculated via Návar et al. (2013) allometry,
+and source data were screened for potential outliers.
+No per-stem coefficients or implementation are provided in the
+metadata. Uniform basal area is not uniform diameter increment.
+Stage30 source exhibits mostly +0.7cm D20, which should be
+treated as an observed RELEASE PATTERN, not proof the
+publisher used a fixed diameter increment.
+
+**Stage31 new read-only audit published, operator execution PENDING:**
+`scripts/stage31/31_asm_TERN_2018_AGB_join_formula_consistency_READONLY.py`;
+pinned commit `541845fcf224a314e5929951b325b008f947acba`,
+blob `d145b35b4a8773d13d3f0bf74ec5983e15aed349`.
+Stage31 pins the source 222-row CSV SHA and checks the actual
+Stage30 receipt (111 stems, 48 flagged, 36 mismatched direction,
+37 negative AGB, 20 large AGB changes). Independently joins
+exact original IDs and values and computes within-species
+**D20-vs-AGB and height-vs-AGB Spearman rank correlations**
+for 2014 field/derived baseline versus 2018 derived rows,
+source AGB ratios, repeated identical 2018 AGB across different
+stems, and same D20/height but different AGB candidate groups.
+Any apparently unrelated 2018 AGB values are only a
+**SUSPECTED join/formula/provenance issue**, never a proven
+column permutation; rank screens are not a reconstruction
+of Návar et al. model parameters. New HOME TSV + JSON only,
+no original CSV, FATES JSON, surface, forcing, CIME/Slurm.
+
+Run on IRIDIS6:
+```bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="541845fcf224a314e5929951b325b008f947acba"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage31_code"
+OUT="$HOME/ozflux_stage31_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS --retry 3 "$BASE/scripts/stage31/31_asm_TERN_2018_AGB_join_formula_consistency_READONLY.py" -o "$CODE/stage31.py.download"
+test "$(git hash-object "$CODE/stage31.py.download")" = "d145b35b4a8773d13d3f0bf74ec5983e15aed349"
+mv "$CODE/stage31.py.download" "$CODE/stage31.py"
+python3 -B -m py_compile "$CODE/stage31.py"
+python3 -B "$CODE/stage31.py" --self-test
+python3 -B "$CODE/stage31.py" --out "$OUT"
+echo "REPORT_DIR $OUT"
+)
+```
+
+Outputs: stage31_all_111_stem_AGB_join_association_screens.tsv,
+stage31_AU_ASM_derived_AGB_join_formula_science_HOLD.json.
+Depending on whether 2018 per-stem AGB associates with D20/height,
+look next for official site-level biomass source and the original
+data product's 2018 AGB computation/mapping documentation; do
+not use 2018 derived AGB as model calibration data yet.
+2014 field tree heights and the separate observed FATES7 height
+compatibility result are **not affected** by these derived
+2018 AGB anomalies. PFT4/PFT7, soil, forcing and AD400 remain
+scientific HOLD.
 ## 4. Future science decisions (still require explicit approvals)
 
 The read-only source forensic stages above are implemented and have already run through Stage05. The following are future *decisions and separate write-authorised workflows*, not reruns of numbered Stage02–05 scripts:
