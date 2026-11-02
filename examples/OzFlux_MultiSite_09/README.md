@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–35 OPERATOR EXECUTED; 111 TERN STEMS SOURCE-VERIFIED (2014 FIELD / 2018 DERIVED), 27/103 ACACIA STEMS ABOVE DEFAULT FATES7 HEIGHT CAP; 2018 DERIVED AGB SCIENCE HOLD. STAGE33 OFFICIAL STAND AGB VERIFIED (2014 37.4168; 2018 44.6277 t/ha). STAGE34 RECOMPUTED 0.06ha 111-STEM ARITHMETIC AND FOUND UNIQUE SINGLE-2014-STEM CANDIDATE. STAGE35 SUCCESS: 7 CROSS-YEAR GROUPING HYPOTHESES TESTED; ONLY 'OMIT 2014 PLANT99/STEM1b AGB 2.429615547kg AND INCLUDE AN EXTRA COPY IN 2018' REPRODUCES BOTH STAND VALUES TO 4DP. THIS IS ARITHMETIC ONLY, NOT PROVEN PUBLISHER FAULT OR APPROVED CORRECTION. CURATOR EVIDENCE NOTE WRITTEN; NO NEW FORENSIC STAGE SCHEDULED. PFT/SOIL/FORCING SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–35 OPERATOR VERIFIED; STAGE36 2018-FIRST EVIDENCE INTAKE PUBLISHED, NOT YET RUN. PRIMARY TARGET: INDEPENDENT CATALOGUED 2018 ALICE MULGA CORE1HA D20/HEIGHT/STANDING AGB SURVEY, `supersite.1041` (EDITION 5; ORIGINAL DATA FILE STILL NOT VERIFIED). SECONDARY: 2022 TERN SOURCE'S 111 DERIVED 2018 STEM ROWS; ALL 2018 DERIVED AGB SCIENCE HOLD DUE TO STAGE30–35 SOURCE CONSISTENCY PROBLEMS. 2014 FIELD 27/103 ACACIA STEM IDS ABOVE FATES7 DEFAULT HEIGHT CAP IS RETAINED AS HISTORIC SUPPORT ONLY. A SEPARATE 2018-FIRST SOURCE-PRIORITY NOTE IS COMMITTED; NO MORE SPECULATIVE HISTORICAL COUNTERFACTUAL STAGES. PFT/SOIL/FORCING SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -2647,6 +2647,83 @@ constraint (27/103 Acacia stems above FATES7 default
 4.735410175m cap) remains independent of 2018 AGB.
 PFT/surface/soil/final forcing science checks and full
 AD400/Normal400 have NOT been approved.
+
+## 3am. NEW OPERATOR PRIORITY 2026-11-02 — 2018-first, independent field source before derived AGB
+
+**Operator explicitly requested 2018 latest relevant vegetation evidence
+and GitHub-only synchronization (do not initiate more email).**
+Source-priority evidence: [STAGE36_2018_FIRST_OBSERVATION_PRIORITY_20261102.md](STAGE36_2018_FIRST_OBSERVATION_PRIORITY_20261102.md).
+The earlier Stage30–35 evidence is preserved, not reanalysed.
+
+An **independently catalogued 2018** Alice Mulga Core 1ha standing
+AGB/individual-stem dataset exists in ARDC/TERN historical metadata:
+https://researchdata.edu.au/vegetation-data-direct-ha-2018/1340784 ,
+original identifier **supersite.1041**, **edition 5**,
+TERN SuperSite Network, Eamus.
+The catalog describes **2018 measured D20 (20cm), height**, and
+**2011–2018 dendrometer records**, allometric Paul et al. (2016)
+and Návar et al. (2013). Its historical link to
+`https://supersites.tern.org.au/knb/metacat/supersite.1041/html`
+currently redirects or is inaccessible in search; the actual
+2018 edition 5 ORIGINAL RAW FILES HAVE NOT BEEN OBTAINED.
+Never invent a direct downloadable filename, interpret metadata
+as data, or assume this archived survey shares the 111-stem
+cohort and sampled area with Cleverly (2022)'s 2018-derived
+table. The latter's metadata says **no individual stem survey
+was repeated in 2018**, while the older independent catalog
+says measurements **were taken in 2018**. Their lineage and
+identities MUST be reconciled only after acquiring raw records.
+
+**Stage36 2018-first read-only evidence intake PUBLISHED,
+operator run pending:** 
+`scripts/stage36/36_asm_2018_first_independent_survey_locator_and_source_audit_READONLY.py`,
+GitHub commit `b7ec1abdcddff54f8c9001391f12e579c1ea8654`,
+Git blob `f4ecf1e4f8a3f8e06de6e9da0e26bf7da3e18df9`.
+It verifies original Stage25 stem SHA256, Stage33 stand SHA256,
+and successful Stage35 receipt; extracts exact 111 published
+**2018 DERIVED** individual stem rows into a read-only TSV
+with the source tier clearly labelled SECONDARY, audits species,
+D20/height and FATES7 cap counts (9/43 A. aneura and
+18/60 A. aptaneura, but height not new independent
+2018 field measurements), and probes ONLY the exact ARDC
+2018 and legacy TERN metadata catalog URLs. Metadata probes
+are NOT automated raw data downloads. Report marks raw
+primary 2018 field source **NOT YET SHA VERIFIED**.
+No model, original, surface, forcing, Slurm or AD400 edits.
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="b7ec1abdcddff54f8c9001391f12e579c1ea8654"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage36_code"
+OUT="$HOME/ozflux_stage36_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS --retry 3 "$BASE/scripts/stage36/36_asm_2018_first_independent_survey_locator_and_source_audit_READONLY.py" -o "$CODE/stage36.py.download"
+test "$(git hash-object "$CODE/stage36.py.download")" = "f4ecf1e4f8a3f8e06de6e9da0e26bf7da3e18df9"
+mv "$CODE/stage36.py.download" "$CODE/stage36.py"
+python3 -B -m py_compile "$CODE/stage36.py"
+python3 -B "$CODE/stage36.py" --self-test
+python3 -B "$CODE/stage36.py" --out "$OUT"
+echo "REPORT_DIR $OUT"
+)
+~~~
+
+Expected new HOME outputs only:
+`stage36_AU_ASM_2018_first_independent_survey_source_gate.json`;
+`stage36_SECONDARY_2018_derived_111_stem_original_source_evidence.tsv`.
+No direct 2018 independent field measurement scientifically approved
+until its original archive source bytes and metadata are verified.
+The 2018 derived *stand* 44.6277 t/ha is a source estimate,
+**not** an approved empirical 2018 live biomass target.
+If original 2018 field survey sources become accessible, intake
+them first; then independently QC D20/height, taxonomic composition,
+sampling area and temporal footprint before using for FATES
+structure/biomass evaluation. D20 must never become DBH without
+a site-specific evidenced transformation. Existing 2014 allometry
+and 2018 AGB review remain documented, with NO further historic
+forensic stages unless new source evidence emerges.
 
 ## 4. Future science decisions (still require explicit approvals)
 
