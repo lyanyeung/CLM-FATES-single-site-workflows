@@ -254,7 +254,7 @@ def selftest():
     assert (d.replace(minute=0)+timedelta(hours=1)).strftime("%Y-%m-%dT%H:%MZ")=="2011-12-17T00:00Z"
     assert (d-timedelta(hours=9)).strftime("%Y%m%d%H%M")=="201112161430"
     assert len(DATES)==2 and COUNTS==Counter({"JP-Fjy":6,"JP-Khw":11,"JP-Yms":10}) and sum(COUNTS.values())==27
-    print("STAGE05AD SELF-TEST PASS | source-verified two-day UTC-midnight, exact per-variable Stage05P context, SHA/CRC; NO WRITES")
+    print("STAGE05AG SELF-TEST PASS | source-verified two-day UTC-midnight, exact per-variable Stage05P context, SHA/CRC; NO WRITES")
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
@@ -313,7 +313,7 @@ def main():
     }
     with report.open("x",encoding="utf-8") as f:
         json.dump(summary,f,indent=2,ensure_ascii=False);f.write("\n")
-    print("STAGE05AD JP-KHW TWO-DAY INDEPENDENT ERA5L SOURCE PA AUDIT PASS | NO CDS / SLURM / REPAIR")
+    print("STAGE05AG JP-KHW TWO-DAY INDEPENDENT ERA5L SOURCE PA AUDIT PASS | NO CDS / SLURM / REPAIR")
     print("ZIP_SHA256_BY_DAY",hashes)
     print("INDEPENDENT_HOURLY_POINTS",len(data),"SOURCE_REQUEST_HOUR_PAIRS",requestpairs)
     print("ORIGINAL_SOURCE_QC2_FIELDS",len(results),
