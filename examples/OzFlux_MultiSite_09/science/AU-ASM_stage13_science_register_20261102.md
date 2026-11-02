@@ -26,3 +26,25 @@ Primary references:
 - https://github.com/OzFlux/PyFluxPro/blob/main/scripts/pfp_gf.py
 
 **Status:** Source data unchanged, six original provisional DATM files unchanged, science approval FALSE, no model submission.
+
+## Stage14 completion and next site surface science gate (2026-11-02)
+
+Operator Stage14 independently verified exactly six new FSDS0 candidate DATM NetCDFs, under
+`/home/ly3n24/ozflux_stage14_FSDS0_20261102T012038Z`.
+The only changes from the six source-faithful Stage12 candidates are
+359 FSDS values in 2014 (original QC420 ACCESS) and one FSDS value in
+2016 (original QC50 interpolation), all modelled sun below the horizon.
+All other fields, coordinates and times were bitwise compared at original
+native precision. The source-faithful set is retained, and original L6
+source SHA256 remained unchanged.
+
+The next science gate is not another meteorology audit. The new
+`scripts/stage15/15_asm_pft_soil_surface_source_inventory_readonly.py`
+checks six Stage14 and six Stage12 hashes, bounded existing AU-ASM surface
+candidates, host natural-PFT fractions, grid landunits, soil vertical
+structure and the existing CTSM surface templates. It is **read-only** and
+does not choose a numerical PFT vector or construct a point surface.
+Keep host natural bare index 0 separate from FATES active cohorts.
+Do not substitute TERN texture 74:11:15 into all 10 model soil layers
+without independent vertical evidence; do not select tree/shrub/C3/C4/bare
+percentages from species lists alone. No AD400 approval.
