@@ -118,7 +118,9 @@ def inspect_original(site,package,events,root,max_inner_mib):
         if (readme_hash!=ORIGINAL_README_SHA or len(text)!=75
             or "time is expressed in local solar time (without DST)" not in text[63]):
             raise ValueError("Original Tef/Tmd site README exact 75-line solar-time claim changed")
-        if z.testzip() is not None: raise ValueError("Original nested JPF source ZIP CRC error")
+        # The original HH member is streamed to EOF below: zipfile verifies
+        # this member's CRC on completion. Avoid extracting/checking all
+        # irrelevant years/variables twice on an IRIDIS6 login node.
         with z.open(hh[0]) as raw:
             with io.TextIOWrapper(raw,encoding="utf-8-sig",newline="") as handle:
                 reader=csv.DictReader(handle)
