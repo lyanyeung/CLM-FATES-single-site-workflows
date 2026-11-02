@@ -66,14 +66,32 @@ def read_param(p):
         raise ValueError("FATES mapping or name list dimension mismatch")
     if not np.isfinite(a).all() or (a<0).any() or (a>1).any() or not np.allclose(a.sum(axis=1),1,atol=1e-8):
         raise ValueError("HLM-to-FATES fractional mapping not physical")
-    if names[7]!="broadleaf_hydrodecid_extratrop_shrub":
-        raise ValueError("Actual host10 shrub target not the pinned default parameter")
-    if (not np.isclose(a[9,7],1) or
-        not np.isclose(a[3,0],1) or
-        not np.isclose(a[4,3],1) or
-        not np.isclose(a[12,12],1) or
-        not np.isclose(a[13,13],1)):
-        raise ValueError("Expected mapping entry drifted: inspect exact FATES config")
+    # Stage19 actual matrix: 0-based row 9 = host NATPFT10,
+    # column 8 = FATES PFT9 (cold-deciduous extratropical shrub).
+    # FATES PFT8 (column 7) is *hydro*-deciduous; confusing these
+    # would lead to a scientifically incorrect arid-zone shrub claim.
+    if names[7]!="broadleaf_hydrodecid_extratrop_shrub" or (
+            names[8]!="broadleaf_colddecid_extratrop_shrub"):
+        raise ValueError("Pinned PFT8/PFT9 name ordering differs from Stage19")
+    expected_cells={
+        3:0,     # host4 -> 1-based FATES1 tropical evergreen tree
+        4:3,     # host5 -> FATES4 evergreen extratropical tree
+        9:8,     # host10 -> FATES9 COLD-deciduous shrub, not FATES8
+        12:12,   # host13 -> FATES13 cool C3 grass
+        13:13,   # host14 -> FATES14 C4 grass
+    }
+    errors=[]
+    for host0, fates0 in expected_cells.items():
+        if not np.isclose(a[host0, fates0],1,atol=1e-10):
+            actual=[{"fates_1based":int(j+1),"name":names[j],
+                     "weight":float(a[host0,j])}
+                    for j in np.flatnonzero(a[host0]>0)]
+            errors.append({"host_natpft":host0+1,
+                           "expected_fates_1based":fates0+1,
+                           "actual":actual})
+    if errors:
+        raise ValueError("Stage19 expected map entries differ: "+
+                         json.dumps(errors,sort_keys=True))
     return a,names,obj
 
 
@@ -155,7 +173,16 @@ def selftest():
     assert HOST_NAMES[10]=="broadleaf_deciduous_temperate_shrub"
     assert (10-1)==9
     assert HOST_NAMES[0]=="bare"
-    print("STAGE20 SELF-TEST PASS: host1->map row0, FATES 14 PFTs, mode gates; NO NETCDF WRITES")
+    # Regression: do not misidentify host10 row9 FATES col8 as
+    # hydro-deciduous col7; the original Stage20 asserted col7 by mistake.
+    regression=np.zeros((14,14),dtype=float)
+    regression[:,0]=1.
+    regression[9,:]=0.
+    regression[9,8]=1.
+    assert np.argmax(regression[9,:])==8
+    assert not np.isclose(regression[9,7],1)
+    assert np.isclose(regression[9,8],1)
+    print("STAGE20 SELF-TEST PASS: host10->FATES9 colddecid regression, host1->map row0, mode gates; NO NETCDF WRITES")
 
 
 def main():
@@ -200,8 +227,8 @@ def main():
               pft_area[i]/(100-nat[0])*100) if nat[0]<100 else None}
         for i in range(14)
     ]
-    if not np.isclose(pft_area[7],nat[10],atol=1e-8):
-        raise ValueError("Host10 arid hydrodeciduous shrub mapped area not conserved")
+    if not np.isclose(pft_area[8],nat[10],atol=1e-8):
+        raise ValueError("Host10 COLD-deciduous shrub mapped area not conserved; verify 14x14 local matrix")
     topkeys=list(params["parameters"])
     per_pft=[]
     for key,value in params["parameters"].items():
@@ -222,6 +249,10 @@ def main():
         "matrix_dims":["fates_hlm_pftno","fates_pft"],
         "host_PFT1_through_14_correspond_to_matrix_rows0_through_13":True,
         "host_PFT0_bare_has_no_FATES_tree_shrub_grass_mapping":True,
+        "ACTUAL_host10_FATES_PFT_1based":9,
+        "ACTUAL_host10_target":"broadleaf_colddecid_extratrop_shrub",
+        "source_Stage20_v1_hydrodecid_index_assertion_incorrect":True,
+        "AU_ASM_Mulga_woody_shrub_phenology_matches_PFT9_NOT_VERIFIED":True,
         "matrix_all_14_rows_sum_to_one":True,
         "FATES_PFT_names":[{"one_based":i+1,"zero_based":i,"name":n}for i,n in enumerate(names)],
         "reference_HOST_PFT_natural_percent":[float(v) for v in nat],
@@ -252,8 +283,10 @@ def main():
     print("STAGE20 FATES JSON SHA VERIFIED",PARAM_SHA)
     print("STAGE20 SURFACE SHA VERIFIED",SURF_SHA)
     print("STAGE20 FULL MAP 14x14 VALID / HOST1..14 -> FATES1..14")
-    print("HOST10",HOST_NAMES[10],"TO",names[7],
-          "AREA_PCT",round(float(nat[10]),6))
+    print("HOST10",HOST_NAMES[10],"TO_FATES_1BASED",9,
+          names[8],"AREA_PCT_IF_FIXED",round(float(nat[10]),6))
+    print("WARNING: FATES9 is COLD-deciduous, not hydro-deciduous FATES8;",
+          "no Mulga suitability approval")
     print("HOST0 BARE",round(float(nat[0]),6),"FATES_MAPPED_VEGETATION",round(float(pft_area.sum()),6))
     for item in fates_by_name:
         if item["mapped_pct_of_natural_land_if_fixed_biogeog"]>0:
