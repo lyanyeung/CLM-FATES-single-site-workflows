@@ -1219,8 +1219,8 @@ https://data.ozflux.org.au/pub/viewDatasetData.jspx?collection.id=152&collection
 
 **Stage21 code published, NOT yet run**:
 `scripts/stage21/21_asm_mulga_FATES_actual_trait_mode_scenario_science_gate_READONLY.py`,
-commit `dc05fbe7bb10a801115c6a3890db5b353855121d`,
-Git blob `12bc8cd938ba2c2ef1c13da1a55041a9b2f9021e`.
+corrected commit `f7ffe64e7674b8fb4434f1f676d3afcb7caf3928`,
+Git blob `231606efdb552960b751f67e23fdd5dc8ae3b8ae`.
 This requires and rehashes Stage20 actual operator JSON, Stage14
 forcing science manifest and the original FATES JSON source.
 It creates an all-214-field TSV and a filtered phenology,
@@ -1233,14 +1233,14 @@ No NetCDF, JSON parameter, case or Slurm modification.
 (
 set -euo pipefail
 conda activate clm_fates_env
-COMMIT="dc05fbe7bb10a801115c6a3890db5b353855121d"
+COMMIT="f7ffe64e7674b8fb4434f1f676d3afcb7caf3928"
 BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
 CODE="$HOME/ozflux_stage21_code"
 SCRIPT="$CODE/ozflux_stage21.py"
 OUT="$HOME/ozflux_stage21_$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$CODE"
 curl -fLsS --retry 3 "$BASE/scripts/stage21/21_asm_mulga_FATES_actual_trait_mode_scenario_science_gate_READONLY.py" -o "$SCRIPT"
-test "$(git hash-object "$SCRIPT")" = "12bc8cd938ba2c2ef1c13da1a55041a9b2f9021e"
+test "$(git hash-object "$SCRIPT")" = "231606efdb552960b751f67e23fdd5dc8ae3b8ae"
 python3 -B -m py_compile "$SCRIPT"
 python3 -B "$SCRIPT" --self-test
 python3 -B "$SCRIPT" --out "$OUT"
@@ -1253,6 +1253,19 @@ Outputs: `stage21_all_214_FATES_traits_PFT1_4_7_8_9_13_14.tsv`,
 and `stage21_AU_ASM_Mulga_trait_mode_science_gate.json`.
 **No AU-ASM mode, Mulga surface fraction or 10-layer soil scenario
 approved. No new cases and no AD400 submission.**
+
+**Stage21 initial operator self-test FAILED SAFELY (2026-11-02):**
+source SHA and syntax both passed, but `extract_pft_axis()`
+attempted `selected.tolist()` on a Python scalar returned by
+`np.take(object_dtype_array, scalar_index)`. This raised
+`AttributeError` before **any** real FATES JSON parsing,
+report creation, NetCDF write or model submission.
+**No FATES trait result or Stage21 SUCCESS was established.**
+Corrected Stage21 now converts via `np.asarray(selected).tolist()`,
+handling native integer/float/string/bool scalar values as well
+as arrays; regression tests cover fates_pft as first/last axis and
+malformed shapes. The corrected source is pinned above. Stage20's
+verified input science remains valid, without rerun.
 
 ## 4. Future science decisions (still require explicit approvals)
 
