@@ -166,8 +166,9 @@ def verify():
         if key in registered or key not in raw_by_key:
             raise ValueError("Paired TSV missing/duplicate original stem key "+repr(key))
         registered.add(key)
-        if raw_by_key[key][2014]["scientificName"]!=r["scientificName"]:
-            raise ValueError("Species differs from original stem")
+        if any(raw_by_key[key][y]["scientificName"]!=r["scientificName"]
+               for y in (2014,2018)):
+            raise ValueError("Species differs from original stem in 2014 or 2018")
         for y,d,h,b in ((2014,"d14","h14","b14"),(2018,"d18","h18","b18")):
             source=raw_by_key[key][y]
             for name,col in (("stemDiameter_centimeters",d),
@@ -176,6 +177,8 @@ def verify():
                 va=num(source[name]);vb=num(r[FIELDS[col]])
                 if va is None or vb is None or not math.isclose(va,vb,rel_tol=1e-8,abs_tol=1e-8):
                     raise ValueError("Raw source / Stage30 numeric mismatch "+repr(key)+" "+name)
+    if registered!=set(raw_by_key):
+        raise ValueError("Stage30 paired stem IDs fail exact original-source set comparison")
     return data,raw_by_key,{
         "original_TERN_SHA256":TERN_SHA,
         "Stage30_pair_TSV_SHA256":digest(PAIRS),
@@ -302,8 +305,22 @@ def selftest():
     assert len(out)==4
     assert any("AGB18_LESS_THAN_20_PERCENT_OF_AGB14" in x["review_reasons"] for x in out)
     assert any("EXACT_2018_AGB_REPEATED_FOR_OTHER_STEMS" in x["review_reasons"] for x in out)
-    assert by["Acacia aneura"]["2018_rank_corr_D20_AGB"]["n"]==4
-    print("STAGE31 SELF-TEST PASS: monotone/nonmonotone Spearman, extreme AGB ratios, repeated values, synthetic 4 stems, no model writes")
+    expected_report_keys=(
+        "2014_rank_corr_D20_AGB",
+        "2018_derived_rank_corr_D20_AGB",
+        "2014_rank_corr_height_AGB",
+        "2018_derived_rank_corr_height_AGB",
+        "AGB18_to_AGB14_ratio_median",
+        "2018_exact_AGB_values_repeated_within_species",
+        "2018_identical_D20_height_groups_with_multiple_AGB_values",
+    )
+    report=by["Acacia aneura"]
+    assert all(key in report for key in expected_report_keys)
+    assert report["2018_derived_rank_corr_D20_AGB"]["n"]==4
+    assert report["2014_rank_corr_D20_AGB"]["n"]==4
+    assert report["2018_exact_AGB_values_repeated_within_species"]==1
+    assert all(set(row)==set(SCIENCE_OUT) for row in out)
+    print("STAGE31 SELF-TEST PASS: Spearman, extreme AGB ratios, duplicate values, all JSON/TSV report keys, synthetic 4 stems, no model writes")
 
 
 def main():
