@@ -258,9 +258,11 @@ def assess(mod,folder,source):
         source_meta[f"{key[0]}|{key[1]}"]=info
         raw={"strd" if v=="surface_thermal_radiation_downwards" else "sp" for v in DAYS[key]}
         series.update({(key[0],t):d for t,d in read_cds_hours(p,key,raw).items()})
-    grids={ (source_meta[f"JP-Tmd|{day}"]["ERA5L_grid_lat"],
-             source_meta[f"JP-Tmd|{day}"]["ERA5L_grid_lon"]) for day in ("2011-12-16","2011-12-17")}
-    if len(grids)!=1:raise ValueError("2011 Tmd two-day returned model grid changed")
+    grid16=source_meta["JP-Tmd|2011-12-16"]
+    grid17=source_meta["JP-Tmd|2011-12-17"]
+    if any(not math.isclose(float(grid16[k]),float(grid17[k]),abs_tol=1e-6,rel_tol=0)
+           for k in ("ERA5L_grid_lat","ERA5L_grid_lon")):
+        raise ValueError("2011 Tmd two-day returned model grid changed")
     minimum={};maximum={};hourly=[]
     for (site,episode),(code,times) in GROUPS.items():
         vals=[]
