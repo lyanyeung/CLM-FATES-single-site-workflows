@@ -1,0 +1,27 @@
+site,scenario,recommended_percent,bare_percent,mapping_profile,fates_natland_percent_json,clm_pct_nat_pft_json,fates_vegetated_only_percent_json,interpretation
+AU-ASM,mulga_as_shrub_FATES7,EvergreenShrub 43 / C4 22 / bare 35,35.0,DEFAULT14,"{""7"": 43.0, ""14"": 22.0}","{""9"": 43.0, ""14"": 22.0}","{""7"": 66.1538, ""14"": 33.8462}",Evergreen shrub structure sensitivity; default FATES7 height cap 4.735 m is below 26% of 2014 Acacia stems.
+AU-ASM,mixed_C3_C4_herb,EBT 43 / CoolC3 8 / C4 14 / bare 35,35.0,DEFAULT14,"{""4"": 43.0, ""13"": 8.0, ""14"": 14.0}","{""5"": 43.0, ""13"": 8.0, ""14"": 14.0}","{""4"": 66.1538, ""13"": 12.3077, ""14"": 21.5385}",Splits herb 22 into C3 8 / C4 14 only as a trait sensitivity; the split is not measured.
+AU-Cpr,mallee_as_shrub_FATES7,EvergreenShrub 43 / C4 3 / bare 54,54.0,DEFAULT14,"{""7"": 43.0, ""14"": 3.0}","{""9"": 43.0, ""14"": 3.0}","{""7"": 93.4783, ""14"": 6.5217}",Treats multistem mallee (3.9 m) as evergreen shrub; FATES7 height cap 4.735 m.
+AU-Cpr,tree_only,EBT 33 / bare 67,67.0,DEFAULT14,"{""4"": 33.0}","{""5"": 33.0}","{""4"": 100.0}",Only the measured upper stratum cover is kept.
+AU-DaS,stem_based_split,TropEBT 13.5 / HydrodecidTropTree 24 / C4 42.5 / bare 20,20.0,DEFAULT14,"{""1"": 13.5, ""5"": 24.0, ""14"": 42.5}","{""4"": 13.5, ""6"": 24.0, ""14"": 42.5}","{""1"": 16.875, ""5"": 30.0, ""14"": 53.125}",Uses stems (36% evergreen of 214 listed) rather than basal area; probably over-weights deciduous trees.
+AU-DaS,all_evergreen_tree,TropEBT 37.5 / C4 42.5 / bare 20,20.0,DEFAULT14,"{""1"": 37.5, ""14"": 42.5}","{""4"": 37.5, ""14"": 42.5}","{""1"": 46.875, ""14"": 53.125}",All trees TropEBT.
+AU-Dry,How_like_deciduous_share,TropEBT 21.3 / HydrodecidTropTree 5.3 / C4 49.4 / bare 24,24.0,DEFAULT14,"{""1"": 21.3, ""5"": 5.3, ""14"": 49.4}","{""4"": 21.3, ""6"": 5.3, ""14"": 49.4}","{""1"": 28.0263, ""5"": 6.9737, ""14"": 65.0}",Applies the Howard Springs 80:20 evergreen:deciduous prior to the tree cover.
+AU-How,Shi2025_model_precedent,TropEBT 50 / ColdDecidShrub 25 / C4 25,0.0,DEFAULT14,"{""1"": 50.0, ""9"": 25.0, ""14"": 25.0}","{""4"": 50.0, ""10"": 25.0, ""14"": 25.0}","{""1"": 50.0, ""9"": 25.0, ""14"": 25.0}","Shi et al. 2025 EBT/DBS/C4 = 50/25/25; the deciduous-shrub mapping is a model choice, not an observation."
+AU-How,ground_canopy_cover_50,TropEBT 40 / HydrodecidTropTree 10 / C4 50,0.0,DEFAULT14,"{""1"": 40.0, ""5"": 10.0, ""14"": 50.0}","{""4"": 40.0, ""6"": 10.0, ""14"": 50.0}","{""1"": 40.0, ""5"": 10.0, ""14"": 50.0}","Tree 50 (80:20 split), grass 50, bare 0; overlapping strata are collapsed."
+AU-Gin,tree_only,EBT 100,0.0,DEFAULT14,"{""4"": 100.0}","{""5"": 100.0}","{""4"": 100.0}",Overstory-only forest convention.
+AU-Gin,shrub_heavy,EBT 30 / EvergreenShrub 50 / bare 20,20.0,DEFAULT14,"{""4"": 30.0, ""7"": 50.0}","{""5"": 30.0, ""9"": 50.0}","{""4"": 37.5, ""7"": 62.5}",Understory shrub dominance sensitivity.
+AU-Stp,literal_max_grass,C4 57.6 / bare 42.4,42.4,DEFAULT14,"{""14"": 57.6}","{""14"": 57.6}","{""14"": 100.0}",Uses max grass cover only and treats the 7.4 persistent cover as bare.
+AU-Stp,full_cover,C4 100,0.0,DEFAULT14,"{""14"": 100.0}","{""14"": 100.0}","{""14"": 100.0}",Bare 0 convention.
+JP-Fhk,larch_only,DNF 100,0.0,DEFAULT14,"{""3"": 100.0}","{""3"": 100.0}","{""3"": 100.0}",Dominant-type proxy.
+JP-Fhk,stem_share,DNF 87.2 / ENF 6.4 / DBF 6.4,0.0,DEFAULT14,"{""3"": 87.2, ""2"": 6.4, ""6"": 6.4}","{""3"": 87.2, ""1"": 6.4, ""7"": 6.4}","{""3"": 87.2, ""2"": 6.4, ""6"": 6.4}",Larch stem share 369/423 = 87.2%.
+JP-Fjy,ilex_lower_layer_prior,ENF 80 / EBT 20,0.0,DEFAULT14,"{""2"": 80.0, ""4"": 20.0}","{""1"": 80.0, ""5"": 20.0}","{""2"": 80.0, ""4"": 20.0}",Placeholder for the Ilex lower layer; the 20 is NOT measured.
+JP-Spp,sasa_c3_patch_placeholder,DBF 75 / CoolC3 25,0.0,DEFAULT14,"{""6"": 75.0, ""13"": 25.0}","{""7"": 75.0, ""13"": 25.0}","{""6"": 75.0, ""13"": 25.0}","Sasa as cool C3 patch; the 25 is a sensitivity placeholder, not measured."
+JP-Tak,sasa_c3_patch_placeholder,DBF 75 / CoolC3 25,0.0,DEFAULT14,"{""6"": 75.0, ""13"": 25.0}","{""7"": 75.0, ""13"": 25.0}","{""6"": 75.0, ""13"": 25.0}","Sasa as cool C3 patch; the 25 is a sensitivity placeholder, not measured."
+JP-Tef,sasa_PAI_share,DNF 17.5 / CoolC3 82.5,0.0,DEFAULT14,"{""3"": 17.5, ""13"": 82.5}","{""3"": 17.5, ""13"": 82.5}","{""3"": 17.5, ""13"": 82.5}","PAI shares 1.7:8.0 (2010) used as area; a LAI proxy, not an area measurement."
+JP-Tmd,birch_forest,DBF 100,0.0,DEFAULT14,"{""6"": 100.0}","{""7"": 100.0}","{""6"": 100.0}",ESSD 'after' DBF label taken literally.
+JP-Tmd,herb_only,CoolC3 100,0.0,DEFAULT14,"{""13"": 100.0}","{""13"": 100.0}","{""13"": 100.0}",ESSD 'windthrow' GRA label.
+JP-Tom,sasa_c3_patch_placeholder,DBF 75 / CoolC3 25,0.0,DEFAULT14,"{""6"": 75.0, ""13"": 25.0}","{""7"": 75.0, ""13"": 25.0}","{""6"": 75.0, ""13"": 25.0}",Sasa as cool C3 patch; the 25 is a placeholder.
+JP-Tgf,equal_C3_C4,CoolC3 50 / C4 50,0.0,DEFAULT14,"{""13"": 50.0, ""14"": 50.0}","{""13"": 50.0, ""14"": 50.0}","{""13"": 50.0, ""14"": 50.0}",Neutral split.
+JP-Tgf,C4_dominant,CoolC3 20 / C4 80,0.0,DEFAULT14,"{""13"": 20.0, ""14"": 80.0}","{""13"": 20.0, ""14"": 80.0}","{""13"": 20.0, ""14"": 80.0}",C4-dominant sensitivity.
+JP-Yms,normalized_named,DBF 70.2 / EBT 29.8,0.0,DEFAULT14,"{""6"": 70.2, ""4"": 29.8}","{""7"": 70.2, ""5"": 29.8}","{""6"": 70.2, ""4"": 29.8}",Named 66+28 normalized to 100.
+JP-Yms,deciduous_only,DBF 100,0.0,DEFAULT14,"{""6"": 100.0}","{""7"": 100.0}","{""6"": 100.0}",Dominant-type proxy.
