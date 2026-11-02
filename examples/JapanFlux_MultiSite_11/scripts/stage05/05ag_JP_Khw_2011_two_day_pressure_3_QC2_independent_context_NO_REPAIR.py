@@ -24,7 +24,7 @@ SITE="JP-Khw"
 DATES=("2011-12-16","2011-12-17")
 BIF_SHA="eef29bcb9bd97874dad32469b1821b61760f3111cbc3836ad6300350b18217b4"
 TOWER=(33.13658,130.70834,196.0)
-COUNTS=Counter({"JP-Khw":6,"JP-Khw":11,"JP-Yms":10})
+COUNTS=Counter({"JP-Fjy":6,"JP-Khw":11,"JP-Yms":10})
 CDS_VAR="surface_pressure"
 ERA_COL="sp"
 FIELDS=("site","original_JST_halfhour_start","derived_UTC_start","variable",
@@ -253,7 +253,7 @@ def selftest():
     d=datetime.strptime("201112162330","%Y%m%d%H%M")
     assert (d.replace(minute=0)+timedelta(hours=1)).strftime("%Y-%m-%dT%H:%MZ")=="2011-12-17T00:00Z"
     assert (d-timedelta(hours=9)).strftime("%Y%m%d%H%M")=="201112161430"
-    assert len(DATES)==2 and len(COUNTS)==3
+    assert len(DATES)==2 and COUNTS==Counter({"JP-Fjy":6,"JP-Khw":11,"JP-Yms":10}) and sum(COUNTS.values())==27
     print("STAGE05AD SELF-TEST PASS | source-verified two-day UTC-midnight, exact per-variable Stage05P context, SHA/CRC; NO WRITES")
 
 def main():
@@ -268,7 +268,7 @@ def main():
     names=("stage05o_utc","stage05r_hours","stage05ae_summary","stage05ab_audit",
            "dec16_zip","dec17_zip","out_dir")
     if any(getattr(a,k) is None for k in names):
-        p.error("Require original Stage05O/R/AA and updated post-download Stage05AB, both 2011 CDS ZIPs and fresh out dir")
+        p.error("Require original Stage05O/R/AE and updated post-download Stage05AB, both 2011 CDS ZIPs and fresh out dir")
     source_guard(read_json(a.stage05ae_summary))
     source=source_events(read_tsv(a.stage05o_utc))
     requestpairs=source_hour_keys(source,read_tsv(a.stage05r_hours))
