@@ -1937,11 +1937,26 @@ No row has been edited, and Stage28 itself did not attempt to
 assign year to each stem's two measurements. Its paired-stem
 height-cap result is independent of D20 diameter.
 
+**Stage29 first operator attempt FAILED SAFELY at self-test (2026-11-02):**
+Source SHA and Python syntax passed; self-test raised
+`ValueError: 111 exact independent stem identifiers expected` because
+its one-stem (two-row) fixture erroneously called the same
+`analyze()` function with a hard-coded production-only expectation
+of 111 stems. This is an incorrect **test/production count coupling**,
+not an original-source error, and the actual TERN science audit was
+NOT entered. No report, source/model write or job was produced.
+The corrected script (updated commit/blob below) passes
+`expected_stems=1` for the fixture and explicitly enforces
+`expected_stems=111` on the real 222-row input, with positive
+1x2014/1x2018 and negative duplicate-year regression checks.
+**GitHub source reviewed; rerun on IRIDIS6 is pending, not yet
+claimed successful.**
+
 **Stage29 read-only source-specified D/M/YYYY temporal reconciliation
 code PUBLISHED (operator run pending):**
 `scripts/stage29/29_asm_TERN_exact_2014_vs_2018_stem_pair_date_science_READONLY.py`
-commit `562df3a5182d0baacd598819b6c0f68920d6b500`,
-blob `c5f11d3c9b4f60c3dddd8e1b03f36f9f20ea6b9e`.
+commit `5c4b136e75fc11e6a5e6025f1a3ac48a3887529d`,
+blob `a45d514909e7af803e5628727f7660117f545827`.
 Verifies Stage28 receipt and original CSV/dictionary SHA256;
 uses strict D/M/YYYY calendar dates, checks each row's phenomenon
 date lies within visit start/end, and fail-closes if any unique
@@ -1957,13 +1972,13 @@ residuals or FATES model runs, since all original diameters are D20.
 (
 set -euo pipefail
 conda activate clm_fates_env
-COMMIT="562df3a5182d0baacd598819b6c0f68920d6b500"
+COMMIT="5c4b136e75fc11e6a5e6025f1a3ac48a3887529d"
 BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
 CODE="$HOME/ozflux_stage29_code"
 OUT="$HOME/ozflux_stage29_$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$CODE"
 curl -fLsS --retry 3 "$BASE/scripts/stage29/29_asm_TERN_exact_2014_vs_2018_stem_pair_date_science_READONLY.py" -o "$CODE/stage29.py.download"
-test "$(git hash-object "$CODE/stage29.py.download")" = "c5f11d3c9b4f60c3dddd8e1b03f36f9f20ea6b9e"
+test "$(git hash-object "$CODE/stage29.py.download")" = "a45d514909e7af803e5628727f7660117f545827"
 mv "$CODE/stage29.py.download" "$CODE/stage29.py"
 python3 -B -m py_compile "$CODE/stage29.py"
 python3 -B "$CODE/stage29.py" --self-test
