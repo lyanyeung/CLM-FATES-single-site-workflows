@@ -26,6 +26,7 @@ from datetime import datetime,timedelta
 from pathlib import Path
 
 CLOCK="JST_UTC_PLUS9_DIAGNOSTIC_ONLY"
+DATASET="reanalysis-era5-land-timeseries"
 SOURCE_README_SHA="17a886f56abc2673b43ad43ba17d95aacb7830b8475231a10b56c619bf5d4ac5"
 AS_BLOB_SHA="8d203d727c37191c42c555caba13860e3dbdfd8f"
 DAY16_TEF_SHA="533b462fa0804a3d34428b6dd5f9b38b8a9e70dbc705af481c18ec614ea16148"
