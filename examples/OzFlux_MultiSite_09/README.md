@@ -1,6 +1,6 @@
 # OzFlux MultiSite 09 — source-preserving IRIDIS6 transfer and L6 scientific intake
 
-**Status (2026-11-02): STAGES01–25 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE CTSM POINT SURFACE VERIFIED; STAGE20/21 FATES MAPPING AND TRAIT VALUES VERIFIED; STAGE24 LOCAL HEIGHT CURVES VERIFIED; STAGE25 ALL FOUR TERN STEM/LEAF CSV+DICTIONARIES DOWNLOADED AND SHA256 VERIFIED (222 STEM ROWS, 142 LEAF ROWS); STAGE26 MEASUREMENT-POINT-AWARE FIELD AUDIT PUBLISHED, EXECUTION PENDING. PFT/SOIL/FORCING SCIENCE APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
+**Status (2026-11-02): STAGES01–26 OPERATOR EXECUTED; SIX SOURCE-FAITHFUL STAGE12 AND SIX FSDS0 STAGE14 AU-ASM DATM FILES VERIFIED; STAGE16 REFERENCE SURFACE VERIFIED; STAGE20–24 FATES MAP, TRAITS AND LOCAL HEIGHT FORMULAS VERIFIED; STAGE25 FOUR TERN CSV SOURCES SHA VERIFIED; STAGE26 ALL 222 STEM ROWS ARE BASAL D20 (ZERO TRUE 1.3m DBH PAIRS), 142 LEAF ROWS/7 SPECIES VERIFIED; STAGE27 YEAR-SCOPED OBSERVED HEIGHT VS FATES7 AND CONDITIONAL LEAF LMA/SLA SENSITIVITY PUBLISHED, EXECUTION PENDING. PFT/SOIL/FORCING APPROVAL AND AD400 REMAIN BLOCKED.** The cohort has **9 site IDs and 10 original L6 NetCDF files**. Stage07 classified 169 file-year rows (67 structural candidates, 102 REVIEW/HOLD). Stage09–11 established a strong provisional Australia/Darwin local-END to UTC-center time hypothesis and six complete AU-ASM NOLEAP calendar years; AU-DaS retains 885 SH supersaturation flags (40 >=1.5x saturation). Stage12 wrote six standalone provisional AU-ASM DATM NetCDFs without changing original sources. **Stage13 independently verified 6/6 exact source-to-DATM meteorological mappings**, and found 360 below-horizon negative FSDS records (2014: 359 QCFlag 420; 2016: 1 unresolved original QC code), plus 1 wind record >15 m/s in 2018. The next step is targeted negative-radiation QC and site-specific PFT/soil/surface assessment. **No final forcing-science approval, CIME case build, AD400/Normal400 model submission or changes to existing AU-How cases have occurred.**
 
 This is a *new cohort* parallel to [JapanFlux MultiSite 11](../JapanFlux_MultiSite_11/), [AmeriFlux Batch03](../AmeriFlux_MultiSite_10_Batch03/) and the existing, previously run [OzFlux AU-How](../OzFlux_AU-How/). Keep scientific settings and decisions independent of those campaigns.
 
@@ -1741,6 +1741,112 @@ echo "REPORT_DIR $OUT"
 **Stage26 not yet executed on IRIDIS6.** Do not assume any source DBH
 count or species-specific leaf trait median until actual report output.
 No source/forcing/surface/experiment files modified.
+
+## 3ac. Stage26 operator SUCCESS: 222 D20-only stems, 142 leaf records, zero valid DBH pairs
+
+**Operator Stage26 SUCCESS on 2026-11-02**:
+`/home/ly3n24/ozflux_stage26_20261102T122636Z`.
+Original 4 Stage25 TERN CSV files and Stage24 formula receipt verified.
+**ALL 222 stem rows have `stemDiameterPointOfMeasurement_metres=0.2`**
+(TERN D20 basal measurement): **ZERO** directly comparable 1.30m
+DBH + height pairs, so Stage26 correctly reports `MAE4=None`,
+`MAE7=None` without inventing a stem taper conversion.
+The observed height distributions still independently test whether
+a chosen PFT can reach the site heights.
+
+Per-species valid stem HEIGHT (not independently counted trees):
+- *Acacia aneura*: n=86, median 3.3m, max **8.5m**
+- *Acacia aptaneura*: n=120, median 3.8m, max **8.5m**
+- *Eremophila latrobei* ssp. *glabra*: n=2, median/max 1.9m
+- *Psydrax latifolia*: n=14, median 4.6m, max **5.0m**
+The exact local Stage24 FATES7 evergreen shrub height plateau is
+4.735410175m at DBH≥3cm; **it cannot attain the observed 8.5m
+Acacia stem heights under the current parameter and formula**.
+This observation is stronger than comparing D20 to DBH (which would
+be scientifically invalid). However, sample rows may span 2014 and
+2018 derived increments, share the same plant/stem identities,
+and were not independently QCed for time and footprint. Quantify
+exceedances separately by observation year; avoid pseudoreplication.
+
+Stage26 leaf records: **142**, seven species. Direct *Acacia aneura*
+records **40** (TERN field PFT `Needle leaf tree`, NOT automatically
+a FATES needleleaf conifer class): median LMA
+**279.985 g dry mass m-2**; median light-saturated
+**net** A 3.165 µmol CO2 m-2 s-1; measured gs 0.011
+mol m-2 s-1. These do **not** measure Vcmax25 or Medlyn g1.
+No *Acacia aptaneura* leaf trait record appears in this 142-row
+release, so do not extrapolate field leaf trait values to both
+dominant Acacia species without species evidence.
+
+The field-measured LMA can be converted to SLA on a carbon-mass
+basis only with **explicit assumed or measured leaf carbon mass
+fraction**: `SLA_m2/gC = 1/(LMA_g dry/m2 * f_C)`.
+For hypothetical `f_C=0.45..0.50`, the observed *A. aneura* LMA
+median gives ~0.00794..0.00714 m2/gC. This is not a direct
+FATES `fates_leaf_slatop` calibration because the source measures
+2014 dry-season sampled leaves/phyllodes while the model parameter
+is canopy-top SLA; the TERN source does NOT measure `f_C`.
+Actual FATES4 top SLA default 0.009 m2/gC; FATES7 0.012.
+Do not change them without defining the canopy/sampling and
+leaf-carbon conversion.
+
+**Independent 2014 TRUE DBH survey remains the next observational
+resource**: `Vegetation Data, Direct Measure of Stems, Alice Mulga
+SuperSite, Core 1ha, 2014`:
+https://researchdata.edu.au/vegetation-data-direct-ha-2014/617073 .
+TERN published metadata reports 1.3m breast-height diameters and
+heights from **200 stems across 86 trees** in six sampled subplots
+within the flux-tower footprint. This is a separate cohort from
+the 222 D20 rows; the original individual DBH-height CSV/XLSX has
+**not yet been directly verified/downloaded** and must not be
+fabricated from the summaries. Metadata file names refer to
+`asn_alic_veg_dbh-h_compliled_core_1ha_2014.csv` and a 2014 XLSX,
+but no verified direct HTTPS attachment is yet available.
+
+**Stage27 source-pinned, HOME-only, non-destructive analysis**
+published at
+`scripts/stage27/27_asm_observed_height_exceedance_and_Acacia_LMA_SLA_sensitivity_READONLY.py`,
+commit `b4d3e2211cdfd7b76fe89cff35a415101e850cf5`,
+Git blob `91c78ab5f5fee4790908af49dc850d1eb254bc48`.
+It pins original Stage25 stem and leaf CSV SHA256, original Stage21
+trait TSV SHA256, and actual Stage24 and Stage26 operator receipts.
+It groups stem heights by species **and year** and reports height
+record counts ABOVE the verified FATES7 4.735410m ceiling
+without ever using D20 as DBH or treating derived 2018 data as
+new independent surveys. For leaf trait comparisons it uses only
+hypothetical `f_C=0.45` and `0.50`, converts measured LMA to
+derived m2/gC SLA under those *explicit assumptions* and compares
+to the actual FATES4 and FATES7 canopy-top model values as a
+sensitivity screen, not calibration. Stage27 creates only new
+HOME JSON and two TSV reports. No FATES parameter, surface, forcing,
+CIME, Slurm or AD400 modification.
+
+~~~bash
+(
+set -euo pipefail
+conda activate clm_fates_env
+COMMIT="b4d3e2211cdfd7b76fe89cff35a415101e850cf5"
+BASE="https://raw.githubusercontent.com/lyanyeung/CLM-FATES-single-site-workflows/$COMMIT/examples/OzFlux_MultiSite_09"
+CODE="$HOME/ozflux_stage27_code"
+SCRIPT="$CODE/ozflux_stage27.py"
+OUT="$HOME/ozflux_stage27_$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$CODE"
+curl -fLsS --retry 3 "$BASE/scripts/stage27/27_asm_observed_height_exceedance_and_Acacia_LMA_SLA_sensitivity_READONLY.py" -o "$SCRIPT"
+test "$(git hash-object "$SCRIPT")" = "91c78ab5f5fee4790908af49dc850d1eb254bc48"
+python3 -B -m py_compile "$SCRIPT"
+python3 -B "$SCRIPT" --self-test
+python3 -B "$SCRIPT" --out "$OUT"
+echo "REPORT_DIR $OUT"
+)
+~~~
+
+Outputs:
+`stage27_TERN_stem_height_above_FATES7_cap_by_year_species.tsv`,
+`stage27_TERN_leaf_LMA_assumed_C_fraction_SLA_sensitivity.tsv`,
+`stage27_AU_ASM_measured_structure_leaf_science_HOLD.json`.
+Do not infer actual experimental PFT cover, a new 10-layer Kandosol
+profile or publish model errors until an independently measured
+DBH-height dataset has been secured.
 
 ## 4. Future science decisions (still require explicit approvals)
 
