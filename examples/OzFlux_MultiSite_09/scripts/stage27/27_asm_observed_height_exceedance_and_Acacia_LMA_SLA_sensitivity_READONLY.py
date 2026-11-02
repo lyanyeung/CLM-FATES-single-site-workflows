@@ -72,11 +72,16 @@ def sha(p):
             h.update(part)
     return h.hexdigest()
 
+def source_delimiter(p):
+    # Stage21 trait source is TAB-separated while TERN originals are CSV.
+    # A wrong delimiter silently hides the "parameter" and PFT columns.
+    return "\t" if p.suffix.lower()==".tsv" else ","
+
 def csv_read(p):
     if p.is_symlink() or not p.is_file():
         raise FileNotFoundError(str(p))
     with p.open(encoding="utf-8-sig",newline="") as f:
-        reader=csv.DictReader(f)
+        reader=csv.DictReader(f,delimiter=source_delimiter(p))
         cols=reader.fieldnames or []
         data=list(reader)
     if not cols or any(None in r for r in data):
@@ -254,6 +259,8 @@ def write_tsv(path,fields,rows):
         w.writeheader();w.writerows(rows)
 
 def selftest():
+    assert source_delimiter(Path("actual_trait.tsv"))=="\t"
+    assert source_delimiter(Path("original_stem.csv"))==","
     assert measurement_class("0.2")=="D20_0.2m_NOT_DBH"
     assert measurement_class("1.3")=="DBH_1.3m"
     assert number("-999") is None
