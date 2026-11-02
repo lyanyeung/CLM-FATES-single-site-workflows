@@ -4,7 +4,8 @@
 Checks every primary and sensitivity row: host PCT_NAT_PFT + bare = 100; host -> FATES through the DEFAULT14
 one-to-one rows; FATES pct_natland = mapped host; pct_vegetated_only = pct_natland / (100 - bare); at most four
 live PFTs; the text vector ("EBT 43 / C4 22 / bare 35") equals the numbers; the three matrices agree with the
-JSON columns of the master CSV; proposals in OZ_JP_PFT_REVIEW obey the same rules.
+JSON columns of the master CSV; the final vectors in OZ_JP_PFT_REVIEW equal the master primaries, and every revised
+site keeps its v1 primary as the v1_primary_20261102 sensitivity row.
 
     python3 scripts/check_recommended_inputs.py [directory]
 """
@@ -67,23 +68,23 @@ for r in main:
 for r in sens:
     check_row(f"{r['site']} {r['scenario']}", r["recommended_percent"], float(r["bare_percent"]),
               json.loads(r["fates_natland_percent_json"]), json.loads(r["clm_pct_nat_pft_json"]), json.loads(r["fates_vegetated_only_percent_json"]))
-if (D / f"OZ_JP_PFT_REVIEW_{TAG}.csv").is_file():   # 2 Nov 2026 literature review: proposed vectors obey the same rules
+if (D / f"OZ_JP_PFT_REVIEW_{TAG}.csv").is_file():   # 2 Nov 2026 review: final vectors must be the master primaries
     review = rd("PFT_REVIEW")
     if {r["site"] for r in review} != {r["site"] for r in main}: issues.append("review site set differs from master")
-    cur = {r["site"]: r["recommended_percent"] for r in main}
+    by = {r["site"]: r for r in main}
+    v1 = {}
+    for r in sens:
+        if r["scenario"] == "v1_primary_20261102": v1[r["site"]] = r["recommended_percent"]
     for r in review:
-        s = r["site"]
-        if r["current_primary"] != cur.get(s): issues.append(f"{s} REVIEW: current_primary differs from master")
-        if not r["proposed_clm_pct_nat_pft_json"]:
-            if r["verdict"] != "HOLD": issues.append(f"{s} REVIEW: no proposal but verdict {r['verdict']}")
-            continue
-        clm, bare = json.loads(r["proposed_clm_pct_nat_pft_json"]), float(r["proposed_bare_percent"])
-        nat = {}
-        for h, v in clm.items():
-            if int(h) in HOST2FATES: nat[HOST2FATES[int(h)]] = nat.get(HOST2FATES[int(h)], 0) + v
-        check_row(f"{s} REVIEW", r["proposed_primary"], bare, nat, clm, {f: v / (100 - bare) * 100 for f, v in nat.items()})
-        if r["verdict"].startswith("KEEP") and r["proposed_primary"] != r["current_primary"]:
-            issues.append(f"{s} REVIEW: KEEP but proposal differs")
+        s, m = r["site"], by.get(r["site"])
+        if m is None: continue
+        if r["final_primary"] != m["recommended_percent"]: issues.append(f"{s} REVIEW: final_primary differs from master")
+        if json.loads(r["final_clm_pct_nat_pft_json"]) != json.loads(m["clm_pct_nat_pft_json"]) or \
+                abs(float(r["final_bare_percent"]) - float(m["bare_percent"])) > 1e-9:
+            issues.append(f"{s} REVIEW: final vector differs from master")
+        changed = r["final_primary"] != r["v1_primary"]
+        if changed and v1.get(s) != r["v1_primary"]: issues.append(f"{s} REVIEW: revised but v1 primary not kept as v1_primary_20261102")
+        if not changed and s in v1: issues.append(f"{s} REVIEW: unchanged but has a v1_primary_20261102 scenario")
 if set(pct) != {r["site"] for r in main} or set(fat) != set(pct): issues.append("site sets differ between tables")
 if not {r["site"] for r in sens} <= set(pct) or not {r["site"] for r in led} <= set(pct): issues.append("unknown site in scenarios/ledger")
 

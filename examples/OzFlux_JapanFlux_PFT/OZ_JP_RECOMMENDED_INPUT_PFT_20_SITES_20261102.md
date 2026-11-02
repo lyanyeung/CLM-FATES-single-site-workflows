@@ -1,4 +1,4 @@
-# OzFlux 与 JapanFlux 20 站：建议的 CLM-FATES 固定输入 PFT 百分比 v1
+# OzFlux 与 JapanFlux 20 站：建议的 CLM-FATES 固定输入 PFT 百分比 v1.1（2026-11-02 文献复核修订）
 
 **2026年11月2日。** 下表为全部 20 个站点（OzFlux 9 个站点 ID、JapanFlux 11 个站点）给出了闭合到 100% 的主推荐，另有若干敏感性/时段替代方案。这是建模建议表，不是观测。格式、PFT 编号和映射沿用 `Ameriflux_Site/Ameriflux_PFT` 的 v1 约定。
 
@@ -8,6 +8,8 @@
 > 1. **没有一个站点有可直接当作面积占比的实测 PFT 向量。** 向量由株数/断面积/生物量/LAI/卫星覆盖度这类分母不同的证据，经过明示的规则转换而来，每行都写了转换规则和假设。
 > 2. 有 **4 个站点（AU-ASM、AU-Gin、JP-Tef、JP-Tmd）** 的主推荐主要靠先验或 LAI 代理，不要当作有证据支持的输入，见“临时先验”列。“待核对项”列只表示还有未核实的来源或未解决的差异，不等于不可用。
 > 3. **裸地、草本 C3/C4 比例、林下 Sasa** 在多数站点是模型分配，不是测量值。
+
+> **v1.1 修订（2026-11-02，操作者已接受文献复核）：** 下表已更新为 v1.1 主推荐。逐站最终说明、依据与不确定性以同目录 [README.md](README.md) 为准；下方“每站决策与证据”中 AU-ASM、AU-DaS、AU-How、JP-Yms、JP-Tef、JP-Tmd 的段落描述的是 v1，替换前的 v1 主推荐保留在敏感性表的 `v1_primary_20261102` 行。裸地一律保留为独立比例（与 AmeriFlux 50 站、ICOS 38 站一致）。
 
 ## 文件
 
@@ -24,12 +26,12 @@
 
 | 网络 | 站点 | 建议百分比：自然土壤面积，含 bare | 依据类型 | 不确定性 | 临时先验 | 待核对项 |
 | --- | --- | --- | --- | --- | --- | --- |
-| OzFlux | AU-ASM | EBT 43 / C4 22 / bare 35 | LAI_SHARE_PROXY_PLUS_MODEL_SURFACE_BARE_PRIOR | 高 | 是 | 有 |
+| OzFlux | AU-ASM | EBT 65 / C4 4 / CoolC3 2 / bare 29 | CROWN_COVER_PLUS_AUSPLOTS_POINT_INTERCEPT_REMAINDER_SPLIT | 中 | 否 | 有 |
 | OzFlux | AU-Cow | TropEBT 100 | STAND_FUNCTIONAL_PROXY | 低 | 否 | 无 |
 | OzFlux | AU-Cpr | EBT 33 / EvergreenShrub 10 / C4 3 / bare 54 | NVIS_STRATUM_COVER_PROXY | 高 | 否 | 有 |
-| OzFlux | AU-DaS | TropEBT 30 / HydrodecidTropTree 7.5 / C4 42.5 / bare 20 | PUBLISHED_MODEL_COVER_PRECEDENT_PLUS_EXPLICIT_TREE_SPLIT | 高 | 否 | 有 |
+| OzFlux | AU-DaS | TropEBT 37.5 / C4 42.5 / bare 20 | PUBLISHED_MODEL_COVER_PRECEDENT_NIJZINK_DEFINITION | 高 | 否 | 有 |
 | OzFlux | AU-Dry | TropEBT 26.6 / C4 49.4 / bare 24 | PUBLISHED_MODEL_COVER_PRECEDENT | 高 | 否 | 有 |
-| OzFlux | AU-How | TropEBT 31.8 / HydrodecidTropTree 8 / C4 44.3 / bare 15.9 | BASAL_AREA_SPLIT_OF_SATELLITE_TREE_COVER | 中 | 否 | 有 |
+| OzFlux | AU-How | TropEBT 39.8 / C4 44.3 / bare 15.9 | PUBLISHED_MODEL_COVER_PRECEDENT_NIJZINK_DEFINITION | 中 | 否 | 有 |
 | OzFlux | AU-Gin | EBT 45 / EvergreenShrub 35 / bare 20 | EXPLICIT_PRIOR_NO_COVER_DATA | 高 | 是 | 有 |
 | OzFlux | AU-Stp | C4 65 / bare 35 | PUBLISHED_MODEL_COVER_PRECEDENT | 中 | 否 | 有 |
 | OzFlux | AU-Tum | EBT 100 | DOMINANT_FOREST_PROXY | 中 | 否 | 有 |
@@ -39,17 +41,17 @@
 | JapanFlux | JP-Khw | ENF 100 | STAND_FUNCTIONAL_PROXY | 低 | 否 | 无 |
 | JapanFlux | JP-Spp | DBF 100 | STAND_FUNCTIONAL_PROXY | 低 | 否 | 有 |
 | JapanFlux | JP-Tak | DBF 100 | STAND_FUNCTIONAL_PROXY | 低 | 否 | 有 |
-| JapanFlux | JP-Tef | DNF 100 | PLANTATION_FUNCTIONAL_PROXY | 高 | 是 | 有 |
-| JapanFlux | JP-Tmd | DBF 19 / CoolC3 81 | LAI_SHARE_PROXY | 高 | 是 | 有 |
+| JapanFlux | JP-Tef | DNF 50 / CoolC3 50 | STRIP_GEOMETRY_AREA_SHARE | 中 | 否 | 有 |
+| JapanFlux | JP-Tmd | DBF 30 / CoolC3 60 / ColdDecidShrub 5 / bare 5 | MULTI_YEAR_TRAJECTORY_COMPROMISE | 高 | 是 | 有 |
 | JapanFlux | JP-Tom | DBF 100 | DOMINANT_FOREST_PROXY | 中 | 否 | 有 |
 | JapanFlux | JP-Tgf | CoolC3 40 / C4 60 | EXPLICIT_C3_C4_PRIOR | 高 | 否 | 有 |
-| JapanFlux | JP-Yms | DBF 72 / EBT 28 | EXPLICIT_BIOMASS_SHARE_PROXY | 中 | 否 | 有 |
+| JapanFlux | JP-Yms | DBF 66 / EBT 28 / ENF 6 | EXPLICIT_FUNCTIONAL_GROUP_BIOMASS_SHARE | 中 | 否 | 有 |
 
 ## 解读时最重要的几点
 
 1. **转换规则按站点类型固定，不是逐站拍脑袋。** 森林：用断面积（或生物量）归一化的功能型份额，裸地 0，林下省略（沿用 AmeriFlux 森林约定）。热带稀树草原（AU-How/DaS/Dry）：用 Nijzink 等 2022 的卫星树/草覆盖度，裸地取其补数，再用已知的常绿/落叶树比例拆分树覆盖。草地（AU-Stp、JP-Tgf）：C4/C3 取证据支持的倾向，其余为先验。
 2. **卫星覆盖度不是足迹实测。** AU-DaS、AU-Dry、AU-How、AU-Stp 的覆盖度来自 fPAR 投影覆盖（树=月最小覆盖，草=最大覆盖减树）。它们的补数当作 bare 是模型分配，不能写成实测裸地。
-3. **常绿/落叶树的拆分是区域先验。** AU-DaS 与 AU-Dry 借用 Howard Springs 的断面积比 80:20；DaS 按株数则偏落叶，已作为替代方案给出。
+3. **（v1.1 更正）Nijzink 2022 的树覆盖度是月最小投影覆盖，原文称其为常绿部分**，所以 AU-How 与 AU-DaS 不再按 80:20 拆分，落叶树叶片落在季节性的“草”项里。AU-Dry 的主推荐本来就没有拆分，80:20 只出现在它的替代方案中。
 4. **LAI 份额代理（AU-ASM、JP-Tef、JP-Tmd）不是面积。** 它只在缺少面积数据时作为明示的代理，对应替代方案同时给出。
 5. **Sasa（矮竹）林下**在 JP-Spp/Tak/Tef/Tom 是常绿 C3 禾本代理，但 FIXNC 的互斥 patch 会挤占树面积。主推荐省略，替代方案中 25% 的 CoolC3 是占位值，不是测量。
 6. **固定状态不重建扰动历史。** AU-Cpr（2014 火）、AU-Tum（2019 火）、JP-Fhk（2014–15 间伐）、JP-Spp（2004 台风）、JP-Tef（2003 皆伐）、JP-Tmd（2004 台风）、AU-ASM（2018–20 枯死）的主推荐只代表表中写明的时段，用完整 release 年份的气象驱动它们只能称为固定状态实验。
@@ -64,7 +66,7 @@
 
 ## 每站决策与证据
 
-### AU-ASM — EBT 43 / C4 22 / bare 35
+### AU-ASM — EBT 43 / C4 22 / bare 35（v1；v1.1 见 README）
 
 站点：Alice Springs Mulga；IGBP 来源：SAV (FLUXNET); NVIS Acacia shrublands。
 目标状态：Mulga woodland, pre-dieback reference；时段：Mulga1 2010-2023 and Mulga2 2024-2026 are separate files; dieback 2018-2020 not represented。
@@ -134,7 +136,7 @@
 - basal area / biomass / height：4.3 m2/ha / 7.2 t/ha / 3.9 m（likely post-fire standing trunks；site；核实：AGENT_READ）[来源](https://pmc.ncbi.nlm.nih.gov/articles/PMC12291013/)
 - fire：17 Jan 2014, severe patchy; 2018 regrowth ~6317 stems/ha, 1.9 m（stem survey；site；核实：AGENT_READ）[来源](https://bg.copernicus.org/articles/13/5895/2016/bg-13-5895-2016.pdf)
 
-### AU-DaS — TropEBT 30 / HydrodecidTropTree 7.5 / C4 42.5 / bare 20
+### AU-DaS — TropEBT 30 / HydrodecidTropTree 7.5 / C4 42.5 / bare 20（v1；v1.1 见 README）
 
 站点：Daly River Uncleared；IGBP 来源：SAV。
 目标状态：Uncleared eucalypt savanna；时段：~2008 plot survey reference; release 2008-2026。
@@ -178,7 +180,7 @@
 - satellite cover：tree 26.6 %, max grass 49.4 %（same as above；site；核实：AGENT_READ）[来源](https://hess.copernicus.org/articles/26/525/2022/hess-26-525-2022.pdf)
 - species：E. tetrodonta, E. dichromophloia, Corymbia terminalis; Sorghum, Themeda, Chrysopogon（qualitative; C4 by genus inference；site；核实：AGENT_READ）[来源](https://ozflux.org.au/monitoringsites/dryriver/dryriver_description.html)
 
-### AU-How — TropEBT 31.8 / HydrodecidTropTree 8 / C4 44.3 / bare 15.9
+### AU-How — TropEBT 31.8 / HydrodecidTropTree 8 / C4 44.3 / bare 15.9（v1；v1.1 见 README）
 
 站点：Howard Springs；IGBP 来源：WSA。
 目标状态：Eucalypt open-forest savanna, fire every 1-3 yr；时段：Release 2001-2025; ~2008 plot survey。
@@ -392,7 +394,7 @@
 - basal-area shares：Q. crispula 26.9, B. ermanii 24.6, B. platyphylla 14.6; deciduous total 97.2 %（share of total basal area；1 ha plot；核实：AGENT_READ）[来源](https://www.mdpi.com/1999-4907/15/4/725)
 - LAI/height：tree LAI ~5.5, Sasa ~1.7; canopy 13-20 m（；site；核实：AGENT_READ）[来源](https://asiaflux.nies.go.jp/site-info/TKY.html)
 
-### JP-Tef — DNF 100
+### JP-Tef — DNF 100（v1；v1.1 见 README）
 
 站点：Teshio CC-LaG；IGBP 来源：DNF (time-varying: MIX -> clearcut -> larch)。
 目标状态：Post-clearcut hybrid larch plantation；时段：Clearcut Jan-Mar 2003, planted Oct 2003; 2011-2023 composition not found。
@@ -414,7 +416,7 @@
 - pre-cut stand：155 trees (DBH>6 cm), BA 21.8 m2/ha; PAI canopy 3.2, Sasa 4.1（50x50 m plot；plot；核实：AGENT_READ）[来源](https://core.ac.uk/download/41877662.pdf)
 - post-cut regrowth：~2500 hybrid larch/ha planted Oct 2003; 2010 larch PAI 1.7, Sasa PAI 8.0（PAI；13.7 ha；核实：AGENT_READ）[来源](https://core.ac.uk/download/41877662.pdf)
 
-### JP-Tmd — DBF 19 / CoolC3 81
+### JP-Tmd — DBF 19 / CoolC3 81（v1；v1.1 见 README）
 
 站点：Tomakomai (disturbed)；IGBP 来源：DBF (ESSD); GRA (ICOS)。
 目标状态：Post-typhoon regrowth: sparse birch over herb layer；时段：2005-2014 (Typhoon Songda Sept 2004 ~90% damage); 2015-2023 not found; year-round data from 2013。
@@ -482,7 +484,7 @@
 - C3/C4 phenology：C3 Solidago altissima spring-early summer; C4 Miscanthus sinensis, Imperata cylindrica late summer-autumn; mown once a year（qualitative；field；核实：AGENT_READ）[来源](https://doi.org/10.2151/sola.2005-044)
 - LAI and biomass：growing-period LAI 1.7-1.9, peak 3.7-4.8; peak biomass 680-886 g/m2（80 quadrats 2x2 m；field；核实：AGENT_READ）[来源](https://doi.org/10.2151/sola.2005-044)
 
-### JP-Yms — DBF 72 / EBT 28
+### JP-Yms — DBF 72 / EBT 28（v1；v1.1 见 README）
 
 站点：Yamashiro；IGBP 来源：DBF。
 目标状态：Oak-dominated secondary forest after 1980s pine wilt；时段：2000-2023; no composition change documented。
