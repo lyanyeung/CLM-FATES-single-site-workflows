@@ -1,5 +1,18 @@
 # JapanFlux Stage05AV — last eight original QC2 fields, final four user-JST-hypothesis candidate CDS site-days
 
+## Actual Stage05AV first-run preflight failure and code-only fix (2026-11-02)
+
+The operator ran the first GitHub-pinned Stage05AV code. The **syntax and self-test passed**, but the immediately following read-only source preflight failed with:
+
+```text
+AttributeError: 'Namespace' object has no attribute 'stage05at_tef'
+  at=js(a.stage05at_tef)
+```
+
+**Cause:** Two inaccurate `argparse.Namespace` attribute references in the original Stage05AV, `a.stage05at_tef` and `a.stage05au_tmd`, while actual declared flags were `--stage05at-tef-report` and `--stage05au-tmd-report`; their correct Python attributes are `a.stage05at_tef_report` and `a.stage05au_tmd_report`. Fixed BOTH in new committed Stage05AV script (commit `8bd1436f8b5eee5845d4e5ee0ab9eeea16858acf`, script blob SHA `0fffdab5a3848dd73235fb4c38e809c9bf0ab206`) and added a CLI flag/attribute self-test regression.
+
+**Actual execution science impact:** zero CDS requests, zero ZIP changes and zero derived full analysis from the failed first Stage05AV; the last verified science result remains Stage05AU **37/45** independent hourly contextual comparisons. No forcing or Slurm writes. The corrected script was statically inspected on GitHub but its actual IRIDIS full run is **pending**. Re-download pinned corrected script, `git hash-object`, `py_compile`, `--self-test`, read-only source preview, only then `--submit-remaining` and `--assess`. Retain original source and all 45 QC2 science HOLD throughout.
+
 **State 2026-11-02:** Script committed to GitHub; **first real IRIDIS run pending**. This is not a declaration that 45/45 fields have been independently compared, nor does it authorize repairs.
 
 ## Established prior results
