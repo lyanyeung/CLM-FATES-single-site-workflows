@@ -133,7 +133,7 @@ def science_inputs():
                         "Stage29_receipt_SHA256":sha(REPORT_SOURCE),
                         "Stage29_pair_TSV_SHA256":sha(PAIR_SOURCE)}
 
-def calculate(raw,stage29):
+def calculate(raw,stage29,expected_stems=None):
     original=defaultdict(dict)
     for r in raw:
         y=original_year(r["phenomenonTime"])
@@ -146,8 +146,9 @@ def calculate(raw,stage29):
         if point is None or abs(point-0.2)>.025:
             raise ValueError("Original diameter at breast height or unverified point")
         original[k][y]=r
-    if len(original)!=111 or any(set(years)!={2014,2018} for years in original.values()):
-        raise ValueError("Source does not contain exact 111 2014/2018 paired stems")
+    if (expected_stems is not None and len(original)!=expected_stems) or any(
+        set(years)!={2014,2018} for years in original.values()):
+        raise ValueError("Source does not contain expected exact 2014/2018 paired stem IDs")
     pair_by_key={}
     for row in stage29:
         k=ident(row)
@@ -266,7 +267,7 @@ def test():
     paired.update({"D20_2014_cm":"4","D20_2018_derived_cm":"3.5",
                    "height_2014_m":"4","height_2018_derived_m":"4",
                    "biomass_2014_kg":"10","biomass_2018_derived_kg":"8"})
-    result=calculate([b,a],[paired])
+    result=calculate([b,a],[paired],expected_stems=1)
     r=result[0]
     assert "DERIVED_D20_DECREASE" in r["review_flags"]
     assert "DERIVED_BASAL_AREA_DECREASE" in r["review_flags"]
@@ -274,11 +275,17 @@ def test():
     assert math.isclose(r["delta_D20_cm"],-.5)
     try:
         pairbad=dict(paired);pairbad["biomass_2018_derived_kg"]="999"
-        calculate([b,a],[pairbad])
+        calculate([b,a],[pairbad],expected_stems=1)
     except ValueError as exc:
         assert "cross-checked" in str(exc)
     else:raise AssertionError("Bad Stage29 paired source must fail closed")
-    print("STAGE30 SELF-TEST PASS: 2014/2018 D20 source pairing, BASAL AREA vs diameter, negative deltas, Stage29 mismatch fail-closed; READ ONLY")
+    try:
+        calculate([b,a],[paired],expected_stems=111)
+    except ValueError as exc:
+        assert "expected exact 2014/2018 paired stem IDs" in str(exc)
+    else:
+        raise AssertionError("The production 111-stem guard did not reject a one-stem fixture")
+    print("STAGE30 SELF-TEST PASS: 1-stem fixture, production 111-stem guard, D20/basal-area pairing, negative deltas, Stage29 mismatch fail-closed; READ ONLY")
 
 def write_table(path,rows):
     with path.open("x",encoding="utf-8",newline="") as f:
@@ -295,7 +302,7 @@ def main():
         or any(x==out or x in out.parents for x in (ROOT.resolve(),S25.resolve(),S29.resolve()))):
         raise ValueError("Report output must be a FRESH direct HOME child")
     raw,paired,provenance=science_inputs()
-    rows=calculate(raw,paired)
+    rows=calculate(raw,paired,expected_stems=111)
     if len(rows)!=111 or sum(x["2014_height_above_FATES7_cap"] is True for x in rows if x["scientificName"] in ("Acacia aneura","Acacia aptaneura"))!=27:
         raise ValueError("111 unique stems / 27 tall Acacia receipt mismatch")
     qc=summary(rows)
