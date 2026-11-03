@@ -173,7 +173,9 @@ def read_site_source(site,package,events,root,max_mib):
                     if size>cap:raise ValueError("Original nested source byte cap exceeded")
                     stream.write(chunk)
             stream.seek(0)
-            return _inner_scan(site,package,events,stream)
+            scanned=_inner_scan(site,package,events,stream)
+            scanned["original_outer_zip"]=str(outer)
+            return scanned
 def _inner_scan(site,package,events,buffer):
     found={};window_rows=defaultdict(list);runs={};run_status={}
     varlist=sorted({k[2] for k in events})
@@ -254,12 +256,9 @@ def _inner_scan(site,package,events,buffer):
             raise ValueError("Missing original target source HH in neighbor window "+repr(k))
     return {"site":site,"package":package,
             "original_source_readme_sha256":readme_digest,
-            "original_outer_zip":str(outer_placeholder(site,package)),
             "source_HH_member":expected_hh,"source_HH_rows_scanned":rows_scanned,
             "full_source_header":headers,"target_values":found,
             "source_window_rows":window_rows,"source_QC2_runs":run_status}
-def outer_placeholder(site,package):
-    return ROOT/site/"forcing"/"packages"/(package+".zip")
 def finite_plausible(var,s):
     value=numeric(s)
     lo,hi=PHYSICAL[var]
