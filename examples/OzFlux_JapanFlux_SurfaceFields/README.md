@@ -56,6 +56,75 @@ Making `zbedrock` matter is therefore a **namelist decision** (`use_bedrock = .t
 
 None of these products sees hardpans, laterite, pumice or lava. They are context for the site evidence, not a substitute for it.
 
+## Stage01 result (IRIDIS6, 3 Nov 2026)
+
+The output is in `$HOME/ozjp_surface_stage01_20261103T135444Z` on IRIDIS6. The console values are transcribed in [`data/stage01_surface_fields_at_towers_20261103.csv`](data/stage01_surface_fields_at_towers_20261103.csv): one f09 row per site and one row per existing OzFlux point surface.
+
+**Template case (`AT-Neu_B03_FIXNC_NORMAL400`).**
+- `use_bedrock = .false.` (not set in `user_nl_clm`).
+- `soil_layerstruct_predefined = '20SL_8.5m'`, `lower_boundary_condition = 2`, `soilwater_movement_method = 1`.
+- `organic_frac_squared = .false.`, `use_fates_planthydro = .false.`, `use_hillslope = .false.`.
+- CLM parameter file `ctsm60_params.c260518.nc`: `organic_max` 130, `zbedrock` −1 (no global override), `zbedrock_sf` 1, `om_frac_sf` 1.
+- FATES default parameters: `zroot_min_z` = `zroot_max_z` = 100 m for all PFTs.
+- **Layer bottoms** of the 20 soil layers (m): 0.02, 0.06, 0.12, 0.20, 0.32, 0.48, 0.68, 0.92, 1.20, 1.52, 1.88, 2.28, 2.72, 3.26, 3.90, 4.64, 5.48, 6.42, 7.46, **8.60**. Then 5 bedrock layers to 49.6 m.
+
+**Point surfaces.**
+- All existing OzFlux point surfaces are subsets of the f09 cell. `zbedrock`, `ORGANIC`, `FMAX` and `SOIL_COLOR` equal the cell values.
+- The CTSM2000 reference surfaces still carry crop: AU-Cpr 18.85 %, AU-Gin 25.87 %, AU-Tum 8.39 %, AU-DaS 0.50 %, AU-Cow 0.28 %. The spin-up surface must set NATVEG = 100, as the project rule requires.
+- No JapanFlux point surface exists yet.
+
+**f09 cells at the towers:**
+
+| Site | f09 `zbedrock` (m) [3×3] | `ORGANIC` L1 / L5 / L10 (kg m⁻³) | FMAX | SOIL_COLOR | f09 NATVEG / CROP / URBAN (%) |
+| --- | --- | --- | --- | --- | --- |
+| AU-ASM | 31.0 [12.0–47.3] | 6.8 / 4.9 / 1.8 | 0.39 | 16 | 100 / 0 / 0 |
+| AU-Cow | **1.12** [1.12–6.96] | 22.6 / 8.1 / 9.7 | 0.39 | 18 | 99.7 / 0.3 / 0 |
+| AU-Cpr | 45.0 [7.2–48.8] | 15.3 / 11.0 / 3.2 | 0.39 | 13 | 80.5 / 18.7 / 0.9 |
+| AU-DaS | 3.67 [1.43–28.0] | 14.4 / 9.5 / 3.0 | 0.39 | 16 | 99.5 / 0.5 / 0 |
+| AU-Dry | 1.79 [1.62–15.0] | 14.4 / 9.5 / 3.0 | 0.39 | 16 | 99.9 / 0.1 / 0 |
+| AU-Gin | 4.08 [2.40–35.9] | 38.8 / 18.3 / 4.5 | 0.39 | 17 | 70.3 / 24.5 / 5.2 |
+| AU-How | 24.4 [1.43–41.5] | 16.8 / 11.0 / 2.8 | 0.39 | 17 | 99.1 / 0.2 / 0.7 |
+| AU-Stp | 26.8 [1.62–48.4] | 25.2 / 19.0 / 8.4 | 0.39 | 16 | 100 / 0 / 0 |
+| AU-Tum | **0.91** [0.91–15.8] | 21.3 / 13.0 / 3.7 | 0.39 | 17 | 90.2 / 8.3 / 1.6 |
+| JP-Api | 1.33 [0.77–12.6] | 37.9 / 14.6 / 3.2 | 0.363 | 15 | 91.7 / 6.7 / 1.6 |
+| JP-Fhk, JP-Fjy (same cell) | 1.98 [1.11–27.8] | 58.3 at all 10 levels | 0.378 | 17 | 82.0 / 7.6 / 10.4 |
+| JP-Khw | 2.98 [0.85–8.51] | 22.5 / 8.5 / 2.4 | 0.379 | 16 | 79.4 / 13.3 / 7.3 |
+| JP-Spp, JP-Tmd, JP-Tom (same cell) | 12.8 [0.87–12.8] | 63.0 / 13.6 / 2.4 | 0.386 | 14 | 76.2 / 15.1 / 6.1 (lake 2.6) |
+| JP-Tak | 2.71 [1.98–9.93] | 51.8 / 13.1 / 1.8 | 0.361 | 16 | 86.0 / 10.2 / 3.8 |
+| JP-Tef | 3.61 [1.06–14.9] | 37.9 / 14.6 / 3.2 | 0.387 | 14 | 93.5 / 6.3 / 0.2 |
+| JP-Tgf | 27.8 [1.98–33.1] | **103.6** / 50.8 / 20.9 | 0.39 | 16 | 45.5 / 32.4 / 20.0 (lake 2.1) |
+| JP-Yms | 3.57 [0.92–18.7] | 22.5 / 8.5 / 2.4 | 0.384 | 17 | 80.4 / 9.6 / 10.0 |
+
+**What this means.**
+- **The f09 grid cannot separate neighbouring towers.** JP-Fhk and JP-Fjy (about 1 km apart) fall in one cell, and so do JP-Spp, JP-Tmd and JP-Tom. Several cells are partly urban or crop.
+- **Turning on `use_bedrock` with the grid values would be wrong in places.** AU-Tum (a 40 m forest) and AU-Cow (26 m rainforest) would get less than 1.2 m of soil, while JP-Fjy (lava) would get 2 m. If `use_bedrock` is switched on, `zbedrock` must come from site evidence.
+- **FMAX** is 0.36–0.39 everywhere, which is the generic value. **SOIL_COLOR** ranges 13–18.
+
+### ORGANIC: f09 against SoilGrids
+
+The soil topic computed ORGANIC candidates as SOC × BD × 1.724 from SoilGrids 2.0. In the top layer they are 2–6 times the f09 values:
+
+| Site | f09 L1 (kg m⁻³) | SoilGrids L1 (kg m⁻³) |
+| --- | --- | --- |
+| AU-Gin | 39 | 101 |
+| AU-Tum | 21 | 172 |
+| JP-Tak | 52 | 183 |
+| JP-Api | 38 | 139 |
+
+Two values exceed `organic_max` = 130, which would make the top layer behave as peat.
+
+The site measurements point the other way:
+- **AU-Gin.** SoilGrids gives AU-Gin 49 g kg⁻¹ SOC at 0–5 cm and still 17 g kg⁻¹ at 1–2 m. That is implausible for a 97–99 % quartz sand (Bassendean sand).
+- **AU-DaS.** The savanna plots near AU-DaS measured OC 0.48–0.66 % with BD 1.34–1.52 g cm⁻³ (Grover et al. 2012). That gives ≈14 kg m⁻³, equal to f09 (14.4).
+- **JP-Tgf.** Its measured OC is 4.9 % at 0–20 cm. With an Andosol BD of 0.7–1.1 g cm⁻³ that gives 59–94 kg m⁻³, against f09 104.
+
+**Provisional rule:**
+- keep f09 `ORGANIC`;
+- replace it only where tower-specific SOC and BD exist;
+- use SoilGrids values only as a sensitivity case.
+
+The literature search for site SOC stocks is still running.
+
 ## Scripts
 
 | Script | Where | What |

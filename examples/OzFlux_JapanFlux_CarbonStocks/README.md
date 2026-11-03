@@ -28,6 +28,43 @@ TERN Support (A. Singh Ramesh) replied by email on 3 Nov 2026 about the *Alice M
 
 This agrees with the [OzFlux_MultiSite_09](../OzFlux_MultiSite_09/) Stage30/31 flags on the 2018-derived stems. Note also that the new plot describes the stand **after** the 2018–2020 mulga dieback, which matches the Mulga2 tower period (2024–2026). It does not describe the pre-dieback state (2013–2017) used for the AU-ASM evaluation window.
 
+## Stage01 result (IRIDIS6, 3 Nov 2026; console truncated at JP-Tom)
+
+**JapanFlux BIF files.**
+- They hold no biomass, soil-chemistry or `GRP_DM_*` disturbance groups.
+- Present groups: site description, IGBP (with history comments), HEIGHTC, LAI, CLIM_AVG and UTC offset. They also hold flux-processing groups (FLUX_REF, UST_THR, ERA_DOWN, ONEFLUX).
+
+**Stand history found in our own files:**
+
+| Site | History |
+| --- | --- |
+| JP-Fhk | Larch "planted around in 1950, and thinned … in 2014 and 2015" |
+| JP-Tef | "Conifer-Hardwood mixed forest until January, 2003, Young larch plantation from late October 2003 (ca. 30000 saplings (ca. 2500 saplings ha-1, 0.04 tC ha-1))" |
+| JP-Tmd | IGBP GRA from 2005, OSH from 2011, DBF from 2017 (the post-windthrow trajectory); canopy height 0.5–3 m (2005–2015); LAI 4.2 (2015) |
+| JP-Spp | A secondary broadleaf forest "which had grown after wildfire" |
+| JP-Khw | Sugi / hinoki "over 50 years old" |
+| JP-Tom | BADM Disturbance_and_Management: `DM_EXT_WEATHER` = Other on 2004-09-08 (Typhoon Songda) |
+| JP-Tgf | BADM Disturbance_and_Management: `DM_GENERAL` = Undisturbed (2001-01-01). The annual mowing is not recorded there |
+
+**Canopy height (HEIGHTC) and LAI:**
+
+| Site | Canopy height (m) | LAI |
+| --- | --- | --- |
+| JP-Api | 17 | — |
+| JP-Fhk | 21.9–24.8 | 2.8 |
+| JP-Fjy | 20 | 5.0 |
+| JP-Khw | 10 | — |
+| JP-Spp | 20 | 4.0 |
+| JP-Tak | 15 | 1.7–5.5 |
+| JP-Tef | 1–18 | 1.3–8.0 (2002–2010) |
+
+**OzFlux L6 global attributes.** They give canopy height and vegetation only:
+- canopy height: AU-ASM 4.4, AU-Cow 26, AU-Cpr 3, AU-DaS 16.4, AU-Gin 6.8 (mean 4.8), AU-How 16, AU-Stp 0.5, AU-Tum 40 m;
+- AU-Dry's attribute reads 0.15 m, which is probably the grass layer;
+- the only event in the attributes is AU-Gin's new EC system from 12 Feb 2021.
+
+Every carbon stock, every event and every annual flux therefore has to come from the literature.
+
 ## Scripts
 
 | Script | Where | What |
