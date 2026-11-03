@@ -1,5 +1,7 @@
 # JapanFlux MultiSite 11 — CLM-FATES single-site workflow (new experiment)
 
+> **Stage05AZ existing-hourly review and one-batch protocol:** operator-supplied Tef/Tmd hourly tables were analyzed locally with explicit UTC+9, fixed-offset and longitude-based mean-solar sensitivity; prior PA/TA/LW source/grid differences remain contextual and all 45 fields HOLD. A 16-CDS-ZIP + five-original-ZIP read-only batch and synthetic tests are committed; actual IRIDIS6 batch execution is pending. See [hourly review and bulk protocol](docs/STAGE05AZ_HOURLY_REVIEW_AND_BULK_READONLY_PROTOCOL.md). No repairs approved.
+
 > **Stage05AY shadow vs existing ERA5-Land envelopes:** the 45 unapproved full-group QC2 bridge shadows were compared with the actual saved Stage05AW hourly context envelopes: 12 inside, 20 below, 13 above. These are contextual comparisons, not repair pass/fail tests; station/grid elevation and time alignment require investigation. All 45 remain SCIENCE HOLD, zero approved replacements. See [shadow versus prior reference review](docs/STAGE05AY_SHADOW_VS_PRIOR_ERA5L_ENVELOPES.md).
 
 > **Stage05AY actual full-window grouped shadow review:** operator export covered all 45 × 97 native half-hours; 1,677 de-duplicated site/variable/time rows were reviewed. The 45 flags form 17 grouped unapproved bridge scenarios, with nearby same-source masking sensitivity checks (not independent tower validation). All 45 remain SCIENCE HOLD; no production repairs. See [full-window evidence, candidate values and limitations](docs/STAGE05AY_ACTUAL_FULL_WINDOWS_SHADOW_REVIEW.md).
