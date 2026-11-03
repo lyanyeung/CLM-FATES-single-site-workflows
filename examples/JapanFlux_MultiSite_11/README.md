@@ -1,5 +1,7 @@
 # JapanFlux MultiSite 11 — CLM-FATES single-site workflow (new experiment)
 
+> **Stage05BL measured-QC0 validation planning:** one five-site read-only source scan is prepared for ±30-day broad-range-screened QC0 counts and same-source QC0 masking opportunities around all 17 groups. The selected grid-plus-QC2-median shadows remain unchanged; synthetic tests pass, real IRIDIS execution pending. All 45 HOLD, zero approved. See [QC0 context protocol](docs/STAGE05BL_FIVE_SITE_QC0_30DAY_VALIDATION_PLAN.md).
+
 > **Stage05BK actual ICOS archive identity and background sensitivity:** operator reported byte-for-byte identity of the Tef/Tmd inner archives with ICOS; both source READMEs explicitly use solar wording. The selected overall QC2 median remains unchanged; asymmetric pre/post coverage adds method sensitivity. All 45 HOLD; zero approved. See [identity and background sensitivity](docs/STAGE05BK_ACTUAL_05BI_IDENTITY_AND_BACKGROUND_BALANCE.md).
 
 > **Stage05BI/BJ publisher identity and Tmd boundary:** ICOS's same-version Tef and Tmd half-hour subset metadata supports local non-DST time; the operator subsequently verified both inner archive hashes against ICOS; the source README solar wording remains unresolved. The selected Tmd PA left-boundary jumps are decomposed into grid-change and QC2-offset components. All 45 HOLD; zero approved. See [evidence and read-only identity protocol](docs/STAGE05BI_ICOS_IDENTITY_AND_TMD_BOUNDARY_DIAGNOSIS.md).
