@@ -83,6 +83,9 @@ class BatchTests(unittest.TestCase):
                 self.assertEqual((report['flags'],report['groups'],report['candidate_scenario_rows']),(45,17,99))
                 self.assertEqual(report['approved_replacements'],0)
                 self.assertEqual(report['cds_zip_count_sha256_crc_schema_24h_grid_verified'],16)
+                with (output/'candidate_hourly_context_HOLD.tsv').open(encoding='utf8',newline='') as f:
+                    data=list(csv.DictReader(f,delimiter='\t'))
+                self.assertEqual(sum(r['clock']=='LOCAL_MEAN_SOLAR_LONGITUDE_DIAGNOSTIC_NOT_PROVEN' for r in data),18)
                 bad=early/'JP-Fjy_ERA5Land_timeseries_20050811_CSV_response.zip'
                 bad.write_bytes(bad.read_bytes()+b'x')
                 args.out=root/'japanflux_stage05az'/'run2'

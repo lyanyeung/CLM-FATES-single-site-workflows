@@ -128,6 +128,11 @@ def reference(grid,var,local_start,offset_minutes):
     frac=(mid-floor).total_seconds()/3600
     return a+(b-a)*frac,mid.isoformat()+'Z','INSTANT_INTERPOLATED_TO_MIDPOINT_APPROX'
 def bridge(a,b,n):return [a+(b-a)*i/(n+1) for i in range(1,n+1)]
+def clock_label(site,offset_minutes):
+    if site not in SOLAR_LONGITUDE:return 'SOURCE_README_STANDARD_UTC_PLUS9'
+    if abs(offset_minutes-540)<1e-9:return 'OPERATOR_JST_PLUS9_HYPOTHESIS'
+    if abs(offset_minutes-SOLAR_LONGITUDE[site]*4)<1e-9:return 'LOCAL_MEAN_SOLAR_LONGITUDE_DIAGNOSTIC_NOT_PROVEN'
+    return 'HYPOTHETICAL_FIXED_OFFSET_SENSITIVITY'
 def windows(records,ledger):
     byflag=defaultdict(dict);unique={}; events={}
     for row in ledger:
@@ -199,9 +204,7 @@ def run(a):
         shadow=bridge(left['f'],right['f'],n)
         offsets=(510,540,570,SOLAR_LONGITUDE[site]*4) if site in SOLAR_LONGITUDE else (540,)
         for off in offsets:
-            clock=('OPERATOR_JST_PLUS9_HYPOTHESIS' if off==540 else
-                   'LOCAL_MEAN_SOLAR_LONGITUDE_DIAGNOSTIC_NOT_PROVEN' if off==SOLAR_LONGITUDE.get(site,0) else
-                   'HYPOTHETICAL_FIXED_OFFSET_SENSITIVITY') if site in SOLAR_LONGITUDE else 'SOURCE_README_STANDARD_UTC_PLUS9'
+            clock=clock_label(site,off)
             counts=Counter(); diffs=defaultdict(list); sides=defaultdict(list); sample_times=defaultdict(list)
             for k,p in sorted(unique.items()):
                 if k[:2]!=(site,var) or not start-timedelta(hours=24)<=p['t']<=end+timedelta(hours=24):continue
@@ -293,6 +296,9 @@ def selftest():
     assert abs(reference(cross,'LW_IN',t,540.1)[0]-(250*6+300*1794)/1800)<1e-9
     assert reference(data,'PA',t-timedelta(hours=1),540)[0] is None
     assert bridge(98,102,3)==[99.,100.,101.]
+    assert clock_label('JP-Tef',SOLAR_LONGITUDE['JP-Tef']*4)=='LOCAL_MEAN_SOLAR_LONGITUDE_DIAGNOSTIC_NOT_PROVEN'
+    assert clock_label('JP-Tmd',540)=='OPERATOR_JST_PLUS9_HYPOTHESIS'
+    assert clock_label('JP-Yms',540)=='SOURCE_README_STANDARD_UTC_PLUS9'
     assert reference({('strd',datetime(2020,1,1,0)):250.},'LW_IN',datetime(2020,1,1,8,30),540)[0]==250.
     day='20200101';text='valid_time,latitude,longitude,sp\n'+''.join(f'2020-01-01 {h:02d}:00:00,35.5,138.8,100000\n' for h in range(24))
     buf=io.BytesIO()
