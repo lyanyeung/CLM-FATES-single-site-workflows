@@ -1,5 +1,7 @@
 # JapanFlux MultiSite 11 — CLM-FATES single-site workflow (new experiment)
 
+> **Stage05BH publisher time and Tmd pressure evidence:** ICOS metadata for a separately packaged same-version JP-Tmd FLUXMET subset describes local non-DST time, supporting UTC+9 alongside BIF; the source README conflict and exact member identity are not fully resolved. Tmd 2022 selected pressure has a large left-boundary contrast in all four diagnostic clock scenarios. All 45 fields remain HOLD. See [publisher and Tmd evidence](docs/STAGE05BH_PUBLISHER_CLOCK_AND_TMD_BOUNDARY_EVIDENCE.md).
+
 > **Stage05BG actual Stage05BF run and selected-shadow clock sensitivity:** operator reports 45 selected fields reconstructed on IRIDIS6 and five original ZIP hashes checked twice; local four-scenario sensitivity for Tef/Tmd 18 fields remains diagnostic only. All 45 HOLD, zero approved. See [actual run and clock sensitivity](docs/STAGE05BG_ACTUAL_IRIDIS_05BF_AND_SELECTED_CLOCK_SENSITIVITY.md).
 
 > **Stage05BF one-batch IRIDIS shadow rebuild:** reuses existing AW/AY/AZ results, checks five original ZIP hashes before/after and matches the user's 45 grid-plus-QC2-median shadows to the local result at six decimals. Operator subsequently reported a successful real IRIDIS run; all 45 remain SCIENCE HOLD; zero approved. See [batch protocol](docs/STAGE05BF_IRIDIS_BATCH_SHADOW_REBUILD_PROTOCOL.md).
