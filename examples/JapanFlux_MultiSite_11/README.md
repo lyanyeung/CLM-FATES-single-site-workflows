@@ -1,6 +1,8 @@
 # JapanFlux MultiSite 11 — CLM-FATES single-site workflow (new experiment)
 
-> **Stage05BF one-batch IRIDIS shadow rebuild:** reuses existing AW/AY/AZ results, checks five original ZIP hashes before/after and matches the user's 45 grid-plus-QC2-median shadows to the local result at six decimals. Synthetic tests passed; actual IRIDIS execution pending. All 45 remain SCIENCE HOLD; zero approved. See [batch protocol](docs/STAGE05BF_IRIDIS_BATCH_SHADOW_REBUILD_PROTOCOL.md).
+> **Stage05BG actual Stage05BF run and selected-shadow clock sensitivity:** operator reports 45 selected fields reconstructed on IRIDIS6 and five original ZIP hashes checked twice; local four-scenario sensitivity for Tef/Tmd 18 fields remains diagnostic only. All 45 HOLD, zero approved. See [actual run and clock sensitivity](docs/STAGE05BG_ACTUAL_IRIDIS_05BF_AND_SELECTED_CLOCK_SENSITIVITY.md).
+
+> **Stage05BF one-batch IRIDIS shadow rebuild:** reuses existing AW/AY/AZ results, checks five original ZIP hashes before/after and matches the user's 45 grid-plus-QC2-median shadows to the local result at six decimals. Operator subsequently reported a successful real IRIDIS run; all 45 remain SCIENCE HOLD; zero approved. See [batch protocol](docs/STAGE05BF_IRIDIS_BATCH_SHADOW_REBUILD_PROTOCOL.md).
 
 > **Stage05BE user-selected grid + QC2 background shadows:** all 45 candidate fields now use the operator's selected method in a separate local shadow package. Boundary diagnostics show 11/17 groups above the local QC2 descriptive jump p95 (all nine PA and two Yms LW groups), not an automatic rejection threshold. All 45 remain SCIENCE HOLD; zero forcing repairs approved. See [selected shadow and continuity evidence](docs/STAGE05BE_USER_SELECTED_GRID_QC2_SHADOW_AND_CONTINUITY.md).
 
