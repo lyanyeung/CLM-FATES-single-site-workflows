@@ -182,6 +182,12 @@ The other 15 sites keep f09. JP-Spp (18 kg C m⁻²) and JP-Yms (3.0) have stock
 
 **Recommendation:** B, starting with AU-ASM, whose AD400 case does not exist yet. Treat the lava and pumice sites as a sensitivity pair (on / off).
 
+**Operator decision, 3 Nov 2026: B.**
+- `use_bedrock = .true.` for all 20 OzFlux / JapanFlux sites, in AD400, NORMAL400 and the observation run.
+- JP-Fjy, JP-Tmd and JP-Tom also get an on / off sensitivity pair.
+- **AU-ASM goes first.** Non-Competition-CLM-experiment Stage22 (`examples/OzFlux_Batch01_09/BEDROCK_20261103_SITE_V3_PLAN.md`, branch `feat/ozflux-asm-bedrock-v3-20261103`) builds a v3 candidate surface from Codex's verified Stage13 SITE-SOIL v2. It changes only `zbedrock`, to 1.0 m, and records the namelist requirement for the future AD400 controller.
+- **AU-ASM landunits stay as Stage16** (NATVEG 99.9994 %), following the operator rule in that pipeline.
+
 ## Scripts
 
 | Script | Where | What |
