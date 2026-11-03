@@ -1,5 +1,7 @@
 # JapanFlux MultiSite 11 — CLM-FATES single-site workflow (new experiment)
 
+> **Stage05BE user-selected grid + QC2 background shadows:** all 45 candidate fields now use the operator's selected method in a separate local shadow package. Boundary diagnostics show 11/17 groups above the local QC2 descriptive jump p95 (all nine PA and two Yms LW groups), not an automatic rejection threshold. All 45 remain SCIENCE HOLD; zero forcing repairs approved. See [selected shadow and continuity evidence](docs/STAGE05BE_USER_SELECTED_GRID_QC2_SHADOW_AND_CONTINUITY.md).
+
 > **Stage05BC held method comparison and actual 05BB operator result:** IRIDIS6 05BB checks and tests passed; the 17-group local masking experiment compares QC2 bridges with grid-plus-QC2-median alternatives against same-release QC2 only. Both candidate methods remain unapproved; all 45 fields SCIENCE HOLD. See [masking comparison and evidence limits](docs/STAGE05BC_MASKED_METHOD_COMPARISON_AND_05BB_OPERATOR_RESULT.md).
 
 > **Stage05BB independent-operation JMA pressure context:** official Tomakomai and Kawaguchiko hourly observations add illustrative pressure checks for Tmd and Fjy; uncertain clock, instrument elevation, spatial gradients and possible shared reanalysis inputs prevent approval or bias correction. See [JMA pressure context](docs/STAGE05BB_JMA_TMD_INDEPENDENT_PRESSURE_CONTEXT.md). All 45 remain SCIENCE HOLD.
