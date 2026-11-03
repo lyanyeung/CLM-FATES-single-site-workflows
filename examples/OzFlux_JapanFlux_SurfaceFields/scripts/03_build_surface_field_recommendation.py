@@ -130,13 +130,17 @@ def build(stage01, gridded, decisions):
         else:
             org_new = org
         bdt = grid.get(s, {}).get("BDTICM", {})
+        zsens = fnum(d.get("sensitivity_zbedrock_m"))
         out.append({
             "site": s,
+            "zbedrock_class": d.get("zbedrock_class", ""),
             "zbedrock_recommended_m": round(z, 3), "zbedrock_tier": d.get("zbedrock_tier") or "GRID_F09",
             "zbedrock_basis": d.get("zbedrock_basis", ""), "zbedrock_f09_m": float(g["zbedrock_m"]),
             "soilgrids_BDTICM_m": None if not bdt.get("centre") else int(bdt["centre"]) / 100,
             "use_bedrock_on_nbedrock": nb, "use_bedrock_on_soil_bottom_m": zbot,
             "use_bedrock_off_soil_bottom_m": MODEL_BOTTOMS[-1],
+            "sensitivity_zbedrock_m": zsens,
+            "sensitivity_soil_bottom_m": None if zsens is None else nbedrock(zsens)[1],
             "organic_rule": rule, "organic_scale_factor": round(factor, 3),
             "organic_basis": d.get("organic_basis", ""),
             **{f"ORGANIC_L{i + 1}": round(o, 3) for i, o in enumerate(org_new)},
