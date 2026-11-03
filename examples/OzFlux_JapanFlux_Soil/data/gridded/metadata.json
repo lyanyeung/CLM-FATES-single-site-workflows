@@ -1,0 +1,117 @@
+{
+ "generated_utc": "2026-11-03T07:06:54+00:00",
+ "script": "01_gridded_soil_at_towers.py",
+ "sites_csv": "../data/OZ_JP_20_SITE_COORDINATES_20261103.csv",
+ "sources": [
+  "SOILGRIDS"
+ ],
+ "slga_used": false,
+ "soilgrids_base": "https://files.isric.org/soilgrids/latest/data",
+ "slga_base": "https://data.tern.org.au/model-derived/slga/NationalMaps/SoilAndLandscapeGrid",
+ "rasterio": "1.5.1",
+ "gdal": "3.12.4",
+ "n_rows": 1440,
+ "n_errors": 0,
+ "sites": {
+  "AU-ASM": {
+   "lat": -22.2828,
+   "lon": 133.2493,
+   "coord_source": "OzFlux L6 global attributes and latitude/longitude variables (Non-Competition-CLM-experiment OzFlux Stage02)"
+  },
+  "AU-Cow": {
+   "lat": -16.23819,
+   "lon": 145.42715,
+   "coord_source": "OzFlux L6 (Stage02)"
+  },
+  "AU-Cpr": {
+   "lat": -34.0027,
+   "lon": 140.5877,
+   "coord_source": "OzFlux L6 (Stage02)"
+  },
+  "AU-DaS": {
+   "lat": -14.1592,
+   "lon": 131.3881,
+   "coord_source": "OzFlux L6 (Stage02)"
+  },
+  "AU-Dry": {
+   "lat": -15.2588,
+   "lon": 132.3706,
+   "coord_source": "OzFlux L6 (Stage02)"
+  },
+  "AU-Gin": {
+   "lat": -31.376351,
+   "lon": 115.71377,
+   "coord_source": "OzFlux L6 (Stage02)"
+  },
+  "AU-How": {
+   "lat": -12.4952,
+   "lon": 131.15005,
+   "coord_source": "OzFlux L6 (Stage02)"
+  },
+  "AU-Stp": {
+   "lat": -17.1507,
+   "lon": 133.3502,
+   "coord_source": "OzFlux L6 (Stage02)"
+  },
+  "AU-Tum": {
+   "lat": -35.6566,
+   "lon": 148.1516,
+   "coord_source": "OzFlux L6 (Stage02)"
+  },
+  "JP-Api": {
+   "lat": 40.0013586,
+   "lon": 140.9365859,
+   "coord_source": "Ueyama et al. 2025 ESSD JapanFlux2024 Table 1 (literature; check against original BIF in Stage02)"
+  },
+  "JP-Fhk": {
+   "lat": 35.44355577,
+   "lon": 138.7646931,
+   "coord_source": "Ueyama et al. 2025 ESSD JapanFlux2024 Table 1 (literature; check against original BIF in Stage02)"
+  },
+  "JP-Fjy": {
+   "lat": 35.45454,
+   "lon": 138.76225,
+   "coord_source": "original JapanFlux BIF LOCATION group (JapanFlux Stage05R)"
+  },
+  "JP-Khw": {
+   "lat": 33.13658,
+   "lon": 130.70834,
+   "coord_source": "original JapanFlux BIF LOCATION group (JapanFlux Stage05R)"
+  },
+  "JP-Spp": {
+   "lat": 42.9868431,
+   "lon": 141.3853305,
+   "coord_source": "Ueyama et al. 2025 ESSD JapanFlux2024 Table 1 (literature; check against original BIF in Stage02)"
+  },
+  "JP-Tak": {
+   "lat": 36.14616667,
+   "lon": 137.4231111,
+   "coord_source": "Ueyama et al. 2025 ESSD JapanFlux2024 Table 1 (literature; check against original BIF in Stage02)"
+  },
+  "JP-Tef": {
+   "lat": 45.055808,
+   "lon": 142.107122,
+   "coord_source": "original JapanFlux BIF LOCATION group (JapanFlux Stage05AR)"
+  },
+  "JP-Tgf": {
+   "lat": 36.11353,
+   "lon": 140.09488,
+   "coord_source": "Ueyama et al. 2025 ESSD JapanFlux2024 Table 1 (literature; check against BADM in Stage02)"
+  },
+  "JP-Tmd": {
+   "lat": 42.735911,
+   "lon": 141.523147,
+   "coord_source": "original JapanFlux BIF LOCATION group (JapanFlux Stage05AR)"
+  },
+  "JP-Tom": {
+   "lat": 42.698906,
+   "lon": 141.571488,
+   "coord_source": "Ueyama et al. 2025 ESSD JapanFlux2024 Table 1 (literature; check against BADM in Stage02)"
+  },
+  "JP-Yms": {
+   "lat": 34.790278,
+   "lon": 135.840939,
+   "coord_source": "original JapanFlux BIF LOCATION group (JapanFlux Stage05R)"
+  }
+ }
+}

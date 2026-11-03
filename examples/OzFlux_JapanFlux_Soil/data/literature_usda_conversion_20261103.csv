@@ -1,0 +1,10 @@
+site,evidence_id,depth_top_cm,depth_bottom_cm,scheme,reported_sand,reported_silt,reported_clay,usda_sand,usda_clay,conversion,usda_sand_if_ISSS,manual_depth,citation
+AU-ASM,AU-ASM-E01,0.0,100.0,UNSTATED,74.0,11.0,15.0,74.0,15.0,UNSTATED_AS_REPORTED,59.1,YES,TERN Data Discovery Portal: Alice Springs Mulga Flux Data Collection (metadata record)
+AU-Cpr,AU-Cpr-E01,0.0,41.0,UNSTATED,94.0,4.0,2.0,94.0,2.0,UNSTATED_AS_REPORTED,88.3,YES,"Sun Q., Meyer W.S., Koerber G.R., Marschner P. (2015) Response of respiration and nutrient availability to drying and rewetting in soil from a semi-arid woodland depends on vegetation patch and a recent wildfire. Biogeosciences 12:5093-5101. doi:10.5194/bg-12-5093-2015"
+AU-Gin,AU-Gin-E01,0.0,1.0,USDA,99.3,0.1,0.7,99.2,0.7,USDA_AS_REPORTED,,,"Turner B.L., Laliberté E. (2020) Proposal for a new Bassendean reference soil in Western Australia. J. R. Soc. West. Aust. 103"
+AU-Gin,AU-Gin-E02,1.0,18.0,USDA,97.2,1.5,1.3,97.2,1.3,USDA_AS_REPORTED,,,"Turner B.L., Laliberté E. (2020) J. R. Soc. West. Aust. 103"
+AU-Gin,AU-Gin-E03,18.0,30.0,USDA,98.6,0.7,0.6,98.7,0.6,USDA_AS_REPORTED,,,"Turner B.L., Laliberté E. (2020) J. R. Soc. West. Aust. 103"
+AU-Gin,AU-Gin-E04,30.0,62.0,USDA,98.9,0.4,0.7,98.9,0.7,USDA_AS_REPORTED,,,"Turner B.L., Laliberté E. (2020) J. R. Soc. West. Aust. 103"
+AU-Gin,AU-Gin-E05,62.0,103.0,USDA,98.9,0.4,0.6,99.0,0.6,USDA_AS_REPORTED,,,"Turner B.L., Laliberté E. (2020) J. R. Soc. West. Aust. 103"
+AU-Gin,AU-Gin-E06,103.0,340.0,USDA,98.9,0.4,0.7,98.9,0.7,USDA_AS_REPORTED,,,"Turner B.L., Laliberté E. (2020) J. R. Soc. West. Aust. 103"
+AU-Gin,AU-Gin-E07,340.0,500.0,USDA,99.3,0.1,0.7,99.2,0.7,USDA_AS_REPORTED,,,"Turner B.L., Laliberté E. (2020) J. R. Soc. West. Aust. 103"

@@ -1,0 +1,21 @@
+site,network,site_name,lat,lon,elevation_m,coord_source,coord_verification
+AU-ASM,OzFlux,Alice Springs Mulga,-22.2828,133.2493,,OzFlux L6 global attributes and latitude/longitude variables (Non-Competition-CLM-experiment OzFlux Stage02),IRIDIS6_SOURCE_FILE
+AU-Cow,OzFlux,Cow Bay,-16.23819,145.42715,,OzFlux L6 (Stage02),IRIDIS6_SOURCE_FILE
+AU-Cpr,OzFlux,Calperum,-34.0027,140.5877,,OzFlux L6 (Stage02),IRIDIS6_SOURCE_FILE
+AU-DaS,OzFlux,Daly River Uncleared,-14.1592,131.3881,,OzFlux L6 (Stage02),IRIDIS6_SOURCE_FILE
+AU-Dry,OzFlux,Dry River,-15.2588,132.3706,,OzFlux L6 (Stage02),IRIDIS6_SOURCE_FILE
+AU-Gin,OzFlux,Gingin,-31.376351,115.71377,,OzFlux L6 (Stage02),IRIDIS6_SOURCE_FILE
+AU-How,OzFlux,Howard Springs,-12.4952,131.15005,,OzFlux L6 (Stage02),IRIDIS6_SOURCE_FILE
+AU-Stp,OzFlux,Sturt Plains,-17.1507,133.3502,,OzFlux L6 (Stage02),IRIDIS6_SOURCE_FILE
+AU-Tum,OzFlux,Tumbarumba,-35.6566,148.1516,,OzFlux L6 (Stage02),IRIDIS6_SOURCE_FILE
+JP-Api,JapanFlux,Appi,40.0013586,140.9365859,831,Ueyama et al. 2025 ESSD JapanFlux2024 Table 1 (literature; check against original BIF in Stage02),LITERATURE_TABLE
+JP-Fhk,JapanFlux,Fuji Hokuroku,35.44355577,138.7646931,1100,Ueyama et al. 2025 ESSD JapanFlux2024 Table 1 (literature; check against original BIF in Stage02),LITERATURE_TABLE
+JP-Fjy,JapanFlux,Fujiyoshida,35.45454,138.76225,1043,original JapanFlux BIF LOCATION group (JapanFlux Stage05R),IRIDIS6_SOURCE_FILE
+JP-Khw,JapanFlux,Kahoku Experiment Watershed,33.13658,130.70834,196,original JapanFlux BIF LOCATION group (JapanFlux Stage05R),IRIDIS6_SOURCE_FILE
+JP-Spp,JapanFlux,Sapporo,42.9868431,141.3853305,173,Ueyama et al. 2025 ESSD JapanFlux2024 Table 1 (literature; check against original BIF in Stage02),LITERATURE_TABLE
+JP-Tak,JapanFlux,Takayama,36.14616667,137.4231111,1425,Ueyama et al. 2025 ESSD JapanFlux2024 Table 1 (literature; check against original BIF in Stage02),LITERATURE_TABLE
+JP-Tef,JapanFlux,Teshio CC-LaG,45.055808,142.107122,79.47,original JapanFlux BIF LOCATION group (JapanFlux Stage05AR),IRIDIS6_SOURCE_FILE
+JP-Tgf,JapanFlux,Tsukuba grassland (TERC),36.11353,140.09488,27,Ueyama et al. 2025 ESSD JapanFlux2024 Table 1 (literature; check against BADM in Stage02),LITERATURE_TABLE
+JP-Tmd,JapanFlux,Tomakomai (disturbed),42.735911,141.523147,117,original JapanFlux BIF LOCATION group (JapanFlux Stage05AR),IRIDIS6_SOURCE_FILE
+JP-Tom,JapanFlux,Tomakomai Experimental Forest,42.698906,141.571488,90,Ueyama et al. 2025 ESSD JapanFlux2024 Table 1 (literature; check against BADM in Stage02),LITERATURE_TABLE
+JP-Yms,JapanFlux,Yamashiro,34.790278,135.840939,220,original JapanFlux BIF LOCATION group (JapanFlux Stage05R),IRIDIS6_SOURCE_FILE
