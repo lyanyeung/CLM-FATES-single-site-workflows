@@ -28,9 +28,11 @@ from pathlib import Path,PurePosixPath
 SITES=Counter({"JP-Fjy":6,"JP-Khw":11,"JP-Yms":10,"JP-Tef":4,"JP-Tmd":14})
 VARS=Counter({"PA":27,"TA":6,"LW_IN":12})
 SOURCE_READMES={
-  "JP-Fjy":"fe96facec6fafc57b126e850140152a540a16d97c3bfde8adfa090a3747598f9",
-  "JP-Khw":"fe96facec6fafc57b126e850140152a540a16d97c3bfde8adfa090a3747598f9",
-  "JP-Yms":"fe96facec6fafc57b126e850140152a540a16d97c3bfde8adfa090a3747598f9",
+  # No unverifiable hard-coded checksum for the original 85-line README:
+  # resolve and verify each source's true SHA from saved Stage05K metadata.
+  "JP-Fjy":None,
+  "JP-Khw":None,
+  "JP-Yms":None,
   "JP-Tef":"17a886f56abc2673b43ad43ba17d95aacb7830b8475231a10b56c619bf5d4ac5",
   "JP-Tmd":"17a886f56abc2673b43ad43ba17d95aacb7830b8475231a10b56c619bf5d4ac5",
 }
@@ -155,6 +157,35 @@ def original_manifest(path):
               "JP-Tmd":"2005-2023"}[site])+"_v1.3_r1":
             raise ValueError("Original JPF exact site release differs "+site)
     return d
+def original_stage05k_readme(site,metadata_dir):
+    """Use the original Stage05K metadata digest as the READONLY source pin.
+
+    JP-Fjy/Khw/Yms README SHA was not previously independently locked in
+    Stage05AX. Never guess a checksum from an abbreviated documentation
+    excerpt. Resolve the exact source README SHA from the saved original
+    site metadata already used in earlier BIF provenance audits.
+    """
+    path=metadata_dir/(site+"_exact_metadata.json")
+    report=jread(path)
+    if (report.get("stage")!="JapanFlux Stage05K"
+        or report.get("site")!=site
+        or report.get("status")!="READONLY_BIF_VARIABLE_AND_TIME_METADATA_EXTRACTED"
+        or report.get("source_files_modified") is not False
+        or report.get("meteorological_rows_read")!=0):
+        raise ValueError("Actual original Stage05K source metadata invalid "+site)
+    candidates=[r for r in report.get("site_metadata_and_readme",[])
+                if PurePosixPath(r.get("member","")).name.lower()=="readme.txt"]
+    if len(candidates)!=1:
+        raise ValueError("Original source Stage05K needs exactly one README digest "+site)
+    expected=candidates[0].get("sha256","")
+    if (not isinstance(expected,str) or len(expected)!=64
+        or any(ch not in "0123456789abcdef" for ch in expected)):
+        raise ValueError("Stage05K original README SHA256 missing/invalid "+site)
+    hardcoded=SOURCE_READMES[site]
+    if hardcoded is not None and expected!=hardcoded:
+        raise ValueError("The original JPF solar README changed since Stage05K "+site)
+    return expected,path
+
 def target_windows(events):
     wanted=defaultdict(list)
     for k in events:
@@ -164,7 +195,7 @@ def target_windows(events):
             s=(t+timedelta(minutes=30*off)).strftime("%Y%m%d%H%M")
             wanted[s].append((k,off))
     return wanted
-def read_site_source(site,package,events,root,max_mib):
+def read_site_source(site,package,events,root,max_mib,expected_readme_sha):
     outer=root/site/"forcing"/"packages"/(package+".zip")
     if not outer.is_file() or outer.is_symlink():raise ValueError("Original source outer JPF ZIP missing "+str(outer))
     inner_name=package+".zip"
@@ -181,10 +212,10 @@ def read_site_source(site,package,events,root,max_mib):
                     if size>cap:raise ValueError("Original nested source byte cap exceeded")
                     stream.write(chunk)
             stream.seek(0)
-            scanned=_inner_scan(site,package,events,stream)
+            scanned=_inner_scan(site,package,events,stream,expected_readme_sha)
             scanned["original_outer_zip"]=str(outer)
             return scanned
-def _inner_scan(site,package,events,buffer):
+def _inner_scan(site,package,events,buffer,expected_readme_sha):
     found={};window_rows=defaultdict(list);runs={};run_status={}
     varlist=sorted({k[2] for k in events})
     target=target_windows(events)
@@ -197,9 +228,21 @@ def _inner_scan(site,package,events,buffer):
         if len(readme)!=1 or len(hh)!=1:
             raise ValueError("Original source nested README or FLUXMET_HH member missing")
         with z.open(readme[0]) as h:
-            readme_digest=hashlib.sha256(h.read()).hexdigest()
-        if readme_digest!=SOURCE_READMES[site]:
-            raise ValueError("Original exact source README content SHA changed "+site)
+            original_readme_bytes=h.read()
+        readme_digest=hashlib.sha256(original_readme_bytes).hexdigest()
+        if readme_digest!=expected_readme_sha:
+            raise ValueError("Original JPF README SHA no longer matches real Stage05K metadata "+site)
+        lines=original_readme_bytes.decode("utf-8-sig",errors="replace").splitlines()
+        if site in JST_SITES:
+            if (len(lines)!=85
+                or not any("local standard time" in line.lower()
+                           and "without dst" in line.lower() for line in lines)):
+                raise ValueError("Source README local standard time without DST claim changed "+site)
+        else:
+            if (len(lines)!=75
+                or not any("local solar time" in line.lower()
+                           and "without dst" in line.lower() for line in lines)):
+                raise ValueError("Original source README local solar time claim changed "+site)
         def finish_run(var):
             previous=runs.pop(var,None)
             if previous is None:return
@@ -357,6 +400,8 @@ def science_summary(site,record,events,neighbor,ledger,manifest):
      "site":site,
      "original_source_JPF_release":record["package"],
      "original_source_readme_sha256":record["original_source_readme_sha256"],
+     "original_readme_sha256_matches_prior_Stage05K":True,
+     "original_stage05k_metadata_sha256":record["original_stage05k_metadata_sha256"],
      "source_HH_csv_rows_scanned":record["source_HH_rows_scanned"],
      "source_HH_CSV_header":record["full_source_header"],
      "neighbor_halfhours_on_each_side":WINDOW,
@@ -392,7 +437,9 @@ def run_site(a):
             for r in records if r["site"]==site}
     if len(events)!=SITES[site]:raise ValueError("Site event population incomplete")
     if a.out_dir.exists():raise ValueError("Output directory exists; never overwrite previous audit")
-    record=read_site_source(site,packages[site],events,a.root,a.max_inner_mib)
+    expected_readme,original_meta=original_stage05k_readme(site,a.stage05k_dir)
+    record=read_site_source(site,packages[site],events,a.root,a.max_inner_mib,expected_readme)
+    record["original_stage05k_metadata_sha256"]=digest(original_meta)
     events_list,neighbor_rows=summary_events(site,events,record)
     science=science_summary(site,record,events_list,neighbor_rows,
                             a.stage05aw_fields,a.stage05aw_summary)
@@ -442,7 +489,12 @@ def aggregate(a):
             or r.get("all_45_original_QC2_fields_SCIENCE_HOLD") is not True
             or r.get("source_timebase_proven")!=(site in JST_SITES)
             or r.get("operator_JST_plus9_time_hypothesis_only")!=(site in SOLAR_SITES)
-            or r.get("original_source_readme_sha256")!=SOURCE_READMES[site]
+            or r.get("original_readme_sha256_matches_prior_Stage05K") is not True
+            or not isinstance(r.get("original_stage05k_metadata_sha256"),str)
+            or len(r["original_stage05k_metadata_sha256"])!=64
+            or not isinstance(r.get("original_source_readme_sha256"),str)
+            or len(r["original_source_readme_sha256"])!=64
+            or (site in SOLAR_SITES and r["original_source_readme_sha256"]!=SOURCE_READMES[site])
             or len(sub)!=SITES[site]):
             raise ValueError("Original Stage05AX source-site report/status mismatch "+site)
         for line in sub:
@@ -489,6 +541,8 @@ def aggregate(a):
 def selftest():
     assert sum(SITES.values())==45 and sum(VARS.values())==45
     assert WINDOW==48 and len(SOURCE_READMES)==5
+    assert sum(v is None for v in SOURCE_READMES.values())==3
+    assert SOURCE_READMES["JP-Tmd"]=="17a886f56abc2673b43ad43ba17d95aacb7830b8475231a10b56c619bf5d4ac5"
     assert qc_class("0")==0 and qc_class("1")==1 and qc_class("2")==2
     assert qc_class("-9999")=="MISSING_OR_OTHER"
     assert finite_plausible("PA","99.4") and not finite_plausible("PA","0")
@@ -513,6 +567,7 @@ def main():
     ap.add_argument("--aggregate",action="store_true")
     ap.add_argument("--stage05aw-fields",type=Path)
     ap.add_argument("--stage05aw-summary",type=Path)
+    ap.add_argument("--stage05k-dir",type=Path)
     ap.add_argument("--manifest",type=Path)
     ap.add_argument("--site-results-root",type=Path)
     ap.add_argument("--root",type=Path,default=ROOT)
@@ -525,8 +580,8 @@ def main():
         if a.site is not None or a.site_results_root is None:
             ap.error("--aggregate requires --site-results-root and not --site")
         aggregate(a);return
-    if a.site is None or any(x is None for x in (a.stage05aw_fields,a.stage05aw_summary,a.manifest)):
-        ap.error("One --site with actual Stage05AW ledger/summary and original manifest required")
+    if a.site is None or any(x is None for x in (a.stage05aw_fields,a.stage05aw_summary,a.stage05k_dir,a.manifest)):
+        ap.error("One --site with actual Stage05AW ledger/summary, original Stage05K metadata folder and original manifest required")
     if not 256<=a.max_inner_mib<=1024:ap.error("Source nested ZIP MiB memory cap must be 256..1024")
     run_site(a)
 if __name__=="__main__":main()
