@@ -1,5 +1,7 @@
 # JapanFlux MultiSite 11 — CLM-FATES single-site workflow (new experiment)
 
+> **Stage05BC held method comparison and actual 05BB operator result:** IRIDIS6 05BB checks and tests passed; the 17-group local masking experiment compares QC2 bridges with grid-plus-QC2-median alternatives against same-release QC2 only. Both candidate methods remain unapproved; all 45 fields SCIENCE HOLD. See [masking comparison and evidence limits](docs/STAGE05BC_MASKED_METHOD_COMPARISON_AND_05BB_OPERATOR_RESULT.md).
+
 > **Stage05BB independent-operation JMA pressure context:** official Tomakomai and Kawaguchiko hourly observations add illustrative pressure checks for Tmd and Fjy; uncertain clock, instrument elevation, spatial gradients and possible shared reanalysis inputs prevent approval or bias correction. See [JMA pressure context](docs/STAGE05BB_JMA_TMD_INDEPENDENT_PRESSURE_CONTEXT.md). All 45 remain SCIENCE HOLD.
 
 > **Stage05BA actual operator-output audit and local shadow package:** reviewed 38 group scenarios, 99 candidate scenarios and 1,936 background pairs from the operator's Stage05AZ output; prepared 45 unapproved shadow values and a 1,677-row window preview (1,632 non-flagged F values unchanged). All 45 remain SCIENCE HOLD; no production forcing modified. Corrected Stage05AZ's longitude-mean-solar scenario label without changing the prior numerical results. See [actual audit and decisions](docs/STAGE05BA_OPERATOR_AUDIT_AND_SHADOW_DECISION.md).
