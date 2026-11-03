@@ -6,11 +6,25 @@ Started 3 November 2026; the fifth OzFlux / JapanFlux topic. An 800-year spin-up
 - dated disturbance and management events;
 - published annual NEE / GPP / ER.
 
-**Status, 3 Nov 2026:**
-- Literature search for the 9 OzFlux and 11 JapanFlux sites in progress.
-- The IRIDIS6 read-only Stage01 script, which reads the metadata already inside our own source files, is published.
+**Status, 3 Nov 2026: evidence v1 done.** The per-site summary is [OZ_JP_CARBON_STATE_20_SITES_20261103.md](OZ_JP_CARBON_STATE_20_SITES_20261103.md). Of the 20 sites:
+- 6 are quasi-steady;
+- 12 are aggrading sinks of −200 to −900 g C m⁻² yr⁻¹, which the equilibrium spin-up will miss in the annual sum;
+- JP-Tef and JP-Tmd are recovering sources inside their evaluation windows.
 
-## Planned files
+New dated events have been written into the post-spin-up site plan. The JP-Yms evaluation window is now split at 2015 because of oak wilt.
+
+## Files
+
+[Script 02](scripts/02_merge_carbon_evidence.py) merges the per-network literature files and checks the column layouts, ids, category values and the AU-ASM restriction. Rows:
+
+| File | Rows |
+| --- | --- |
+| [carbon_stock_evidence_20261103.csv](data/carbon_stock_evidence_20261103.csv) | 159 |
+| [disturbance_management_events_20261103.csv](data/disturbance_management_events_20261103.csv) | 102 |
+| [published_annual_fluxes_20261103.csv](data/published_annual_fluxes_20261103.csv) | 104 |
+| [japanflux_package_metadata_20261103.csv](data/japanflux_package_metadata_20261103.csv), from our own packages | 41 |
+
+The layouts were planned as follows:
 
 | File | Content |
 | --- | --- |

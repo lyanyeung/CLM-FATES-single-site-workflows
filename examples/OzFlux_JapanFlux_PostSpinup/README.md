@@ -82,6 +82,11 @@ Stage02 writes `experiments/NonCompetitionObserved22/co2_adopted/fco2_datm_globa
 - GPP and ecosystem respiration separately.
 - The annual NEE sum mainly tests the equilibrium assumption. This applies most to the regrowth stands: JP-Tef (clear-cut 2003), JP-Tmd (windthrow) and JP-Fhk (plantation).
 
+The published sink at each tower, and how far each stand is from equilibrium, are tabulated in [OzFlux_JapanFlux_CarbonStocks](../OzFlux_JapanFlux_CarbonStocks/OZ_JP_CARBON_STATE_20_SITES_20261103.md):
+- 6 sites are quasi-steady;
+- 12 are aggrading sinks of −200 to −900 g C m⁻² yr⁻¹;
+- JP-Tef and JP-Tmd are recovering sources inside their evaluation windows.
+
 ### Soil and surface
 
 - The observation run must use the spin-up surface; `create_clone --keepexe` guarantees this.
@@ -104,10 +109,10 @@ The full table is [OZ_JP_POST_SPINUP_SITE_PLAN_20261103.csv](data/OZ_JP_POST_SPI
 | AU-Cpr | Mallee, pre-fire | 2011–2013 (L6 starts 30 Jul 2010) | not built | UNCHANGED |
 | AU-DaS | Uncleared savanna | 2008–2021 | candidate 2009–2021 | UNCHANGED |
 | AU-Dry | Savanna | 2010–2024 within the forcing years (candidate 2010–2018) | candidate 2010–2018 | UNCHANGED |
-| AU-Gin | Banksia woodland | 2012–2022 (L6 starts 13 Oct 2011) | not built | UNCHANGED |
+| AU-Gin | Banksia woodland | 2012–2022 (L6 starts 13 Oct 2011); the 2016 fuel-reduction burn falls inside the window | not built | UNCHANGED |
 | AU-How | Savanna (fire part of the state) | 2002–2025 (L6 starts 1 Jan 2002) | not built | UNCHANGED |
 | AU-Stp | Mitchell grassland | 2009–2025 (L6 starts 28 Aug 2008) | not built | UNCHANGED |
-| AU-Tum | Wet eucalypt forest, pre-fire | 2003–2019 (L6 starts 7 Jan 2002) | not built | UNCHANGED |
+| AU-Tum | Wet eucalypt forest, pre-fire | 2003–2019 (L6 starts 7 Jan 2002); flag the 2004 footprint logging and the 2006–09 partial logging | not built | UNCHANGED |
 | JP-Api | Beech | 2000–2022 (flag 2007) | not built | NEEDS_PHENOLOGY_PATCH |
 | JP-Fhk | Larch, pre-thinning | 2006–2013 | not built | NEEDS_PATCH_AND_F |
 | JP-Fjy | Red pine on lava | 2001–2021 | not built | NEEDS_NEEDLELEAF_F |
@@ -118,7 +123,7 @@ The full table is [OZ_JP_POST_SPINUP_SITE_PLAN_20261103.csv](data/OZ_JP_POST_SPI
 | JP-Tgf | Mown C3/C4 grassland | 2002–2022 | not built | UNCHANGED |
 | JP-Tmd | Windthrow regrowth | 2005–2014 and 2015–2023 separately | not built | NEEDS_PHENOLOGY_PATCH |
 | JP-Tom | Deciduous broadleaf | 1999–2013 (check the second tower) | not built | NEEDS_PHENOLOGY_PATCH |
-| JP-Yms | Oak-dominated secondary forest | 2000–2023 | not built | NEEDS_PATCH_AND_F |
+| JP-Yms | Oak-dominated secondary forest | 2000–2014 and 2015–2023 separately (oak wilt 2015–16 killed ~10 % of biomass) | not built | NEEDS_PATCH_AND_F |
 
 **Expected rules class.** This comes from the [maintenance rules](https://github.com/lyanyeung/Non-Competition-CLM-experiment/blob/main/maintenance/RULES_FOR_NEW_CASES.md):
 

@@ -18,9 +18,10 @@ Rules:
       A value of 0.32 m or less matches nothing and gives the FULL column; it is flagged.
     - the depth of that layer's bottom.
   The value only acts with use_bedrock = .true.; with the FATES default (.false.) every site has the full 8.6 m.
-- ORGANIC: F09 keeps the f09 profile. SCALE_TO_SITE_STOCK multiplies the whole f09 profile by
-  site stock / f09-implied stock over the same depth, with stock = sum(ORGANIC_j / 1.724 * overlap_j). This keeps
-  the f09 vertical shape and matches the measured stock. Values are capped at organic_max = 130.
+- ORGANIC: F09 keeps the f09 profile. SCALE_TO_SITE_STOCK multiplies the dataset levels that start above the stock
+  depth by site stock / f09-implied stock over that depth, with stock = sum(ORGANIC_j / 1.724 * overlap_j). This
+  keeps the f09 vertical shape there, matches the measured stock, and leaves deeper levels at f09. Values are capped
+  at organic_max = 130, and the stock achieved after the cap is reported.
 - FMAX and SOIL_COLOR are kept at f09. Landunits become NATVEG 100, with crop / urban / lake / wetland / glacier 0.
 
 Outputs:
@@ -95,8 +96,12 @@ def implied_stock(organic, depth_m):
 
 
 def scale_to_stock(organic, stock, depth_m):
+    """Scale the dataset levels that start above depth_m so the 0..depth_m stock equals the site stock; deeper levels
+    keep f09. Values are capped at organic_max. Returns (profile, factor, stock achieved after the cap)."""
     f = stock / implied_stock(organic, depth_m)
-    return [min(o * f, ORGANIC_MAX) for o in organic], f
+    tops = (0.0,) + FL_BOTTOMS[:-1]
+    new = [min(o * f, ORGANIC_MAX) if top < depth_m else o for o, top in zip(organic, tops)]
+    return new, f, implied_stock(new, depth_m)
 
 
 def fnum(x):
@@ -122,9 +127,11 @@ def build(stage01, gridded, decisions):
             flags.append("ZBEDROCK_TOO_SHALLOW_GIVES_FULL_COLUMN")
         nb, zbot = nbedrock(z)
         rule = d.get("organic_rule") or "F09"
-        factor = 1.0
+        factor, achieved = 1.0, None
+        depth = (fnum(d.get("soc_depth_cm")) or 100.0) / 100
+        f09_stock = implied_stock(org, depth)
         if rule == "SCALE_TO_SITE_STOCK":
-            org_new, factor = scale_to_stock(org, float(d["site_soc_stock_kgC_m2"]), float(d["soc_depth_cm"]) / 100)
+            org_new, factor, achieved = scale_to_stock(org, float(d["site_soc_stock_kgC_m2"]), depth)
             if any(o >= ORGANIC_MAX for o in org_new):
                 flags.append("ORGANIC_CAPPED_130")
         else:
@@ -142,6 +149,9 @@ def build(stage01, gridded, decisions):
             "sensitivity_zbedrock_m": zsens,
             "sensitivity_soil_bottom_m": None if zsens is None else nbedrock(zsens)[1],
             "organic_rule": rule, "organic_scale_factor": round(factor, 3),
+            "soc_depth_cm": round(depth * 100), "f09_implied_soc_kgC_m2": round(f09_stock, 2),
+            "site_soc_kgC_m2": fnum(d.get("site_soc_stock_kgC_m2")),
+            "recommended_soc_kgC_m2": round(achieved if achieved is not None else f09_stock, 2),
             "organic_basis": d.get("organic_basis", ""),
             **{f"ORGANIC_L{i + 1}": round(o, 3) for i, o in enumerate(org_new)},
             "ORGANIC_f09_L1": org[0],
@@ -161,10 +171,11 @@ def self_test():
     assert nbedrock(31.0) == (20, 8.60)
     org = [10.0] * 10
     assert abs(implied_stock(org, FL_BOTTOMS[9]) - 10 / OM_PER_C * FL_BOTTOMS[9]) < 1e-9
-    new, f = scale_to_stock(org, 2 * implied_stock(org, 0.30), 0.30)
-    assert abs(f - 2) < 1e-9 and new == [20.0] * 10
-    new, _ = scale_to_stock([100.0] * 10, 2 * implied_stock([100.0] * 10, 0.3), 0.3)
-    assert new == [ORGANIC_MAX] * 10
+    new, f, got = scale_to_stock(org, 2 * implied_stock(org, 0.30), 0.30)
+    # levels starting above 0.30 m are 1-6 (level 6 starts at 0.29 m); the 0-0.30 m stock doubles exactly
+    assert abs(f - 2) < 1e-9 and new == [20.0] * 6 + [10.0] * 4 and abs(got - 2 * implied_stock(org, 0.30)) < 1e-9
+    new, _, got = scale_to_stock([100.0] * 10, 2 * implied_stock([100.0] * 10, 0.3), 0.3)
+    assert new[:6] == [ORGANIC_MAX] * 6 and new[6:] == [100.0] * 4 and got < 2 * implied_stock([100.0] * 10, 0.3)
     st = [{"site": "XX", "kind": "GLOBAL_F09", "zbedrock_m": "12.8", "FMAX": "0.39", "SOIL_COLOR": "14",
            "PCT_NATVEG": "76", **{f"ORGANIC_L{i}": "20" for i in range(1, 11)}}]
     gr = [{"site": "XX", "product": "BDTICM", "centre": "1965"}]
@@ -174,7 +185,8 @@ def self_test():
     r = build(st, gr, [{"site": "XX", "zbedrock_m": "0.3", "zbedrock_tier": "T1", "organic_rule": "SCALE_TO_SITE_STOCK",
                         "site_soc_stock_kgC_m2": str(implied_stock([20.0] * 10, 0.3) / 2), "soc_depth_cm": "30"}])[0]
     assert r["use_bedrock_on_soil_bottom_m"] == 8.6 and "ZBEDROCK_TOO_SHALLOW_GIVES_FULL_COLUMN" in r["flags"]
-    assert r["ORGANIC_L1"] == 10.0 and r["organic_scale_factor"] == 0.5
+    assert r["ORGANIC_L1"] == 10.0 and r["ORGANIC_L10"] == 20.0 and r["organic_scale_factor"] == 0.5
+    assert abs(r["recommended_soc_kgC_m2"] - r["site_soc_kgC_m2"]) < 0.01
     print("SURFACE RECOMMENDATION SELF-TEST PASS (dataset levels, CLM nbedrock, stock scaling and cap, build)")
     return 0
 

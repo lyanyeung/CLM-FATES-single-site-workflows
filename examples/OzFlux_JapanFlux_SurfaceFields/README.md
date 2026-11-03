@@ -9,9 +9,7 @@ Started 3 November 2026; the fourth OzFlux / JapanFlux topic. [OzFlux_JapanFlux_
 
 These must be settled before the 19 remaining spin-up surfaces are built, because a later change means repeating the 800-year spin-up.
 
-**Status, 3 Nov 2026:**
-- Done: pinned-source check, gridded depth-to-bedrock evidence (script 02, committed), and the IRIDIS6 read-only Stage01 script.
-- Pending: the site literature (soil depth, restrictive layers, rooting depth, water table), the Stage01 run, and the recommendation.
+**Status, 3 Nov 2026: recommendation v1 done.** It is [`OZ_JP_RECOMMENDED_SURFACE_FIELDS_20_SITES_20261103.csv`](OZ_JP_RECOMMENDED_SURFACE_FIELDS_20_SITES_20261103.csv), [described below](#recommendation-v1-3-nov-2026). One decision is open: whether to switch on `use_bedrock`.
 
 ## What the pinned model does with these fields
 
@@ -126,21 +124,74 @@ The site measurements point the other way:
 
 The literature search for site SOC stocks is still running.
 
+## Recommendation v1 (3 Nov 2026)
+
+**Inputs:**
+- the site soil-depth evidence ([`data/soil_depth_evidence_20261103.csv`](data/soil_depth_evidence_20261103.csv): 57 rows, 20 sites, with quotes, locators and verification levels);
+- the SOC stocks from the [carbon topic](../OzFlux_JapanFlux_CarbonStocks/);
+- the per-site decisions in [`data/site_surface_decisions_20261103.csv`](data/site_surface_decisions_20261103.csv).
+
+[Script 03](scripts/03_build_surface_field_recommendation.py) builds the table from these.
+
+### `zbedrock`
+
+**Rule:** restrict the column only where a root-restricting or shallow layer is documented. Elsewhere set 8.6 m, so that the full column is used. With this rule, switching on `use_bedrock` changes only the five restricted sites.
+
+| Class | Sites | `zbedrock` | CLM column with `use_bedrock` on |
+| --- | --- | --- | --- |
+| RESTRICT | AU-ASM | 1.0 m. Siliceous hardpan at ~1 m with roots above it and a perched reservoir; water table 49 m | 1.20 m (layer 9) |
+| | JP-Fjy | 0.4 m. Lava, almost no soil | 0.48 m |
+| | JP-Tmd | 0.45 m. ~10 cm A over permeable pumice; roots to 0.31–0.55 m nearby | 0.48 m |
+| | JP-Tom | 0.55 m. Topsoil 5–10 cm; roots in buried pumice to 0.55 m | 0.68 m |
+| | JP-Tef | 0.6 m. O + A + B ≈ 0.6 m over Cretaceous sedimentary rock | 0.68 m |
+| FULL_COLUMN, deep | AU-Gin, AU-How | Water table 10–11 m; roots to 9–10 m | 8.6 m |
+| FULL_COLUMN, lower bound | AU-Cow (≥ 2.0 m), AU-Cpr (≥ 2.5), AU-DaS (≥ 2.5), AU-Tum (≥ 2.42), JP-Tak (≥ 1.0), JP-Tgf (≈ 2 m ash over clay) | — | 8.6 m |
+| FULL_COLUMN, no evidence | AU-Dry, AU-Stp (atlas only), JP-Api, JP-Fhk, JP-Khw, JP-Spp, JP-Yms | — | 8.6 m |
+
+**Sensitivity values** (`sensitivity_zbedrock_m`): AU-Cow 1.5, AU-Dry 1.44, AU-Stp 0.89, JP-Fhk 1.0, JP-Tgf 2.0, JP-Yms 0.45.
+
+**Corrections to the grid and to the soil topic:**
+- The f09 grid values for AU-Tum (0.91 m) and AU-Cow (1.12 m) are contradicted by the site profiles.
+- The pumice at JP-Tmd / JP-Tom is permeable (Hirano et al. 2003), not root-impermeable as the soil topic had it.
+
+### `ORGANIC`
+
+**Rule:** keep f09 unless a tower-specific (or tower-basin) SOC stock with a stated depth exists. Where one exists, scale the f09 levels above that depth so the stock matches, and keep deeper levels at f09.
+
+| Site | Depth | f09-implied → site SOC (kg C m⁻²) | L1 `ORGANIC` (kg m⁻³) | Basis |
+| --- | --- | --- | --- | --- |
+| AU-How | 0–100 cm | 5.2 → 15.1 | 16.8 → 48.8 | Chen et al. 2003, 3-site mean |
+| JP-Api | 0–20 cm | 3.9 → 11.0 | 37.9 → 106.1 | Koarashi 2009, secondary |
+| JP-Tak | 0–100 cm | 7.2 → > 30 | 51.8 → **130 (cap)** | Jia and Akiyama 2005, secondary. Reaches 21.8 after the cap, which is flagged |
+| JP-Tef | 0–100 cm | 7.1 → 15.9 | 37.9 → 85.2 | Aguilos et al. 2014 |
+| JP-Tom | 0–100 cm | 8.9 → 5.5 | 63.0 → 39.1 | Shibata et al. 2005, tower basin, incl. O horizon |
+
+The other 15 sites keep f09. JP-Spp (18 kg C m⁻²) and JP-Yms (3.0) have stocks without a depth, so they are not used. JP-Tmd keeps f09, with JP-Tom as the nearest evidence.
+
+### Other fields
+
+- FMAX and SOIL_COLOR: f09.
+- Landunits: NATVEG 100; crop, urban, lake, wetland and glacier 0. The f09 cells carry up to 32 % crop and 20 % urban.
+
+### Open decision: `use_bedrock`
+
+| Option | What changes | Notes |
+| --- | --- | --- |
+| **A. Keep the FATES default (off)** | Every site gets 8.6 m of soil | Consistent with the 78 finished ICOS / AmeriFlux spin-ups. The five shallow sites get too much plant-available water |
+| **B. Switch it on for the OzFlux / JapanFlux sites** | Only AU-ASM, JP-Fjy, JP-Tmd, JP-Tom and JP-Tef change | `use_bedrock = .true.` goes in `user_nl_clm` for AD400, NORMAL400 and the observation run alike. CLM puts a zero-flux base at the bedrock layer. That matches the perched hardpan reservoir at AU-ASM. For the fissured lava and permeable pumice sites it may hold too much water above 0.48–0.68 m; check against soil moisture where it exists (JP-Fjy has none) |
+
+**Recommendation:** B, starting with AU-ASM, whose AD400 case does not exist yet. Treat the lava and pumice sites as a sensitivity pair (on / off).
+
 ## Scripts
 
 | Script | Where | What |
 | --- | --- | --- |
 | [01_surface_fields_at_towers_READONLY.py](scripts/01_surface_fields_at_towers_READONLY.py) | IRIDIS6 login node, read only | Reads three things:<ul><li>the project global surface `surfdata_0.9x1.25_hist_2000_16pfts_c240908.nc` at each tower (nearest cell and 3×3 land cells): `zbedrock`, `ORGANIC`, `FMAX`, `SOIL_COLOR`, `SLOPE`, `STD_ELEV`, landunits;</li><li>the same fields in every existing point surface of the sites;</li><li>the template case's `use_bedrock`, soil layer structure, `organic_max` / `zbedrock_sf` / `om_frac_sf`, the FATES rooting parameters, and the model layer depths.</li></ul> |
 | [02_gridded_depth_to_bedrock_at_towers.py](scripts/02_gridded_depth_to_bedrock_at_towers.py) | anywhere (public data) | SoilGrids250m 2017 depth-to-bedrock products at the towers. Done 3 Nov |
+| [03_build_surface_field_recommendation.py](scripts/03_build_surface_field_recommendation.py) | anywhere | Builds the recommendation table from the Stage01 values, the gridded products and the per-site decisions. Maps `zbedrock` to the CLM bedrock layer exactly as `initVerticalMod`; scales `ORGANIC` to site stocks. Done 3 Nov |
 
 ## Next steps
 
-1. Run Stage01 on IRIDIS6.
-2. Collect site evidence on soil depth, restrictive layers, rooting depth and water table (literature search in progress).
-3. Recommendation table for each site:
-   - a plant-accessible `zbedrock`;
-   - a 10-level `ORGANIC` from site SOC and bulk density where they exist, otherwise SoilGrids, against the current grid values;
-   - `FMAX` / `SOIL_COLOR` kept unless contradicted;
-   - NATVEG = 100.
-
-   Plus a separate decision on `use_bedrock`.
+1. Decide `use_bedrock` (A or B above).
+2. When each site's spin-up surface is built, apply soil v1 texture together with this table: `zbedrock`, `ORGANIC`, NATVEG 100 and FMAX / SOIL_COLOR unchanged. Record the changed variable names and SHA256 values as the project's surface rules require.
+3. Optional: read SLGA depth of soil / regolith for the Australian sites once a TERN API key is available.
