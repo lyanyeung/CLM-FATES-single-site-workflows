@@ -26,6 +26,14 @@ class ScreenTests(unittest.TestCase):
         rows=[row(-1,100),row(0,0),row(1,49),row(2,100)]
         self.assertIsNone(ay.episode(rows,1,'PA',{(rows[1][1],'PA')})['shadow'])
 
+    def test_independently_flagged_inside_range_never_an_anchor(self):
+        rows=[row(-1,67.794),row(0,37.349),row(1,67.801)]
+        flags={(r[1],'PA') for r in rows}
+        result=ay.episode(rows,1,'PA',flags)
+        self.assertEqual(result['status'],'FLAGGED_BOUNDARY_UNRESOLVED')
+        self.assertEqual(result['route'],'HOLD_MANUAL')
+        self.assertIsNone(result['shadow'])
+
     def test_gap_and_missing_are_censored(self):
         rows=[row(-2,100),row(0,0),row(1,-9999)]
         result=ay.episode(rows,1,'PA',{(rows[1][1],'PA')})

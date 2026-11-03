@@ -78,17 +78,22 @@ def episode(rows, index, var, flag_keys):
     bounded = (a is not None and b is not None and
                screen(var,a[2]['source_F_value']) == 'INSIDE_SCREEN_NOT_VALIDATED' and
                screen(var,b[2]['source_F_value']) == 'INSIDE_SCREEN_NOT_VALIDATED')
+    # An in-range value can still be one of the independently flagged 45.
+    # Such a cell must never bound an episode or serve as a shadow anchor.
+    flagged_boundary = (a is not None and (a[1],var) in flag_keys) or (b is not None and (b[1],var) in flag_keys)
     n = right-left+1
     verified_flags = all((r[1],var) in flag_keys for r in rows[left:right+1])
     def source_qc2(rec):
         f = number(rec['source_F_value']); e = number(rec['same_release_ERA'])
         return number(rec['source_F_QC']) == 2 and f is not None and e is not None and math.isclose(f,e,rel_tol=1e-10,abs_tol=1e-6)
-    eligible = bounded and n <= 4 and verified_flags and source_qc2(a[2]) and source_qc2(b[2])
+    eligible = bounded and not flagged_boundary and n <= 4 and verified_flags and source_qc2(a[2]) and source_qc2(b[2])
     candidate = None
     if eligible:
         av = number(a[2]['source_F_value']); bv = number(b[2]['source_F_value'])
         candidate = av + (bv-av)*(index-left+1)/(n+1)
-    return {'status':'BOUNDED_SCREEN_ONLY' if bounded else 'CENSORED_OR_UNKNOWN_BOUNDARY',
+    status = ('FLAGGED_BOUNDARY_UNRESOLVED' if flagged_boundary else
+              'BOUNDED_SCREEN_ONLY' if bounded else 'CENSORED_OR_UNKNOWN_BOUNDARY')
+    return {'status':status,
             'length':n, 'start':rows[left][1], 'end':rows[right][1],
             'left':a[1] if a else '', 'right':b[1] if b else '',
             'left_rec':a[2] if a else {}, 'right_rec':b[2] if b else {},
@@ -223,6 +228,10 @@ def self_test():
     assert episode([r(-1,100,'1'),r(0,0),r(1,100)],1,'PA',flags)['shadow'] is None
     assert episode([r(-1,100,era=99),r(0,0),r(1,100)],1,'PA',flags)['shadow'] is None
     assert episode([r(-1,100),r(0,0),r(1,49),r(2,100)],1,'PA',flags)['shadow'] is None
+    flagged_anchors=[r(-1,68),r(0,37),r(1,68)]
+    all_flagged={(v[1],'PA') for v in flagged_anchors}
+    e=episode(flagged_anchors,1,'PA',all_flagged)
+    assert e['shadow'] is None and e['status']=='FLAGGED_BOUNDARY_UNRESOLVED'
     assert episode([r(-1,100),r(0,99),r(1,100)],1,'PA',flags)['status']=='FLAG_INSIDE_SCREEN_BOUNDARY_UNRESOLVED'
     assert screen('PA','nan')=='UNKNOWN_MISSING' and screen('TA','-284.222')=='OUTSIDE_SCREEN'
     assert stamp('202212312330')+STEP==stamp('202301010000')
