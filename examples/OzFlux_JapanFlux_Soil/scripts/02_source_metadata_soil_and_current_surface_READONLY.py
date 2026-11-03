@@ -338,7 +338,7 @@ def read_surface(path, lat, lon):
 # ------------------------------------------------------------------ driver
 def write_tsv(path, rows, fields):
     with open(path, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=fields, delimiter="\t", extrasaction="ignore")
+        w = csv.DictWriter(f, fieldnames=fields, delimiter="\t", extrasaction="ignore", lineterminator="\n")
         w.writeheader()
         w.writerows(rows)
 

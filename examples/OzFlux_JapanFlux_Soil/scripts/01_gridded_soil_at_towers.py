@@ -190,7 +190,7 @@ def run(a):
     allrows = sorted(keep + new, key=lambda r: (r["site"], r["source"], r["property"], int(r["depth_top_cm"]),
                                                  r["statistic"]))
     with open(long_csv, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=FIELDS, extrasaction="ignore")
+        w = csv.DictWriter(f, fieldnames=FIELDS, extrasaction="ignore", lineterminator="\n")
         w.writeheader()
         w.writerows(allrows)
     import rasterio
