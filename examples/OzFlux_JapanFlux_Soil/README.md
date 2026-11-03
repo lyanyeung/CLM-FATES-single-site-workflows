@@ -2,11 +2,12 @@
 
 Started 3 November 2026. This is the soil companion of [OzFlux_JapanFlux_PFT](../OzFlux_JapanFlux_PFT/). It uses the same layer rules as [Ameriflux_Soil](../Ameriflux_Site/Ameriflux_Soil/). **Nothing here changes a case, surface file, forcing file or running job.**
 
-**Status, 3 Nov 2026: interim.** The literature search and SoilGrids are complete for all 20 sites. Two read-only steps are still open:
-- [Stage02](scripts/02_source_metadata_soil_and_current_surface_READONLY.py) on IRIDIS6: soil records inside our own OzFlux L6 and JapanFlux packages (BIF, BADM), plus the soil in the current surface files.
-- SLGA for the Australian sites, which needs a TERN API key.
+**Status, 3 Nov 2026: recommendation v1.** For all 20 sites, the following are complete:
+- the literature search;
+- SoilGrids;
+- [Stage02](scripts/02_source_metadata_soil_and_current_surface_READONLY.py) on IRIDIS6, which covered our own OzFlux L6 and JapanFlux BIF / BADM files and the current OzFlux surfaces.
 
-Both can change the recommendation; see [Next steps](#next-steps).
+Only SLGA for the Australian sites is still open, because it needs a TERN API key; see [Next steps](#next-steps).
 
 The per-site recommendation and evidence are in [OZ_JP_SOIL_TEXTURE_20_SITES_20261103.md](OZ_JP_SOIL_TEXTURE_20_SITES_20261103.md).
 
@@ -22,13 +23,14 @@ Sources are applied **layer by layer**, highest tier first:
 | **T1N neighbour measured** | A measured profile on the same soil unit near the tower, with a written reason | Sites with no tower data but a clearly matching profile (AU-Gin) |
 | **T2 SLGA 90 m** | TERN Soil and Landscape Grid of Australia v2, six depths to 2 m | Australian sites, below or instead of T1 |
 | **T3 SoilGrids 250 m** | ISRIC SoilGrids 2.0, six depths to 2 m | All sites; the only gridded source for Japan |
-| T4 keep surface | Current surface values | Only when nothing above exists |
+| T4 keep surface | Current surface values | When nothing above exists, or when the site's soil order rules out the gridded sources above (AU-Stp, AU-Tum) |
 
 Rules:
 - Below the deepest covered depth, the profile that supplied the layer above is extended downward.
 - The 0–30 cm value is the mean of layers 1–5.
 - A record without a depth is never used automatically. Its application depth is set by hand, with a written reason, in [manual_depth_assignments](data/manual_depth_assignments_20261103.csv).
 - **Texture classes are never converted to numbers.** Field textures, soil orders and narrative descriptions are only used to check the gridded values. Where they disagree, the site is flagged.
+- If a soil order rules out a gridded source and another existing profile satisfies it, that profile is chosen. For example, a Vertosol needs at least 35 % clay throughout. Each such choice is a per-site decision in [site_soil_decisions](data/site_soil_decisions_20261103.csv), with its reason.
 - **ORGANIC** candidates are reported but not applied. They are computed as SOC (g kg⁻¹) × bulk density (g cm⁻³) × 1.724.
 - Changing soil makes a **new surface variant**, which needs a new case and a new spin-up.
 
@@ -45,16 +47,34 @@ SLGA texture is ISSS, so it is converted with Minasny & McBratney. SoilGrids is 
 
 A site value whose source does not state the scheme is used as reported. Its ISSS reading is kept as a sensitivity (column `usda_sand_if_ISSS` in [literature_usda_conversion](data/literature_usda_conversion_20261103.csv)).
 
-## Result (interim)
+## Result (v1)
 
 | Tier | Sites |
 | --- | ---: |
 | T1 site measured | 2 (AU-ASM, AU-Cpr; both upper layers only) |
 | T1N neighbour measured | 1 (AU-Gin) |
-| T3 SoilGrids | 17 |
+| T4 keep the current surface | 2 (AU-Stp Vertosol, AU-Tum Alfisol) |
+| T3 SoilGrids | 15 |
 
-- **No measured texture at any JapanFlux tower.** The JapanFlux2024 paper (Ueyama et al. 2025, ESSD) says each site's dataset includes a BADM soil file. The online archive was unavailable during the search, but the packages on IRIDIS6 may contain it; Stage02 looks for it.
-- **SoilGrids conflicts with the site descriptions** at AU-Stp (Vertosol, but less than 35 % clay), AU-Tum, AU-Dry, AU-Cpr below 41 cm, JP-Tef, JP-Yms and the two Tomakomai pumice sites. These sites are flagged rather than adjusted.
+**What Stage02 found in our own files (3 Nov 2026):**
+- *OzFlux L6.* Every file has a `soil` global attribute with descriptions only, no numbers. They support AU-ASM, AU-Cpr, AU-Gin, AU-Cow and AU-Tum.
+  - AU-Stp's "red kandasol" is the same string as in three other Northern Territory files, and conflicts with the literature (Vertosol). It is not used.
+- *JapanFlux.* There is no texture anywhere:
+  - The nine JPF BIF files have no `GRP_SOIL*` groups.
+  - The JapanFLUX2024 BADM soil files of JP-Tgf and JP-Tom give only the classification: Andosol / Andisols and Regosol / Entisols.
+- *Coordinates.* All six JapanFlux coordinates first taken from the literature are confirmed by the original BIF / BADM.
+- *Current OzFlux surfaces* (CTSM-2000 point references, [table](data/current_surface_soil_layers_OzFlux_20261103.tsv)):
+  - *Badly wrong:* AU-Gin (36 / 31 against ~98 / 1), AU-Cow (86 / 4 at a clay loam) and AU-ASM (90 / 6 against 74 / 15).
+  - *Better than SoilGrids:* AU-Stp and AU-Tum, which are therefore kept.
+
+**Conflicts that remain flagged.** SoilGrids disagrees with the site descriptions at:
+- AU-Dry (topsoil);
+- AU-Cpr below 41 cm;
+- JP-Tef (clay-rich);
+- JP-Yms (sandy granite regosol);
+- the two Tomakomai pumice sites.
+
+None of these has a numeric alternative, so they are flagged rather than adjusted.
 
 Files:
 
@@ -63,7 +83,8 @@ Files:
 | [OZ_JP_RECOMMENDED_INPUT_SOIL_TEXTURE_20_SITES_20261103.csv](OZ_JP_RECOMMENDED_INPUT_SOIL_TEXTURE_20_SITES_20261103.csv) | Tier, 0–30 cm sand/clay, class, layer sources, flags |
 | [OZ_JP_RECOMMENDED_CLM10_SOIL_TEXTURE_LONG_20261103.csv](OZ_JP_RECOMMENDED_CLM10_SOIL_TEXTURE_LONG_20261103.csv) | Per layer: value, source, ORGANIC candidate |
 | [OZ_JP_RECOMMENDED_CLM10_SOIL_TEXTURE_WIDE_20261103.csv](OZ_JP_RECOMMENDED_CLM10_SOIL_TEXTURE_WIDE_20261103.csv) | `PCT_SAND_L1..L10`, `PCT_CLAY_L1..L10` |
-| [data/literature_soil_evidence_20261103.csv](data/literature_soil_evidence_20261103.csv) | 149 evidence records: citation, locator, quote, verification, curation decision |
+| [data/literature_soil_evidence_20261103.csv](data/literature_soil_evidence_20261103.csv) | 165 evidence records: citation, locator, quote, verification (`SOURCE_FILE_READ` for our own files), curation decision |
+| [data/current_surface_soil_layers_OzFlux_20261103.tsv](data/current_surface_soil_layers_OzFlux_20261103.tsv) | Stage02: soil in the nine OzFlux FIXNC candidate surfaces |
 | [data/site_soil_decisions_20261103.csv](data/site_soil_decisions_20261103.csv) | Per-site source priority, basis and flags |
 | [data/gridded/](data/gridded/) | SoilGrids at the towers: clay/sand/silt (mean, Q0.05, Q0.95), bulk density, SOC and coarse fragments at six depths, plus the 3 × 3-pixel range |
 | [data/clm10_candidates_by_source_20261103.csv](data/clm10_candidates_by_source_20261103.csv) | Every source mapped onto the 10 layers |
@@ -81,11 +102,10 @@ Each script has `--self-test`.
 
 ## Next steps
 
-1. **Run Stage02 on IRIDIS6.** It reports:
-   - JapanFlux BADM soil files, which could give T1 values at the JapanFlux sites;
-   - original BIF coordinates for the six JapanFlux sites whose coordinates came from the literature;
-   - the current surface soil for the comparison column.
-2. **SLGA for the nine Australian sites.** Get a free TERN API key (account.tern.org.au) and run Stage01 with `--sources SLGA --tern-key-file`. SLGA uses Australian site data and should be better than SoilGrids at AU-Stp, AU-Tum, AU-Dry and AU-Cpr.
+1. **Stage02 on IRIDIS6: done, 3 Nov 2026.** See *Result (v1)*. The current surface table was transcribed from the operator console: sand and clay are exact whole numbers, ORGANIC is to 0.1 or better.
+2. **SLGA for the nine Australian sites.** Get a free TERN API key (account.tern.org.au) and run Stage01 with `--sources SLGA --tern-key-file`.
+   - SLGA uses Australian site data and should be better than SoilGrids at AU-Dry and at AU-Cpr below 41 cm.
+   - At AU-Stp and AU-Tum it is checked against the soil order before it replaces the current surface.
 3. **Papers that probably hold measured texture but could not be read** (paywalled or offline):
    - Hutley et al. 2011 AFM 151:1417 (all NATT towers);
    - Eamus et al. 2013 AFM 182–183:225 (AU-ASM);
@@ -93,4 +113,6 @@ Each script has `--self-test`.
    - Koarashi et al. 2009 (JP-Api);
    - Ishizuka et al. 2006 (JP-Spp, JP-Api);
    - Jia & Akiyama 2005 (JP-Tak).
-4. After that, rerun Stage03 and finalise. Building soil-variant surfaces is a separate, later step.
+4. **Decisions** on ORGANIC and `zbedrock` (shallow soils). These are listed at the end of the [per-site report](OZ_JP_SOIL_TEXTURE_20_SITES_20261103.md).
+
+Stage03 is rerun with `--current-surface ../data/current_surface_soil_layers_OzFlux_20261103.tsv`. Building soil-variant surfaces is a separate, later step.

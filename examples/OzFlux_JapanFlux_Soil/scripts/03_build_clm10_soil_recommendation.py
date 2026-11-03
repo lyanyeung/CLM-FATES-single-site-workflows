@@ -119,11 +119,17 @@ def value_at(profile, depth_cm):
 
 
 def recommend(profiles, priority):
-    """profiles: {source: [intervals]} -> list of 10 layer dicts."""
+    """profiles: {source: [intervals]} -> list of 10 layer dicts. Unlike the Ameriflux_Soil copy, SURFACE may also
+    appear inside the priority (a per-site decision to keep the current surface ahead of a gridded source)."""
     layers = []
     for j, z in enumerate(NODES_CM, start=1):
         pick, how = None, ""
         for src in priority:
+            if src == "SURFACE":
+                if profiles.get("SURFACE"):
+                    pick, how = ("SURFACE", profiles["SURFACE"][j - 1]), "KEEP_SURFACE"
+                    break
+                continue
             r = value_at(profiles.get(src, []), z)
             if r:
                 pick, how = (src, r), "COVERED"
@@ -393,9 +399,15 @@ def self_test():
         raise AssertionError("missing depth must fail")
     except ValueError:
         pass
+    # SURFACE inside the priority wins over SoilGrids, but not over site evidence above it
+    surf = [{"top": None, "bot": None, "sand": 20.0, "clay": 54.0, "om_kgm3": 25.0} for _ in range(10)]
+    lay = recommend({**g["X"], "SURFACE": surf}, ("LIT", "SLGA", "SURFACE", "SOILGRIDS"))
+    assert all(l["source"] == "SURFACE" and l["how"] == "KEEP_SURFACE" and l["PCT_CLAY"] == 54.0 for l in lay)
+    lay = recommend({**g["X"], **lp["X"], "SURFACE": surf}, ("LIT", "SURFACE", "SOILGRIDS"))
+    assert all(l["source"] == "LIT" for l in lay)
     assert usda_class(95, 2) == "sand" and usda_class(59, 15) == "sandy loam" and usda_class(20, 55) == "clay"
     print("STAGE03 SELF-TEST PASS (ISSS->USDA MM2001 and log-linear, layer mapping, deep extension, manual depth, "
-          "ORGANIC candidate)")
+          "SURFACE in priority, ORGANIC candidate)")
     return 0
 
 
