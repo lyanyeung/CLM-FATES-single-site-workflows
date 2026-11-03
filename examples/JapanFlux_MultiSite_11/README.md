@@ -1,5 +1,7 @@
 # JapanFlux MultiSite 11 — CLM-FATES single-site workflow (new experiment)
 
+> **Stage05BI/BJ publisher identity and Tmd boundary:** ICOS's same-version Tef and Tmd half-hour subset metadata supports local non-DST time; archive inner-byte identity remains unverified and the source README solar wording remains unresolved. The selected Tmd PA left-boundary jumps are decomposed into grid-change and QC2-offset components. All 45 HOLD; zero approved. See [evidence and read-only identity protocol](docs/STAGE05BI_ICOS_IDENTITY_AND_TMD_BOUNDARY_DIAGNOSIS.md).
+
 > **Stage05BH publisher time and Tmd pressure evidence:** ICOS metadata for a separately packaged same-version JP-Tmd FLUXMET subset describes local non-DST time, supporting UTC+9 alongside BIF; the source README conflict and exact member identity are not fully resolved. Tmd 2022 selected pressure has a large left-boundary contrast in all four diagnostic clock scenarios. All 45 fields remain HOLD. See [publisher and Tmd evidence](docs/STAGE05BH_PUBLISHER_CLOCK_AND_TMD_BOUNDARY_EVIDENCE.md).
 
 > **Stage05BG actual Stage05BF run and selected-shadow clock sensitivity:** operator reports 45 selected fields reconstructed on IRIDIS6 and five original ZIP hashes checked twice; local four-scenario sensitivity for Tef/Tmd 18 fields remains diagnostic only. All 45 HOLD, zero approved. See [actual run and clock sensitivity](docs/STAGE05BG_ACTUAL_IRIDIS_05BF_AND_SELECTED_CLOCK_SENSITIVITY.md).
