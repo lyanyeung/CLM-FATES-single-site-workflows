@@ -18,7 +18,27 @@ The operator ran the original [Stage05AW unified 45-field source ledger](../scri
 
 Original-source evidence classes: 22 previously `STRONG_CONTEXT` at source-verified JST sites, 5 newer Yms context-only at verified JST source, 18 Tef/Tmd context-only using operator-chosen `JST_UTC_PLUS9_DIAGNOSTIC_ONLY` (original 75-line README SHA `17a886f56abc2673b43ad43ba17d95aacb7830b8475231a10b56c619bf5d4ac5` says local solar time). The original `F_QC=2` class is a release-specific ERA-derived selected-field flag, not true measured tower values. **All 45 science HOLD, 0 approved replacement values**.
 
-## Next Stage05AX (script COMMITTED; real IRIDIS original source scan PENDING)
+## Stage05AX first REAL JP-Tmd attempt: source-number type error, corrected code committed
+
+On 2026-11-03 the operator ran the first SHA-pinned Stage05AX `--site JP-Tmd`. The real `py_compile` and `--self-test` passed. During **read-only original source QC2 source-row reconciliation**, Python raised:
+
+```text
+TypeError: must be real number, not str
+  File "stage05ax.py", line 231, in _inner_scan
+    close(f,events[key]["original_source_F_QC2"])
+  File "stage05ax.py", line 83, in close
+    math.isclose(a,b,abs_tol=atol,rel_tol=1e-10)
+```
+
+**Root cause:** source `F` parsed as a float, but Stage05AW TSV loaded via `csv.DictReader` retained the same original source number as a string. This is a Python code typing error, NOT original JP-Tmd provenance corruption and NOT a failed meteorological science test. Source ZIP is only read; no original ZIP/forcing/model, no external CDS or Slurm modifications occurred.
+
+The corrected Stage05AX source `close` now runs **both** operands through the already existing `numeric()` source parser, refuses nonfinite/missing values, and compares source floats to original ledger numeric strings safely. Added self-test regression for mixed `float`/`str`, source value `0.0`, and missing/-9999 values.
+
+**Additional preventative source-provenance correction:** instead of using an unverified full literal SHA for the 85-line JP-Fjy/Khw/Yms original README releases, Stage05AX now **requires `--stage05k-dir`**, reads each original `JP-<site>_exact_metadata.json` from the earlier verified Stage05K sources, requires its original `README.txt` SHA256 and source metadata status, and cross-compares with SHA256 computed by re-reading the actual nested original JPF source ZIP. Checks that the original 85-line JST-source README states local standard time (without DST), and retains the independently verified, exact 75-line Tef/Tmd solar README original SHA `17a886f56abc2673b43ad43ba17d95aacb7830b8475231a10b56c619bf5d4ac5`. The genuine computed README SHA is stored in each site report, with `original_readme_sha256_matches_prior_Stage05K: true`. This improves source integrity without guessing a digest or altering timebase science status.
+
+**Code fix commit:** `476cc0ade51c95e14ed3c6b84826e3129316ec2e`, script Git blob SHA `7cc202ff9a15fd4f78bba84d33cf65faeb4b3e07`. A corrected *real* JP-Tmd source run has **not yet been observed**. No result of Stage05AX site audit can be claimed until successful real execution. Stage05AW 45/45 independently contextualized science result remains PASS and all original 45 variable fields remain HOLD. Use corrected pinned Stage05AX and `--stage05k-dir "$HOME/japanflux_stage05k"` on the retry.
+
+## Next Stage05AX (script COMMITTED; corrected real IRIDIS run PENDING)
 
 [Stage05AX 5-source JPF original halfhour QC0 vs QC1 gapfill neighbor / contiguous QC2 episode forensic read-only](../scripts/stage05/05ax_45_original_JPF_QC0_QC1_neighbor_and_QC2_run_READONLY.py)
 
