@@ -80,7 +80,15 @@ def numeric(s):
     except (ValueError,TypeError,OverflowError):
         return None
 def close(a,b,atol=1e-6):
-    return a is not None and b is not None and math.isclose(a,b,abs_tol=atol,rel_tol=1e-10)
+    """Compare independently read source CSV numbers and Stage05AW TSV strings.
+
+    Both operands may be string or float. Nonfinite/source-missing values
+    must fail source provenance verification rather than raising TypeError
+    or treating a missing source value as an observation.
+    """
+    x=numeric(a)
+    y=numeric(b)
+    return x is not None and y is not None and math.isclose(x,y,abs_tol=atol,rel_tol=1e-10)
 def qc_class(s):
     x=numeric(s)
     if x is not None and x in (0,1,2):return int(x)
@@ -486,6 +494,11 @@ def selftest():
     assert finite_plausible("PA","99.4") and not finite_plausible("PA","0")
     assert finite_plausible("LW_IN","200") and not finite_plausible("LW_IN","26.164")
     assert close(numeric("26.164"),26.164)
+    assert close(26.164,"26.164") and close("26.164",26.164)
+    assert close("0.0",0.0) and close(0,"0")
+    assert not close("not-a-number",26.164)
+    assert not close(None,"26.164") and not close("-9999","-9999")
+    assert not close(26.164,"26.264")
     native=datetime(2011,12,17,6)
     assert (native-timedelta(hours=9)).strftime("%Y%m%d%H%M")=="201112162100"
     # Deterministic +-48 original halfhour window mapping, no file/ZIP access.
