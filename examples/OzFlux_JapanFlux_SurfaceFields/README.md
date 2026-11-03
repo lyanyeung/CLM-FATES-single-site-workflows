@@ -29,7 +29,8 @@ Pinned versions: CTSM `d5ea9d01`, FATES `121723f6`.
 
 - **The FATES default switches bedrock off.** `namelist_defaults_ctsm.xml` sets `use_bedrock = .false.` when `use_fates = .true.`. No case in this project overrides it.
 - **Effect when off:** `zbedrock` is ignored, and every site has the full column hydrologically active: 20 layers to about 8.6 m with `soil_layerstruct_predefined = '20SL_8.5m'`. Stage01 confirms this from the template case.
-- **Effect when on:** layers below `zbedrock` are bedrock — no water and no roots. CLM raises any value below 0.4 m (`zmin_bedrock`) to that minimum.
+- **Effect when on:** layers below `zbedrock` are bedrock — no water and no roots.
+- **Shallow values need care.** CLM does *not* raise small values. Its search for the bedrock layer starts at the layer that contains `zmin_bedrock` = 0.4 m, which is layer 6 (0.32–0.48 m). So any `zbedrock` from 0.32 m to 0.48 m gives a 0.48 m column, and a value **at or below 0.32 m matches no layer and silently gives the full 8.6 m column**. Shallow sites therefore need a value between 0.33 and 0.48 m.
 - **build-namelist allows the switch with FATES.** It only requires `lower_boundary_condition = 2` (zero flux), which is already the default.
 - **Rooting depth.** The default FATES parameters put no practical limit on it: `fates_allom_zroot_min_z = fates_allom_zroot_max_z = 100 m` for all 14 PFTs. So roots use whatever soil column CLM provides.
 
