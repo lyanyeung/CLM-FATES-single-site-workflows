@@ -1,0 +1,21 @@
+site,lat,lon,nearest_river_name,nearest_river_m,rivers_within_10km,nearest_stream_type,nearest_stream_name,nearest_stream_m,nearest_water_body_type,nearest_water_body_name,nearest_water_body_m,status
+AU-ASM,-22.2828,133.2493,Hanson River,5145,2,,,,,,,OK
+AU-Cow,-16.23819,145.42715,Daintree River,3666,3,stream,Mclean Creek,239,water,,2613,OK
+AU-Cpr,-34.0027,140.5877,,,0,,,,,,,OK
+AU-DaS,-14.1592,131.3881,Daly River,2564,2,,,,,,,OK
+AU-Dry,-15.2588,132.3706,Dry River,8417,1,,,,,,,OK
+AU-Gin,-31.376351,115.71377,,,0,,,,,,,OK
+AU-How,-12.4952,131.15005,Howard River,7849,1,,,,,,,OK
+AU-Stp,-17.1507,133.3502,,6850,1,,,,,,,OK
+AU-Tum,-35.6566,148.1516,,,0,stream,Black Gully,197,,,,OK
+JP-Api,40.00135858,140.9365859,安比川,976,19,stream,アスナ沢,449,pond,,1270,OK
+JP-Fhk,35.4435557694444,138.764693061111,Miyagawa River,741,28,stream,,210,reservoir,,1425,OK
+JP-Fjy,35.45454,138.76225,Miyagawa River,224,30,stream,,417,pond,,561,OK
+JP-Khw,33.13658,130.70834,開山川,350,44,stream,,509,water,,859,OK
+JP-Spp,42.986843,141.385331,月寒川,398,31,stream,月寒川,421,reservoir,西岡水源池,411,OK
+JP-Tak,36.14616667,137.4231111,生井川,1488,18,stream,岩井谷,759,,,,OK
+JP-Tef,45.055808,142.107122,問寒別川,1722,6,stream,ヤツメノ沢川,226,,,,OK
+JP-Tgf,36.11353,140.09488,Hasunuma River,809,38,stream,天の川,555,pond,Hyotaro Pond,302,OK
+JP-Tmd,42.735911,141.523147,苫小牧川,6480,6,stream,植苗川,666,,,,OK
+JP-Tom,42.698906,141.571488,苫小牧川,2467,8,stream,幌内川,893,reservoir,,2459,OK
+JP-Yms,34.790278,135.840939,天神川,739,100,stream,,355,water,,1717,OK

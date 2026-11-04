@@ -171,7 +171,7 @@ The other 15 sites keep f09. JP-Spp (18 kg C m⁻²) and JP-Yms (3.0) have stock
 ### Other fields
 
 - FMAX and SOIL_COLOR: f09.
-- Landunits: NATVEG 100; crop, urban, lake, wetland and glacier 0. The f09 cells carry up to 32 % crop and 20 % urban.
+- Landunits: NATVEG 100; crop, urban, lake, wetland and glacier 0. The f09 cells carry up to 32 % crop and 20 % urban. Confirmed against the land cover at the towers [below](#land-cover-and-rivers-at-the-towers-script-04-4-nov-2026).
 
 ### Decision: `use_bedrock`
 
@@ -191,6 +191,52 @@ The other 15 sites keep f09. JP-Spp (18 kg C m⁻²) and JP-Yms (3.0) have stock
 - **AU-ASM goes first.** Non-Competition-CLM-experiment Stage22 (`examples/OzFlux_Batch01_09/BEDROCK_20261103_SITE_V3_PLAN.md`, branch `feat/ozflux-asm-bedrock-v3-20261103`) builds a v3 candidate surface from Codex's verified Stage13 SITE-SOIL v2. It changes only `zbedrock`, to 1.0 m, and records the namelist requirement for the future AD400 controller.
 - **AU-ASM landunits stay as Stage16** (NATVEG 99.9994 %), following the operator rule in that pipeline.
 
+## Land cover and rivers at the towers (script 04, 4 Nov 2026)
+
+[Script 04](scripts/04_landcover_and_waterways_at_towers.py) reads two sources at the coordinates in [`OZ_JP_20_SITE_COORDINATES_20261103.csv`](../OzFlux_JapanFlux_Soil/data/OZ_JP_20_SITE_COORDINATES_20261103.csv):
+- ESA WorldCover 10 m 2021 class shares within 250, 500, 1000 and 2000 m: [`data/worldcover_landcover_at_towers_20261104.csv`](data/worldcover_landcover_at_towers_20261104.csv);
+- OpenStreetMap distances to the nearest river, stream and water body: [`data/osm_waterways_near_towers_20261104.csv`](data/osm_waterways_near_towers_20261104.csv).
+
+### Cropland: operator rule, 4 Nov 2026
+
+**Rule:** where there is real cropland at the tower, use its real share. The f09 crop share is not used.
+
+**What the pinned model does with a crop share.**
+- With FATES, `create_crop_landunit = .false.` (`namelist_defaults_ctsm.xml`).
+- `surfrd_wtfates` therefore merges the crop landunit into the natural landunit, and the `PCT_CFT` weights become HLM PFTs 15–16 (`surfrdMod.F90`).
+- The project FATES parameter file (`fates_params_default.json`, SHA256 `0819f8fd…`) maps only HLM PFTs 1–14 (`fates_hlm_pftno` = 14). `EDInitMod` takes bare ground from HLM PFT 0 and renormalises the live PFTs to one.
+- **Net effect: a crop share is never simulated as crop.** It is dropped and goes to the live PFTs, and bare ground shrinks by the factor NATVEG / (NATVEG + CROP).
+- The Stage03 surfaces built so far would give:
+  - AU-Cpr: bare 54 % → 43.8 %;
+  - AU-Gin: bare 20 % → 14.8 %;
+  - AU-Tum: no change (no bare ground).
+- **Real cropland would therefore have to enter `PCT_NAT_PFT` as a grass PFT.**
+
+**Result.** Within 2 km, WorldCover shows **0.0 % cropland** at all nine OzFlux towers, including AU-Cpr, AU-Gin and AU-Tum. The other JapanFlux towers show at most 1.9 % within 1 km (JP-Tmd at 250 m) and at most 4.0 % within 2 km (JP-Spp).
+
+**JP-Tgf** shows 16.9 % "cropland" within 250 m and 11.9 % within 500 m. The tower stands in a mown experimental grass field, which WorldCover's cropland class most likely includes (grassland is only 2.3 % within 250 m). This is not crop in the footprint.
+
+**Decision:** PCT_CROP = 0 and NATVEG = 100 at all 20 sites. The surfaces for AU-Cpr, AU-Gin and AU-Tum must be rebuilt with crop 0, together with soil v1 and these surface fields. That restores the v1.1 bare-ground shares in FATES.
+
+**Built-up land** at the towers is small within 500 m: JP-Fjy 6.9 %, JP-Tgf 27.5 % (the research centre around the field), JP-Spp 0.1 %. Urban also stays 0.
+
+### Sites near rivers and using groundwater
+
+The per-site table is [`data/groundwater_river_flags_20261104.csv`](data/groundwater_river_flags_20261104.csv). It combines the OSM distances with the water-table evidence in `soil_depth_evidence_20261103.csv`.
+
+| Flag | Sites | Evidence |
+| --- | --- | --- |
+| **RIVER_AND_GROUNDWATER** | **JP-Spp** | 398 m from the Tsukisamu River (月寒川); groundwater-level gauge buried at 1.4 m, so a water table at times shallower than 1.4 m |
+| **GROUNDWATER_DEPENDENT** (no river) | **AU-Gin**, **AU-How** | AU-Gin: Banksia roots to ~9 m; water table 9.6 → 10.5–11 m; no river within 10 km. AU-How: roots to ~10 m at the dry-season water table; Howard River 7.8 km |
+| SHALLOW_WATER_TABLE | JP-Tgf | Water table within the ~2 m ash loam or the clay below; Hasunuma River 0.8 km |
+| NEAR_WATERCOURSE_NO_GW_EVIDENCE | AU-Cow, AU-Tum, JP-Api, JP-Fhk, JP-Fjy, JP-Khw, JP-Tef, JP-Yms | River or stream ≤ 500 m, no water-table evidence. Check only |
+| NONE | AU-ASM, AU-Cpr, AU-DaS, AU-Dry, AU-Stp, JP-Tak, JP-Tmd, JP-Tom | AU-DaS is 2.6 km from the Daly River, with deeper groundwater |
+
+**What the model cannot represent.** The single-column CLM has an 8.6 m column, a zero-flux base and no lateral or river inflow. So:
+- **AU-Gin and AU-How:** the real water table (about 10–11 m) lies below the model column, so the model can give too much dry-season water stress, and GPP, ET and NEE are biased in the dry season;
+- **JP-Spp:** gets no river-fed water;
+- **all flagged sites:** the flags are for interpreting the evaluation. They do not change any input.
+
 ## Scripts
 
 | Script | Where | What |
@@ -198,10 +244,11 @@ The other 15 sites keep f09. JP-Spp (18 kg C m⁻²) and JP-Yms (3.0) have stock
 | [01_surface_fields_at_towers_READONLY.py](scripts/01_surface_fields_at_towers_READONLY.py) | IRIDIS6 login node, read only | Reads three things:<ul><li>the project global surface `surfdata_0.9x1.25_hist_2000_16pfts_c240908.nc` at each tower (nearest cell and 3×3 land cells): `zbedrock`, `ORGANIC`, `FMAX`, `SOIL_COLOR`, `SLOPE`, `STD_ELEV`, landunits;</li><li>the same fields in every existing point surface of the sites;</li><li>the template case's `use_bedrock`, soil layer structure, `organic_max` / `zbedrock_sf` / `om_frac_sf`, the FATES rooting parameters, and the model layer depths.</li></ul> |
 | [02_gridded_depth_to_bedrock_at_towers.py](scripts/02_gridded_depth_to_bedrock_at_towers.py) | anywhere (public data) | SoilGrids250m 2017 depth-to-bedrock products at the towers. Done 3 Nov |
 | [03_build_surface_field_recommendation.py](scripts/03_build_surface_field_recommendation.py) | anywhere | Builds the recommendation table from the Stage01 values, the gridded products and the per-site decisions. Maps `zbedrock` to the CLM bedrock layer exactly as `initVerticalMod`; scales `ORGANIC` to site stocks. Done 3 Nov |
+| [04_landcover_and_waterways_at_towers.py](scripts/04_landcover_and_waterways_at_towers.py) | anywhere (public data) | ESA WorldCover class shares around the towers, and OpenStreetMap distances to rivers, streams and water bodies. Done 4 Nov |
 
 ## Next steps
 
 1. AU-ASM: run Non-Competition-CLM-experiment Stage22 on IRIDIS6 to build the v3 surface, and record its SHA256.
 2. When each site's spin-up surface is built, apply soil v1 texture together with this table: `zbedrock`, `ORGANIC`, NATVEG 100 and FMAX / SOIL_COLOR unchanged. Record the changed variable names and SHA256 values as the project's surface rules require. Set `use_bedrock` from [`data/use_bedrock_decision_20261104.csv`](data/use_bedrock_decision_20261104.csv).
-3. Open: whether AU-Cpr, AU-Gin and AU-Tum get NATVEG 100. Their OzFlux v1.1 PFT surfaces keep the grid crop share (19 %, 26 %, 8 %).
+3. AU-Cpr, AU-Gin and AU-Tum: rebuild with PCT_CROP = 0. Their Stage03 surfaces carry the grid crop share (18.85 %, 25.87 %, 8.39 %), but there is no cropland at the towers ([script 04](#cropland-operator-rule-4-nov-2026)).
 3. Optional: read SLGA depth of soil / regolith for the Australian sites once a TERN API key is available.

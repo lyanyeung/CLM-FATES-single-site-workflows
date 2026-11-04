@@ -1,0 +1,21 @@
+site,flag,nearest_river,nearest_river_m,nearest_stream,nearest_stream_m,water_table_evidence,model_note
+AU-ASM,NONE,Hanson River,5145,,,Regional water table 49 m; the hardpan blocks drainage to it (AU-ASM-D03),Not groundwater-fed
+AU-Cow,NEAR_WATERCOURSE_NO_GW_EVIDENCE,Daintree River,3666,Mclean Creek,239,None found,Wet rainforest; check only
+AU-Cpr,NONE,,,,,None measured; site page mentions possible regional groundwater use (AU-Cpr soil notes),No mapped river within 10 km
+AU-DaS,NONE,Daly River,2564,,,A borehole ~2 km from Daly River suggests deeper groundwater (VOM set-up),Not riparian at the tower
+AU-Dry,NONE,Dry River,8417,,,A borehole ~13 km away suggests deeper groundwater,
+AU-Gin,GROUNDWATER_DEPENDENT,,,,,Water table 9.6 m at set-up -> 10.5-11 m by 2024; Banksia roots reach ~9 m (AU-Gin-D01-D05),No river within 10 km. The water table lies below the 8.6 m model column; no groundwater supply in the model
+AU-How,GROUNDWATER_DEPENDENT,Howard River,7849,,,Roots to ~10 m at the dry-season water table (Cook et al. 1998; AU-How-D01-D04),The water table lies below the 8.6 m model column; dry-season water stress may be too strong in the model
+AU-Stp,NONE,(unnamed),6850,,,Boreholes ~10 km away suggest deeper groundwater,
+AU-Tum,NEAR_WATERCOURSE_NO_GW_EVIDENCE,,,Black Gully,197,None found,Forest on slope; check only
+JP-Api,NEAR_WATERCOURSE_NO_GW_EVIDENCE,安比川 (Appi River),976,アスナ沢,449,None found,Check only
+JP-Fhk,NEAR_WATERCOURSE_NO_GW_EVIDENCE,Miyagawa River,741,(unnamed),210,None found,Check only
+JP-Fjy,NEAR_WATERCOURSE_NO_GW_EVIDENCE,Miyagawa River,224,(unnamed),417,No groundwater observation; fissured lava,Check only
+JP-Khw,NEAR_WATERCOURSE_NO_GW_EVIDENCE,開山川,350,(unnamed),509,None found,Check only
+JP-Spp,RIVER_AND_GROUNDWATER,月寒川 (Tsukisamu River),398,月寒川,421,Groundwater-level gauge buried at 1.4 m: a water table at times shallower than 1.4 m (JP-Spp-D01),Single-column CLM has no lateral or river inflow and a zero-flux base; soil moisture can be too low
+JP-Tak,NONE,生井川,1488,岩井谷,759,None found,
+JP-Tef,NEAR_WATERCOURSE_NO_GW_EVIDENCE,問寒別川,1722,ヤツメノ沢川,226,Gleyic Cambisol (wet profile); no water-table value,Check only
+JP-Tgf,SHALLOW_WATER_TABLE,Hasunuma River,809,天の川,555,Water table generally within the Kanto loam or the Joso clay (~2 m ash over clay; JP-Tgf-D01-D02),River 0.8 km away; the zero-flux model column can hold a water table but gets no lateral supply
+JP-Tmd,NONE,苫小牧川,6480,植苗川,666,None found,
+JP-Tom,NONE,苫小牧川,2467,幌内川,893,None found,
+JP-Yms,NEAR_WATERCOURSE_NO_GW_EVIDENCE,天神川,739,(unnamed),355,Groundwater level listed as not observed; valley and ridge towers in the Kizu River headwaters,Check only
