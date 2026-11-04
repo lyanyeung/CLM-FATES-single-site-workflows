@@ -9,7 +9,7 @@ Started 3 November 2026; the fourth OzFlux / JapanFlux topic. [OzFlux_JapanFlux_
 
 These must be settled before the 19 remaining spin-up surfaces are built, because a later change means repeating the 800-year spin-up.
 
-**Status, 3 Nov 2026: recommendation v1 done.** It is [`OZ_JP_RECOMMENDED_SURFACE_FIELDS_20_SITES_20261103.csv`](OZ_JP_RECOMMENDED_SURFACE_FIELDS_20_SITES_20261103.csv), [described below](#recommendation-v1-3-nov-2026). One decision is open: whether to switch on `use_bedrock`.
+**Status, 4 Nov 2026: recommendation v1 done.** It is [`OZ_JP_RECOMMENDED_SURFACE_FIELDS_20_SITES_20261103.csv`](OZ_JP_RECOMMENDED_SURFACE_FIELDS_20_SITES_20261103.csv), [described below](#recommendation-v1-3-nov-2026). `use_bedrock` is decided: on at AU-ASM only ([decision C](#decision-use_bedrock)).
 
 ## What the pinned model does with these fields
 
@@ -173,18 +173,21 @@ The other 15 sites keep f09. JP-Spp (18 kg C m⁻²) and JP-Yms (3.0) have stock
 - FMAX and SOIL_COLOR: f09.
 - Landunits: NATVEG 100; crop, urban, lake, wetland and glacier 0. The f09 cells carry up to 32 % crop and 20 % urban.
 
-### Open decision: `use_bedrock`
+### Decision: `use_bedrock`
 
 | Option | What changes | Notes |
 | --- | --- | --- |
 | **A. Keep the FATES default (off)** | Every site gets 8.6 m of soil | Consistent with the 78 finished ICOS / AmeriFlux spin-ups. The five shallow sites get too much plant-available water |
 | **B. Switch it on for the OzFlux / JapanFlux sites** | Only AU-ASM, JP-Fjy, JP-Tmd, JP-Tom and JP-Tef change | `use_bedrock = .true.` goes in `user_nl_clm` for AD400, NORMAL400 and the observation run alike. CLM puts a zero-flux base at the bedrock layer. That matches the perched hardpan reservoir at AU-ASM. For the fissured lava and permeable pumice sites it may hold too much water above 0.48–0.68 m; check against soil moisture where it exists (JP-Fjy has none) |
+| **C. Switch it on only where the restricting layer is documented under the tower and acts as a barrier** | Only AU-ASM changes | The other four shallow sites have T2 evidence: fissured lava, permeable pumice, or rock whose contact is not stated. A zero-flux base at 0.48–0.68 m is not established there |
 
-**Recommendation:** B, starting with AU-ASM, whose AD400 case does not exist yet. Treat the lava and pumice sites as a sensitivity pair (on / off).
+**Operator decision, 3 Nov 2026: B.** Superseded on 4 Nov.
 
-**Operator decision, 3 Nov 2026: B.**
-- `use_bedrock = .true.` for all 20 OzFlux / JapanFlux sites, in AD400, NORMAL400 and the observation run.
-- JP-Fjy, JP-Tmd and JP-Tom also get an on / off sensitivity pair.
+**Operator decision, 4 Nov 2026: C, not all 20 sites.** The per-site table is [`data/use_bedrock_decision_20261104.csv`](data/use_bedrock_decision_20261104.csv).
+- **AU-ASM:** `use_bedrock = .true.` in AD400, NORMAL400 and the observation run. The hardpan is documented under the tower (T1), and its perched reservoir matches CLM's zero-flux base.
+- **The other 19 sites:** FATES default (`.false.`, not set in `user_nl_clm`), as in the 78 ICOS / AmeriFlux spin-ups.
+- **JP-Fjy, JP-Tmd, JP-Tom and JP-Tef:** baseline off. An on run is an optional sensitivity case. It needs its own AD400 and NORMAL400, because soil water and carbon come to a different equilibrium.
+- **Every site's surface still carries the `zbedrock` of the recommendation CSV.** With the switch off the value is ignored, so a sensitivity run changes only `user_nl_clm`, not the surface.
 - **AU-ASM goes first.** Non-Competition-CLM-experiment Stage22 (`examples/OzFlux_Batch01_09/BEDROCK_20261103_SITE_V3_PLAN.md`, branch `feat/ozflux-asm-bedrock-v3-20261103`) builds a v3 candidate surface from Codex's verified Stage13 SITE-SOIL v2. It changes only `zbedrock`, to 1.0 m, and records the namelist requirement for the future AD400 controller.
 - **AU-ASM landunits stay as Stage16** (NATVEG 99.9994 %), following the operator rule in that pipeline.
 
@@ -198,6 +201,7 @@ The other 15 sites keep f09. JP-Spp (18 kg C m⁻²) and JP-Yms (3.0) have stock
 
 ## Next steps
 
-1. Decide `use_bedrock` (A or B above).
-2. When each site's spin-up surface is built, apply soil v1 texture together with this table: `zbedrock`, `ORGANIC`, NATVEG 100 and FMAX / SOIL_COLOR unchanged. Record the changed variable names and SHA256 values as the project's surface rules require.
+1. AU-ASM: run Non-Competition-CLM-experiment Stage22 on IRIDIS6 to build the v3 surface, and record its SHA256.
+2. When each site's spin-up surface is built, apply soil v1 texture together with this table: `zbedrock`, `ORGANIC`, NATVEG 100 and FMAX / SOIL_COLOR unchanged. Record the changed variable names and SHA256 values as the project's surface rules require. Set `use_bedrock` from [`data/use_bedrock_decision_20261104.csv`](data/use_bedrock_decision_20261104.csv).
+3. Open: whether AU-Cpr, AU-Gin and AU-Tum get NATVEG 100. Their OzFlux v1.1 PFT surfaces keep the grid crop share (19 %, 26 %, 8 %).
 3. Optional: read SLGA depth of soil / regolith for the Australian sites once a TERN API key is available.
