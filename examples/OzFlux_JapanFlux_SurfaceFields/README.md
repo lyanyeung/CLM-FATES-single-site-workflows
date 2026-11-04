@@ -9,7 +9,7 @@ Started 3 November 2026; the fourth OzFlux / JapanFlux topic. [OzFlux_JapanFlux_
 
 These must be settled before the 19 remaining spin-up surfaces are built, because a later change means repeating the 800-year spin-up.
 
-**Status, 4 Nov 2026: recommendation v1 done.** It is [`OZ_JP_RECOMMENDED_SURFACE_FIELDS_20_SITES_20261103.csv`](OZ_JP_RECOMMENDED_SURFACE_FIELDS_20_SITES_20261103.csv), [described below](#recommendation-v1-3-nov-2026). `use_bedrock` is decided: on at AU-ASM only ([decision C](#decision-use_bedrock)).
+**Status, 4 Nov 2026: recommendation v1 done.** It is [`OZ_JP_RECOMMENDED_SURFACE_FIELDS_20_SITES_20261103.csv`](OZ_JP_RECOMMENDED_SURFACE_FIELDS_20_SITES_20261103.csv), [described below](#recommendation-v1-3-nov-2026). `use_bedrock` is decided: on at AU-ASM only ([decision C](#decision-use_bedrock)). **AU-DaS is no longer processed** (4 Nov 2026: only 14 complete years before the 2022 land clearing; see [PostSpinup](../OzFlux_JapanFlux_PostSpinup/README.md#au-das-excluded-operator-decision-4-nov-2026)). Its rows stay in the tables as records.
 
 ## What the pinned model does with these fields
 

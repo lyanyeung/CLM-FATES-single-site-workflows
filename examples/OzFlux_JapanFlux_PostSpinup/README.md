@@ -6,6 +6,7 @@ Started 3 November 2026. This is the third OzFlux / JapanFlux topic. [OzFlux_Jap
 - Stage01 (IRIDIS6 read-only inventory) ran at 12:54 UTC. Results are [below](#stage01-result-3-nov-2026).
 - Stage02 writes the NOAA CO₂ stream file and previews the observation-run namelists on a clone of one finished NORMAL400 case. It does not build or submit anything.
 - None of the 20 sites has finished spin-up. AU-ASM's direct AD400 case **has not been created yet** (Stage01), and the other 19 sites have no DATM forcing.
+- **4 Nov 2026: AU-DaS is no longer processed** ([why](#au-das-excluded-operator-decision-4-nov-2026)), so the OzFlux / JapanFlux set is now 19 sites.
 
 ## What the observation run is
 
@@ -107,7 +108,7 @@ The full table is [OZ_JP_POST_SPINUP_SITE_PLAN_20261103.csv](data/OZ_JP_POST_SPI
 | AU-ASM | Mulga, pre-dieback | 2013–2017 (2011–2012 and 2018–2022 run, not evaluated) | Spin-up years Mulga1 2011–2022 (decided 4 Nov); DATM 2013–2018 built so far; AD400 case not created | UNCHANGED |
 | AU-Cow | Rainforest | 2009–2022 | not built | UNCHANGED |
 | AU-Cpr | Mallee, pre-fire | 2011–2013 (L6 starts 30 Jul 2010) | not built | UNCHANGED |
-| AU-DaS | Uncleared savanna | 2008–2021 | candidate 2009–2021 | UNCHANGED |
+| AU-DaS | **Excluded, 4 Nov 2026** (uncleared savanna until the 2022 clearing) | — | not processed | — |
 | AU-Dry | Savanna | 2010–2024 within the forcing years (candidate 2010–2018) | candidate 2010–2018 | UNCHANGED |
 | AU-Gin | Banksia woodland | 2012–2022 (L6 starts 13 Oct 2011); the 2016 fuel-reduction burn falls inside the window | not built | UNCHANGED |
 | AU-How | Savanna (fire part of the state) | 2002–2025 (L6 starts 1 Jan 2002) | not built | UNCHANGED |
@@ -152,7 +153,20 @@ The full table is [OZ_JP_POST_SPINUP_SITE_PLAN_20261103.csv](data/OZ_JP_POST_SPI
 - **Separate record.** Mulga2 follows a 17.5-month gap, a change of PI and a logger change. It also measures the stand after the 2018–2020 dieback, which TERN's new 2025/26 census plot also describes.
 - **Use.** Mulga2 stays outside the spin-up cycle, which would otherwise jump across the gap. It is not in the pre-dieback evaluation either.
 
-**AU-DaS needs a decision.** Its record runs 2008-01-01 to 2026-04-23, but the tower area was cleared for crop development in November 2022. "All complete years" would therefore include 2023–2025 forcing measured over cleared land. The choice is between ending the spin-up at 2022 and following the rule literally.
+### AU-DaS excluded (operator decision 4 Nov 2026)
+
+**We no longer process AU-DaS (Daly River Uncleared).**
+
+**Why:**
+- **The land use changed.** The site was uncleared eucalypt savanna (woodland, not closed forest) until land was cleared for crop development in November 2022. TERN's OzFlux site description records this, and Stephens et al. (2025, GCB, doi:10.1111/gcb.70361, Sect. 2.1) write: "Data at Daly Uncleared was excluded from 01/11/2022 due to land clearing". Neither source states how much of the footprint was cleared.
+- **The record before the clearing is too short.** The L6 record starts on 2008-01-01. Before the clearing it has **14 complete calendar years (2008–2021)**; 2022 has only January–October.
+- **The operator requires at least 15 years.** A record that mixes savanna and cleared years is not used.
+
+**What is kept.** The AU-DaS inputs prepared so far stay in the repositories as records but are not used:
+- the v1.1 PFT row and the NCE Stage03 PFT surface candidate;
+- the soil v1 row;
+- the SurfaceFields v1 row;
+- the carbon-state evidence.
 
 **Expected rules class.** This comes from the [maintenance rules](https://github.com/lyanyeung/Non-Competition-CLM-experiment/blob/main/maintenance/RULES_FOR_NEW_CASES.md):
 
