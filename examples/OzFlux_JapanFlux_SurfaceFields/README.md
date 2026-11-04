@@ -216,7 +216,7 @@ The other 15 sites keep f09. JP-Spp (18 kg C m⁻²) and JP-Yms (3.0) have stock
 
 **JP-Tgf** shows 16.9 % "cropland" within 250 m and 11.9 % within 500 m. The tower stands in a mown experimental grass field, which WorldCover's cropland class most likely includes (grassland is only 2.3 % within 250 m). This is not crop in the footprint.
 
-**Decision:** PCT_CROP = 0 and NATVEG = 100 at all 20 sites. The surfaces for AU-Cpr, AU-Gin and AU-Tum must be rebuilt with crop 0, together with soil v1 and these surface fields. That restores the v1.1 bare-ground shares in FATES.
+**Decision (operator confirmed 4 Nov 2026):** PCT_CROP = 0 and NATVEG = 100 at all 20 sites. The surfaces for AU-Cpr, AU-Gin and AU-Tum must be rebuilt with crop 0, together with soil v1 and these surface fields. That restores the v1.1 bare-ground shares in FATES.
 
 **Built-up land** at the towers is small within 500 m: JP-Fjy 6.9 %, JP-Tgf 27.5 % (the research centre around the field), JP-Spp 0.1 %. Urban also stays 0.
 
