@@ -3,8 +3,9 @@
 
 Every cell of the seven (JPF) or eight (Tom/Tgf, plus RH_F) forcing variables is written with its original QC and a
 provenance tag. Unchanged cells carry the original source string byte-for-byte. Rules:
-  D1  P at Api/Tak/Tmd: P_F(t+1h)/3.6 (same-release ERA back to raw ERA5 units and time); Yms: JapanFlux2024 gauge
-      P_F where its QC is 0, otherwise the same /3.6 rule.                      [approved by the user 2026-11-04]
+  D1  P at Api/Tak/Tmd: P_F(t+1h)/3.6 (same-release ERA back to raw ERA5 units and time); Yms: the JapanFlux2024
+      rain gauge P_RAIN_1_1_1 (ALLVARS) where it is present, otherwise the same /3.6 rule.  [approved 2026-11-04]
+      JapanFlux2024 Yms P_F is NOT used: despite QC 0 it equals its bias-corrected ERA5 (P_ERA5) month by month.
   D2  -1e-12<P<0 -> 0 and -1e-9<=VPD<0 -> 0 at Tom/Tgf; must equal the 5,099 audited cells.  [approved 2026-11-04]
   C2  Tom TA/RH/VPD/SW: value at t is the tower value labelled t+1h when that is QC0, else the JapanFlux2024
       bias-corrected ERA5 at t (identical to its QC1 fill). P/LW/PA/WS unchanged.     [delegated clock decision]
@@ -142,7 +143,7 @@ def jpf_site(site,path,yms,out):
         for v in JPF_VARS:
             val=data[v][i];q=data[v+'_QC'][i];tag='ORIGINAL';bad=inst if v in INSTANT else interval
             if v=='P_F' and site in D1A_SITES:
-                if site=='JP-Yms' and yms['QC'].get(t)==0:val=yms['P'][t];tag='D1B_JF2024_GAUGE_QC0'
+                if site=='JP-Yms' and t in yms['P']:val=yms['P'][t];tag='D1B_JF2024_RAIN_GAUGE'
                 elif src in eidx:
                     val=fmt(num(era['P_ERA'][eidx[src]])/3.6);tag='D1A_ERA5_DIV3P6_SHIFTM60'
                     if src in bad:tag=hold('HOLD_ERA_ARTIFACT_SHIFTED',tag)
@@ -184,13 +185,16 @@ def ws_stuck(data,n,minimum=24,limit=.5):
     return out
 
 def load_yms_gauge(path):
-    br.check(path,JF2024_YMS[1]);out={'P':{},'QC':{},'TA':{}}
+    """JapanFlux2024 Yms ALLVARS: raw rain-gauge P_RAIN_1_1_1 (present values only) and QC0 TA_F for the label check."""
+    br.check(path,JF2024_YMS[1]);out={'P':{},'TA':{}}
     with zipfile.ZipFile(path) as z:
-        core=[n for n in z.namelist() if '_COREVARS_HH_' in n and '/COREVARS/' in '/'+n]
-        if len(core)!=1:raise ValueError('JapanFlux2024 Yms COREVARS scope')
-        for r in csv_rows(z,core[0]):
-            t=r['TIMESTAMP_START'];q=num(r['P_F_QC'])
-            out['P'][t]=r['P_F'];out['QC'][t]=int(q) if finite(q) else -1
+        allv=[n for n in z.namelist() if '_ALLVARS_HH_' in n and '/ALLVARS/' in '/'+n]
+        if len(allv)!=1:raise ValueError('JapanFlux2024 Yms ALLVARS scope')
+        for r in csv_rows(z,allv[0]):
+            t=r['TIMESTAMP_START'];p=num(r['P_RAIN_1_1_1'])
+            if finite(p):
+                if p<0:raise ValueError('negative Yms gauge rain at '+t)
+                out['P'][t]=r['P_RAIN_1_1_1']
             out['TA'][t]=num(r['TA_F']) if is_qc(r['TA_F_QC'],0) else float('nan')
     br.check(path,JF2024_YMS[1]);return out
 
