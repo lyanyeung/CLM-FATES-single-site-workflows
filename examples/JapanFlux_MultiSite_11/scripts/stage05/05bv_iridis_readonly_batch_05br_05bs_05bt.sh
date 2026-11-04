@@ -29,7 +29,7 @@ for s in 05bp_six_site_meteorology_batch_READONLY.py 05bq_four_site_humidity_and
   nice -n 10 "$PY" -B "$s" --self-test
 done
 nice -n 10 "$PY" -B -m unittest discover -s "$D" -p 'test_05b[pqrst]*.py' 2>&1 | tail -4
-echo "OPERATOR_FILES_ON_DISK"; sha256sum "$BP_EVENTS" "$BQ_DIR/special_shadow_candidates_HOLD.tsv" "$BQ_DIR/summary_HOLD.json"
+echo "OPERATOR_FILES_ON_DISK (informational)"; sha256sum "$BP_EVENTS" "$BQ_DIR/special_shadow_candidates_HOLD.tsv" "$BQ_DIR/summary_HOLD.json" || echo "WARN: an operator 05BP/05BQ file is missing at the recorded path"
 echo "STEP 05BR"; nice -n 10 "$PY" -B 05br_nine_site_jpf_forcing_variable_qc_READONLY.py --root "$ROOT" --layout iridis --out "$RUN/05br" 2>&1 | tee "$RUN/05br.log"
 echo "STEP 05BS"; nice -n 10 "$PY" -B 05bs_tom_tgf_humidity_tiny_negative_isolated_forensics_READONLY.py --root "$ROOT" --layout iridis --out "$RUN/05bs" 2>&1 | tee "$RUN/05bs.log"
 echo "STEP 05BT COMPANION"; nice -n 10 "$PY" -B 05bt_45_field_companion_artifacts_and_era_lag_sensitivity_READONLY.py companion --artifact-tsv "$RUN/05br/era_artifact_windows_all_F_fields_HOLD.tsv" --out "$RUN/05bt_companion" 2>&1 | tee "$RUN/05bt_companion.log"
