@@ -1,0 +1,61 @@
+site,product,description,unit,centre,window3x3_min,window3x3_max,window3x3_n,row,col,lat,lon,url,status
+AU-ASM,BDTICM,absolute depth to bedrock,cm,2879,2754,2879,9,51015,150359,-22.2828,133.2493,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+AU-Cow,BDTICM,absolute depth to bedrock,cm,796,559,1369,9,48113,156205,-16.23819,145.42715,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+AU-Cpr,BDTICM,absolute depth to bedrock,cm,4350,4011,4561,9,56640,153882,-34.0027,140.5877,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+AU-DaS,BDTICM,absolute depth to bedrock,cm,3582,3233,3582,9,47116,149466,-14.1592,131.3881,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+AU-Dry,BDTICM,absolute depth to bedrock,cm,3345,2853,3498,9,47643,149937,-15.2588,132.3706,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+AU-Gin,BDTICM,absolute depth to bedrock,cm,3808,3357,4351,9,55380,141942,-31.376351,115.71377,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+AU-How,BDTICM,absolute depth to bedrock,cm,4825,4606,4825,9,46317,149352,-12.4952,131.15005,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+AU-Stp,BDTICM,absolute depth to bedrock,cm,4033,3951,4367,9,48551,150408,-17.1507,133.3502,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+AU-Tum,BDTICM,absolute depth to bedrock,cm,262,52,278,9,57434,157512,-35.6566,148.1516,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+JP-Api,BDTICM,absolute depth to bedrock,cm,4202,4045,4318,9,21118,154049,40.00135858,140.9365859,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+JP-Fhk,BDTICM,absolute depth to bedrock,cm,1605,1461,1649,9,23306,153007,35.4435557694444,138.764693061111,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+JP-Fjy,BDTICM,absolute depth to bedrock,cm,1615,1447,1730,9,23301,153005,35.45454,138.76225,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+JP-Khw,BDTICM,absolute depth to bedrock,cm,1347,1111,1620,9,24414,149140,33.13658,130.70834,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+JP-Spp,BDTICM,absolute depth to bedrock,cm,1965,1830,2708,9,19685,154264,42.986843,141.385331,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+JP-Tak,BDTICM,absolute depth to bedrock,cm,2040,1658,2226,9,22969,152363,36.14616667,137.4231111,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+JP-Tef,BDTICM,absolute depth to bedrock,cm,1848,1628,1944,9,18692,154611,45.055808,142.107122,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+JP-Tgf,BDTICM,absolute depth to bedrock,cm,1110,1110,1762,9,22985,153645,36.11353,140.09488,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+JP-Tmd,BDTICM,absolute depth to bedrock,cm,1739,1736,1961,9,19806,154331,42.735911,141.523147,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+JP-Tom,BDTICM,absolute depth to bedrock,cm,1977,1939,2152,9,19824,154354,42.698906,141.571488,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+JP-Yms,BDTICM,absolute depth to bedrock,cm,1148,1043,1175,9,23620,151603,34.790278,135.840939,https://files.isric.org/soilgrids/former/2017-03-10/data/BDTICM_M_250m_ll.tif,OK
+AU-ASM,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,176,172,200,9,51015,150359,-22.2828,133.2493,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+AU-Cow,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,152,125,172,9,48113,156205,-16.23819,145.42715,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+AU-Cpr,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,200,200,200,9,56640,153882,-34.0027,140.5877,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+AU-DaS,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,200,200,200,9,47116,149466,-14.1592,131.3881,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+AU-Dry,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,200,198,200,9,47643,149937,-15.2588,132.3706,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+AU-Gin,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,200,199,200,9,55380,141942,-31.376351,115.71377,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+AU-How,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,200,200,200,9,46317,149352,-12.4952,131.15005,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+AU-Stp,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,200,200,200,9,48551,150408,-17.1507,133.3502,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+AU-Tum,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,200,200,200,9,57434,157512,-35.6566,148.1516,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+JP-Api,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,174,169,182,9,21118,154049,40.00135858,140.9365859,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+JP-Fhk,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,185,180,191,9,23306,153007,35.4435557694444,138.764693061111,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+JP-Fjy,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,198,190,200,9,23301,153005,35.45454,138.76225,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+JP-Khw,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,200,192,200,9,24414,149140,33.13658,130.70834,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+JP-Spp,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,192,188,200,9,19685,154264,42.986843,141.385331,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+JP-Tak,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,180,174,187,9,22969,152363,36.14616667,137.4231111,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+JP-Tef,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,156,156,175,9,18692,154611,45.055808,142.107122,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+JP-Tgf,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,200,200,200,9,22985,153645,36.11353,140.09488,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+JP-Tmd,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,189,185,199,9,19806,154331,42.735911,141.523147,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+JP-Tom,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,194,182,194,9,19824,154354,42.698906,141.571488,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+JP-Yms,BDRICM,depth to R horizon within 0-200 cm (200 = none),cm,200,194,200,9,23620,151603,34.790278,135.840939,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif,OK
+AU-ASM,BDRLOG,probability of R horizon within 0-200 cm,%,33,32,35,9,51015,150359,-22.2828,133.2493,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+AU-Cow,BDRLOG,probability of R horizon within 0-200 cm,%,39,28,46,9,48113,156205,-16.23819,145.42715,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+AU-Cpr,BDRLOG,probability of R horizon within 0-200 cm,%,28,23,36,9,56640,153882,-34.0027,140.5877,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+AU-DaS,BDRLOG,probability of R horizon within 0-200 cm,%,13,11,14,9,47116,149466,-14.1592,131.3881,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+AU-Dry,BDRLOG,probability of R horizon within 0-200 cm,%,21,19,36,9,47643,149937,-15.2588,132.3706,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+AU-Gin,BDRLOG,probability of R horizon within 0-200 cm,%,24,23,26,9,55380,141942,-31.376351,115.71377,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+AU-How,BDRLOG,probability of R horizon within 0-200 cm,%,10,10,14,9,46317,149352,-12.4952,131.15005,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+AU-Stp,BDRLOG,probability of R horizon within 0-200 cm,%,3,3,5,9,48551,150408,-17.1507,133.3502,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+AU-Tum,BDRLOG,probability of R horizon within 0-200 cm,%,20,19,22,9,57434,157512,-35.6566,148.1516,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+JP-Api,BDRLOG,probability of R horizon within 0-200 cm,%,34,31,36,9,21118,154049,40.00135858,140.9365859,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+JP-Fhk,BDRLOG,probability of R horizon within 0-200 cm,%,31,28,34,9,23306,153007,35.4435557694444,138.764693061111,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+JP-Fjy,BDRLOG,probability of R horizon within 0-200 cm,%,29,27,31,9,23301,153005,35.45454,138.76225,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+JP-Khw,BDRLOG,probability of R horizon within 0-200 cm,%,20,16,23,9,24414,149140,33.13658,130.70834,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+JP-Spp,BDRLOG,probability of R horizon within 0-200 cm,%,33,33,39,9,19685,154264,42.986843,141.385331,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+JP-Tak,BDRLOG,probability of R horizon within 0-200 cm,%,40,38,43,9,22969,152363,36.14616667,137.4231111,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+JP-Tef,BDRLOG,probability of R horizon within 0-200 cm,%,45,38,48,9,18692,154611,45.055808,142.107122,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+JP-Tgf,BDRLOG,probability of R horizon within 0-200 cm,%,12,9,16,9,22985,153645,36.11353,140.09488,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+JP-Tmd,BDRLOG,probability of R horizon within 0-200 cm,%,38,29,40,9,19806,154331,42.735911,141.523147,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+JP-Tom,BDRLOG,probability of R horizon within 0-200 cm,%,33,27,34,9,19824,154354,42.698906,141.571488,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK
+JP-Yms,BDRLOG,probability of R horizon within 0-200 cm,%,22,22,26,9,23620,151603,34.790278,135.840939,https://files.isric.org/soilgrids/former/2017-03-10/data/BDRLOG_M_250m_ll.tif,OK

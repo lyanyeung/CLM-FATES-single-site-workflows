@@ -21,8 +21,8 @@ The observation run comes after it:
 | # | Input | Spin-up (as run; Stage01) | Observation run (decided) | Evidence |
 | --- | --- | --- | --- | --- |
 | 1 | **Initial state** | cold start → AD400 → NORMAL400 | **Hybrid start from the final NORMAL400 restart** (model year Y+800). This is the same mechanism as the AD400 → NORMAL400 hand-off ([Batch03 script 14](https://github.com/lyanyeung/Non-Competition-CLM-experiment/blob/main/examples/Batch03_10/scripts/14_batch03_AD400_to_NORMAL400.py)): `create_clone --keepexe` of the NORMAL400 case; `RUN_TYPE=hybrid`; `RUN_REFCASE` = the NORMAL400 case; `RUN_REFDATE` = Y+800-01-01; `GET_REFCASE=FALSE`; the restart set is copied (SHA-checked) into the new RUNDIR with rpointers; `finidat` is set explicitly. `RUN_STARTDATE` = 1 January of the first forcing year | <ul><li>The last restart set holds `clm2.r`, `cpl.r`, `datm.r`, `rh0a/rh0i` and three rpointers. `spinup_state` = 0. The land restart has 220 FATES variables.</li><li>FATES phenology counts days with its own counter, `fates_phen_model_date`, which is kept in the restart. So the calendar jump from Y+800 to the real year does not disturb leaf-on / leaf-off timing.</li></ul> |
-| 2 | **Model configuration** | `2000_DATM%1PT_CLM60%FATES…`, `CLM_NML_USE_CASE=2000_control`, `suplnitro='ALL'`, `fates_parteh_mode='carbon_only'`, `use_lch4`, nocomp + fixed biogeography | **Identical.** `create_clone --keepexe` keeps the executable, SourceMods, surface, FATES parameter file and every namelist value. Only rows 3–6 change. The 2000 compset brings no transient land use or deposition | Stage02 diffs the generated `lnd_in` / `datm_in` / streams against the template |
-| 3 | **Forcing** | The site DATM files cycled (`taxmode=cycle`); model calendar Y…Y+800 | The same files and stream settings (`year_first` / `year_last` / `year_align`). `RUN_STARTDATE` = `year_first`-01-01, so model year = data year. `STOP_N` = number of forcing years: one pass | Stage02: met stream unchanged |
+| 2 | **Model configuration** | `2000_DATM%1PT_CLM60%FATES…`, `CLM_NML_USE_CASE=2000_control`, `suplnitro='ALL'`, `fates_parteh_mode='carbon_only'`, `use_lch4`, nocomp + fixed biogeography | **Identical.** `create_clone --keepexe` keeps the executable, SourceMods, surface, FATES parameter file and every namelist value. Only rows 3–6 change. The 2000 compset brings no transient land use or deposition. **`use_bedrock` (operator decision 4 Nov 2026):** `.true.` only at AU-ASM, whose spin-up carries the [SurfaceFields](../OzFlux_JapanFlux_SurfaceFields/) `zbedrock`; its observation run must keep it (re-verify in `lnd_in`). The other 19 OzFlux / JapanFlux sites keep the default `.false.`. The observation run always uses the same setting as its own spin-up | Stage02 diffs the generated `lnd_in` / `datm_in` / streams against the template |
+| 3 | **Forcing** | The site DATM files cycled (`taxmode=cycle`); model calendar Y…Y+800. **Years (operator decision 4 Nov 2026):** all complete calendar years of the tower record, as in the 78 AmeriFlux / ICOS spin-ups ([below](#spin-up-forcing-years-operator-decision-4-nov-2026)) | The same files and stream settings (`year_first` / `year_last` / `year_align`). `RUN_STARTDATE` = `year_first`-01-01, so model year = data year. `STOP_N` = number of forcing years: one pass | Stage02: met stream unchanged |
 | 4 | **CO₂** | Constant: `CLM_CO2_TYPE=constant`, `CCSM_CO2_PPMV` = NOAA global mean of the first forcing year (e.g. AT-Neu 2002 = 372.58) | **Transient NOAA global annual mean**, from the [same NOAA file](data/NOAA_GML_co2_annmean_gl_rev20261009.csv) as the spin-up values (revision 9 Oct 2026, SHA256 `d82714c8…`, 1979–2025). Settings: `CLM_CO2_TYPE=diagnostic`, `CCSM_BGC=CO2A`, `DATM_CO2_TSERIES=cmip6_20tr`, and `user_nl_datm_streams` points `co2tseries.cmip6_20tr` at the NOAA stream file (1979–2025). `CCSM_BGC` matters: a `_DATM` compset defaults to `none`, and without `CO2A` the mediator does not pass `Sa_co2diag` and CLM aborts | Pinned source (CTSM `d5ea9d01`, CDEPS `cdeps1.0.105`, CMEPS `cmeps1.1.64`, FATES `121723f6`):<ul><li>`CCSM_BGC=CO2A` → `flds_co2a`;</li><li>`DATM_CO2_TSERIES` ≠ none → datm `flds_co2` and the co2tseries stream;</li><li>CLM `diagnostic` requires `Sa_co2diag`;</li><li>the stream override reaches the input-data list.</li></ul>Stage02 repeats these checks on IRIDIS |
 | 5 | **N / aerosol / O₃ deposition** | DATM streams `presndep.clim_2000_cmip6`, `presaero.clim_2000`, `preso3.clim_2000` (year-2000 climatology) | **Keep, unchanged.** With `suplnitro='ALL'` and carbon-only FATES, N deposition cannot change carbon; aerosol deposition only affects snow albedo. A transient-deposition sensitivity run is therefore not needed | Stage01 |
 | 6 | **Output** | One **daily** tape (`hist_nhtfrq=-24`, 365 per file): `TOTSOMC TOTSOMN TLAI FATES_GPP FATES_NPP TWS H2OSNO` | Two tapes, [below](#output-tapes) | Stage02 checks every field name, and the update frequency of the half-hourly FATES fields |
@@ -82,6 +82,11 @@ Stage02 writes `experiments/NonCompetitionObserved22/co2_adopted/fco2_datm_globa
 - GPP and ecosystem respiration separately.
 - The annual NEE sum mainly tests the equilibrium assumption. This applies most to the regrowth stands: JP-Tef (clear-cut 2003), JP-Tmd (windthrow) and JP-Fhk (plantation).
 
+The published sink at each tower, and how far each stand is from equilibrium, are tabulated in [OzFlux_JapanFlux_CarbonStocks](../OzFlux_JapanFlux_CarbonStocks/OZ_JP_CARBON_STATE_20_SITES_20261103.md):
+- 6 sites are quasi-steady;
+- 12 are aggrading sinks of −200 to −900 g C m⁻² yr⁻¹;
+- JP-Tef and JP-Tmd are recovering sources inside their evaluation windows.
+
 ### Soil and surface
 
 - The observation run must use the spin-up surface; `create_clone --keepexe` guarantees this.
@@ -99,15 +104,15 @@ The full table is [OZ_JP_POST_SPINUP_SITE_PLAN_20261103.csv](data/OZ_JP_POST_SPI
 
 | Site | Fixed PFT state | Evaluation window | Forcing / spin-up (3 Nov) | Expected rules class |
 | --- | --- | --- | --- | --- |
-| AU-ASM | Mulga, pre-dieback | 2013–2017 (2018 run, not evaluated) | DATM 2013–2018 built; AD400 case not created | UNCHANGED |
+| AU-ASM | Mulga, pre-dieback | 2013–2017 (2011–2012 and 2018–2022 run, not evaluated) | Spin-up years Mulga1 2011–2022 (decided 4 Nov); DATM 2013–2018 built so far; AD400 case not created | UNCHANGED |
 | AU-Cow | Rainforest | 2009–2022 | not built | UNCHANGED |
 | AU-Cpr | Mallee, pre-fire | 2011–2013 (L6 starts 30 Jul 2010) | not built | UNCHANGED |
 | AU-DaS | Uncleared savanna | 2008–2021 | candidate 2009–2021 | UNCHANGED |
 | AU-Dry | Savanna | 2010–2024 within the forcing years (candidate 2010–2018) | candidate 2010–2018 | UNCHANGED |
-| AU-Gin | Banksia woodland | 2012–2022 (L6 starts 13 Oct 2011) | not built | UNCHANGED |
+| AU-Gin | Banksia woodland | 2012–2022 (L6 starts 13 Oct 2011); the 2016 fuel-reduction burn falls inside the window | not built | UNCHANGED |
 | AU-How | Savanna (fire part of the state) | 2002–2025 (L6 starts 1 Jan 2002) | not built | UNCHANGED |
 | AU-Stp | Mitchell grassland | 2009–2025 (L6 starts 28 Aug 2008) | not built | UNCHANGED |
-| AU-Tum | Wet eucalypt forest, pre-fire | 2003–2019 (L6 starts 7 Jan 2002) | not built | UNCHANGED |
+| AU-Tum | Wet eucalypt forest, pre-fire | 2003–2019 (L6 starts 7 Jan 2002); flag the 2004 footprint logging and the 2006–09 partial logging | not built | UNCHANGED |
 | JP-Api | Beech | 2000–2022 (flag 2007) | not built | NEEDS_PHENOLOGY_PATCH |
 | JP-Fhk | Larch, pre-thinning | 2006–2013 | not built | NEEDS_PATCH_AND_F |
 | JP-Fjy | Red pine on lava | 2001–2021 | not built | NEEDS_NEEDLELEAF_F |
@@ -118,7 +123,36 @@ The full table is [OZ_JP_POST_SPINUP_SITE_PLAN_20261103.csv](data/OZ_JP_POST_SPI
 | JP-Tgf | Mown C3/C4 grassland | 2002–2022 | not built | UNCHANGED |
 | JP-Tmd | Windthrow regrowth | 2005–2014 and 2015–2023 separately | not built | NEEDS_PHENOLOGY_PATCH |
 | JP-Tom | Deciduous broadleaf | 1999–2013 (check the second tower) | not built | NEEDS_PHENOLOGY_PATCH |
-| JP-Yms | Oak-dominated secondary forest | 2000–2023 | not built | NEEDS_PATCH_AND_F |
+| JP-Yms | Oak-dominated secondary forest | 2000–2014 and 2015–2023 separately (oak wilt 2015–16 killed ~10 % of biomass) | not built | NEEDS_PATCH_AND_F |
+
+### Spin-up forcing years (operator decision 4 Nov 2026)
+
+**Rule.** The spin-up cycles **all complete calendar years of the tower record**, as the 5 AmeriFlux and 4 ICOS batches did. For example, CA-TP4 cycles 2002–2023 and AT-Neu 2002–2020. The observation run then runs the same years once, and only the evaluation window above is scored.
+
+**AU-ASM:**
+- **Years.** The Mulga1 record runs 2010-09-03 to 2023-03-08, so the spin-up years are **2011–2022** (12 years). The partial years 2010 and 2023 are left out.
+- **Current state.** Only 2013–2018 exist as provisional DATM, and only those six years have been through the forcing-science QC (Non-Competition-CLM-experiment PR #65). The QC and DATM must be extended to 2011–2012 and 2019–2022.
+- **Structural gate.** In OzFlux_MultiSite_09 Stage07/08, the years 2011, 2012 and 2019 did not pass the structural gate. Their reasons are in the Stage08 ledger. These years need review, not silent exclusion. Any year that cannot be made usable comes back as an operator decision.
+
+**Mulga1 and Mulga2.** The global attributes of the TERN 2026_v2 L6 files `AliceSpringsMulga1_20100903T0000_to_20230308T0900_L6.nc` and `AliceSpringsMulga2_20240821T0700_to_20260423T0000_L6.nc` were read through OPeNDAP on 4 Nov 2026.
+
+| | Mulga1 | Mulga2 |
+| --- | --- | --- |
+| Latitude / longitude | −22.2828 / 133.2493 | same |
+| Elevation, tower height, canopy height | 606 m, 13.7 m, 4.4 m | same |
+| Site name, soil, vegetation descriptions | AliceSpringsMulga; red kandosol; mulga + three understorey types | same |
+| Time zone | Australia/Darwin | same |
+| Site PI | J. Cleverly | A. Griebel |
+| Title | calendar year 2023 | "calendar year 2025 post logger change 10/04/2025" |
+| Coverage | 2010-09-03 → 2023-03-08 | 2024-08-21 → 2026-04-23 |
+
+**What this shows:**
+- **Same site.** By its metadata, Mulga2 is the same site at the same tower position, not a second tower.
+- **The metadata may be copied.** Both files carry `history` = "June 2021 processing", which suggests the attributes are reused, so this does not exclude a small move.
+- **Separate record.** Mulga2 follows a 17.5-month gap, a change of PI and a logger change. It also measures the stand after the 2018–2020 dieback, which TERN's new 2025/26 census plot also describes.
+- **Use.** Mulga2 stays outside the spin-up cycle, which would otherwise jump across the gap. It is not in the pre-dieback evaluation either.
+
+**AU-DaS needs a decision.** Its record runs 2008-01-01 to 2026-04-23, but the tower area was cleared for crop development in November 2022. "All complete years" would therefore include 2023–2025 forcing measured over cleared land. The choice is between ending the spin-up at 2022 and following the rule literally.
 
 **Expected rules class.** This comes from the [maintenance rules](https://github.com/lyanyeung/Non-Competition-CLM-experiment/blob/main/maintenance/RULES_FOR_NEW_CASES.md):
 

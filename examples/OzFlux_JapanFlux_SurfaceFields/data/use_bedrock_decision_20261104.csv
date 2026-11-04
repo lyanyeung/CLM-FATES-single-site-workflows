@@ -1,0 +1,21 @@
+site,use_bedrock_baseline,zbedrock_in_surface_m,zbedrock_tier,baseline_soil_bottom_m,optional_sensitivity,sensitivity_soil_bottom_m,reason
+AU-ASM,.true.,1.0,T1_SITE_RESTRICTIVE_LAYER,1.20,,,Siliceous hardpan at ~1 m under the tower with a perched reservoir; matches CLM's zero-flux base
+AU-Cow,.false.,8.6,T1_LOWER_BOUND,8.60,,,FATES default; no restricting layer documented
+AU-Cpr,.false.,8.6,T1_LOWER_BOUND,8.60,,,FATES default; no restricting layer documented
+AU-DaS,.false.,8.6,T1_LOWER_BOUND,8.60,,,FATES default; no restricting layer documented
+AU-Dry,.false.,8.6,ATLAS_ONLY_LOW,8.60,,,FATES default; no restricting layer documented
+AU-Gin,.false.,8.6,T1_DEEP,8.60,,,FATES default; deep sand with roots to ~9 m
+AU-How,.false.,8.6,T1_DEEP,8.60,,,FATES default; roots to 9-10 m
+AU-Stp,.false.,8.6,ATLAS_ONLY_LOW,8.60,,,FATES default; no restricting layer documented
+AU-Tum,.false.,8.6,T1_LOWER_BOUND,8.60,,,FATES default; no restricting layer documented
+JP-Api,.false.,8.6,NO_DEPTH_EVIDENCE,8.60,,,FATES default; no depth evidence
+JP-Fhk,.false.,8.6,NO_DEPTH_EVIDENCE,8.60,,,FATES default; no depth evidence
+JP-Fjy,.false.,0.4,T2_SITE_DESCRIPTION,8.60,use_bedrock = .true.,0.48,Fissured permeable lava; a zero-flux base at 0.48 m is not established
+JP-Khw,.false.,8.6,NO_DEPTH_EVIDENCE,8.60,,,FATES default; no depth evidence
+JP-Spp,.false.,8.6,NO_DEPTH_EVIDENCE,8.60,,,FATES default; no depth evidence
+JP-Tak,.false.,8.6,T1_LOWER_BOUND,8.60,,,FATES default; no restricting layer documented
+JP-Tef,.false.,0.6,T2_SITE_PROFILE,8.60,use_bedrock = .true.,0.68,~0.6 m of soil over sedimentary rock; rock contact not stated
+JP-Tgf,.false.,8.6,T1_LOWER_BOUND,8.60,,,FATES default; no restricting layer documented
+JP-Tmd,.false.,0.45,T2_NEAR,8.60,use_bedrock = .true.,0.48,Permeable pumice; evidence from nearby profiles; a zero-flux base at 0.48 m is not established
+JP-Tom,.false.,0.55,T2_NEAR,8.60,use_bedrock = .true.,0.68,Permeable pumice with roots to 0.55 m; a zero-flux base at 0.68 m is not established
+JP-Yms,.false.,8.6,T2_SITE_DESCRIPTION,8.60,,,FATES default; thin sandy soil on root-permeable weathering granite
