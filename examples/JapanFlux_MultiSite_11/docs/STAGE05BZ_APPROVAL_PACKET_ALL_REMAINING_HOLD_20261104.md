@@ -95,3 +95,14 @@ EOF
 bash "$D/05ca_iridis_readonly_batch_05bw_05bz.sh" "$D" 2>&1 | tee "$HOME/japanflux_stage05ca/console_${C:0:12}.log"
 sha256sum "$HOME/japanflux_stage05ca/console_${C:0:12}.log"
 ```
+
+## 6. IRIDIS Stage05CA 实际结果（2026-11-05，操作员日志）
+
+运行环境为 `login6003`（Python 3.10.21），运行目录 `/home/ly3n24/japanflux_stage05ca/run_20261105T030635Z_2576314`，控制台日志 SHA-256 为 `51395a5ec69fc1525daea7dce2d4ae656c5111ddcedcad38e1ee8dc97bf916aa`。10 个脚本的 SHA-256 均核对通过，self-test 与 17 项单元测试通过。**4 项检查全部为 true**：
+
+- 05BW 的 D2 恰为 5,099 个单元格。
+- 05BW 指纹 `ea5951e5…` 与本地一致。Yms 影子表 `1b79b4df…` 和摘要 `1cdddf21…` 与本地逐字节相同。
+- **05BZ 的 45 个 D8 值与 IRIDIS 上的 05BT 偏移表（`070732bc…`）逐值核对一致**。
+- 05BZ 指纹 `9bc3512d…` 与本地一致。12 张候选表的 gzip 字节和审批清单 `5a7d8551…` 都与本地相同。摘要文件（`8aff419b…`）与本地不同，原因是其中“D8 已核对”标志在 IRIDIS 为 true、本地为 false，该标志不参与指纹计算。
+
+终检结果与本地相同：只剩 Khw 2008-08-17 那次 52 mm 雷暴（保留），以及 Tgf 的 23,073 个夜间或低太阳负短波（构建时截零）。**所有候选值仍为 NOT_APPROVED，等待用户审批。**
