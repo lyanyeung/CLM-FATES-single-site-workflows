@@ -106,3 +106,7 @@ sha256sum "$HOME/japanflux_stage05ca/console_${C:0:12}.log"
 - 05BZ 指纹 `9bc3512d…` 与本地一致。12 张候选表的 gzip 字节和审批清单 `5a7d8551…` 都与本地相同。摘要文件（`8aff419b…`）与本地不同，原因是其中“D8 已核对”标志在 IRIDIS 为 true、本地为 false，该标志不参与指纹计算。
 
 终检结果与本地相同：只剩 Khw 2008-08-17 那次 52 mm 雷暴（保留），以及 Tgf 的 23,073 个夜间或低太阳负短波（构建时截零）。**所有候选值仍为 NOT_APPROVED，等待用户审批。**
+
+## 7. 审批（2026-11-05）
+
+用户回复“批准，下一步怎么做”，**全部建议获批准**。Stage05CB 已把 145,855 个单元格的标签改为 `APPROVED_20261105_<规则>`，数值不变。见 [Stage05CB/06A](STAGE05CB_06A_APPROVED_TABLES_AND_UTC_DATM_CANDIDATES_20261105.md)。
