@@ -108,3 +108,8 @@
 | `test_06c_humidity_clock.py`（E1A/E1B/E1C 判定与非目标单元格不变） | 合成 | 3/3；stage06 合计 8/8 |
 | 06C 读取 05CB 表与原件 | **本地真实** | 指纹 `e4340c01…` |
 | IRIDIS 复现（Stage06D） | **待运行** | 硬检查：4 个确认窗口；指纹与本地一致；另报告 06B 的 QBOT 与文件字节是否与本地相同（仅供参考） |
+
+## 6. 审批（2026-11-05）
+
+- IRIDIS Stage06D：运行目录 `run_20261105T183840Z_717241`，控制台日志 `fd19519d…`。两项检查均为 true，8 个输出文件与本地逐字节相同。
+- 用户批准 F1–F3，F4 保留并记录。定稿见 [Stage06E–06I](STAGE06E_06I_APPROVED_E_TABLES_DATM_AND_TA_ANOMALY_PROPOSALS_20261105.md)。
