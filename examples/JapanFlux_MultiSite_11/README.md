@@ -1,5 +1,17 @@
 # JapanFlux MultiSite 11 — CLM-FATES single-site workflow (new experiment)
 
+> **Stage06J–06K (2026-11-07): G2 approved, DATM from every approved decision.**
+> - IRIDIS Stage06G ran twice and passed 8/8 both times. The user approved G1 (Tgf forcing years 2004–2022), G2A, G2B and R (other TA departures kept).
+> - **Correction:** Stage06I had written its 2,948 proposed TA values as `np.float64(x)` text. The Stage06A missing-value guard stopped the build before any of them reached the forcing. The corrected Stage06I has identical rows, cells, rules and episodes, and both 06I and 06J now check that every value reads back as a finite number.
+> - Stage06J approves the 5,904 G2 rows cell by cell. Stage06K builds 215 yearly UTC NOLEAP files (Tgf 2004–2022) through the unchanged Stage06A checks. Data differ from Stage06F only in TBOT/QBOT of the site-years with G2 cells and in the Tgf 2022 cycle wrap.
+> - All 11 sites now have approved decisions for every issue found so far; the remaining limits are recorded in the attributes.
+> - **Stage06M** screens LW_IN, SW_IN, VPD, WS and PA. All of the following are NOT APPROVED:
+>   - H1–H4 proposals: 364 episodes, 1,589 rows (physically impossible LW/SW, MDS fills that depart from the reference, short PA faults).
+>   - I1, systematic LW site-years: Spp 2002–03 reads +42 W m⁻²; Tef 2002/04/05 winter emissivity is below the clear-sky minimum.
+>   - I2, recurring night SW: Yms 2009, Tak 1999, and Fjy autumn 2021 (with PA jumps).
+>
+> These are local runs. One IRIDIS batch, `06l_iridis_batch_06i_06j_06k_06m.sh`, runs 06I, 06J, 06K and 06M. No stream is activated. See [Stage06J–06K](docs/STAGE06J_06K_G2_APPROVED_TABLES_AND_DATM_20261107.md) and [Stage06M](docs/STAGE06M_OTHER_VARIABLE_SCREEN_PROPOSALS_20261107.md).
+
 > **Stage06E–06I (2026-11-05): E rules approved, DATM rebuilt, new proposals G1/G2 NOT APPROVED.**
 > - IRIDIS Stage06D reproduced Stage06C byte for byte, and the user approved F1–F4.
 > - Stage06E applies the 160,285 approval-list rows cell by cell (Tgf cells moved by E2 and then replaced by E1 carry both tags) and copies the 7 unchanged tables byte for byte.

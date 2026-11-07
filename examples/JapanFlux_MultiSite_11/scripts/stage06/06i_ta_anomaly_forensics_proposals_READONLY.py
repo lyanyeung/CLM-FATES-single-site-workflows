@@ -87,6 +87,12 @@ def classify(ep):
     if warm_saturated:return 'REVIEW_WARM_SATURATED'                     # long: mountain cloud or fog is possible
     return 'REVIEW_ONLY'
 
+def value(x):
+    """Proposed value as table text; must read back as the same finite number."""
+    s=bw.fmt(float(x))
+    if not math.isfinite(num(s)) or num(s)!=round(float(x),6):raise ValueError('proposed value does not read back: %r'%s)
+    return s
+
 def dew_vpd(ta,vpd,formula):
     e=br.es(ta,formula)-vpd
     return c6.dew(e) if e>0 else float('nan')
@@ -122,8 +128,9 @@ def run(a):
                 if not ep['proposed']:continue
                 rule=ep['class']+'_'+label;ev='episode %s..%s peak a %+.1f C'%(ep['first'],ep['last'],ep['peak_anomaly'])
                 for k in range(i,j):
-                    t.put(k,'TA_F',bw.fmt(tr[k]),rule,ev);t.put(k,'VPD_F',bw.fmt(ref[k][1]),rule,ev)
-                    if 'RH_F' in t.col:t.put(k,'RH_F',bw.fmt(ref[k][2]),rule,ev)
+                    # float(): repr of a NumPy scalar is 'np.float64(...)', which reads back as missing
+                    t.put(k,'TA_F',value(tr[k]),rule,ev);t.put(k,'VPD_F',value(ref[k][1]),rule,ev)
+                    if 'RH_F' in t.col:t.put(k,'RH_F',value(ref[k][2]),rule,ev)
                     proposed+=1
             identical=all(b[c]==r[c] for b,r in zip(before,rows) for v in variables for c in (t.col[v],t.qcc[v],t.tagc[v]) if not r[t.tagc[v]].startswith('PROPOSED_G2'))
             if not identical:raise ValueError('a cell changed without a proposal in '+key)
@@ -157,7 +164,12 @@ def selftest():
     assert classify(ep(peak_anomaly=9.,peak_RH=97.))=='G2A_SHORT_TA_FAULT' and classify(ep(peak_anomaly=-9.,peak_RH=97.))=='REVIEW_ONLY'
     assert classify(ep(hours=2.5))=='REVIEW_ONLY' and classify(ep(hours=10.,peak_anomaly=9.,peak_RH=99.))=='REVIEW_WARM_SATURATED'
     assert classify(ep(n_QC0=0,hours=40.))=='G2B_GAPFILL_DEPARTS' and classify(ep(reference_complete=False,n_QC0=0))=='REVIEW_REFERENCE_INCOMPLETE'
-    print('STAGE06I SELF-TEST PASS: slot-of-day baseline, episode runs, episode classes; NO FILES')
+    assert value(np.float64(-6.5751))=='-6.5751' and value(np.array([12.25])[0])=='12.25' and value(3)=='3.0'
+    for bad in (np.nan,np.inf):
+        try:value(bad)
+        except ValueError:pass
+        else:raise AssertionError('non-finite proposal accepted')
+    print('STAGE06I SELF-TEST PASS: slot-of-day baseline, episode runs, episode classes, proposed values read back; NO FILES')
 
 def main():
     p=argparse.ArgumentParser(description=__doc__,formatter_class=argparse.RawDescriptionHelpFormatter)
